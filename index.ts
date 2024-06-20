@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import ora from 'ora';
 import { exec } from 'node:child_process';
+import { postSession, getSession, generateValidationString } from './login';
 
 const program = new Command();
 
@@ -9,36 +10,6 @@ program
     .description('San Francisco Compute command line tool')
     .version('1.0.0');
 
-async function postSession(props: {
-    host: string
-}) {
-    function generateValidationString() {
-        const getRandomNumber = () => Math.floor(Math.random() * 100);
-        return `${getRandomNumber()} ${getRandomNumber()} ${getRandomNumber()}`;
-    }
-
-    const validationString = generateValidationString();
-
-    const response = await fetch(`${props.host}/cli/session`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            validation: validationString
-        })
-    });
-    if (!response.ok) {
-        console.error("Response not ok", response.status, response.statusText)
-        console.error(await response.text())
-        return null
-    }
-
-    const body = await response.json() as {
-        url: string
-    };
-    return body;
-}
 
 program
     .command('login')
@@ -46,24 +17,35 @@ program
     .action(async () => {
         const spinner = ora('Logging in...').start();
 
-        const result = await postSession({ 'host': "http://localhost:3000" })
+        const validation = generateValidationString()
+        const result = await postSession({ 'host': "http://localhost:3000", validationString: validation })
         if (!result) {
             console.error('Failed to login')
             process.exit(1)
         }
-        const { url } = result;
+        const { url, token } = result;
         exec(`open ${url}`, (err) => {
             if (err) {
                 // console.error('Failed to open URL:', err);
             }
         });
 
-        console.log(`Open ${url}`)
+        process.stdout.write('\x1Bc');
+        console.log(`\n\n  Click here to login:\n  ${url}\n\n`)
+        console.log(`  Do these numbers match your browser window?\n  ${validation}\n\n`)
 
-        // Simulate login process
-        setTimeout(() => {
-            spinner.succeed('Logged in successfully');
-        }, 2000);
+
+        const checkSession = async () => {
+            const session = await getSession({ host: "http://localhost:3000", token: result.token });
+            if (session?.token) {
+                spinner.succeed('Logged in successfully');
+                console.log(`Session token: ${session.token}`);
+            } else {
+                setTimeout(checkSession, 100);
+            }
+        };
+
+        checkSession();
     });
 
 program.parse(Bun.argv);
