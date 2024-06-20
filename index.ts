@@ -40,7 +40,7 @@ program
 
                 await saveConfig({ token: session.token });
             } else {
-                setTimeout(checkSession, 100);
+                setTimeout(checkSession, 200);
             }
         };
 
