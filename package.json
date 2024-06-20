@@ -1,0 +1,15 @@
+{
+  "dependencies": { "commander": "^12.1.0", "ora": "^8.0.1" },
+  "name": "cli",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
