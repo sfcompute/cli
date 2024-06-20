@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import ora from 'ora';
 import { exec } from 'node:child_process';
 import { postSession, getSession, generateValidationString } from './login';
+import { loadConfig, saveConfig } from './config';
 
 const program = new Command();
 
@@ -24,11 +25,7 @@ program
             process.exit(1)
         }
         const { url, token } = result;
-        exec(`open ${url}`, (err) => {
-            if (err) {
-                // console.error('Failed to open URL:', err);
-            }
-        });
+        exec(`open ${url}`); // if this fails, that's okay 
 
         process.stdout.write('\x1Bc');
         console.log(`\n\n  Click here to login:\n  ${url}\n\n`)
@@ -40,6 +37,8 @@ program
             if (session?.token) {
                 spinner.succeed('Logged in successfully');
                 console.log(`Session token: ${session.token}`);
+
+                await saveConfig({ token: session.token });
             } else {
                 setTimeout(checkSession, 100);
             }

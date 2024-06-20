@@ -3,14 +3,10 @@ export function generateValidationString() {
     return `${getRandomNumber()} ${getRandomNumber()} ${getRandomNumber()}`;
 }
 
-
-
 export async function postSession(props: {
     host: string,
     validationString: string;
 }) {
-
-
     const response = await fetch(`${props.host}/cli/session`, {
         method: 'POST',
         headers: {
@@ -22,7 +18,6 @@ export async function postSession(props: {
     });
     if (!response.ok) {
         console.error("Response not ok", response.status, response.statusText)
-        console.error(await response.text())
         return null
     }
 
