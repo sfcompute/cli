@@ -1,18 +1,24 @@
 {
-	"dependencies": { "commander": "^12.1.0", "ora": "^8.0.1" },
-	"name": "cli",
-	"module": "index.ts",
-	"type": "module",
-	"scripts": {
-		"dev": "bun run index.ts",
-		"format": "biome format --write ./server",
-		"lint": "biome lint --apply ./server",
-		"check": "biome check ./server"
-	},
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	}
+  "dependencies": { "commander": "^12.1.0", "dotenv": "^16.4.5", "ora": "^8.0.1" },
+  "name": "cli",
+  "bin": {
+    "cli": "dist/cli.js"
+  },
+  "type": "module",
+  "module": "src/index.ts",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun bun src/index.ts --outfile dist/cli.js",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --write ./src",
+    "check": "biome check ./src",
+    "postbuild": "chmod +x dist/cli.js"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.2",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
 }

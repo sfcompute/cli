@@ -6,6 +6,12 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
+			"correctness": {
+        "noUnusedImports": "warn"
+      },
+			"suspicious": {
+        "noExplicitAny": "warn"
+      },
 			"recommended": true
 		}
 	}
