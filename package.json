@@ -1,18 +1,17 @@
 {
   "dependencies": { "commander": "^12.1.0", "dotenv": "^16.4.5", "ora": "^8.0.1" },
-  "name": "cli",
+  "name": "@sfc/cli",
   "bin": {
-    "cli": "dist/cli.js"
+    "sfc": "dist/cli.js"
   },
   "type": "module",
   "module": "src/index.ts",
   "scripts": {
-    "dev": "bun run src/index.ts",
-    "build": "bun bun src/index.ts --outfile dist/cli.js",
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check ./src",
-    "postbuild": "chmod +x dist/cli.js"
+    "dev": "bun run src/index.ts",
+    "pack": "bun build src/index.ts --outfile dist/cli.js"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
