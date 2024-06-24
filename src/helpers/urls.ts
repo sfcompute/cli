@@ -92,8 +92,8 @@ interface BaseUrlOptions {
 	suffix?: string;
 }
 const getBaseUrl = ({ host, port: _port, suffix }: BaseUrlOptions) => {
-  const protocol = env.isDevelopment ? "http" : "https";
-  const port = _port ? `:${_port}` : "";
+	const protocol = env.isDevelopment ? "http" : "https";
+	const port = _port ? `:${_port}` : "";
 
 	return `${protocol}://${host}${port}${suffix ? suffix : ""}`;
 };
@@ -102,9 +102,10 @@ const getBaseUrl = ({ host, port: _port, suffix }: BaseUrlOptions) => {
 
 export const WebPaths = {
 	cli: {
-    session: {
-      create: getWebappUrl({ path: "/cli/session" }),
-      get: ({token}: {token: string}) => getWebappUrl({ path: "/cli/session", queryParams: { token } }),
-    },
+		session: {
+			create: getWebappUrl({ path: "/cli/session" }),
+			get: ({ token }: { token: string }) =>
+				getWebappUrl({ path: "/cli/session", queryParams: { token } }),
+		},
 	},
 };

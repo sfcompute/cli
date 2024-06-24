@@ -2,8 +2,8 @@
 
 import { Command } from "commander";
 import { loadEnvironment } from "./environment";
-import { registerLogin } from "./lib/login";
 import { registerDev } from "./lib/dev";
+import { registerLogin } from "./lib/login";
 
 loadEnvironment(); // load .env → process.env
 const program = new Command();

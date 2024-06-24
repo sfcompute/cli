@@ -1,48 +1,50 @@
-import { Command } from "commander";
-import ora from "ora";
 import { exec } from "node:child_process";
-import { WebPaths } from "../helpers/urls";
+import type { Command } from "commander";
+import ora from "ora";
 import { saveConfig } from "../helpers/config";
+import { WebPaths } from "../helpers/urls";
 
 export function registerLogin(program: Command) {
-  program
-    .command("login")
-    .description("Login to the San Francisco Compute")
-    .action(async () => {
-      const spinner = ora("Logging in...").start();
-  
-      const validation = generateValidationString();
-      const result = await createSession({ validation });
-      if (!result) {
-        console.error("Failed to login");
-        process.exit(1);
-      }
-      const { url } = result;
-      exec(`open ${url}`); // if this fails, that's okay
-  
-      process.stdout.write("\x1Bc");
-      console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
-      console.log(
-        `  Do these numbers match your browser window?\n  ${validation}\n\n`,
-      );
-  
-      const checkSession = async () => {
-        const session = await getSession({ token: result.token });
-        if (session?.token) {
-          spinner.succeed("Logged in successfully");
-          console.log(`Session token: ${session.token}`);
-  
-          await saveConfig({ token: session.token });
-        } else {
-          setTimeout(checkSession, 200);
-        }
-      };
-  
-      checkSession();
-    });
+	program
+		.command("login")
+		.description("Login to the San Francisco Compute")
+		.action(async () => {
+			const spinner = ora("Logging in...").start();
+
+			const validation = generateValidationString();
+			const result = await createSession({ validation });
+			if (!result) {
+				console.error("Failed to login");
+				process.exit(1);
+			}
+			const { url } = result;
+			exec(`open ${url}`); // if this fails, that's okay
+
+			process.stdout.write("\x1Bc");
+			console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
+			console.log(
+				`  Do these numbers match your browser window?\n  ${validation}\n\n`,
+			);
+
+			const checkSession = async () => {
+				const session = await getSession({ token: result.token });
+				if (session?.token) {
+					spinner.succeed("Logged in successfully");
+					console.log(`Session token: ${session.token}`);
+
+					await saveConfig({ token: session.token });
+				} else {
+					setTimeout(checkSession, 200);
+				}
+			};
+
+			checkSession();
+		});
 }
 
-async function createSession({ validation }: {
+async function createSession({
+	validation,
+}: {
 	validation: string;
 }) {
 	const response = await fetch(WebPaths.cli.session.create, {
@@ -65,18 +67,17 @@ async function createSession({ validation }: {
 	return body;
 }
 
-async function getSession({token}: {
-	token: string
+async function getSession({
+	token,
+}: {
+	token: string;
 }) {
-	const response = await fetch(
-		WebPaths.cli.session.get({ token }),
-		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
+	const response = await fetch(WebPaths.cli.session.get({ token }), {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
 		},
-	);
+	});
 	if (!response.ok) {
 		return null;
 	}

@@ -12,6 +12,9 @@
 			"suspicious": {
         "noExplicitAny": "warn"
       },
+			"style": {
+				"useTemplate": "off"
+			},
 			"recommended": true
 		}
 	}
