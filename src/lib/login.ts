@@ -29,10 +29,9 @@ export function registerLogin(program: Command) {
 			const checkSession = async () => {
 				const session = await getSession({ token: result.token });
 				if (session?.token) {
-					spinner.succeed("Logged in successfully");
-					console.log(`Session token: ${session.token}`);
-
 					await saveConfig({ token: session.token });
+					spinner.succeed("Logged in successfully");
+					process.exit(0);
 				} else {
 					setTimeout(checkSession, 200);
 				}
@@ -79,6 +78,7 @@ async function getSession({
 		},
 	});
 	if (!response.ok) {
+		console.error("Response not ok", response.status, response.statusText);
 		return null;
 	}
 
