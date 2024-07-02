@@ -109,3 +109,23 @@ export const WebPaths = {
 		},
 	},
 };
+
+export const ApiPaths = {
+	credentials: {
+		create: getApiUrl({ path: "/v0/credentials" }),
+		list: getApiUrl({ path: "/v0/credentials" }),
+	},
+	instances: {
+		list: getApiUrl({ path: "/v0/instances" }),
+		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/instances/${id}` }),
+	},
+	contracts: {
+		list: getApiUrl({ path: "/v0/contracts" }),
+		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/contracts/${id}` }),
+	},
+	orders: {
+		create: getApiUrl({ path: "/v0/orders" }),
+		list: getApiUrl({ path: "/v0/orders" }),
+		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/orders/${id}` }),
+	},
+};

@@ -31,3 +31,13 @@ export async function loadConfig(): Promise<Config | null> {
 		return null;
 	}
 }
+
+export async function getToken() {
+	const config = await loadConfig();
+	return config?.token;
+}
+
+export async function getAuthorizationHeader() {
+	const token = await getToken();
+	return { Authorization: `Bearer ${token}` };
+}
