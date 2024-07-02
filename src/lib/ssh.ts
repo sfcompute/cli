@@ -74,7 +74,6 @@ export type SSHCredential = {
 	id: string;
 	pubkey: string;
 	username: string;
-	group_id: string;
 };
 
 export type CredentialObject = SSHCredential;
