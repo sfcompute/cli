@@ -70,6 +70,16 @@ async function compileDistribution() {
 	}
 }
 
+async function asyncSpawn(cmds: string[]) {
+	const result = Bun.spawn(cmds);
+
+	await result.exited;
+
+	return {
+		exitCode: result.exitCode,
+	};
+}
+
 async function createRelease(version: string) {
 	const distFiles = fs.readdirSync("./dist");
 	const zipFiles = distFiles
@@ -87,19 +97,24 @@ async function createRelease(version: string) {
 	}
 	console.log(`✅ Created GitHub release for version ${version}`);
 
-	const gitAddResult = await Bun.$`git add package.json`;
+	const gitAddResult = await asyncSpawn(["git", "add", "package.json"]);
 	if (gitAddResult.exitCode !== 0) {
 		logAndError("Failed to add package.json to git");
 	}
 	console.log("✅ Added package.json to git");
 
-	const gitCommitResult = await Bun.$`git commit -m "release: v${version}"`;
+	const gitCommitResult = await asyncSpawn([
+		"git",
+		"commit",
+		"-m",
+		`release: v${version}`,
+	]);
 	if (gitCommitResult.exitCode !== 0) {
 		logAndError(`Failed to commit with message "release: v${version}"`);
 	}
 	console.log(`✅ Committed with message "release: v${version}"`);
 
-	const gitPushResult = await Bun.$`git push origin main`;
+	const gitPushResult = await asyncSpawn(["git", "push", "origin", "main"]);
 	if (gitPushResult.exitCode !== 0) {
 		logAndError("Failed to push to origin main");
 	}
