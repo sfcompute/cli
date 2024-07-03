@@ -1,5 +1,9 @@
 {
-  "dependencies": { "commander": "^12.1.0", "dotenv": "^16.4.5", "ora": "^8.0.1" },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "ora": "^8.0.1"
+  },
   "name": "@sfc/cli",
   "bin": {
     "sfc": "dist/cli.js"
@@ -19,5 +23,6 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  }
+  },
+  "version": "0.0.0-pre.1719967046799"
 }
