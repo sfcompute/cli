@@ -64,6 +64,7 @@ fi
 
 # Download the 'sf' CLI binary from the specified URL.
 echo "Downloading '${BINARY_NAME}' CLI binary..."
+echo "curl -L -o \"${TMPDIR}/${BINARY_NAME}.zip\" \"${SF_BINARY_URL}\""
 curl -L -o "${TMPDIR}/${BINARY_NAME}.zip" "${SF_BINARY_URL}"
 
 # Extract the zip file in the temporary directory.
