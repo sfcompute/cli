@@ -129,6 +129,18 @@ program
 				process.exit(1);
 			}
 
+			const ghCheckResult = await Bun.$`which gh`;
+			if (ghCheckResult.exitCode !== 0) {
+				console.error(
+					`The 'gh' command is not installed. Please install it.
+
+  $ brew install gh
+
+  `,
+				);
+				process.exit(1);
+			}
+
 			await cleanDist();
 			const version = await getLocalVersion();
 			const bumpedVersion = bumpVersion(version, type);
