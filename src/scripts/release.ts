@@ -90,8 +90,15 @@ async function createRelease(version: string) {
 	console.log(zipFiles);
 
 	const releaseFlag = version.includes("pre") ? "--prerelease" : "--latest";
-	const result =
-		await Bun.$`gh release create ${version} ${zipFiles} --generate-notes ${releaseFlag}`;
+	const result = await asyncSpawn([
+		"gh",
+		"release",
+		"create",
+		version,
+		...zipFiles,
+		"--generate-notes",
+		releaseFlag,
+	]);
 	if (result.exitCode !== 0) {
 		logAndError(`Failed to create GitHub release for version ${version}`);
 	}
