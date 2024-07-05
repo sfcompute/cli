@@ -1,6 +1,6 @@
 import type { Command } from "commander";
-import { ApiPaths } from "../helpers/urls";
 import { getAuthorizationHeader } from "../helpers/config";
+import { getApiUrl } from "../helpers/urls";
 
 function isPubkey(key: string): boolean {
 	const pubKeyPattern = /^ssh-(rsa|dss|ed25519) [A-Za-z0-9+/=]+ ?.*$/;
@@ -35,7 +35,7 @@ async function readFileOrKey(keyOrFile: string): Promise<string> {
 async function addSSHKey(key: string) {
 	const pubkey = await readFileOrKey(key);
 
-	const res = await fetch(ApiPaths.credentials.create, {
+	const res = await fetch(await getApiUrl("credentials_create"), {
 		method: "POST",
 		headers: await getAuthorizationHeader(),
 		body: JSON.stringify({
@@ -84,7 +84,7 @@ export type PostSSHCredentialBody = {
 };
 
 export async function getSSHKeys() {
-	const res = await fetch(ApiPaths.credentials.list, {
+	const res = await fetch(await getApiUrl("credentials_list"), {
 		headers: await getAuthorizationHeader(),
 	});
 
@@ -93,7 +93,7 @@ export async function getSSHKeys() {
 }
 
 export async function postSSHKeys(key: string) {
-	const res = await fetch(ApiPaths.credentials.create, {
+	const res = await fetch(await getApiUrl("credentials_create"), {
 		method: "POST",
 		headers: await getAuthorizationHeader(),
 		body: JSON.stringify({

@@ -1,15 +1,16 @@
 import type { Command } from "commander";
-import env from "../environment";
+import { loadConfig } from "../helpers/config";
 
-export function registerDev(program: Command) {
-	if (env.isDevelopment) {
+export async function registerDev(program: Command) {
+	const config = await loadConfig();
+	if (config?.isDevelopment) {
 		// development only commands
 		program.command("ping").action(async () => {
 			console.log("pong");
 		});
 
 		program.command("env").action(async () => {
-			console.log(env);
+			console.log(config);
 		});
 	}
 }

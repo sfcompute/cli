@@ -3,7 +3,15 @@ import { join } from "node:path";
 
 export interface Config {
 	token?: string;
+	isDevelopment?: boolean;
+	api_url: string;
+	webapp_url: string;
 }
+
+const ConfigDefaults = {
+	api_url: "https://api.sfcompute.com",
+	webapp_url: "https://sfcompute.com",
+};
 
 export async function saveConfig(config: Config): Promise<void> {
 	const configDir = join(homedir(), ".sfcompute");
@@ -18,17 +26,17 @@ export async function saveConfig(config: Config): Promise<void> {
 	}
 }
 
-export async function loadConfig(): Promise<Config | null> {
+export async function loadConfig(): Promise<Config> {
 	const configDir = join(homedir(), ".sfcompute");
 	const configPath = join(configDir, "config");
 
 	try {
 		const file = Bun.file(configPath);
 		const configData = await file.text();
-		return JSON.parse(configData) as Config;
+		const config = JSON.parse(configData) as Config;
+		return { ...ConfigDefaults, ...config };
 	} catch (error) {
-		console.error("Failed to load config:", error);
-		return null;
+		return ConfigDefaults;
 	}
 }
 

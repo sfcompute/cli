@@ -1,131 +1,53 @@
-import env from "../environment";
+import { loadConfig } from "./config";
 
-export const getWebappUrl = (
-	{
-		path,
-		queryParams,
-	}: {
-		path: string;
-		queryParams?: Record<string, any>;
-	} = {
-		path: "/",
-		queryParams: {},
-	},
-) => {
-	return getUrlToResource({
-		baseUrl: getBaseWebappUrl(),
-		resourcePath: path,
-		queryParams,
-	});
+const webPaths = {
+	cli_session_create: "/cli/session",
+	cli_session_get: ({ token }: { token: string }) =>
+		`/cli/session?token=${token}`,
 };
 
-export const getApiUrl = (
-	{
-		path,
-		queryParams,
-	}: {
-		path: string;
-		queryParams?: Record<string, any>;
-	} = {
-		path: "/",
-		queryParams: {},
-	},
-) => {
-	return getUrlToResource({
-		baseUrl: getBaseApiUrl(),
-		resourcePath: path,
-		queryParams,
-	});
+const apiPaths = {
+	credentials_create: "/v0/credentials",
+	credentials_list: "/v0/credentials",
+	instances_list: "/v0/instances",
+	instances_get: ({ id }: { id: string }) => `/v0/instances/${id}`,
+	contracts_list: "/v0/contracts",
+	contracts_get: ({ id }: { id: string }) => `/v0/contracts/${id}`,
+	orders_create: "/v0/orders",
+	orders_list: "/v0/orders",
+	orders_get: ({ id }: { id: string }) => `/v0/orders/${id}`,
 };
 
-const getUrlToResource = ({
-	baseUrl,
-	resourcePath,
-	queryParams,
-}: {
-	baseUrl: string;
-	resourcePath: string;
-	queryParams?: Record<string, string>;
-}) => {
-	// Adjust for trailing slash
-	if (!!resourcePath && resourcePath.charAt(resourcePath.length - 1) === "/") {
-		resourcePath = resourcePath.substring(0, resourcePath.length - 1);
+export async function getWebAppUrl<
+	K extends keyof typeof webPaths,
+	V extends Extract<(typeof webPaths)[K], (...args: any) => any>,
+>(key: K, params: Parameters<V>[0]): Promise<string>;
+export async function getWebAppUrl(key: keyof typeof webPaths): Promise<string>;
+export async function getWebAppUrl(
+	key: keyof typeof webPaths,
+	params?: any,
+): Promise<string> {
+	const config = await loadConfig();
+	const path = webPaths[key];
+	if (typeof path === "function") {
+		return config.webapp_url + path(params);
 	}
-
-	// Adjust for leading slash
-	if (!!resourcePath && resourcePath.charAt(0) !== "/") {
-		resourcePath = "/" + resourcePath;
-	}
-
-	const queryParamString = queryParams ? getQueryParamString(queryParams) : "";
-
-	return baseUrl + resourcePath + queryParamString;
-};
-
-const getQueryParamString = (queryParams: Record<string, string>): string => {
-	if (!queryParams) {
-		return "";
-	}
-
-	const paramItems = Object.keys(queryParams).map((paramLabel: string) => {
-		const value = queryParams[paramLabel];
-		if (!value) {
-			return undefined;
-		}
-
-		return `${encodeURIComponent(paramLabel)}=${encodeURIComponent(value)}`;
-	});
-
-	return `?${paramItems.filter(Boolean).join("&")}`;
-};
-
-const getBaseWebappUrl = () => {
-	return getBaseUrl({ host: env.webapp.host, port: env.webapp.port });
-};
-const getBaseApiUrl = (): string => {
-	return getBaseUrl({ host: env.api.host, port: env.api.port });
-};
-
-interface BaseUrlOptions {
-	host: string;
-	port: number | string;
-	suffix?: string;
+	return config.webapp_url + path;
 }
-const getBaseUrl = ({ host, port: _port, suffix }: BaseUrlOptions) => {
-	const protocol = env.isDevelopment ? "http" : "https";
-	const port = _port ? `:${_port}` : "";
 
-	return `${protocol}://${host}${port}${suffix ? suffix : ""}`;
-};
-
-// ---
-
-export const WebPaths = {
-	cli: {
-		session: {
-			create: getWebappUrl({ path: "/cli/session" }),
-			get: ({ token }: { token: string }) =>
-				getWebappUrl({ path: "/cli/session", queryParams: { token } }),
-		},
-	},
-};
-
-export const ApiPaths = {
-	credentials: {
-		create: getApiUrl({ path: "/v0/credentials" }),
-		list: getApiUrl({ path: "/v0/credentials" }),
-	},
-	instances: {
-		list: getApiUrl({ path: "/v0/instances" }),
-		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/instances/${id}` }),
-	},
-	contracts: {
-		list: getApiUrl({ path: "/v0/contracts" }),
-		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/contracts/${id}` }),
-	},
-	orders: {
-		create: getApiUrl({ path: "/v0/orders" }),
-		list: getApiUrl({ path: "/v0/orders" }),
-		get: ({ id }: { id: string }) => getApiUrl({ path: `/v0/orders/${id}` }),
-	},
-};
+export async function getApiUrl<
+	K extends keyof typeof apiPaths,
+	V extends Extract<(typeof apiPaths)[K], (...args: any) => any>,
+>(key: K, params: Parameters<V>[0]): Promise<string>;
+export async function getApiUrl(key: keyof typeof apiPaths): Promise<string>;
+export async function getApiUrl(
+	key: keyof typeof apiPaths,
+	params?: any,
+): Promise<string> {
+	const config = await loadConfig();
+	const path = apiPaths[key];
+	if (typeof path === "function") {
+		return config.api_url + path(params);
+	}
+	return config.api_url + path;
+}
