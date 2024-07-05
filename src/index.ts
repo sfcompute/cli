@@ -6,6 +6,7 @@ import { registerLogin } from "./lib/login";
 import { registerSSH } from "./lib/ssh";
 import { registerUpgrade } from "./lib/upgrade";
 import { version } from "../package.json";
+import { registerBuy } from "./lib/buy";
 
 const program = new Command();
 
@@ -18,6 +19,7 @@ program
 registerLogin(program);
 registerSSH(program);
 registerUpgrade(program);
+registerBuy(program);
 
 // (only development commands)
 registerDev(program);

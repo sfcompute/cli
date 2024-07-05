@@ -71,14 +71,20 @@ async function getSession({
 }: {
 	token: string;
 }) {
-	const response = await fetch(await getWebAppUrl("cli_session_get"), {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
+	const response = await fetch(
+		await getWebAppUrl("cli_session_get", {
+			token,
+		}),
+		{
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
 		},
-	});
+	);
 	if (!response.ok) {
 		console.error("Response not ok", response.status, response.statusText);
+		process.exit(1);
 		return null;
 	}
 

@@ -8,20 +8,24 @@ export interface Config {
 	webapp_url: string;
 }
 
-const ConfigDefaults = {
+const ProductionConfigDefaults = {
 	api_url: "https://api.sfcompute.com",
 	webapp_url: "https://sfcompute.com",
 };
 
-export async function saveConfig(newConfig: Partial<Config>): Promise<void> {
+const DevelopmentConfigDefaults = {
+	api_url: "http://localhost:8000",
+	webapp_url: "http://localhost:3000",
+};
+
+const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
+	? DevelopmentConfigDefaults
+	: ProductionConfigDefaults;
+
+export async function saveConfig(config: Partial<Config>): Promise<void> {
 	const configDir = join(homedir(), ".sfcompute");
 	const configPath = join(configDir, "config");
-	const config = await loadConfig();
-	const configData = JSON.stringify(
-		{ ...ConfigDefaults, ...config, ...newConfig },
-		null,
-		2,
-	);
+	const configData = JSON.stringify(config, null, 2);
 
 	try {
 		await Bun.write(configPath, configData);

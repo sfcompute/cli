@@ -1,29 +1,31 @@
 {
-  "dependencies": {
-    "commander": "^12.1.0",
-    "dotenv": "^16.4.5",
-    "ora": "^8.0.1"
-  },
-  "name": "@sfc/cli",
-  "bin": {
-    "sfc": "dist/cli.js"
-  },
-  "type": "module",
-  "module": "src/index.ts",
-  "scripts": {
-    "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src",
-    "check": "biome check ./src",
-    "dev": "bun run src/index.ts",
-    "pack": "bun build src/index.ts --outfile dist/cli.js",
-    "release": "bun run src/scripts/release.ts"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.8.2",
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "version": "0.0.0-pre.1720203472273"
+	"dependencies": {
+		"chrono-node": "^2.7.6",
+		"commander": "^12.1.0",
+		"dotenv": "^16.4.5",
+		"ora": "^8.0.1",
+		"parse-duration": "^1.1.0"
+	},
+	"name": "@sfc/cli",
+	"bin": {
+		"sfc": "dist/cli.js"
+	},
+	"type": "module",
+	"module": "src/index.ts",
+	"scripts": {
+		"format": "biome format --write ./src",
+		"lint": "biome lint --write ./src",
+		"check": "biome check ./src",
+		"dev": "IS_DEVELOPMENT_CLI_ENV=true bun run src/index.ts",
+		"pack": "bun build src/index.ts --outfile dist/cli.js",
+		"release": "bun run src/scripts/release.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.2",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"version": "0.0.0-pre.1720203472273"
 }
