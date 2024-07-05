@@ -32,20 +32,6 @@ async function readFileOrKey(keyOrFile: string): Promise<string> {
 	}
 }
 
-async function addSSHKey(key: string) {
-	const pubkey = await readFileOrKey(key);
-
-	const res = await fetch(await getApiUrl("credentials_create"), {
-		method: "POST",
-		headers: await getAuthorizationHeader(),
-		body: JSON.stringify({
-			id: key,
-			object: "ssh_credential",
-			pubkey,
-		}),
-	});
-}
-
 export function registerSSH(program: Command) {
 	const cmd = program
 		.command("ssh")
@@ -61,7 +47,7 @@ export function registerSSH(program: Command) {
 
 		if (options.add) {
 			const credential = await postSSHKeys(options.add);
-			console.log("Added ssh key.");
+			console.log("Added ssh key");
 			return;
 		}
 
