@@ -163,6 +163,16 @@ program
 				process.exit(1);
 			}
 
+			process.on("SIGINT", () => {
+				console.log(
+					"\nRelease process interrupted. Please confirm to exit (ctrl-c again to confirm).",
+				);
+				process.once("SIGINT", () => {
+					console.log("Exiting...");
+					process.exit(1);
+				});
+			});
+
 			await cleanDist();
 			const version = await getLocalVersion();
 			const bumpedVersion = bumpVersion(version, type);
