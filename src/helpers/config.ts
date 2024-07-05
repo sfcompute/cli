@@ -14,7 +14,7 @@ const ProductionConfigDefaults = {
 };
 
 const DevelopmentConfigDefaults = {
-	api_url: "http://localhost:8000",
+	api_url: "http://localhost:8080",
 	webapp_url: "http://localhost:3000",
 };
 
