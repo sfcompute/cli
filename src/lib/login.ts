@@ -2,7 +2,7 @@ import { exec } from "node:child_process";
 import type { Command } from "commander";
 import ora from "ora";
 import { saveConfig } from "../helpers/config";
-import { WebPaths } from "../helpers/urls";
+import { getWebAppUrl } from "../helpers/urls";
 
 export function registerLogin(program: Command) {
 	program
@@ -46,7 +46,7 @@ async function createSession({
 }: {
 	validation: string;
 }) {
-	const response = await fetch(WebPaths.cli.session.create, {
+	const response = await fetch(await getWebAppUrl("cli_session_create"), {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -71,7 +71,7 @@ async function getSession({
 }: {
 	token: string;
 }) {
-	const response = await fetch(WebPaths.cli.session.get({ token }), {
+	const response = await fetch(await getWebAppUrl("cli_session_get"), {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",

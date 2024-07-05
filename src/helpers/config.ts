@@ -13,10 +13,15 @@ const ConfigDefaults = {
 	webapp_url: "https://sfcompute.com",
 };
 
-export async function saveConfig(config: Config): Promise<void> {
+export async function saveConfig(newConfig: Partial<Config>): Promise<void> {
 	const configDir = join(homedir(), ".sfcompute");
 	const configPath = join(configDir, "config");
-	const configData = JSON.stringify(config, null, 2);
+	const config = await loadConfig();
+	const configData = JSON.stringify(
+		{ ...ConfigDefaults, ...config, ...newConfig },
+		null,
+		2,
+	);
 
 	try {
 		await Bun.write(configPath, configData);
