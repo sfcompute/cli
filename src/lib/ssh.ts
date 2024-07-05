@@ -46,7 +46,8 @@ export function registerSSH(program: Command) {
 		}
 
 		if (options.add) {
-			const credential = await postSSHKeys(options.add);
+			const key = await readFileOrKey(options.add);
+			const credential = await postSSHKeys(key);
 			console.log("Added ssh key");
 			return;
 		}
