@@ -3,6 +3,7 @@ import type { Command } from "commander";
 import ora from "ora";
 import { saveConfig } from "../helpers/config";
 import { getWebAppUrl } from "../helpers/urls";
+import { clearScreen } from "../helpers/prompt";
 
 export function registerLogin(program: Command) {
 	program
@@ -20,7 +21,7 @@ export function registerLogin(program: Command) {
 			const { url } = result;
 			exec(`open ${url}`); // if this fails, that's okay
 
-			process.stdout.write("\x1Bc");
+			clearScreen();
 			console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
 			console.log(
 				`  Do these numbers match your browser window?\n  ${validation}\n\n`,
