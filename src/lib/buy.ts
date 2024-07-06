@@ -35,7 +35,7 @@ interface PlaceBuyOrderArguments {
 	price: string | number;
 	quantity?: number;
 	start?: string;
-	y?: boolean;
+	yes?: boolean;
 }
 
 function priceToCenticents(price: string | number): number {
@@ -144,7 +144,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 
 	const msg = confirmPlaceOrderParametersMessage(params);
 
-	if (!props.y) {
+	if (!props.yes) {
 		const answer = await prompt(msg);
 		if (answer !== "y") {
 			return logAndQuit("Order cancelled");
