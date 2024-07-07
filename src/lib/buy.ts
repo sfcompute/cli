@@ -8,7 +8,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import readline from "node:readline";
-import { clearScreen } from "../helpers/prompt";
 import { getApiUrl } from "../helpers/urls";
 
 dayjs.extend(relativeTime);
@@ -18,7 +17,7 @@ export function registerBuy(program: Command) {
 	program
 		.command("buy")
 		.description("Place a buy order")
-		.requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
+		.requiredOption("-t, --type <type>", "Specify the type of node")
 		.requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
 		.requiredOption("-p, --price <price>", "Specify a price")
 		.option("-n, --quantity <quantity>", "Specify quantity")
@@ -163,8 +162,8 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 	});
 
 	if (!response.ok) {
-		console.log(await response.text());
-		return logAndQuit(`Failed to place order: ${response.statusText}`);
+		const resp = await response.json();
+		return logAndQuit(`Failed to place order: ${resp.message}`);
 	}
 
 	const data = await response.json();
