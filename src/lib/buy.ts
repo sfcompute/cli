@@ -115,6 +115,25 @@ function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
 	return `\n${topLine}\n${priceLine} `;
 }
 
+interface PostOrderResponse {
+	object: "order";
+	id: string;
+	side: "buy" | "sell";
+	instance_type: string;
+	price: number;
+	starts_at: string;
+	duration: number;
+	quantity: number;
+	flags: {
+		market: boolean;
+		post_only: boolean;
+		ioc: boolean;
+	};
+	created_at: string;
+	executed: boolean;
+	cancelled: boolean;
+}
+
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 	const { type, duration, price, quantity, start } = props;
 	const config = await loadConfig();
@@ -166,7 +185,6 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 		return logAndQuit(`Failed to place order: ${resp.message}`);
 	}
 
-	const data = await response.json();
-
+	const data = (await response.json()) as PostOrderResponse;
 	console.log("Order placed");
 }
