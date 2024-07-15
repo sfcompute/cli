@@ -1,7 +1,7 @@
 import type { Command } from "commander";
 import * as chrono from "chrono-node";
 import parseDuration from "parse-duration";
-import { logAndQuit } from "../helpers/errors";
+import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { loadConfig } from "../helpers/config";
 import c from "chalk";
 import dayjs from "dayjs";
@@ -138,7 +138,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 	const { type, duration, price, quantity, start } = props;
 	const config = await loadConfig();
 	if (!config.token) {
-		return logAndQuit("You need to login first.\n\n\t$ sf login\n");
+		return logLoginMessageAndQuit();
 	}
 
 	const orderQuantity = quantity ?? 1;
