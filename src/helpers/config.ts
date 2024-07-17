@@ -9,8 +9,8 @@ export interface Config {
 }
 
 const ProductionConfigDefaults = {
-	api_url: "https://api.sfcompute.com",
-	webapp_url: "https://sfcompute.com",
+	api_url: "https://api.sfcompute.dev",
+	webapp_url: "https://sfcompute.dev",
 };
 
 const DevelopmentConfigDefaults = {

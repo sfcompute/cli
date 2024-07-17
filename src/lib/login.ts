@@ -5,6 +5,11 @@ import { saveConfig } from "../helpers/config";
 import { getWebAppUrl } from "../helpers/urls";
 import { clearScreen } from "../helpers/prompt";
 
+// We're using Axios here because there's a bug
+// where the fetch API in Bun isn't passing the body
+// through redirects correctly
+import axios from "axios";
+
 export function registerLogin(program: Command) {
 	program
 		.command("login")
@@ -47,24 +52,28 @@ async function createSession({
 }: {
 	validation: string;
 }) {
-	const response = await fetch(await getWebAppUrl("cli_session_create"), {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({ validation }),
-	});
-	if (!response.ok) {
-		console.error("Response not ok", response.status, response.statusText);
+	const url = await getWebAppUrl("cli_session_create");
+
+	try {
+		const response = await axios.post(
+			url,
+			{ validation },
+			{
+				headers: {
+					"Content-Type": "application/json",
+				},
+				maxRedirects: 5,
+			},
+		);
+
+		return response.data as {
+			url: string;
+			token: string;
+		};
+	} catch (error) {
+		console.error("Error creating session:", error);
 		return null;
 	}
-
-	const body = (await response.json()) as {
-		url: string;
-		token: string;
-	};
-
-	return body;
 }
 
 async function getSession({
@@ -72,28 +81,23 @@ async function getSession({
 }: {
 	token: string;
 }) {
-	const response = await fetch(
-		await getWebAppUrl("cli_session_get", {
-			token,
-		}),
-		{
-			method: "GET",
+	try {
+		const url = await getWebAppUrl("cli_session_get", { token });
+		const response = await axios.get(url, {
 			headers: {
 				"Content-Type": "application/json",
 			},
-		},
-	);
-	if (!response.ok) {
-		console.error("Response not ok", response.status, response.statusText);
+		});
+
+		return response.data as {
+			validation?: string;
+			token?: string;
+		};
+	} catch (error) {
+		console.error("Error getting session:", error);
 		process.exit(1);
 		return null;
 	}
-
-	const body = (await response.json()) as {
-		validation?: string;
-		token?: string;
-	};
-	return body;
 }
 
 function generateValidationString() {
