@@ -17,9 +17,9 @@ export function registerUpgrade(program: Command) {
 			}
 
 			if (version) {
-				await Bun.$`bash -c "$(curl -fsSL https://www.sfcompute.dev/cli/install)" -- ${version}`;
+				await Bun.$`bash -c "$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`;
 			} else {
-				await Bun.$`bash -c "$(curl -fsSL https://www.sfcompute.dev/cli/install)"`;
+				await Bun.$`bash -c "$(curl -fsSL https://www.sfcompute.com/cli/install)"`;
 			}
 		});
 }
