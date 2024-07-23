@@ -1,16 +1,69 @@
 import type { Command } from "commander";
-import { loadConfig } from "../helpers/config";
+import { deleteConfig, getConfigPath, loadConfig } from "../helpers/config";
+import { confirm } from "@inquirer/prompts";
 
-export async function registerDev(program: Command) {
-	const config = await loadConfig();
-	if (config?.isDevelopment) {
-		// development only commands
+// development only commands
+export function registerDev(program: Command) {
+	if (process.env.IS_DEVELOPMENT_CLI_ENV) {
 		program.command("ping").action(async () => {
 			console.log("pong");
+			process.exit(0);
 		});
 
-		program.command("env").action(async () => {
-			console.log(config);
-		});
+		registerConfig(program);
 	}
+}
+
+function registerConfig(program: Command) {
+	const configCmd = program
+		.command("config")
+		.description("Manage cli config file.")
+		.option("-rm, --remove", "Remove config file");
+
+	// sf config
+	// sf config [-rm, --remove]
+	configCmd.action(async (options) => {
+		if (options.remove) {
+			await removeConfigAction();
+		} else {
+			await showConfigAction();
+		}
+	});
+
+	// sf config show
+	configCmd
+		.command("show")
+		.description("Display config settings")
+		.action(showConfigAction);
+
+	// sf config remove
+	configCmd
+		.command("remove")
+		.description("Remove config file")
+		.action(removeConfigAction);
+
+	// sf config rm
+	configCmd
+		.command("rm")
+		.description("Remove config file (alias)")
+		.action(removeConfigAction);
+}
+
+// --
+
+async function showConfigAction() {
+	const config = await loadConfig();
+	console.log(config);
+	process.exit(0);
+}
+
+async function removeConfigAction() {
+	const configFilePath = getConfigPath();
+	const confirmedYes = await confirm({
+		message: `Delete configuration file at ${configFilePath}?`,
+	});
+	if (confirmedYes) {
+		await deleteConfig();
+	}
+	process.exit(0);
 }

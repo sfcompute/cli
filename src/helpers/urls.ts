@@ -7,15 +7,20 @@ const webPaths = {
 };
 
 const apiPaths = {
-	credentials_create: "/v0/credentials",
-	credentials_list: "/v0/credentials",
-	instances_list: "/v0/instances",
-	instances_get: ({ id }: { id: string }) => `/v0/instances/${id}`,
-	contracts_list: "/v0/contracts",
-	contracts_get: ({ id }: { id: string }) => `/v0/contracts/${id}`,
 	orders_create: "/v0/orders",
 	orders_list: "/v0/orders",
 	orders_get: ({ id }: { id: string }) => `/v0/orders/${id}`,
+
+	instances_list: "/v0/instances",
+	instances_get: ({ id }: { id: string }) => `/v0/instances/${id}`,
+
+	credentials_create: "/v0/credentials",
+	credentials_list: "/v0/credentials",
+
+	contracts_list: "/v0/contracts",
+	contracts_get: ({ id }: { id: string }) => `/v0/contracts/${id}`,
+
+	balance_get: "/v0/balance",
 };
 
 export async function getWebAppUrl<

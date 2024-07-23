@@ -137,7 +137,7 @@ interface PostOrderResponse {
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 	const { type, duration, price, quantity, start } = props;
 	const config = await loadConfig();
-	if (!config.token) {
+	if (!config.auth_token) {
 		return logLoginMessageAndQuit();
 	}
 
@@ -176,7 +176,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
 		body: JSON.stringify(params),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${config.token}`,
+			Authorization: `Bearer ${config.auth_token}`,
 		},
 	});
 

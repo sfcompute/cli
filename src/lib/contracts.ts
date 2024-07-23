@@ -16,7 +16,7 @@ export function registerContracts(program: Command) {
 
 async function listContracts() {
 	const config = await loadConfig();
-	if (!config.token) {
+	if (!config.auth_token) {
 		return logLoginMessageAndQuit();
 	}
 
@@ -24,7 +24,7 @@ async function listContracts() {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${config.token}`,
+			Authorization: `Bearer ${config.auth_token}`,
 		},
 	});
 

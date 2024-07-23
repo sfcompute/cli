@@ -1,16 +1,17 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { unlinkSync } from "node:fs";
+import type { EmptyObject } from "../types/empty";
 
 export interface Config {
-	token?: string;
-	isDevelopment?: boolean;
 	api_url: string;
 	webapp_url: string;
+	auth_token?: string;
 }
 
 const ProductionConfigDefaults = {
-	api_url: "https://api.sfcompute.dev",
-	webapp_url: "https://sfcompute.dev",
+	api_url: "https://api.sfcompute.com",
+	webapp_url: "https://sfcompute.com",
 };
 
 const DevelopmentConfigDefaults = {
@@ -23,8 +24,7 @@ const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
 	: ProductionConfigDefaults;
 
 export async function saveConfig(config: Partial<Config>): Promise<void> {
-	const configDir = join(homedir(), ".sfcompute");
-	const configPath = join(configDir, "config");
+	const configPath = getConfigPath();
 	const configData = JSON.stringify(config, null, 2);
 
 	try {
@@ -36,25 +36,71 @@ export async function saveConfig(config: Partial<Config>): Promise<void> {
 }
 
 export async function loadConfig(): Promise<Config> {
-	const configDir = join(homedir(), ".sfcompute");
-	const configPath = join(configDir, "config");
+	const configFileData = await readConfigFile();
+
+	return { ...ConfigDefaults, ...configFileData };
+}
+
+// only for development
+export async function deleteConfig() {
+	const exists = await configFileExists();
+	if (!exists) {
+		return;
+	}
+
+	const configPath = getConfigPath();
 
 	try {
-		const file = Bun.file(configPath);
-		const configData = await file.text();
-		const config = JSON.parse(configData) as Config;
-		return { ...ConfigDefaults, ...config };
+		unlinkSync(configPath);
+		console.log("Config deleted successfully.");
 	} catch (error) {
-		return ConfigDefaults;
+		console.error("Failed to delete config:", error);
 	}
 }
 
-export async function getToken() {
+// --
+
+export function getConfigPath(): string {
+	const configDir = join(homedir(), ".sfcompute");
+	const configPath = join(configDir, "config");
+
+	return configPath;
+}
+
+function configFileExists(): Promise<boolean> {
+	const configPath = getConfigPath();
+	return Bun.file(configPath).exists();
+}
+
+async function readConfigFile(): Promise<Config | EmptyObject> {
+	const exists = await configFileExists();
+	if (!exists) {
+		return {};
+	}
+
+	const configPath = getConfigPath();
+	try {
+		const configData = await Bun.file(configPath).text();
+		const config = JSON.parse(configData);
+		if (typeof config === "object" && config !== null) {
+			return config;
+		}
+
+		return {};
+	} catch (error) {
+		console.error("Error reading config file:", error);
+		return {};
+	}
+}
+
+// --
+
+export async function getAuthToken() {
 	const config = await loadConfig();
-	return config?.token;
+	return config?.auth_token;
 }
 
 export async function getAuthorizationHeader() {
-	const token = await getToken();
+	const token = await getAuthToken();
 	return { Authorization: `Bearer ${token}` };
 }

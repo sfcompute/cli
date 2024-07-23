@@ -8,20 +8,22 @@ import { registerUpgrade } from "./lib/upgrade";
 import { version } from "../package.json";
 import { registerBuy } from "./lib/buy";
 import { registerContracts } from "./lib/contracts";
+import { registerBalance } from "./lib/balance";
 
 const program = new Command();
 
 program
-	.name("sfc")
-	.description("San Francisco Compute command line tool")
+	.name("sf")
+	.description("San Francisco Compute command line tool.")
 	.version(version);
 
 // commands
 registerLogin(program);
-registerSSH(program);
-registerUpgrade(program);
 registerBuy(program);
+registerSSH(program);
 registerContracts(program);
+registerBalance(program);
+registerUpgrade(program);
 
 // (only development commands)
 registerDev(program);

@@ -15,7 +15,7 @@ export function registerLogin(program: Command) {
 		.command("login")
 		.description("Login to the San Francisco Compute")
 		.action(async () => {
-			const spinner = ora("Logging in...").start();
+			const spinner = ora("Logging in...\n").start();
 
 			const validation = generateValidationString();
 			const result = await createSession({ validation });
@@ -35,7 +35,7 @@ export function registerLogin(program: Command) {
 			const checkSession = async () => {
 				const session = await getSession({ token: result.token });
 				if (session?.token) {
-					await saveConfig({ token: session.token });
+					await saveConfig({ auth_token: session.token });
 					spinner.succeed("Logged in successfully");
 					process.exit(0);
 				} else {
