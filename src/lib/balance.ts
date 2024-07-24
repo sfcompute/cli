@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import Table from "cli-table3";
 import type { Command } from "commander";
 import { loadConfig } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
@@ -37,23 +38,29 @@ export function registerBalance(program: Command) {
         const formattedAvailable = usdFormatter.format(availableWhole);
         const formattedReserved = usdFormatter.format(reservedWhole);
 
-        const balanceTable = [
-          {
-            Type: "Available",
-            Amount: chalk.green(formattedAvailable),
-            "Centicents (1/100th of a cent)": chalk.green(
-              availableCenticents.toLocaleString(),
-            ),
-          },
-          {
-            Type: "Reserved",
-            Amount: chalk.gray(formattedReserved),
-            "Centicents (1/100th of a cent)": chalk.gray(
-              reservedCenticents.toLocaleString(),
-            ),
-          },
-        ];
-        console.table(balanceTable);
+        const table = new Table({
+          head: [
+            chalk.gray("Type"),
+            chalk.gray("Amount"),
+            chalk.gray("Centicents (1/100th of a cent)"),
+          ],
+          colWidths: [15, 15, 35],
+        });
+
+        table.push(
+          [
+            "Available",
+            chalk.green(formattedAvailable),
+            chalk.green(availableCenticents.toLocaleString()),
+          ],
+          [
+            "Reserved",
+            chalk.gray(formattedReserved),
+            chalk.gray(reservedCenticents.toLocaleString()),
+          ],
+        );
+
+        console.log(table.toString());
       }
 
       process.exit(0);

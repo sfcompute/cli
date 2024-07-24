@@ -7,16 +7,16 @@ import { registerBuy } from "./lib/buy";
 import { registerContracts } from "./lib/contracts";
 import { registerDev } from "./lib/dev";
 import { registerLogin } from "./lib/login";
+import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
 import { registerUpgrade } from "./lib/upgrade";
-import { registerSell } from "./lib/sell";
 
 const program = new Command();
 
 program
-	.name("sf")
-	.description("San Francisco Compute command line tool.")
-	.version(version);
+  .name("sf")
+  .description("San Francisco Compute command line tool.")
+  .version(version);
 
 // commands
 registerLogin(program);
