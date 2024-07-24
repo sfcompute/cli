@@ -49,10 +49,12 @@ GITHUB=${GITHUB-"https://github.com"}
 
 github_repo="$GITHUB/$GITHUB_REPO"
 
-if [[ $# = 0 ]]; then
+# Check if a version is provided as an argument
+if [[ $# -eq 0 ]]; then
     SF_BINARY_URL=$github_repo/releases/latest/download/sf-$target.zip
 else
-    SF_BINARY_URL=$github_repo/releases/download/$1/sf-$target.zip
+    VERSION=$1
+    SF_BINARY_URL=$github_repo/releases/download/$VERSION/sf-$target.zip
 fi
 
 # Check if the download URL was found.
@@ -98,7 +100,6 @@ if [ -f "${TARGET_FILE}" ]; then
     echo -e "\033[1m  echo 'export PATH=\"${TARGET_DIR}:\$PATH\"' >> ~/.zshrc && source ~/.zshrc\033[0m"
     echo -e "\033[0;32m"
     echo -e "After running the appropriate command, you can use '${BINARY_NAME}'.\033[0m"
-
 
 else
     echo "Installation failed. '${BINARY_NAME}' CLI could not be installed."
