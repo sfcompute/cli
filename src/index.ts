@@ -13,9 +13,9 @@ import { registerUpgrade } from "./lib/upgrade";
 const program = new Command();
 
 program
-	.name("sf")
-	.description("San Francisco Compute command line tool.")
-	.version(version);
+  .name("sf")
+  .description("San Francisco Compute command line tool.")
+  .version(version);
 
 // commands
 registerLogin(program);
