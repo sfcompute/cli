@@ -40,7 +40,7 @@ async function placeSellOrder(options: {
   flags?: Record<string, any>;
 }) {
   const config = await loadConfig();
-  if (!config.token) {
+  if (!config.auth_token) {
     return logLoginMessageAndQuit();
   }
 
@@ -66,7 +66,7 @@ async function placeSellOrder(options: {
     ...flags,
   };
 
-  const res = await postSellOrder(config.token, params);
+  const res = await postSellOrder(config.auth_token, params);
   if (!res.ok) {
     return logAndQuit("Failed to place sell order");
   }
