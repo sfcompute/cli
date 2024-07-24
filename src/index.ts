@@ -9,19 +9,21 @@ import { registerDev } from "./lib/dev";
 import { registerLogin } from "./lib/login";
 import { registerSSH } from "./lib/ssh";
 import { registerUpgrade } from "./lib/upgrade";
+import { registerSell } from "./lib/sell";
 
 const program = new Command();
 
 program
-  .name("sf")
-  .description("San Francisco Compute command line tool.")
-  .version(version);
+	.name("sf")
+	.description("San Francisco Compute command line tool.")
+	.version(version);
 
 // commands
 registerLogin(program);
 registerBuy(program);
 registerSSH(program);
 registerContracts(program);
+registerSell(program);
 registerBalance(program);
 registerUpgrade(program);
 
