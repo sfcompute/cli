@@ -10,6 +10,7 @@ import { registerLogin } from "./lib/login";
 import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
 import { registerUpgrade } from "./lib/upgrade";
+import { registerInstances } from "./lib/instances";
 
 const program = new Command();
 
@@ -21,6 +22,7 @@ program
 // commands
 registerLogin(program);
 registerBuy(program);
+registerInstances(program);
 registerSSH(program);
 registerContracts(program);
 registerSell(program);
