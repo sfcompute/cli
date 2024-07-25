@@ -1,4 +1,13 @@
 {
+  "scripts": {
+    "format": "biome format --write ./src",
+    "lint": "biome lint --write ./src",
+    "check": "biome check ./src",
+    "dev": "IS_DEVELOPMENT_CLI_ENV=true bun run src/index.ts",
+    "pack": "bun build src/index.ts --outfile dist/cli.js",
+    "release": "bun run src/scripts/release.ts",
+    "prod": "bun run src/index.ts"
+  },
   "dependencies": {
     "@inquirer/prompts": "^5.1.2",
     "axios": "^1.7.2",
@@ -13,21 +22,6 @@
     "ora": "^8.0.1",
     "parse-duration": "^1.1.0"
   },
-  "name": "@sfc/cli",
-  "bin": {
-    "sfc": "dist/cli.js"
-  },
-  "type": "module",
-  "module": "src/index.ts",
-  "scripts": {
-    "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src",
-    "check": "biome check ./src",
-    "dev": "IS_DEVELOPMENT_CLI_ENV=true bun run src/index.ts",
-    "pack": "bun build src/index.ts --outfile dist/cli.js",
-    "release": "bun run src/scripts/release.ts",
-    "prod": "bun run src/index.ts"
-  },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
     "@types/bun": "latest"
@@ -35,5 +29,5 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "version": "0.0.1-pre.1721774335232"
+  "version": "0.0.2"
 }
