@@ -44,7 +44,9 @@ async function listInstancesAction({
   returnJson,
 }: { clusterId?: string; returnJson?: boolean }) {
   const instances = await getInstances({ clusterId });
-  instances.sort(sortInstancesByTypeAndIp());
+  if (instances.length !== 0) {
+    instances.sort(sortInstancesByTypeAndIp());
+  }
 
   if (returnJson) {
     console.log(JSON.stringify(instances, null, 2));
