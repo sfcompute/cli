@@ -39,13 +39,8 @@ function registerConfig(program: Command) {
   // sf config remove
   configCmd
     .command("remove")
+    .alias("rm")
     .description("Remove config file")
-    .action(removeConfigAction);
-
-  // sf config rm
-  configCmd
-    .command("rm")
-    .description("Remove config file (alias)")
     .action(removeConfigAction);
 }
 

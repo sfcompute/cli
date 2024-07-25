@@ -17,6 +17,7 @@
         "noExplicitAny": "warn"
       },
 			"style": {
+				"noUselessElse": "off",
 				"useTemplate": "off"
 			},
 			"recommended": true

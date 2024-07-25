@@ -60,7 +60,7 @@ export function registerBalance(program: Command) {
           ],
         );
 
-        console.log(table.toString());
+        console.log(table.toString() + "\n");
       }
 
       process.exit(0);
