@@ -6,6 +6,7 @@ import { registerBalance } from "./lib/balance";
 import { registerBuy } from "./lib/buy";
 import { registerContracts } from "./lib/contracts";
 import { registerDev } from "./lib/dev";
+import { registerInstances } from "./lib/instances";
 import { registerLogin } from "./lib/login";
 import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
@@ -21,6 +22,7 @@ program
 // commands
 registerLogin(program);
 registerBuy(program);
+registerInstances(program);
 registerSSH(program);
 registerContracts(program);
 registerSell(program);
