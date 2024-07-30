@@ -134,7 +134,9 @@ async function cleanDist() {
 
 program
   .name("release")
-  .description("A github release tool for the project")
+  .description(
+    "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
+  )
   .arguments("[type]")
   .action(async (type) => {
     try {
