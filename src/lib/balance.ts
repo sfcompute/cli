@@ -2,7 +2,7 @@ import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
 import { loadConfig } from "../helpers/config";
-import { logLoginMessageAndQuit } from "../helpers/errors";
+import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 
@@ -87,6 +87,22 @@ async function getBalance(): Promise<{
       Authorization: `Bearer ${config.auth_token}`,
     },
   });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      logLoginMessageAndQuit();
+      return {
+        available: { centicents: 0, whole: 0 },
+        reserved: { centicents: 0, whole: 0 },
+      };
+    }
+
+    logAndQuit(`Failed to fetch balance: ${response.statusText}`);
+    return {
+      available: { centicents: 0, whole: 0 },
+      reserved: { centicents: 0, whole: 0 },
+    };
+  }
 
   const data = await response.json();
 
