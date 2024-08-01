@@ -109,13 +109,17 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     return logAndQuit("Invalid start date");
   }
 
+  const roundedStartDate = new Date(
+    Math.ceil(startDate.getTime() / (1000 * 60 * 60)) * (1000 * 60 * 60),
+  );
+
   const params: PlaceOrderParameters = {
     side: "buy",
     quantity: orderQuantity,
     price: priceToCenticents(price),
     instance_type: type,
     duration: durationMs / 1000, // Convert milliseconds to seconds
-    start_at: startDate.toISOString(),
+    start_at: roundedStartDate.toISOString(),
   };
 
   const msg = confirmPlaceOrderParametersMessage(params);
