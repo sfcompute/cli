@@ -21,5 +21,7 @@ export function registerUpgrade(program: Command) {
       } else {
         await Bun.$`bash -c "$(curl -fsSL https://www.sfcompute.com/cli/install)"`;
       }
+
+      process.exit(0);
     });
 }
