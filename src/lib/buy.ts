@@ -52,8 +52,14 @@ async function prompt(msg: string) {
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const { quantity, price, instance_type, duration, start_at } = params;
 
-  const fromNowTime = dayjs(start_at).fromNow();
-  const humanReadableStartAt = dayjs(start_at).format("MM/DD/YYYY hh:mm A");
+  const roundedStartDate = new Date(
+    Math.ceil(new Date(start_at).getTime() / (1000 * 60 * 60)) *
+      (1000 * 60 * 60),
+  );
+
+  const fromNowTime = dayjs(roundedStartDate).fromNow();
+  const humanReadableStartAt =
+    dayjs(roundedStartDate).format("MM/DD/YYYY hh:mm A");
   const centicentsAsDollars = (price / 10000).toFixed(2);
   const durationHumanReadable = formatDuration(duration * 1000);
 
@@ -109,17 +115,13 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     return logAndQuit("Invalid start date");
   }
 
-  const roundedStartDate = new Date(
-    Math.ceil(startDate.getTime() / (1000 * 60 * 60)) * (1000 * 60 * 60),
-  );
-
   const params: PlaceOrderParameters = {
     side: "buy",
     quantity: orderQuantity,
     price: priceToCenticents(price),
     instance_type: type,
     duration: durationMs / 1000, // Convert milliseconds to seconds
-    start_at: roundedStartDate.toISOString(),
+    start_at: startDate.toISOString(),
   };
 
   const msg = confirmPlaceOrderParametersMessage(params);
