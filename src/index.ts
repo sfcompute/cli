@@ -23,13 +23,13 @@ program
 // commands
 registerLogin(program);
 registerBuy(program);
+registerOrders(program);
+registerContracts(program);
 registerInstances(program);
 registerSSH(program);
-registerContracts(program);
 registerSell(program);
 registerBalance(program);
 registerUpgrade(program);
-registerOrders(program);
 
 // (only development commands)
 registerDev(program);
