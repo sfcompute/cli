@@ -105,7 +105,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     return logLoginMessageAndQuit();
   }
 
-  const orderQuantity = quantity ?? 1;
+  const orderQuantity = quantity ? Number(quantity) : 1;
   const durationMs = parseDuration(duration);
   if (!durationMs) {
     return logAndQuit("Invalid duration");
@@ -133,8 +133,6 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     }
   }
 
-  console.log(`\n${c.green("Order placed successfully")}`);
-
   const response = await fetch(await getApiUrl("orders_create"), {
     method: "POST",
     body: JSON.stringify(params),
@@ -150,5 +148,5 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
   }
 
   const data = (await response.json()) as PostOrderResponse;
-  console.log("Order placed");
+  console.log(`\n${c.green("Order placed successfully")}`);
 }

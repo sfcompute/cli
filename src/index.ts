@@ -8,10 +8,10 @@ import { registerContracts } from "./lib/contracts";
 import { registerDev } from "./lib/dev";
 import { registerInstances } from "./lib/instances";
 import { registerLogin } from "./lib/login";
+import { registerOrders } from "./lib/orders";
 import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
 import { registerUpgrade } from "./lib/upgrade";
-import { registerOrders } from "./lib/orders";
 
 const program = new Command();
 
