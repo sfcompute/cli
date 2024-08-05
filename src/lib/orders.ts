@@ -1,12 +1,12 @@
+import Table from "cli-table3";
+import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { loadConfig } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import { loadConfig } from "../helpers/config";
 import type { ListResponseBody, Order } from "./types";
-import type { Command } from "commander";
-import Table from "cli-table3";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

@@ -1,8 +1,8 @@
+import Table from "cli-table3";
 import { Command } from "commander";
 import { loadConfig } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import Table from "cli-table3";
 
 interface Contract {
   object: string;
