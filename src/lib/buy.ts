@@ -52,14 +52,10 @@ async function prompt(msg: string) {
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const { quantity, price, instance_type, duration, start_at } = params;
 
-  const roundedStartDate = new Date(
-    Math.ceil(new Date(start_at).getTime() / (1000 * 60 * 60)) *
-      (1000 * 60 * 60),
-  );
+  const startDate = new Date(start_at);
 
-  const fromNowTime = dayjs(roundedStartDate).fromNow();
-  const humanReadableStartAt =
-    dayjs(roundedStartDate).format("MM/DD/YYYY hh:mm A");
+  const fromNowTime = dayjs(startDate).fromNow();
+  const humanReadableStartAt = dayjs(startDate).format("MM/DD/YYYY hh:mm A");
   const centicentsAsDollars = (price / 10000).toFixed(2);
   const durationHumanReadable = formatDuration(duration * 1000);
 

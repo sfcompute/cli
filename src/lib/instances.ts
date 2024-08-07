@@ -165,6 +165,10 @@ async function getInstances({
     },
   });
 
+  if (!response.ok) {
+    throw new Error(`Failed to fetch instances: ${response.statusText}`);
+  }
+
   const responseData: ListResponseBody<InstanceObject> = await response.json();
   return responseData.data;
 }
