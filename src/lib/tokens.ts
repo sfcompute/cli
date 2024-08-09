@@ -10,6 +10,7 @@ import chalk from "chalk";
 import { getApiUrl } from "../helpers/urls";
 import { getCommandBase } from "../helpers/command";
 import Table from "cli-table3";
+import dayjs from "dayjs";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -30,11 +31,11 @@ export function registerTokens(program: Command) {
     .description("Create a new access token")
     .action(createTokenAction);
 
-  // tokens
-  //   .command("ls")
-  //   .description("List all tokens")
-  //   .option("--include-system, -is", "Include system tokens")
-  //   .action(listTokensAction);
+  tokens
+    .command("list")
+    .alias("ls")
+    .description("List all tokens")
+    .action(listTokensAction);
 
   // tokens
   //   .command("delete")
@@ -45,6 +46,19 @@ export function registerTokens(program: Command) {
 }
 
 // --
+
+interface TokenObject {
+  id: string;
+  token?: string;
+  name?: string;
+  description?: string;
+  is_sandbox: boolean;
+  created_at: string;
+  last_active_at: string;
+  expires_at: string;
+  origin_client: string;
+  is_system: boolean;
+}
 
 interface PostTokenRequestBody {
   expires_in_seconds: number;
@@ -108,10 +122,9 @@ async function createTokenAction() {
       await logSessionTokenExpiredAndQuit();
     }
 
-    const data = await response.json();
-    console.log(data);
-    loadingSpinner.fail("Failed to create token");
+    // TODO: handle specific errors
 
+    loadingSpinner.fail("Failed to create token");
     process.exit(1);
   }
 
@@ -170,16 +183,82 @@ async function listTokensAction() {
     logLoginMessageAndQuit();
   }
 
-  // const response = await fetch(await getApiUrl("tokens_create"), {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${config.auth_token}`,
-  //   },
-  // });
+  const loadingSpinner = ora("Fetching tokens...").start();
 
-  console.log("Listing tokens...");
+  // fetch tokens
+  const tokensListUrl = await getApiUrl("tokens_list");
+  const response = await fetch(tokensListUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+  });
+  if (!response.ok) {
+    if (response.status === 401) {
+      await logSessionTokenExpiredAndQuit();
+    }
+
+    // TODO: handle specific errors
+
+    loadingSpinner.fail("Failed to fetch tokens");
+    process.exit(1);
+  }
+  loadingSpinner.stop(); // hide spinner
+
+  // show account tokens
+  const responseBody = await response.json();
+  const tokens = responseBody.data as Array<TokenObject>;
+
+  // show empty table if no tokens
+  if (tokens.length === 0) {
+    const table = new Table({
+      head: [chalk.gray("Access Tokens")],
+      colWidths: [50],
+    });
+    table.push([
+      { colSpan: 1, content: "No access tokens found", hAlign: "center" },
+    ]);
+    console.log(table.toString() + "\n");
+
+    // prompt user that they can generate one
+    const base = getCommandBase();
+    console.log(
+      chalk.gray("Generate your first token with: ") +
+        chalk.magenta(`${base} tokens create`),
+    );
+
+    process.exit(0);
+  }
+
+  // display table
+  const tokensTable = new Table({
+    head: [
+      chalk.gray("Token ID"),
+      chalk.gray("Last Active At"),
+      chalk.gray("Expires"),
+      chalk.gray("Created At"),
+    ],
+    colWidths: [40, 25, 25, 25],
+  });
+  for (const token of tokens) {
+    tokensTable.push([
+      token.id,
+      chalk.green(formatDate(token.last_active_at)),
+      chalk.red(formatDate(token.expires_at)),
+      chalk.gray(formatDate(token.created_at)),
+    ]);
+  }
+  console.log(tokensTable.toString());
+
+  process.exit(0);
 }
+
+function formatDate(isoString: string): string {
+  return dayjs(isoString).format("MMM D, YYYY [at] h:mma").toLowerCase();
+}
+
+// --
 
 async function deleteTokenAction() {
   const loggedIn = await isLoggedIn();
