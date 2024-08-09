@@ -3,7 +3,8 @@ import { getAuthorizationHeader } from "../helpers/config";
 import { getApiUrl } from "../helpers/urls";
 
 function isPubkey(key: string): boolean {
-  const pubKeyPattern = /^ssh-(rsa|dss|ed25519) [A-Za-z0-9+/=]+ ?.*$/;
+  const pubKeyPattern =
+    /^ssh-(rsa|dss|ed25519) [A-Za-z0-9+/=]+(?: [^@]+@[^@]+)?$/;
   return pubKeyPattern.test(key);
 }
 
@@ -15,7 +16,6 @@ async function readFileOrKey(keyOrFile: string): Promise<string> {
       throw new Error("File not found");
     }
     const file = await fileContent.text();
-
     if (!isPubkey(file)) {
       throw new Error("The file content does not look like a valid public key");
     }
@@ -49,7 +49,7 @@ export function registerSSH(program: Command) {
       const key = await readFileOrKey(options.add);
       const credential = await postSSHKeys(key);
       console.log("Added ssh key");
-      return;
+      process.exit(0);
     }
 
     cmd.help();
@@ -67,7 +67,7 @@ export type CredentialObject = SSHCredential;
 
 export type PostSSHCredentialBody = {
   pubkey: string;
-  user: string;
+  username: string;
 };
 
 export async function getSSHKeys() {
@@ -82,17 +82,19 @@ export async function getSSHKeys() {
 export async function postSSHKeys(key: string) {
   const res = await fetch(await getApiUrl("credentials_create"), {
     method: "POST",
-    headers: await getAuthorizationHeader(),
+    headers: {
+      ...(await getAuthorizationHeader()),
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       pubkey: key,
-      user: "sf",
+      username: "sf",
     }),
   });
   if (!res.ok) {
     console.error(await res.text());
     throw new Error("Failed to add SSH key");
   }
-
   const data = await res.json();
   return data as SSHCredential;
 }

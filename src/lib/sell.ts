@@ -4,7 +4,7 @@ import parseDuration from "parse-duration";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import type { PlaceSellOrderParameters } from "./orders";
+import { priceToCenticents, type PlaceSellOrderParameters } from "./orders";
 
 export function registerSell(program: Command) {
   program
@@ -29,6 +29,13 @@ export function registerSell(program: Command) {
     .action(async (options) => {
       await placeSellOrder(options);
     });
+}
+
+function forceAsNumber(value: string | number): number {
+  if (typeof value === "number") {
+    return value;
+  }
+  return Number.parseFloat(value);
 }
 
 async function placeSellOrder(options: {
@@ -58,8 +65,8 @@ async function placeSellOrder(options: {
 
   const params: PlaceSellOrderParameters = {
     side: "sell",
-    quantity: options.quantity,
-    price: options.price,
+    quantity: forceAsNumber(options.quantity),
+    price: priceToCenticents(options.price),
     contract_id: options.contractId,
     duration: durationMs,
     start_at: startDate.toISOString(),
@@ -72,6 +79,7 @@ async function placeSellOrder(options: {
   }
   const data = await res.json();
   console.log(data);
+  process.exit(0);
 }
 
 async function postSellOrder(params: PlaceSellOrderParameters) {
