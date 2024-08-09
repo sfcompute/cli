@@ -66,7 +66,7 @@ async function placeSellOrder(options: {
   const params: PlaceSellOrderParameters = {
     side: "sell",
     quantity: forceAsNumber(options.quantity),
-    price: priceToCenticents(forceAsNumber(options.price)),
+    price: priceToCenticents(options.price),
     contract_id: options.contractId,
     duration: durationMs,
     start_at: startDate.toISOString(),
