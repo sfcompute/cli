@@ -42,6 +42,7 @@ export function registerTokens(program: Command) {
 
   tokens
     .command("delete")
+    .command("rm")
     .description("Delete a token")
     .requiredOption("--id <id>", "Specify the token ID")
     .option("--force", "Force delete the token, skipping confirmation")
