@@ -1,114 +1,80 @@
-import chalk from "chalk";
-import Table from "cli-table3";
 import type { Command } from "commander";
-import { loadConfig } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
-import type { Centicents } from "../helpers/units";
-import { getApiUrl } from "../helpers/urls";
+import { isLoggedIn } from "../helpers/config";
+import { logLoginMessageAndQuit } from "../helpers/errors";
 
 export function registerTokens(program: Command) {
-  program
-    .command("balance")
-    .description("Get account balance")
-    .option("--json", "Output in JSON format")
-    .action(async (options) => {
-      const {
-        available: { whole: availableWhole, centicents: availableCenticents },
-        reserved: { whole: reservedWhole, centicents: reservedCenticents },
-      } = await getBalance();
+  const tokens = program
+    .command("tokens")
+    .description("Manage account access tokens.");
 
-      if (options.json) {
-        const jsonOutput = {
-          available: {
-            whole: availableWhole,
-            centicents: availableCenticents,
-          },
-          reserved: {
-            whole: reservedWhole,
-            centicents: reservedCenticents,
-          },
-        };
-        console.log(JSON.stringify(jsonOutput, null, 2));
-      } else {
-        const formattedAvailable = usdFormatter.format(availableWhole);
-        const formattedReserved = usdFormatter.format(reservedWhole);
+  tokens
+    .command("create")
+    .description("Create a new access token")
+    .action(createTokenAction);
 
-        const table = new Table({
-          head: [
-            chalk.gray("Type"),
-            chalk.gray("Amount"),
-            chalk.gray("Centicents (1/100th of a cent)"),
-          ],
-          colWidths: [15, 15, 35],
-        });
+  // tokens
+  //   .command("ls")
+  //   .description("List all tokens")
+  //   .option("--include-system, -is", "Include system tokens")
+  //   .action(listTokensAction);
 
-        table.push(
-          [
-            "Available",
-            chalk.green(formattedAvailable),
-            chalk.green(availableCenticents.toLocaleString()),
-          ],
-          [
-            "Reserved",
-            chalk.gray(formattedReserved),
-            chalk.gray(reservedCenticents.toLocaleString()),
-          ],
-        );
-
-        console.log(table.toString() + "\n");
-      }
-
-      process.exit(0);
-    });
+  // tokens
+  //   .command("delete")
+  //   .description("Delete a token")
+  //   .option("--name <name>", "Specify the token name")
+  //   .option("--id <id>", "Specify the token ID")
+  //   .action(deleteTokenAction);
 }
 
-async function getBalance(): Promise<{
-  available: { centicents: Centicents; whole: number };
-  reserved: { centicents: Centicents; whole: number };
-}> {
-  const config = await loadConfig();
-  if (!config.auth_token) {
+// --
+
+async function createTokenAction() {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     logLoginMessageAndQuit();
-    return {
-      available: { centicents: 0, whole: 0 },
-      reserved: { centicents: 0, whole: 0 },
-    };
   }
 
-  const response = await fetch(await getApiUrl("balance_get"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
-    },
-  });
+  // const response = await fetch(await getApiUrl("tokens_create"), {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${config.auth_token}`,
+  //   },
+  // });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      logLoginMessageAndQuit();
-      return {
-        available: { centicents: 0, whole: 0 },
-        reserved: { centicents: 0, whole: 0 },
-      };
-    }
+  console.log("Creating token...");
+}
 
-    logAndQuit(`Failed to fetch balance: ${response.statusText}`);
-    return {
-      available: { centicents: 0, whole: 0 },
-      reserved: { centicents: 0, whole: 0 },
-    };
+async function listTokensAction() {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
+    logLoginMessageAndQuit();
   }
 
-  const data = await response.json();
+  // const response = await fetch(await getApiUrl("tokens_create"), {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${config.auth_token}`,
+  //   },
+  // });
 
-  return {
-    available: {
-      centicents: data.available.amount,
-      whole: data.available.amount / 10_000,
-    },
-    reserved: {
-      centicents: data.reserved.amount,
-      whole: data.reserved.amount / 10_000,
-    },
-  };
+  console.log("Listing tokens...");
+}
+
+async function deleteTokenAction() {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
+    logLoginMessageAndQuit();
+  }
+
+  // const response = await fetch(await getApiUrl("tokens_create"), {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${config.auth_token}`,
+  //   },
+  // });
+
+  console.log("Deleting tokens...");
 }

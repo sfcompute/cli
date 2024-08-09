@@ -107,6 +107,7 @@ export async function getAuthorizationHeader() {
   return { Authorization: `Bearer ${token}` };
 }
 
-export function isLoggedIn() {
-  return !!getAuthToken();
+export async function isLoggedIn() {
+  const authToken = await getAuthToken();
+  return !!authToken;
 }

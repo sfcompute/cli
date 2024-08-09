@@ -95,10 +95,11 @@ interface PlaceBuyOrderArguments {
 }
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
-  const { type, duration, price, quantity, start } = props;
-  if (!isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
+  const { type, duration, price, quantity, start } = props;
 
   const orderQuantity = quantity ? Number(quantity) : 1;
   const durationMs = parseDuration(duration);

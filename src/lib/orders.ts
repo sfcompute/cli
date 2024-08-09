@@ -157,7 +157,8 @@ export async function getOrders(props: {
   side?: "buy" | "sell";
   include_public?: boolean;
 }) {
-  if (!isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 

@@ -70,7 +70,8 @@ export function registerContracts(program: Command) {
 }
 
 async function listContracts() {
-  if (!isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
 

@@ -39,7 +39,8 @@ async function placeSellOrder(options: {
   duration: string;
   flags?: Record<string, any>;
 }) {
-  if (!isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
 

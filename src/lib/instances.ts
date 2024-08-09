@@ -148,7 +148,8 @@ const colorInstanceType = (instanceType: InstanceType) =>
 async function getInstances({
   clusterId,
 }: { clusterId?: string }): Promise<Array<InstanceObject>> {
-  if (!isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
