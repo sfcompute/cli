@@ -79,6 +79,7 @@ async function placeSellOrder(options: {
   }
   const data = await res.json();
   console.log(data);
+  process.exit(0);
 }
 
 async function postSellOrder(token: string, params: PlaceSellOrderParameters) {
