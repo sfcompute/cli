@@ -1,3 +1,5 @@
+import { getCommandBase } from "./command";
+
 export const ApiErrorCode = {
   Base: {
     InvalidRequest: "invalid_request",
@@ -45,9 +47,8 @@ export function logAndQuit(message: string) {
 }
 
 export function logLoginMessageAndQuit() {
-  const loginCommand = process.env.IS_DEVELOPMENT_CLI_ENV
-    ? "bun dev login"
-    : "sf login";
+  const base = getCommandBase();
+  const loginCommand = `${base} login`;
 
   logAndQuit(`You need to login first.\n\n\t$ ${loginCommand}\n`);
 }

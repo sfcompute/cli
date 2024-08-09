@@ -1,9 +1,12 @@
 import type { Command } from "commander";
-import { isLoggedIn } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
-import { input } from "@inquirer/prompts";
+import { input, select } from "@inquirer/prompts";
 import ora from "ora";
 import chalk from "chalk";
+import { getApiUrl } from "../helpers/urls";
+import { getCommandBase } from "../helpers/command";
+import Table from "cli-table3";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -40,6 +43,13 @@ export function registerTokens(program: Command) {
 
 // --
 
+interface PostTokenRequestBody {
+  expires_in_seconds: number;
+  name?: string;
+  description?: string;
+  origin_client: string;
+}
+
 async function createTokenAction() {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
@@ -73,20 +83,77 @@ async function createTokenAction() {
     default: "",
   });
 
-  const loadingSpinner = ora("Generating token\n").start();
+  // generate token
+  console.log("\n");
+  const loadingSpinner = ora("Generating token").start();
 
-  // const response = await fetch(await getApiUrl("tokens_create"), {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${config.auth_token}`,
-  //   },
-  // });
+  const response = await fetch(await getApiUrl("tokens_create"), {
+    method: "POST",
+    body: JSON.stringify({
+      expires_in_seconds: expiresInSeconds,
+      name,
+      description,
+      origin_client: "cli",
+    } as PostTokenRequestBody),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+  });
+  if (!response.ok) {
+    loadingSpinner.fail("Failed to create token");
 
-  // console.log(expiresInSeconds);
-  console.log(name);
+    process.exit(1);
+  }
+
+  // display token to user
+  const data = await response.json();
+  loadingSpinner.succeed(chalk.gray("Access token created 🎉"));
+  console.log(chalk.green(data.token) + "\n");
+
+  // tell them they will set this in the Authorization header
+  console.log(
+    `${chalk.gray(`Pass this in the 'Authorization' header of API requests:`)}`,
+  );
+  console.log(
+    [
+      chalk.gray("{ "),
+      chalk.white("Authorization"),
+      chalk.gray(": "),
+      chalk.green('"Bearer '),
+      chalk.magenta("<token>"),
+      chalk.green('"'),
+      chalk.gray(" }"),
+    ].join(""),
+  );
+  console.log("\n");
+
+  // give them a sample curl
+  const pingUrl = await getApiUrl("ping");
+  console.log(`${chalk.gray("Here is a sample curl to get your started:")}`);
+  console.log(
+    chalk.white(`curl --request GET \\
+  --url ${pingUrl} \\
+  --header 'Authorization: Bearer ${data.token}'`),
+  );
+  console.log("\n");
+
+  // tip user on other commands
+  const base = getCommandBase();
+
+  const table = new Table({
+    colWidths: [20, 30],
+  });
+  table.push(["View All Tokens", chalk.magenta(`${base} tokens list`)]);
+  table.push(["Delete a Token", chalk.magenta(`${base} tokens delete`)]);
+
+  console.log(`${chalk.gray("And other commands you can try:")}`);
+  console.log(table.toString());
+
   process.exit(0);
 }
+
+// --
 
 async function listTokensAction() {
   const loggedIn = await isLoggedIn();

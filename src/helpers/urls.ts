@@ -7,6 +7,9 @@ const webPaths = {
 };
 
 const apiPaths = {
+  index: "/",
+  ping: "/v0/ping",
+
   orders_create: "/v0/orders",
   orders_list: "/v0/orders",
   orders_get: ({ id }: { id: string }) => `/v0/orders/${id}`,

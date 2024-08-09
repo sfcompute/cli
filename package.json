@@ -14,7 +14,7 @@
     "chrono-node": "^2.7.6",
     "cli-table3": "^0.6.5",
     "commander": "^12.1.0",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "inquirer": "^10.1.2",
     "node-fetch": "^3.3.2",
