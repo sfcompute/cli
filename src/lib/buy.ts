@@ -1,4 +1,3 @@
-import readline from "node:readline";
 import c from "chalk";
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
@@ -14,6 +13,7 @@ import {
   formatDuration,
   priceToCenticents,
 } from "./orders";
+import { confirm } from "@inquirer/prompts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -31,22 +31,6 @@ export function registerBuy(program: Command) {
     .action(async (options) => {
       await placeBuyOrder(options);
     });
-}
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-async function prompt(msg: string) {
-  const answer = await new Promise((resolve) =>
-    rl.question(msg, (ans) => {
-      rl.close();
-      resolve(ans);
-    }),
-  );
-
-  return answer;
 }
 
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
@@ -96,7 +80,7 @@ interface PlaceBuyOrderArguments {
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
   const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
+  if (loggedIn) {
     return logLoginMessageAndQuit();
   }
   const { type, duration, price, quantity, start } = props;
@@ -120,11 +104,13 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     start_at: startDate.toISOString(),
   };
 
-  const msg = confirmPlaceOrderParametersMessage(params);
-
   if (!props.yes) {
-    const answer = await prompt(msg);
-    if (answer !== "y") {
+    const placeBuyOrderConfirmed = await confirm({
+      message: confirmPlaceOrderParametersMessage(params),
+      default: false,
+    });
+
+    if (!placeBuyOrderConfirmed) {
       return logAndQuit("Order cancelled");
     }
   }
