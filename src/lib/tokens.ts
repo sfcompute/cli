@@ -235,18 +235,18 @@ async function listTokensAction() {
   const tokensTable = new Table({
     head: [
       chalk.gray("Token ID"),
+      chalk.gray("Name"),
       chalk.gray("Last Active At"),
       chalk.gray("Expires"),
-      chalk.gray("Created At"),
     ],
-    colWidths: [40, 25, 25, 25],
+    colWidths: [40, 15, 25, 25],
   });
   for (const token of tokens) {
     tokensTable.push([
-      token.id,
+      chalk.gray(token.id),
+      token.name ? token.name : chalk.gray("(empty)"),
       chalk.green(formatDate(token.last_active_at)),
-      chalk.red(formatDate(token.expires_at)),
-      chalk.gray(formatDate(token.created_at)),
+      chalk.white(formatDate(token.expires_at)),
     ]);
   }
   console.log(tokensTable.toString());
