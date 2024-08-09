@@ -1,7 +1,7 @@
 import chalk, { type ChalkInstance } from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 
@@ -148,8 +148,8 @@ const colorInstanceType = (instanceType: InstanceType) =>
 async function getInstances({
   clusterId,
 }: { clusterId?: string }): Promise<Array<InstanceObject>> {
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
@@ -161,7 +161,7 @@ async function getInstances({
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 

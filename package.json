@@ -4,7 +4,6 @@
     "lint": "biome lint --write ./src",
     "check": "biome check ./src",
     "dev": "IS_DEVELOPMENT_CLI_ENV=true bun run src/index.ts",
-    "pack": "bun build src/index.ts --outfile dist/cli.js",
     "release": "bun run src/scripts/release.ts",
     "prod": "bun run src/index.ts"
   },
@@ -15,7 +14,7 @@
     "chrono-node": "^2.7.6",
     "cli-table3": "^0.6.5",
     "commander": "^12.1.0",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "inquirer": "^10.1.2",
     "node-fetch": "^3.3.2",

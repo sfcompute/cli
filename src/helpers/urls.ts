@@ -7,6 +7,9 @@ const webPaths = {
 };
 
 const apiPaths = {
+  index: "/",
+  ping: "/v0/ping",
+
   orders_create: "/v0/orders",
   orders_list: "/v0/orders",
   orders_get: ({ id }: { id: string }) => `/v0/orders/${id}`,
@@ -21,13 +24,14 @@ const apiPaths = {
   contracts_get: ({ id }: { id: string }) => `/v0/contracts/${id}`,
 
   balance_get: "/v0/balance",
+
+  tokens_create: "/v0/tokens",
+  tokens_list: "/v0/tokens",
+  tokens_delete_by_id: ({ id }: { id: string }) => `/v0/tokens/${id}`,
 };
 
-export async function getWebAppUrl<
-  K extends keyof typeof webPaths,
-  V extends Extract<(typeof webPaths)[K], (...args: any) => any>,
->(key: K, params: Parameters<V>[0]): Promise<string>;
-export async function getWebAppUrl(key: keyof typeof webPaths): Promise<string>;
+// --
+
 export async function getWebAppUrl(
   key: keyof typeof webPaths,
   params?: any,
@@ -37,14 +41,10 @@ export async function getWebAppUrl(
   if (typeof path === "function") {
     return config.webapp_url + path(params);
   }
+
   return config.webapp_url + path;
 }
 
-export async function getApiUrl<
-  K extends keyof typeof apiPaths,
-  V extends Extract<(typeof apiPaths)[K], (...args: any) => any>,
->(key: K, params: Parameters<V>[0]): Promise<string>;
-export async function getApiUrl(key: keyof typeof apiPaths): Promise<string>;
 export async function getApiUrl(
   key: keyof typeof apiPaths,
   params?: any,
@@ -54,5 +54,6 @@ export async function getApiUrl(
   if (typeof path === "function") {
     return config.api_url + path(params);
   }
+
   return config.api_url + path;
 }
