@@ -16,7 +16,6 @@ async function readFileOrKey(keyOrFile: string): Promise<string> {
       throw new Error("File not found");
     }
     const file = await fileContent.text();
-
     if (!isPubkey(file)) {
       throw new Error("The file content does not look like a valid public key");
     }
@@ -83,17 +82,19 @@ export async function getSSHKeys() {
 export async function postSSHKeys(key: string) {
   const res = await fetch(await getApiUrl("credentials_create"), {
     method: "POST",
-    headers: await getAuthorizationHeader(),
+    headers: {
+      ...(await getAuthorizationHeader()),
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       pubkey: key,
-      user: "sf",
+      username: "sf",
     }),
   });
   if (!res.ok) {
     console.error(await res.text());
     throw new Error("Failed to add SSH key");
   }
-
   const data = await res.json();
   return data as SSHCredential;
 }
