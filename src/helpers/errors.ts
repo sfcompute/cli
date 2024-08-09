@@ -1,6 +1,13 @@
 import { getCommandBase } from "./command";
 import { clearAuthFromConfig } from "./config";
 
+export interface ApiError {
+  object: "error";
+  code: string;
+  message: string;
+  details: Record<string, any>;
+}
+
 export const ApiErrorCode = {
   Base: {
     InvalidRequest: "invalid_request",

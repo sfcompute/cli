@@ -1,8 +1,10 @@
 import type { Command } from "commander";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
+  ApiErrorCode,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
+  type ApiError,
 } from "../helpers/errors";
 import { input, select } from "@inquirer/prompts";
 import ora from "ora";
@@ -10,6 +12,7 @@ import chalk from "chalk";
 import { getApiUrl } from "../helpers/urls";
 import { getCommandBase } from "../helpers/command";
 import Table from "cli-table3";
+import { confirm } from "@inquirer/prompts";
 import dayjs from "dayjs";
 
 export const TOKEN_EXPIRATION_SECONDS = {
@@ -37,12 +40,12 @@ export function registerTokens(program: Command) {
     .description("List all tokens")
     .action(listTokensAction);
 
-  // tokens
-  //   .command("delete")
-  //   .description("Delete a token")
-  //   .option("--name <name>", "Specify the token name")
-  //   .option("--id <id>", "Specify the token ID")
-  //   .action(deleteTokenAction);
+  tokens
+    .command("delete")
+    .description("Delete a token")
+    .requiredOption("--id <id>", "Specify the token ID")
+    .option("--force", "Force delete the token, skipping confirmation")
+    .action(deleteTokenAction);
 }
 
 // --
@@ -260,19 +263,69 @@ function formatDate(isoString: string): string {
 
 // --
 
-async function deleteTokenAction() {
+async function deleteTokenAction({
+  id,
+  force,
+}: { id: string; force?: boolean }) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
-  // const response = await fetch(await getApiUrl("tokens_create"), {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${config.auth_token}`,
-  //   },
-  // });
+  if (force) {
+    await deleteTokenById(id);
+  }
 
-  console.log("Deleting tokens...");
+  const deleteTokenConfirmed = await confirm({
+    message: `Are you sure you want to delete this token? ${chalk.gray("(it will stop working immediately.)")}`,
+    default: false,
+  });
+  if (!deleteTokenConfirmed) {
+    process.exit(0);
+  } else {
+    const verySureConfirmed = await confirm({
+      message:
+        chalk.red("Very sure?") + " " + chalk.gray("(just double-checking)"),
+      default: false,
+    });
+
+    if (!verySureConfirmed) {
+      process.exit(0);
+    } else {
+      await deleteTokenById(id);
+    }
+  }
+}
+async function deleteTokenById(id: string) {
+  const deleteTokenByIdUrl = await getApiUrl("tokens_delete_by_id", { id });
+  const loadingSpinner = ora("Deleting token...").start();
+
+  const response = await fetch(deleteTokenByIdUrl, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+  });
+  if (!response.ok) {
+    if (response.status === 401) {
+      await logSessionTokenExpiredAndQuit();
+    }
+
+    const error = (await response.json()) as ApiError;
+    if (error.code === ApiErrorCode.Tokens.TokenNotFound) {
+      loadingSpinner.fail("Token not found");
+      process.exit(1);
+    }
+
+    // TODO: handle more specific errors
+
+    // generic catch-all
+    loadingSpinner.fail("Failed to delete token");
+    process.exit(1);
+  }
+
+  loadingSpinner.stop();
+  console.log(chalk.gray("Token deleted. 🧼"));
+
+  process.exit(0);
 }

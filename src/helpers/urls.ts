@@ -27,7 +27,7 @@ const apiPaths = {
 
   tokens_create: "/v0/tokens",
   tokens_list: "/v0/tokens",
-  tokens_delete: ({ id }: { id: string }) => `/v0/tokens/${id}`,
+  tokens_delete_by_id: ({ id }: { id: string }) => `/v0/tokens/${id}`,
 };
 
 // --
