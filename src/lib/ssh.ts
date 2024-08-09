@@ -48,6 +48,7 @@ export function registerSSH(program: Command) {
     if (options.add) {
       const key = await readFileOrKey(options.add);
       const credential = await postSSHKeys(key);
+      console.log("Added ssh key");
       return;
     }
 
@@ -82,8 +83,8 @@ export async function postSSHKeys(key: string) {
   const res = await fetch(await getApiUrl("credentials_create"), {
     method: "POST",
     headers: {
-      ...await getAuthorizationHeader(),
-      'Content-Type': 'application/json',
+      ...(await getAuthorizationHeader()),
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       pubkey: key,
@@ -91,6 +92,7 @@ export async function postSSHKeys(key: string) {
     }),
   });
   if (!res.ok) {
+    console.error(await res.text());
     throw new Error("Failed to add SSH key");
   }
   const data = await res.json();
