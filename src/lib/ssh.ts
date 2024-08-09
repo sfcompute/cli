@@ -49,7 +49,7 @@ export function registerSSH(program: Command) {
       const key = await readFileOrKey(options.add);
       const credential = await postSSHKeys(key);
       console.log("Added ssh key");
-      return;
+      process.exit(0);
     }
 
     cmd.help();
