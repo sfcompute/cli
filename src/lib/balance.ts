@@ -2,7 +2,11 @@ import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
 import { isLoggedIn, loadConfig } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 
@@ -92,7 +96,7 @@ async function getBalance(): Promise<{
 
   if (!response.ok) {
     if (response.status === 401) {
-      logLoginMessageAndQuit();
+      logSessionTokenExpiredAndQuit();
 
       return {
         available: { centicents: 0, whole: 0 },

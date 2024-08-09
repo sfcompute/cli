@@ -25,15 +25,18 @@ const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
 
 // --
 
-export async function saveConfig(config: Partial<Config>): Promise<void> {
+export async function saveConfig(
+  config: Partial<Config>,
+): Promise<{ success: boolean }> {
   const configPath = getConfigPath();
   const configData = JSON.stringify(config, null, 2);
 
   try {
     await Bun.write(configPath, configData);
-    console.log("Config saved successfully.");
+
+    return { success: true };
   } catch (error) {
-    console.error("Failed to save config:", error);
+    return { success: false };
   }
 }
 
@@ -41,6 +44,15 @@ export async function loadConfig(): Promise<Config> {
   const configFileData = await readConfigFile();
 
   return { ...ConfigDefaults, ...configFileData };
+}
+
+export async function clearAuthFromConfig() {
+  const config = await loadConfig();
+
+  await saveConfig({
+    ...config,
+    auth_token: undefined,
+  });
 }
 
 // only for development

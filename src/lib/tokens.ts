@@ -1,6 +1,9 @@
 import type { Command } from "commander";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
-import { logLoginMessageAndQuit } from "../helpers/errors";
+import {
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import { input, select } from "@inquirer/prompts";
 import ora from "ora";
 import chalk from "chalk";
@@ -101,6 +104,12 @@ async function createTokenAction() {
     },
   });
   if (!response.ok) {
+    if (response.status === 401) {
+      await logSessionTokenExpiredAndQuit();
+    }
+
+    const data = await response.json();
+    console.log(data);
     loadingSpinner.fail("Failed to create token");
 
     process.exit(1);

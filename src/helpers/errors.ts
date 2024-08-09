@@ -1,4 +1,5 @@
 import { getCommandBase } from "./command";
+import { clearAuthFromConfig } from "./config";
 
 export const ApiErrorCode = {
   Base: {
@@ -30,15 +31,6 @@ export const ApiErrorCode = {
   },
 };
 
-export const HTTPStatusCode = {
-  BadRequest: 400,
-  Unauthorized: 401,
-  Forbidden: 403,
-  NotFound: 404,
-  TooManyRequests: 429,
-  InternalServerError: 500,
-};
-
 // --
 
 export function logAndQuit(message: string) {
@@ -51,4 +43,9 @@ export function logLoginMessageAndQuit() {
   const loginCommand = `${base} login`;
 
   logAndQuit(`You need to login first.\n\n\t$ ${loginCommand}\n`);
+}
+
+export async function logSessionTokenExpiredAndQuit() {
+  await clearAuthFromConfig();
+  logAndQuit("\nYour session has expired. Please login again.");
 }
