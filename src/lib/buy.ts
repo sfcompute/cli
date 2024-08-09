@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import {
@@ -56,7 +56,7 @@ function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
 
   const fromNowTime = dayjs(startDate).fromNow();
   const humanReadableStartAt = dayjs(startDate).format("MM/DD/YYYY hh:mm A");
-  const centicentsAsDollars = (price / 10000).toFixed(2);
+  const centicentsAsDollars = (price / 10_000).toFixed(2);
   const durationHumanReadable = formatDuration(duration * 1000);
 
   const topLine = `${c.green(quantity)} ${c.green(instance_type)} nodes for ${c.green(durationHumanReadable)} starting ${c.green(humanReadableStartAt)} (${c.green(fromNowTime)})`;
@@ -96,8 +96,7 @@ interface PlaceBuyOrderArguments {
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
   const { type, duration, price, quantity, start } = props;
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  if (!isLoggedIn()) {
     return logLoginMessageAndQuit();
   }
 
@@ -134,7 +133,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     body: JSON.stringify(params),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 

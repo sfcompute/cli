@@ -1,7 +1,7 @@
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
 import parseDuration from "parse-duration";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import type { PlaceSellOrderParameters } from "./orders";
@@ -39,8 +39,7 @@ async function placeSellOrder(options: {
   duration: string;
   flags?: Record<string, any>;
 }) {
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  if (!isLoggedIn()) {
     return logLoginMessageAndQuit();
   }
 
@@ -66,7 +65,7 @@ async function placeSellOrder(options: {
     ...flags,
   };
 
-  const res = await postSellOrder(config.auth_token, params);
+  const res = await postSellOrder(params);
   if (!res.ok) {
     return logAndQuit("Failed to place sell order");
   }
@@ -74,13 +73,13 @@ async function placeSellOrder(options: {
   console.log(data);
 }
 
-async function postSellOrder(token: string, params: PlaceSellOrderParameters) {
+async function postSellOrder(params: PlaceSellOrderParameters) {
   return await fetch(await getApiUrl("orders_create"), {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 }

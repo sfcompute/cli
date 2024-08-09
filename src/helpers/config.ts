@@ -23,6 +23,8 @@ const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
   ? DevelopmentConfigDefaults
   : ProductionConfigDefaults;
 
+// --
+
 export async function saveConfig(config: Partial<Config>): Promise<void> {
   const configPath = getConfigPath();
   const configData = JSON.stringify(config, null, 2);
@@ -103,4 +105,8 @@ export async function getAuthToken() {
 export async function getAuthorizationHeader() {
   const token = await getAuthToken();
   return { Authorization: `Bearer ${token}` };
+}
+
+export function isLoggedIn() {
+  return !!getAuthToken();
 }

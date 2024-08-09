@@ -11,13 +11,14 @@ import { registerLogin } from "./lib/login";
 import { registerOrders } from "./lib/orders";
 import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
+import { registerTokens } from "./lib/tokens";
 import { registerUpgrade } from "./lib/upgrade";
 
 const program = new Command();
 
 program
   .name("sf")
-  .description("San Francisco Compute command line tool.")
+  .description("The San Francisco Compute command line tool.")
   .version(version);
 
 // commands
@@ -29,9 +30,10 @@ registerInstances(program);
 registerSSH(program);
 registerSell(program);
 registerBalance(program);
+registerTokens(program);
 registerUpgrade(program);
 
-// (only development commands)
+// (development commands)
 registerDev(program);
 
 program.parse(Bun.argv);

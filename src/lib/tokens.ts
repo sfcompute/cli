@@ -1,17 +1,12 @@
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { isLoggedIn, loadConfig } from "../helpers/config";
+import { loadConfig } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 
-const usdFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-
-export function registerBalance(program: Command) {
+export function registerTokens(program: Command) {
   program
     .command("balance")
     .description("Get account balance")
@@ -71,15 +66,14 @@ async function getBalance(): Promise<{
   available: { centicents: Centicents; whole: number };
   reserved: { centicents: Centicents; whole: number };
 }> {
-  if (!isLoggedIn()) {
+  const config = await loadConfig();
+  if (!config.auth_token) {
     logLoginMessageAndQuit();
-
     return {
       available: { centicents: 0, whole: 0 },
       reserved: { centicents: 0, whole: 0 },
     };
   }
-  const config = await loadConfig();
 
   const response = await fetch(await getApiUrl("balance_get"), {
     method: "GET",
@@ -92,7 +86,6 @@ async function getBalance(): Promise<{
   if (!response.ok) {
     if (response.status === 401) {
       logLoginMessageAndQuit();
-
       return {
         available: { centicents: 0, whole: 0 },
         reserved: { centicents: 0, whole: 0 },
@@ -100,7 +93,6 @@ async function getBalance(): Promise<{
     }
 
     logAndQuit(`Failed to fetch balance: ${response.statusText}`);
-
     return {
       available: { centicents: 0, whole: 0 },
       reserved: { centicents: 0, whole: 0 },
