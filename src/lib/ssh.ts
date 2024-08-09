@@ -67,7 +67,7 @@ export type CredentialObject = SSHCredential;
 
 export type PostSSHCredentialBody = {
   pubkey: string;
-  user: string;
+  username: string;
 };
 
 export async function getSSHKeys() {
