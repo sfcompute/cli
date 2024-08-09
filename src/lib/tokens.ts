@@ -1,19 +1,19 @@
+import { input, select } from "@inquirer/prompts";
+import { confirm } from "@inquirer/prompts";
+import chalk from "chalk";
+import Table from "cli-table3";
 import type { Command } from "commander";
+import dayjs from "dayjs";
+import ora from "ora";
+import { getCommandBase } from "../helpers/command";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
+  type ApiError,
   ApiErrorCode,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-  type ApiError,
 } from "../helpers/errors";
-import { input, select } from "@inquirer/prompts";
-import ora from "ora";
-import chalk from "chalk";
 import { getApiUrl } from "../helpers/urls";
-import { getCommandBase } from "../helpers/command";
-import Table from "cli-table3";
-import { confirm } from "@inquirer/prompts";
-import dayjs from "dayjs";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,

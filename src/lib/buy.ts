@@ -1,3 +1,4 @@
+import { confirm } from "@inquirer/prompts";
 import c from "chalk";
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
@@ -13,7 +14,6 @@ import {
   formatDuration,
   priceToCenticents,
 } from "./orders";
-import { confirm } from "@inquirer/prompts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
