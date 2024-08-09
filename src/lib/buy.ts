@@ -1,4 +1,4 @@
-import readline from "node:readline";
+import { confirm } from "@inquirer/prompts";
 import c from "chalk";
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import {
@@ -33,22 +33,6 @@ export function registerBuy(program: Command) {
     });
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-async function prompt(msg: string) {
-  const answer = await new Promise((resolve) =>
-    rl.question(msg, (ans) => {
-      rl.close();
-      resolve(ans);
-    }),
-  );
-
-  return answer;
-}
-
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const { quantity, price, instance_type, duration, start_at } = params;
 
@@ -56,7 +40,7 @@ function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
 
   const fromNowTime = dayjs(startDate).fromNow();
   const humanReadableStartAt = dayjs(startDate).format("MM/DD/YYYY hh:mm A");
-  const centicentsAsDollars = (price / 10000).toFixed(2);
+  const centicentsAsDollars = (price / 10_000).toFixed(2);
   const durationHumanReadable = formatDuration(duration * 1000);
 
   const topLine = `${c.green(quantity)} ${c.green(instance_type)} nodes for ${c.green(durationHumanReadable)} starting ${c.green(humanReadableStartAt)} (${c.green(fromNowTime)})`;
@@ -95,11 +79,11 @@ interface PlaceBuyOrderArguments {
 }
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
-  const { type, duration, price, quantity, start } = props;
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  const loggedIn = await isLoggedIn();
+  if (loggedIn) {
     return logLoginMessageAndQuit();
   }
+  const { type, duration, price, quantity, start } = props;
 
   const orderQuantity = quantity ? Number(quantity) : 1;
   const durationMs = parseDuration(duration);
@@ -120,11 +104,13 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     start_at: startDate.toISOString(),
   };
 
-  const msg = confirmPlaceOrderParametersMessage(params);
-
   if (!props.yes) {
-    const answer = await prompt(msg);
-    if (answer !== "y") {
+    const placeBuyOrderConfirmed = await confirm({
+      message: confirmPlaceOrderParametersMessage(params),
+      default: false,
+    });
+
+    if (!placeBuyOrderConfirmed) {
       return logAndQuit("Order cancelled");
     }
   }
@@ -134,7 +120,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     body: JSON.stringify(params),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 

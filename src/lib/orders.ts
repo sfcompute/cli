@@ -3,7 +3,7 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import type { ListResponseBody, Order } from "./types";
@@ -157,8 +157,8 @@ export async function getOrders(props: {
   side?: "buy" | "sell";
   include_public?: boolean;
 }) {
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
@@ -175,7 +175,7 @@ export async function getOrders(props: {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 

@@ -1,6 +1,6 @@
 import Table from "cli-table3";
 import { Command } from "commander";
-import { loadConfig } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 
@@ -70,8 +70,8 @@ export function registerContracts(program: Command) {
 }
 
 async function listContracts() {
-  const config = await loadConfig();
-  if (!config.auth_token) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
 
@@ -79,7 +79,7 @@ async function listContracts() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
 
