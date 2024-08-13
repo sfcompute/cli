@@ -3,8 +3,7 @@ import { getAuthorizationHeader } from "../helpers/config";
 import { getApiUrl } from "../helpers/urls";
 
 function isPubkey(key: string): boolean {
-  const pubKeyPattern =
-    /^ssh-(rsa|dss|ed25519) [A-Za-z0-9+/=]+(?: [^@]+@[^@]+)?$/;
+  const pubKeyPattern = /^ssh-/;
   return pubKeyPattern.test(key);
 }
 
