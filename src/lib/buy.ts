@@ -80,7 +80,7 @@ interface PlaceBuyOrderArguments {
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
   const loggedIn = await isLoggedIn();
-  if (loggedIn) {
+  if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
   const { type, duration, price, quantity, start } = props;
