@@ -8,6 +8,7 @@ const webPaths = {
 
 const apiPaths = {
   index: "/",
+  me: "/v0/me",
   ping: "/v0/ping",
 
   orders_create: "/v0/orders",
