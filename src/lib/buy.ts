@@ -86,10 +86,11 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
   const { type, duration, price, quantity, start } = props;
 
   const orderQuantity = quantity ? Number(quantity) : 1;
-  const durationMs = parseDuration(duration);
-  if (!durationMs) {
+  const durationSecs = parseDuration(duration, "s");
+  if (!durationSecs) {
     return logAndQuit("Invalid duration");
   }
+
   const startDate = start ? chrono.parseDate(start) : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
@@ -100,7 +101,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     quantity: orderQuantity,
     price: priceToCenticents(price),
     instance_type: type,
-    duration: durationMs / 1000, // Convert milliseconds to seconds
+    duration: durationSecs,
     start_at: startDate.toISOString(),
   };
 
