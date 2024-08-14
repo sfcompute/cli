@@ -87,7 +87,7 @@ export async function postSSHKeys(key: string) {
     },
     body: JSON.stringify({
       pubkey: key,
-      username: "sf",
+      username: "user",
     }),
   });
   if (!res.ok) {
