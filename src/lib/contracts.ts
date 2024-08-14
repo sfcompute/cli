@@ -20,32 +20,37 @@ interface Contract {
 }
 
 function printTable(data: Contract[]) {
-  const table = new Table({
-    head: [
-      "ID",
-      "Status",
-      "Instance Type",
-      // Found by looking at the first interval
-      "Starts At",
-      // Found by looking at the last interval
-      "Ends At",
-    ],
-  });
-
   for (const contract of data) {
-    const startsAt = contract.shape.intervals[0];
-    const endsAt =
-      contract.shape.intervals[contract.shape.intervals.length - 1];
-    table.push([
-      contract.id,
-      contract.status,
-      contract.instance_type,
-      new Date(startsAt).toLocaleString(),
-      new Date(endsAt).toLocaleString(),
-    ]);
-  }
+    // print the contract shape in a table
+    // if the contract is empty, will print empty shape table
+    const intervals: (string | number)[][] = [];
+    for (let i = 0; i < contract.shape.intervals.length - 1; i++) {
+      intervals.push([
+        "-",
+        "-",
+        "-",
+        new Date(contract.shape.intervals[i]).toLocaleString(),
+        new Date(contract.shape.intervals[i + 1]).toLocaleString(),
+        contract.shape.quantities[i],
+      ]);
+    }
 
-  console.log(table.toString());
+    const table = new Table({
+      head: ["ID", "Status", "Instance Type", "From", "To", "Quantity"],
+    });
+
+    if (intervals.length > 0) {
+      intervals[0][0] = contract.id;
+      intervals[0][1] = contract.status;
+      intervals[0][2] = contract.instance_type;
+    }
+
+    for (const interval of intervals) {
+      table.push(interval);
+    }
+
+    console.log(table.toString());
+  }
 }
 
 export function registerContracts(program: Command) {
