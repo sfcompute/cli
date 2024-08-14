@@ -4,7 +4,13 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import {
+  ApiErrorCode,
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+  type ApiError,
+} from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import type { ListResponseBody, Order } from "./types";
 
@@ -142,6 +148,11 @@ export function registerOrders(program: Command) {
 
       process.exit(0);
     });
+
+  ordersCommand
+    .command("cancel <id>")
+    .description("Cancel an order")
+    .action(submitOrderCancellationByIdAction);
 }
 
 export async function getOrders(props: {
@@ -185,4 +196,47 @@ export async function getOrders(props: {
 
   const resp = (await response.json()) as ListResponseBody<Order>;
   return resp.data;
+}
+
+export async function submitOrderCancellationByIdAction(
+  orderId: string,
+): Promise<void> {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
+    logLoginMessageAndQuit();
+  }
+
+  const url = await getApiUrl("orders_cancel", { id: orderId });
+  const response = await fetch(url, {
+    method: "DELETE",
+    body: JSON.stringify({}),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+  });
+  if (!response.ok) {
+    if (response.status === 401) {
+      await logSessionTokenExpiredAndQuit();
+    }
+
+    const error = (await response.json()) as ApiError;
+    if (error.code === ApiErrorCode.Orders.NotFound) {
+      logAndQuit(`Order ${orderId} not found`);
+    }
+
+    // TODO: handle more specific errors
+
+    logAndQuit(`Failed to cancel order ${orderId}`);
+  }
+
+  const resp = await response.json();
+  const cancellationSubmitted = resp.object === "pending";
+  if (!cancellationSubmitted) {
+    logAndQuit(`Failed to cancel order ${orderId}`);
+  }
+
+  // cancellation submitted successfully
+  console.log(`Cancellation for Order ${orderId} submitted.`);
+  process.exit(0);
 }
