@@ -84,7 +84,7 @@ function printAsTable(orders: Order[]) {
       "Start",
       "Status",
     ],
-    colWidths: [10, 10, 10, 10, 10, 20, 15, 10],
+    colWidths: [10, 8, 10, 10, 10, 10, 25, 10],
   });
   for (const order of orders) {
     if (order.status === "pending") {
@@ -99,7 +99,7 @@ function printAsTable(orders: Order[]) {
         order.status,
       ]);
     } else {
-      const startDate = new Date(order.starts_at);
+      const startDate = new Date(order.start_at);
       table.push([
         order.id.slice(0, 8),
         order.side,

@@ -17,7 +17,7 @@ export interface PlacedOrder {
   side: OrderType;
   instance_type: string;
   price: number;
-  starts_at: string;
+  start_at: string;
   duration: number;
   quantity: number;
   flags: OrderFlags;
