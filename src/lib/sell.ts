@@ -12,7 +12,7 @@ export function registerSell(program: Command) {
     .description("Place a sell order")
     .requiredOption("-p, --price <price>", "Specify the price in centicents")
     .requiredOption("-c, --contract-id <id>", "Specify the contract ID")
-    .requiredOption("-q, --quantity <quantity>", "Specify the quantity")
+    .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .requiredOption(
       "-s, --start <start>",
       "Specify the start time (ISO 8601 format)",

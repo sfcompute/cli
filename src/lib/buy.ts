@@ -24,9 +24,9 @@ export function registerBuy(program: Command) {
     .description("Place a buy order")
     .requiredOption("-t, --type <type>", "Specify the type of node")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
-    .requiredOption("-p, --price <price>", "Specify a price")
-    .option("-n, --quantity <quantity>", "Specify quantity")
-    .option("-s, --start <start>", "Specify a start date")
+    .requiredOption("-p, --price <price>", "Specify the price")
+    .option("-n, --nodes <quantity>", "Specify the number of nodes")
+    .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .action(async (options) => {
       await placeBuyOrder(options);
