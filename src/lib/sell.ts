@@ -4,7 +4,7 @@ import parseDuration from "parse-duration";
 import { loadConfig } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import { priceToCenticents, type PlaceSellOrderParameters } from "./orders";
+import { type PlaceSellOrderParameters, priceToCenticents } from "./orders";
 
 export function registerSell(program: Command) {
   program

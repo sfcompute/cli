@@ -21,7 +21,6 @@ interface Contract {
 
 function printTable(data: Contract[]) {
   for (const contract of data) {
-
     // print the contract shape in a table
     // if the contract is empty, will print empty shape table
     const intervals: (string | number)[][] = [];
@@ -37,14 +36,7 @@ function printTable(data: Contract[]) {
     }
 
     const table = new Table({
-      head: [
-        "ID",
-        "Status",
-        "Instance Type",
-        "From",
-        "To",
-        "Quantity",
-      ]
+      head: ["ID", "Status", "Instance Type", "From", "To", "Quantity"],
     });
 
     if (intervals.length > 0) {
