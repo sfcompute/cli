@@ -35,6 +35,7 @@ export function registerBuy(program: Command) {
 
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const { quantity, price, instance_type, duration, start_at } = params;
+  const nodesLabel = quantity > 1 ? "nodes" : "node";
 
   const startDate = new Date(start_at);
 
@@ -43,11 +44,11 @@ function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const centicentsAsDollars = (price / 10_000).toFixed(2);
   const durationHumanReadable = formatDuration(duration * 1000);
 
-  const topLine = `${c.green(quantity)} ${c.green(instance_type)} nodes for ${c.green(durationHumanReadable)} starting ${c.green(humanReadableStartAt)} (${c.green(fromNowTime)})`;
+  const topLine = `${c.green(quantity)} ${c.green(instance_type)} ${nodesLabel} for ${c.green(durationHumanReadable)} starting ${c.green(humanReadableStartAt)} (${c.green(fromNowTime)})`;
 
   const priceLine = `\nBuy for ${c.green(`$${centicentsAsDollars}`)}? ${c.dim("(y/n)")}`;
 
-  return `\n${topLine}\n${priceLine} `;
+  return `${topLine}\n${priceLine} `;
 }
 
 interface PostOrderResponse {
@@ -91,7 +92,9 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     return logAndQuit("Invalid duration");
   }
 
-  const startDate = start ? chrono.parseDate(start) : new Date();
+  const startDate = start
+    ? chrono.parseDate(start)
+    : dayjs().add(1, "hour").toDate();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }

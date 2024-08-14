@@ -65,7 +65,7 @@ export function priceToCenticents(price: string | number): number {
     const numericPrice = Number.parseFloat(price.replace(/^\$/, ""));
 
     // Convert dollars to centicents
-    return Math.round(numericPrice * 10000);
+    return Math.round(numericPrice * 10_000);
   } catch (error) {
     logAndQuit("Invalid price");
   }
