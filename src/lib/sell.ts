@@ -52,8 +52,8 @@ async function placeSellOrder(options: {
   }
 
   const flags = options.flags || {};
-  const durationMs = parseDuration(options.duration);
-  if (!durationMs) {
+  const durationSecs = parseDuration(options.duration, "s");
+  if (!durationSecs) {
     return logAndQuit("Invalid duration");
   }
   const startDate = options.start
@@ -68,7 +68,7 @@ async function placeSellOrder(options: {
     quantity: forceAsNumber(options.quantity),
     price: priceToCenticents(options.price),
     contract_id: options.contractId,
-    duration: durationMs,
+    duration: durationSecs,
     start_at: startDate.toISOString(),
     ...flags,
   };
