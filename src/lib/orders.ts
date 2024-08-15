@@ -223,6 +223,8 @@ export async function submitOrderCancellationByIdAction(
     const error = (await response.json()) as ApiError;
     if (error.code === ApiErrorCode.Orders.NotFound) {
       logAndQuit(`Order ${orderId} not found`);
+    } else if (error.code === ApiErrorCode.Orders.AlreadyCancelled) {
+      logAndQuit(`Order ${orderId} is already cancelled`);
     }
 
     // TODO: handle more specific errors
