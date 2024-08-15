@@ -8,11 +8,13 @@ const webPaths = {
 
 const apiPaths = {
   index: "/",
+  me: "/v0/me",
   ping: "/v0/ping",
 
   orders_create: "/v0/orders",
   orders_list: "/v0/orders",
   orders_get: ({ id }: { id: string }) => `/v0/orders/${id}`,
+  orders_cancel: ({ id }: { id: string }) => `/v0/orders/${id}`,
 
   instances_list: "/v0/instances",
   instances_get: ({ id }: { id: string }) => `/v0/instances/${id}`,

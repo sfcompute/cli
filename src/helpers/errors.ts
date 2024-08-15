@@ -28,6 +28,7 @@ export const ApiErrorCode = {
     InvalidStart: "order.invalid_start",
     InvalidDuration: "order.invalid_duration",
     InsufficientFunds: "order.insufficient_funds",
+    AlreadyCancelled: "order.already_cancelled",
     NotFound: "order.not_found",
   },
   Tokens: {
