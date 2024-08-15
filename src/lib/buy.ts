@@ -92,9 +92,7 @@ async function placeBuyOrder(props: PlaceBuyOrderArguments) {
     return logAndQuit("Invalid duration");
   }
 
-  const startDate = start
-    ? chrono.parseDate(start)
-    : dayjs().add(1, "hour").toDate();
+  const startDate = start ? chrono.parseDate(start) : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
