@@ -37,6 +37,7 @@ interface InstanceObject {
   id: string;
   type: InstanceType;
   ip: string;
+  status: string;
 }
 
 async function listInstancesAction({
@@ -55,6 +56,7 @@ async function listInstancesAction({
       chalk.gray("Instance Id"),
       chalk.gray("Type"),
       chalk.gray("IP Address"),
+      chalk.gray("Status"),
     ];
 
     if (instances.length === 0) {
@@ -78,6 +80,7 @@ async function listInstancesAction({
           instance.id,
           colorInstanceType(instance.type),
           instance.ip,
+          instance.status,
         ]),
       );
       console.log(table.toString() + "\n\n");
