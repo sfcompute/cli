@@ -18,8 +18,29 @@ else
   exit 1
 fi
 
-command -v unzip >/dev/null ||
-    error 'unzip is required to install sfcompute cli'
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Check if unzip is installed, if not, try to install it
+if ! command_exists unzip; then
+  echo "unzip is not installed. Attempting to install..."
+  if command_exists apt-get; then
+    sudo apt-get update && sudo apt-get install -y unzip
+  elif command_exists yum; then
+    sudo yum install -y unzip
+  else
+    echo "Unable to install unzip. Please install it manually and run this script again."
+    exit 1
+  fi
+fi
+
+# Verify unzip is now available
+if ! command_exists unzip; then
+  echo "Failed to install unzip. Please install it manually and run this script again."
+  exit 1
+fi
 
 # Make sure the target dir exists
 mkdir -p "${TARGET_DIR}"
@@ -72,7 +93,7 @@ curl -L -o "${TMPDIR}/${BINARY_NAME}.zip" "${SF_BINARY_URL}"
 # Extract the zip file in the temporary directory.
 echo "unzip -o \"${TMPDIR}/${BINARY_NAME}.zip\" -d \"${TMPDIR}/dist\""
 unzip -o "${TMPDIR}/${BINARY_NAME}.zip" -d "${TMPDIR}/dist" ||
-    error 'Failed to extract sf'
+    { echo "Failed to extract sf"; exit 1; }
 
 # Move the binary to the target directory.
 mv "${TMPDIR}/dist/sf-$target" "${TARGET_DIR}/${BINARY_NAME}"
@@ -100,6 +121,9 @@ if [ -f "${TARGET_FILE}" ]; then
     echo -e "\033[1m  echo 'export PATH=\"${TARGET_DIR}:\$PATH\"' >> ~/.zshrc && source ~/.zshrc\033[0m"
     echo -e "\033[0;32m"
     echo -e "After running the appropriate command, you can use '${BINARY_NAME}'.\033[0m"
+    echo -e "\033[0;32m"
+    echo -e "To get started, run: 'sf login'\033[0m"
+    echo -e "\033[0;32m"
 
 else
     echo "Installation failed. '${BINARY_NAME}' CLI could not be installed."
