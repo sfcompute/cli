@@ -23,6 +23,7 @@ export interface PlacedOrder {
   flags: OrderFlags;
   created_at: string;
   executed: boolean;
+  execution_price?: number;
   cancelled: boolean;
   status: "placed";
 }

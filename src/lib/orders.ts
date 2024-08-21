@@ -5,11 +5,11 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
+  type ApiError,
   ApiErrorCode,
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-  type ApiError,
 } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import type { ListResponseBody, Order } from "./types";
@@ -72,8 +72,8 @@ function printAsTable(orders: Order[]) {
       "Duration",
       "Start",
       "Status",
+      "Execution Price",
     ],
-    colWidths: [10, 8, 10, 10, 10, 10, 25, 10],
   });
   for (const order of orders) {
     if (order.status === "pending") {
@@ -88,16 +88,29 @@ function printAsTable(orders: Order[]) {
         order.status,
       ]);
     } else {
+      let status: string;
+      let executionPrice: number | undefined;
+      if (order.cancelled) {
+        status = "cancelled";
+      } else if (order.executed) {
+        status = "executed";
+        // ! this could be undefined if the order was placed before this feature was implemented
+        executionPrice = order.execution_price;
+      } else {
+        status = order.status;
+      }
+
       const startDate = new Date(order.start_at);
       table.push([
-        order.id.slice(0, 8),
+        order.id,
         order.side,
         order.instance_type,
         usdFormatter.format(order.price / 10000),
         order.quantity.toString(),
         formatDuration(order.duration * 1000),
         startDate.toLocaleString(),
-        order.status,
+        status,
+        executionPrice ? usdFormatter.format(executionPrice / 10000) : "-",
       ]);
     }
   }
