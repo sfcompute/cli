@@ -91,7 +91,6 @@ function printAsTable(orders: Order[]) {
       "Status",
       "Execution Price",
     ],
-    colWidths: [10, 8, 10, 10, 10, 10, 25, 10, 20],
   });
   for (const order of orders) {
     if (order.status === "pending") {
@@ -120,7 +119,7 @@ function printAsTable(orders: Order[]) {
 
       const startDate = new Date(order.start_at);
       table.push([
-        order.id.slice(0, 8),
+        order.id,
         order.side,
         order.instance_type,
         usdFormatter.format(order.price / 10000),
