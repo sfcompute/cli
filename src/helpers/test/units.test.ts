@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { priceWholeToCenticents } from "../units";
+import {
+  centicentsToDollarsFormatted,
+  priceWholeToCenticents,
+  type Centicents,
+} from "../units";
 
 describe("units", () => {
   test("price whole to centicents", () => {
@@ -64,6 +68,37 @@ describe("units", () => {
 
       expect(centicents).toBeNull();
       expect(invalid).toBeTrue();
+    }
+  });
+
+  test("centicents to dollars formatted", () => {
+    const inputToExpectedValids = [
+      // whole
+      [0, "$0.00"],
+      [10_000, "$1.00"],
+      [100_000, "$10.00"],
+      [1_000_000, "$100.00"],
+
+      [99_910, "$9.99"],
+
+      // with cents
+      [100, "$0.01"],
+      [200, "$0.02"],
+      [1_000, "$0.10"],
+      [9000, "$0.90"],
+
+      // rounding
+      [1, "$0.00"],
+      [49, "$0.00"],
+      [50, "$0.01"],
+      [99, "$0.01"],
+      [100, "$0.01"],
+    ];
+
+    for (const [input, expected] of inputToExpectedValids) {
+      const result = centicentsToDollarsFormatted(input as Centicents);
+
+      expect(result).toEqual(expected as string);
     }
   });
 });

@@ -41,3 +41,7 @@ export function priceWholeToCenticents(
   // default invalid
   return { centicents: null, invalid: true };
 }
+
+export function centicentsToDollarsFormatted(centicents: Centicents): string {
+  return `$${(centicents / 10_000).toFixed(2)}`;
+}

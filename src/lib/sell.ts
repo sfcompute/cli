@@ -4,7 +4,8 @@ import parseDuration from "parse-duration";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import { type PlaceSellOrderParameters, priceToCenticents } from "./orders";
+import type { PlaceSellOrderParameters } from "./orders";
+import { priceWholeToCenticents } from "../helpers/units";
 
 export function registerSell(program: Command) {
   program
@@ -63,10 +64,17 @@ async function placeSellOrder(options: {
     return logAndQuit("Invalid start date");
   }
 
+  const { centicents: priceCenticents, invalid } = priceWholeToCenticents(
+    options.price,
+  );
+  if (invalid || !priceCenticents) {
+    return logAndQuit(`Invalid price: ${options.price}`);
+  }
+
   const params: PlaceSellOrderParameters = {
     side: "sell",
     quantity: forceAsNumber(options.quantity),
-    price: priceToCenticents(options.price),
+    price: priceCenticents,
     contract_id: options.contractId,
     duration: durationSecs,
     start_at: startDate.toISOString(),

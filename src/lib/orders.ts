@@ -5,14 +5,14 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
-  type ApiError,
-  ApiErrorCode,
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import type { ListResponseBody, Order } from "./types";
+import type { ListResponseBody } from "../api/types";
+import { ApiErrorCode, type ApiError } from "../api";
+import type { HydratedOrder } from "../api/orders";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -61,7 +61,7 @@ export type PlaceOrderParameters = {
   start_at: string;
 };
 
-function printAsTable(orders: Order[]) {
+function printAsTable(orders: Array<HydratedOrder>) {
   const table = new Table({
     head: [
       "ID",
@@ -190,7 +190,7 @@ export async function getOrders(props: {
     logAndQuit(`Failed to fetch orders: ${response.statusText}`);
   }
 
-  const resp = (await response.json()) as ListResponseBody<Order>;
+  const resp = (await response.json()) as ListResponseBody<HydratedOrder>;
   return resp.data;
 }
 
