@@ -76,10 +76,10 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
   }
 
   const { data: pendingOrder, err } = await placeBuyOrderRequest({
-    instanceType: options.instanceType,
-    totalNodes: options.totalNodes,
-    durationSeconds: options.durationSeconds,
-    startAtIso: options.startsAt.iso,
+    instance_type: options.instanceType,
+    quantity: options.totalNodes,
+    duration: options.durationSeconds,
+    start_at: options.startsAt.iso,
     price: options.priceCenticents,
   });
   if (err) {
