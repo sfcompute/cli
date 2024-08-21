@@ -4,7 +4,6 @@ import type { Command } from "commander";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import type { StringLike } from "bun";
 
 export function registerInstances(program: Command) {
   const instances = program
@@ -81,7 +80,7 @@ async function listInstancesAction({
           instance.id,
           colorInstanceType(instance.type),
           instance.ip,
-          instance.status
+          instance.status,
         ]),
       );
       console.log(table.toString() + "\n\n");
