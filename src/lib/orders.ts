@@ -61,23 +61,6 @@ export type PlaceOrderParameters = {
   start_at: string;
 };
 
-export function priceToCenticents(price: string | number): number {
-  if (typeof price === "number") {
-    return price;
-  }
-
-  try {
-    // Remove any leading dollar sign and convert to a number
-    const numericPrice = Number.parseFloat(price.replace(/^\$/, ""));
-
-    // Convert dollars to centicents
-    return Math.round(numericPrice * 10_000);
-  } catch (error) {
-    logAndQuit("Invalid price");
-  }
-  return 0;
-}
-
 function printAsTable(orders: Order[]) {
   const table = new Table({
     head: [

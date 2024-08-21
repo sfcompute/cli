@@ -14,24 +14,84 @@ import {
   formatDuration,
   priceToCenticents,
 } from "./orders";
+import type { OrderStatus } from "../types/orders";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
+
+interface SfBuyOptions {
+  type: string;
+  nodes?: string;
+  duration: string;
+  price: string;
+  start?: string;
+  yes?: boolean;
+  quote?: boolean;
+}
 
 export function registerBuy(program: Command) {
   program
     .command("buy")
     .description("Place a buy order")
     .requiredOption("-t, --type <type>", "Specify the type of node")
+    .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
     .requiredOption("-p, --price <price>", "Specify the price")
-    .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
-    .action(async (options) => {
-      await placeBuyOrder(options);
-    });
+    .option("--quote", "Only provide a quote for the order")
+    .action(buyOrderAction);
 }
+
+// --
+
+async function buyOrderAction(options: SfBuyOptions) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
+    return logLoginMessageAndQuit();
+  }
+
+  // parse options
+  const durationSecs = parseDuration(options.duration, "s");
+  if (!durationSecs) {
+    return logAndQuit("Invalid duration");
+  }
+
+  if (options.quote) {
+    await quoteBuyOrder(options);
+  } else {
+    await placeBuyOrder(options);
+  }
+}
+
+async function placeBuyOrderAction(options: SfBuyOptions) {}
+
+async function quoteBuyOrderAction(options: SfBuyOptions) {}
+
+// --
+
+interface SfBuyParamsNormalized {
+  instanceType: string;
+  totalNodes: number;
+  durationSeconds: number;
+  priceCenticents: number;
+}
+function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
+  const durationSeconds = parseDuration(options.duration, "s");
+  if (!durationSeconds) {
+    logAndQuit(`Invalid duration: ${options.duration}`);
+    process.exit(1); // make typescript happy
+  }
+
+  return {
+    instanceType: options.type,
+    totalNodes: options.nodes ? Number(options.nodes) : 1,
+    durationSeconds,
+    priceCenticents: priceToCenticents(options.price),
+  };
+}
+
+// --
 
 function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
   const { quantity, price, instance_type, duration, start_at } = params;
@@ -54,43 +114,11 @@ function confirmPlaceOrderParametersMessage(params: PlaceOrderParameters) {
 interface PostOrderResponse {
   object: "order";
   id: string;
-  side: "buy" | "sell";
-  instance_type: string;
-  price: number;
-  starts_at: string;
-  duration: number;
-  quantity: number;
-  flags: {
-    market: boolean;
-    post_only: boolean;
-    ioc: boolean;
-  };
-  created_at: string;
-  executed: boolean;
-  cancelled: boolean;
-}
-
-interface PlaceBuyOrderArguments {
-  type: string;
-  duration: string;
-  price: string | number;
-  quantity?: number;
-  start?: string;
-  yes?: boolean;
+  status: OrderStatus.Pending;
 }
 
 async function placeBuyOrder(props: PlaceBuyOrderArguments) {
-  const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
-    return logLoginMessageAndQuit();
-  }
-  const { type, duration, price, quantity, start } = props;
-
-  const orderQuantity = quantity ? Number(quantity) : 1;
-  const durationSecs = parseDuration(duration, "s");
-  if (!durationSecs) {
-    return logAndQuit("Invalid duration");
-  }
+  const { type, price, start } = props;
 
   const startDate = start ? chrono.parseDate(start) : new Date();
   if (!startDate) {
