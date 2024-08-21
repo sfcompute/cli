@@ -3,6 +3,8 @@ import type { Nullable } from "../types/empty";
 export type Cents = number;
 export type Centicents = number;
 
+// --
+
 interface PriceWholeToCenticentsReturn {
   centicents: Nullable<Centicents>;
   invalid: boolean;
@@ -19,12 +21,21 @@ export function priceWholeToCenticents(
   }
 
   if (typeof price === "number") {
+    if (price < 0) {
+      return { centicents: null, invalid: true };
+    }
+
     return { centicents: price * 10_000, invalid: false };
   } else if (typeof price === "string") {
-    // remove any whitespace and dollar signs
-    const numericPrice = Number.parseFloat(price.replace(/[\s\$]/g, ""));
+    // remove any whitespace, dollar signs, negative signs, single and double quotes
+    const priceCleaned = price.replace(/[\s\$\-\'\"]/g, "");
+    if (priceCleaned === "") {
+      return { centicents: null, invalid: true };
+    }
 
-    return { centicents: numericPrice * 10_000, invalid: false };
+    const parsedPrice = Number.parseFloat(priceCleaned);
+
+    return { centicents: parsedPrice * 10_000, invalid: false };
   }
 
   // default invalid
