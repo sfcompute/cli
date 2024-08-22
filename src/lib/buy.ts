@@ -12,9 +12,12 @@ import { formatDuration } from "./orders";
 import {
   centicentsToDollarsFormatted,
   priceWholeToCenticents,
+  type Centicents,
 } from "../helpers/units";
 import { OrderStatus, placeBuyOrderRequest } from "../api/orders";
 import { quoteBuyOrderRequest } from "../api/quoting";
+import { ApiErrorCode } from "../api";
+import type { Nullable } from "../types/empty";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -36,7 +39,7 @@ export function registerBuy(program: Command) {
     .requiredOption("-t, --type <type>", "Specify the type of node")
     .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
-    .requiredOption("-p, --price <price>", "Specify the price")
+    .option("-p, --price <price>", "Specify the price")
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option("--quote", "Only provide a quote for the order")
@@ -64,6 +67,10 @@ async function buyOrderAction(options: SfBuyOptions) {
 // --
 
 async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
+  if (!options.priceCenticents) {
+    return;
+  }
+
   if (options.confirmWithUser) {
     const confirmationMessage = confirmPlaceOrderMessage(options);
     const confirmed = await confirm({
@@ -95,6 +102,10 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 }
 
 function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
+  if (!options.priceCenticents) {
+    return "";
+  }
+
   const totalNodesLabel = c.green(options.totalNodes);
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.totalNodes > 1 ? "nodes" : "node";
@@ -126,6 +137,10 @@ async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
     max_start_date: options.startsAt.iso,
   });
   if (err) {
+    if (err.code === ApiErrorCode.Quotes.NoAvailability) {
+      return logAndQuit("Not enough data exists to quote this order.");
+    }
+
     return logAndQuit(`Failed to quote order: ${err.message}`);
   }
 
@@ -142,7 +157,7 @@ interface SfBuyParamsNormalized {
   instanceType: string;
   totalNodes: number;
   durationSeconds: number;
-  priceCenticents: number;
+  priceCenticents: Nullable<number>;
   startsAt: {
     iso: string;
     date: Date;
@@ -155,6 +170,8 @@ interface SfBuyParamsNormalized {
   quoteOnly: boolean;
 }
 function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
+  const isQuoteOnly = options.quote ?? false;
+
   // parse duration
   const durationSeconds = parseDuration(options.duration, "s");
   if (!durationSeconds) {
@@ -163,11 +180,17 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
   }
 
   // parse price
-  const { centicents: priceCenticents, invalid: priceInputInvalid } =
-    priceWholeToCenticents(options.price);
-  if (priceInputInvalid || !priceCenticents) {
-    logAndQuit(`Invalid price: ${options.price}`);
-    process.exit(1); // make typescript happy
+  let priceCenticents: Nullable<Centicents> = null;
+  if (!isQuoteOnly) {
+    const { centicents: priceParsed, invalid: priceInputInvalid } =
+      priceWholeToCenticents(options.price);
+
+    if (priceInputInvalid || !priceCenticents) {
+      logAndQuit(`Invalid price: ${options.price}`);
+      process.exit(1); // make typescript happy
+    }
+
+    priceCenticents = priceParsed;
   }
 
   // parse starts at
@@ -196,6 +219,6 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
       date: dayjs(startDate).add(durationSeconds, "s").toDate(),
     },
     confirmWithUser: confirmWithUser,
-    quoteOnly: options.quote ?? false,
+    quoteOnly: isQuoteOnly,
   };
 }

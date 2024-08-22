@@ -34,6 +34,10 @@ export const ApiErrorCode = {
     InvalidTokenExpirationDuration: "token.invalid_token_expiration_duration",
     MaxTokenLimitReached: "token.max_token_limit_reached",
   },
+  Quotes: {
+    NoAvailability: "quote.no_availability_satisfying_quote_parameters",
+    InvalidDateRange: "quote.invalid_date_range",
+  },
 };
 
 export function objToQueryString(obj: Record<string, any>): string {

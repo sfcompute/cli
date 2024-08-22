@@ -52,7 +52,6 @@ export async function quoteBuyOrderRequest(
   };
   const queryString = objToQueryString(queryParams);
   const url = `${urlBase}?${queryString}`;
-  console.log(url);
 
   const response = await fetch(url, {
     method: "GET",
