@@ -182,12 +182,16 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
   // parse price
   let priceCenticents: Nullable<Centicents> = null;
   if (!isQuoteOnly) {
+    if (!options.price) {
+      logAndQuit("Please provide a price.");
+      process.exit(1);
+    }
+
     const { centicents: priceParsed, invalid: priceInputInvalid } =
       priceWholeToCenticents(options.price);
-
-    if (priceInputInvalid || !priceCenticents) {
+    if (priceInputInvalid) {
       logAndQuit(`Invalid price: ${options.price}`);
-      process.exit(1); // make typescript happy
+      process.exit(1);
     }
 
     priceCenticents = priceParsed;
@@ -199,7 +203,7 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
     : new Date();
   if (!startDate) {
     logAndQuit("Invalid start date");
-    process.exit(1); // make typescript happy
+    process.exit(1);
   }
 
   const yesFlagOmitted = options.yes === undefined || options.yes === null;
