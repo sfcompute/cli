@@ -5,7 +5,6 @@ import Table from "cli-table3";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import ora from "ora";
-import { getCommandBase } from "../helpers/command";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
   logLoginMessageAndQuit,
@@ -13,6 +12,7 @@ import {
 } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import { ApiErrorCode, type ApiError } from "../api";
+import { CLICommand } from "../helpers/commands";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -164,13 +164,11 @@ async function createTokenAction() {
   console.log("\n");
 
   // tip user on other commands
-  const base = getCommandBase();
-
   const table = new Table({
     colWidths: [20, 30],
   });
-  table.push(["View All Tokens", chalk.magenta(`${base} tokens list`)]);
-  table.push(["Delete a Token", chalk.magenta(`${base} tokens delete`)]);
+  table.push(["View All Tokens", chalk.magenta(`${CLICommand.Tokens.List}`)]);
+  table.push(["Delete a Token", chalk.magenta(`${CLICommand.Tokens.Delete}`)]);
 
   console.log(`${chalk.gray("And other commands you can try:")}`);
   console.log(table.toString());
@@ -225,10 +223,9 @@ async function listTokensAction() {
     console.log(table.toString() + "\n");
 
     // prompt user that they can generate one
-    const base = getCommandBase();
     console.log(
       chalk.gray("Generate your first token with: ") +
-        chalk.magenta(`${base} tokens create`),
+        chalk.magenta(CLICommand.Tokens.Create),
     );
 
     process.exit(0);

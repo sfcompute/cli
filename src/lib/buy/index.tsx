@@ -34,7 +34,7 @@ export function registerBuy(program: Command) {
     });
 }
 
-// // --
+// --
 
 async function buyOrderAction(options: SfBuyOptions) {
   const loggedIn = await isLoggedIn();

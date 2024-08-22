@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, Box } from "ink";
 import { InstanceType } from "../../api/instances";
-import { getCommandBase } from "../../helpers/command";
+import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
 import type { Nullable } from "../../types/empty";
+import { getBalance } from "../../api/balance";
+import {
+  centicentsToDollarsFormatted,
+  centicentsToWhole,
+} from "../../helpers/units";
 
 type SFBuyProps = {
   light: string;
@@ -21,26 +26,27 @@ const SFBuy: React.FC<SFBuyProps> = () => {
 };
 
 const InfoBanner = () => {
-  const commandBase = getCommandBase();
-  const rootCommand = `${commandBase} buy`;
-
   return (
     <Box
       width={COMMAND_CONTAINER_MAX_WIDTH}
       flexDirection="column"
       marginTop={1}
       marginBottom={1}
-      padding={1}
+      paddingX={2}
+      paddingY={1}
       borderColor="gray"
       borderStyle="double"
     >
-      <Box width="100%" flexDirection="row" marginBottom={1}>
+      <Box
+        width="100%"
+        flexDirection="row"
+        justifyContent="space-between"
+        marginBottom={1}
+      >
         <Box alignItems="flex-start">
-          <Text color="gray">{rootCommand}</Text>
+          <Text color="gray">{CLICommand.Buy}</Text>
         </Box>
-        <Box alignItems="flex-end">
-          <Text color="gray">{rootCommand}</Text>
-        </Box>
+        <AvailableBalance />
       </Box>
       <Box alignItems="flex-start">
         <Text>
@@ -51,6 +57,51 @@ const InfoBanner = () => {
           <Text color="green">soon</Text> as possible.
         </Text>
       </Box>
+    </Box>
+  );
+};
+
+const AvailableBalance = () => {
+  const [balance, setBalance] = useState<Nullable<number>>(0);
+  const [fetching, setFetching] = useState<boolean>(false);
+  useEffect(() => {
+    setFetching(true);
+
+    getBalance().then(({ data }) => {
+      if (data) {
+        setBalance(centicentsToWhole(data.available.amount));
+      }
+
+      setFetching(false);
+    });
+  }, []);
+  return <AvailableBalanceLabel balance={balance} loading={fetching} />;
+};
+const AvailableBalanceLabel = ({
+  balance,
+  loading,
+}: { balance: Nullable<number>; loading: boolean }) => {
+  if (loading) {
+    return <Text color="gray">(loading balance)</Text>;
+  }
+
+  if (!balance) {
+    return <Text color="gray">$--.--</Text>;
+  }
+
+  const getBalanceColor = () => {
+    if (balance === 0) {
+      return "white";
+    }
+
+    return "green";
+  };
+  const balanceColor = getBalanceColor();
+
+  return (
+    <Box>
+      <Text color="gray">spending power: </Text>
+      <Text color={balanceColor}>{centicentsToDollarsFormatted(balance)}</Text>
     </Box>
   );
 };

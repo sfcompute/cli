@@ -1,4 +1,4 @@
-import { getCommandBase } from "./command";
+import { CLICommand } from "./commands";
 import { clearAuthFromConfig } from "./config";
 
 export function logAndQuit(message: string) {
@@ -7,10 +7,7 @@ export function logAndQuit(message: string) {
 }
 
 export function logLoginMessageAndQuit() {
-  const base = getCommandBase();
-  const loginCommand = `${base} login`;
-
-  logAndQuit(`You need to login first.\n\n\t$ ${loginCommand}\n`);
+  logAndQuit(`You need to login first.\n\n\t$ ${CLICommand.Login}\n`);
 }
 
 export async function logSessionTokenExpiredAndQuit() {
