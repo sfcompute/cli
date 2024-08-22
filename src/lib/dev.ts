@@ -25,7 +25,7 @@ export function registerDev(program: Command) {
       process.exit(0);
     });
     program.command("epoch").action(async () => {
-      const MILLS_PER_EPOCH = 1000 * 60 * 60;
+      const MILLS_PER_EPOCH = 1000 * 60;
       console.log(Math.floor(Date.now() / MILLS_PER_EPOCH));
 
       process.exit(0);

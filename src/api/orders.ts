@@ -4,7 +4,10 @@ import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { Nullable } from "../types/empty";
 
-export type OrderType = "buy" | "sell";
+enum OrderType {
+  Buy = "buy",
+  Sell = "sell",
+}
 export enum OrderStatus {
   Pending = "pending",
   Rejected = "rejected",
