@@ -14,6 +14,7 @@ import {
   priceWholeToCenticents,
 } from "../helpers/units";
 import { OrderStatus, placeBuyOrderRequest } from "../api/orders";
+import { quoteBuyOrderRequest } from "../api/quoting";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -116,7 +117,24 @@ function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
 
 // --
 
-async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {}
+async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
+  const { data: quote, err } = await quoteBuyOrderRequest({
+    instance_type: options.instanceType,
+    quantity: options.totalNodes,
+    duration: options.durationSeconds,
+    min_start_date: options.startsAt.iso,
+    max_start_date: options.startsAt.iso,
+  });
+  if (err) {
+    return logAndQuit(`Failed to quote order: ${err.message}`);
+  }
+
+  if (quote) {
+    const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
+
+    console.log(`This order is projected to cost ${priceLabelUsd}`);
+  }
+}
 
 // --
 

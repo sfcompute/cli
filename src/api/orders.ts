@@ -46,7 +46,7 @@ export type Order = PlacedOrder | HydratedOrder;
 
 // -- place buy order
 
-interface PlaceBuyOrderRequestBody {
+interface PlaceBuyOrderRequestOptions {
   instance_type: string;
   quantity: number;
   duration: number;
@@ -59,7 +59,7 @@ interface PlaceBuyOrderReturn {
   err: Nullable<ApiError>;
 }
 export async function placeBuyOrderRequest(
-  body: PlaceBuyOrderRequestBody,
+  body: PlaceBuyOrderRequestOptions,
 ): Promise<PlaceBuyOrderReturn> {
   const response = await fetch(await getApiUrl("orders_create"), {
     method: "POST",

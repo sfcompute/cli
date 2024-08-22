@@ -35,3 +35,9 @@ export const ApiErrorCode = {
     MaxTokenLimitReached: "token.max_token_limit_reached",
   },
 };
+
+export function objToQueryString(obj: Record<string, any>): string {
+  return Object.keys(obj)
+    .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]))
+    .join("&");
+}
