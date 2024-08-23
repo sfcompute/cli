@@ -65,7 +65,7 @@ const InfoBanner = () => {
         <Box flexDirection="column" marginLeft={2}>
           <Text>
             — it can get <Text color="green">filled</Text>{" "}
-            <Text color="gray">(you get the compute)</Text>
+            <Text color="gray">(you get the compute you requested)</Text>
           </Text>
           <Text>
             — you can <Text color="red">cancel</Text> it
