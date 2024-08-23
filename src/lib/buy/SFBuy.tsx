@@ -21,7 +21,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const [orderId, setOrderId] = useState<Nullable<string>>(null);
 
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
-  const [totalNodes, setTotalNodes] = useState<number>(1);
+  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(null);
   const [durationSeconds, setDurationSeconds] =
     useState<Nullable<number>>(null);
   const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
@@ -35,6 +35,10 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     <Box width={COMMAND_CONTAINER_MAX_WIDTH} flexDirection="column" marginY={1}>
       <InfoBanner balance={balance} loadingBalance={loadingBalance} />
       <OrderInfoCollection
+        instanceType={instanceType}
+        totalNodes={totalNodes}
+        durationSeconds={durationSeconds}
+        startAtIso={startAtIso}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
       />
@@ -45,9 +49,20 @@ const SFBuy: React.FC<SFBuyProps> = () => {
 // --
 
 const OrderInfoCollection = ({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
   noFunds,
   showLoading,
-}: { noFunds: boolean; showLoading: boolean }) => {
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+  noFunds: boolean;
+  showLoading: boolean;
+}) => {
   if (showLoading) {
     return (
       <Box marginTop={1}>
@@ -75,9 +90,55 @@ const OrderInfoCollection = ({
         </Box>
       </Box>
       <Box marginTop={1}>
-        <Text>asdfasdfasdfasdf</Text>
+        <Text>instance type</Text>
+      </Box>
+      <Box flexDirection="row" justifyContent="flex-end">
+        <TotalStepsCompleteLabel
+          instanceType={instanceType}
+          totalNodes={totalNodes}
+          durationSeconds={durationSeconds}
+          startAtIso={startAtIso}
+        />
       </Box>
     </Box>
+  );
+};
+
+const TOTAL_STEPS = 4;
+const TotalStepsCompleteLabel = ({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+}) => {
+  const instanceTypeSet = instanceType !== null && instanceType !== undefined;
+  const totalNodesSet = totalNodes !== null && totalNodes !== undefined;
+  const durationSecondsSet =
+    durationSeconds !== null && durationSeconds !== undefined;
+  const startAtIsoSet = startAtIso !== null && startAtIso !== undefined;
+
+  const stepsComplete = [
+    instanceTypeSet,
+    totalNodesSet,
+    durationSecondsSet,
+    startAtIsoSet,
+  ].filter(Boolean).length;
+  const allStepsComplete = stepsComplete === TOTAL_STEPS;
+
+  const ratioLabelColor = allStepsComplete ? "green" : "white";
+
+  return (
+    <Text>
+      <Text color={ratioLabelColor}>
+        {stepsComplete}/{TOTAL_STEPS}
+      </Text>{" "}
+      complete
+    </Text>
   );
 };
 
