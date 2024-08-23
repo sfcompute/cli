@@ -34,6 +34,13 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const noFunds = balance !== null && balance !== undefined && balance === 0;
   const showOrderInfoCollectionLoading = loadingBalance;
 
+  const { allStepsComplete } = useTotalSteps({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+  });
+
   return (
     <Box width={COMMAND_CONTAINER_MAX_WIDTH} flexDirection="column" marginY={1}>
       <InfoBanner balance={balance} loadingBalance={loadingBalance} />
@@ -44,6 +51,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         startAtIso={startAtIso}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
+        isFocused={!allStepsComplete}
       />
     </Box>
   );
@@ -58,6 +66,7 @@ const OrderInfoCollection = ({
   startAtIso,
   noFunds,
   showLoading,
+  isFocused,
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
@@ -65,6 +74,7 @@ const OrderInfoCollection = ({
   startAtIso: Nullable<string>;
   noFunds: boolean;
   showLoading: boolean;
+  isFocused: boolean;
 }) => {
   if (showLoading) {
     return (
@@ -77,13 +87,15 @@ const OrderInfoCollection = ({
     return <AddFundsGoToWebsite />;
   }
 
+  const borderColor = isFocused ? "white" : "gray";
+
   return (
     <Box
       flexDirection="column"
       marginTop={1}
       paddingX={2}
       paddingY={1}
-      borderColor="white"
+      borderColor={borderColor}
       borderStyle="single"
     >
       <Box flexDirection="row" width="100%" justifyContent="space-between">
@@ -105,23 +117,60 @@ const OrderInfoCollection = ({
   );
 };
 
+const instanceTypeToLabel = (instanceType: Nullable<InstanceType>): string => {
+  if (instanceType === InstanceType.H100i) {
+    return "8x H100 InfiniBand";
+  }
+
+  return "";
+};
 const SelectInstanceType = ({
   instanceType,
 }: {
   instanceType: Nullable<InstanceType>;
 }) => {
+  const label = instanceTypeToLabel(instanceType);
+
   return (
     <Box marginTop={1}>
       <Text>
         <Text color="green">✓</Text> Instance Type{" "}
-        <Text color="gray">{instanceType}</Text>
+        <Text color="gray">{label}</Text>
       </Text>
     </Box>
   );
 };
 
-const TOTAL_STEPS = 4;
 const TotalStepsCompleteLabel = ({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+}) => {
+  const { stepsComplete, totalSteps, allStepsComplete } = useTotalSteps({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+  });
+
+  const ratioLabelColor = allStepsComplete ? "green" : "white";
+
+  return (
+    <Text>
+      <Text color={ratioLabelColor}>
+        {stepsComplete}/{totalSteps}
+      </Text>{" "}
+      complete
+    </Text>
+  );
+};
+const useTotalSteps = ({
   instanceType,
   totalNodes,
   durationSeconds,
@@ -144,18 +193,14 @@ const TotalStepsCompleteLabel = ({
     durationSecondsSet,
     startAtIsoSet,
   ].filter(Boolean).length;
-  const allStepsComplete = stepsComplete === TOTAL_STEPS;
+  const allStepsComplete =
+    instanceTypeSet && totalNodesSet && durationSecondsSet && startAtIsoSet;
 
-  const ratioLabelColor = allStepsComplete ? "green" : "white";
-
-  return (
-    <Text>
-      <Text color={ratioLabelColor}>
-        {stepsComplete}/{TOTAL_STEPS}
-      </Text>{" "}
-      complete
-    </Text>
-  );
+  return {
+    stepsComplete,
+    totalSteps: 4,
+    allStepsComplete,
+  };
 };
 
 const LiveQuote = () => {
