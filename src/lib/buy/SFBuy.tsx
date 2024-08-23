@@ -17,6 +17,7 @@ import { Check, OpenCircle } from "../../ui/symbols";
 import SelectInput from "ink-select-input";
 import { UTCLive } from "../../ui/lib/UTCLive";
 import { useWebUrl } from "../../hooks/urls";
+import dayjs from "dayjs";
 
 type SFBuyProps = {
   placeholder: string;
@@ -81,6 +82,7 @@ const OrderInfoCollection = ({
   const {
     isSelectingTotalNodes,
     isSelectingDurationSeconds,
+    isSelectingStartAtIso,
     allStepsComplete,
   } = useSteps({
     instanceType,
@@ -127,6 +129,11 @@ const OrderInfoCollection = ({
         durationSeconds={durationSeconds}
         setDurationSeconds={setDurationSeconds}
         selectionInProgress={isSelectingDurationSeconds}
+      />
+      <SelectStartAt
+        startAtIso={startAtIso}
+        setStartAtIso={setStartAtIso}
+        selectionInProgress={isSelectingStartAtIso}
       />
       <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
@@ -284,6 +291,76 @@ const SelectDuration = ({
   }));
   const handleSelect = ({ value }: { label: string; value: number }) => {
     setDurationSeconds(value);
+  };
+
+  return (
+    <Box flexDirection="column">
+      <Text>
+        {StatusSymbol} <Label />
+      </Text>
+      {selectionInProgress && (
+        <SelectInput items={items} isFocused onSelect={handleSelect} />
+      )}
+    </Box>
+  );
+};
+
+const SelectStartAt = ({
+  startAtIso,
+  setStartAtIso,
+  selectionInProgress,
+}: {
+  startAtIso: Nullable<string>;
+  setStartAtIso: (startAtIso: string) => void;
+  selectionInProgress: boolean;
+}) => {
+  const startAtIsoSet = startAtIso !== null && startAtIso !== undefined;
+  const StatusSymbol = startAtIsoSet ? (
+    Check
+  ) : (
+    <OpenCircle color="gray" dimColor={!selectionInProgress} />
+  );
+
+  const Label = () => {
+    if (!startAtIsoSet) {
+      if (!selectionInProgress) {
+        return (
+          <Text color="gray" dimColor>
+            Select Start Time
+          </Text>
+        );
+      } else {
+        return <Text color="magenta">Select Start Time</Text>;
+      }
+    }
+
+    return (
+      <Text>
+        Start Time
+        <Text color="gray" dimColor>
+          {"  "}
+          ~~~~~~~~~~~{"  "}
+        </Text>
+        <Text color="gray">
+          {dayjs(startAtIso).format("MM/DD/YYYY hh:mm A")}
+        </Text>
+      </Text>
+    );
+  };
+
+  const items = Array(18)
+    .fill(0)
+    .map((_, i) => {
+      const offset = i + 1; // start on next hour
+
+      const date = dayjs().add(offset, "hour").startOf("hour");
+      return {
+        label: date.format("ddd h A"),
+        value: date.toISOString(),
+      };
+    });
+  const handleSelect = ({ value }: { label: string; value: string }) => {
+    setStartAtIso(value);
   };
 
   return (
