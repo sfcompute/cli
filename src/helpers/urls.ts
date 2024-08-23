@@ -1,12 +1,14 @@
 import { loadConfig } from "./config";
 
-const webPaths = {
+export const webPaths = {
+  dashboard: "/dashboard",
+
   cli_session_create: "/cli/session",
   cli_session_get: ({ token }: { token: string }) =>
     `/cli/session?token=${token}`,
 };
 
-const apiPaths = {
+export const apiPaths = {
   index: "/",
   me: "/v0/me",
   ping: "/v0/ping",
@@ -61,3 +63,9 @@ export async function getApiUrl(
 
   return config.api_url + path;
 }
+
+// --
+
+export const Emails = {
+  Contact: "contact@sfcompute.com",
+};

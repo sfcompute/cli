@@ -7,9 +7,12 @@ import type { Nullable } from "../../types/empty";
 import { UTCLive } from "../../ui/lib/UTCLive";
 import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
 import { useBalance } from "../../api/hooks/useBalance";
+import { Emails } from "../../helpers/urls";
+import { useWebUrl } from "../../ui/urls";
+import Spinner from "ink-spinner";
 
 type SFBuyProps = {
-  light: string;
+  placeholder: string;
 };
 
 const SFBuy: React.FC<SFBuyProps> = () => {
@@ -21,9 +24,72 @@ const SFBuy: React.FC<SFBuyProps> = () => {
 
   const { balance, loadingBalance } = useBalance();
 
+  const noFunds = balance !== null && balance !== undefined && balance === 0;
+  const showOrderInfoCollectionLoading = loadingBalance;
+
   return (
-    <Box width={COMMAND_CONTAINER_MAX_WIDTH}>
+    <Box width={COMMAND_CONTAINER_MAX_WIDTH} flexDirection="column" marginY={1}>
       <InfoBanner balance={balance} loadingBalance={loadingBalance} />
+      <OrderInfoCollection
+        noFunds={noFunds}
+        showLoading={showOrderInfoCollectionLoading}
+      />
+    </Box>
+  );
+};
+
+const OrderInfoCollection = ({
+  noFunds,
+  showLoading,
+}: { noFunds: boolean; showLoading: boolean }) => {
+  if (showLoading) {
+    return (
+      <Box marginTop={1}>
+        <Spinner type="dots" />
+      </Box>
+    );
+  }
+  if (noFunds) {
+    return <AddFundsGoToWebsite />;
+  }
+
+  return (
+    <Box
+      flexDirection="column"
+      marginTop={1}
+      paddingX={2}
+      paddingY={1}
+      borderColor="white"
+      borderStyle="single"
+    >
+      <Text>asdfasdfasdfasdf</Text>
+    </Box>
+  );
+};
+const AddFundsGoToWebsite = () => {
+  const dashboardUrl = useWebUrl("dashboard") ?? "";
+
+  return (
+    <Box
+      flexDirection="column"
+      marginTop={1}
+      paddingX={2}
+      paddingY={1}
+      borderColor="white"
+      borderStyle="single"
+    >
+      <Box>
+        <Text>
+          <Text bold>You have no funds to spend.</Text> Add funds to your
+          account by visiting your dashboard: {dashboardUrl}
+        </Text>
+      </Box>
+      <Box marginTop={1}>
+        <Text>
+          <Text color="gray">or,</Text> you can contact us at{" "}
+          <Text bold>{Emails.Contact}</Text> 🌁
+        </Text>
+      </Box>
     </Box>
   );
 };
@@ -36,8 +102,6 @@ const InfoBanner = ({
     <Box
       width={COMMAND_CONTAINER_MAX_WIDTH}
       flexDirection="column"
-      marginTop={1}
-      marginBottom={1}
       paddingX={2}
       paddingY={1}
       borderColor="gray"
