@@ -7,15 +7,16 @@ import type { Nullable } from "../../types/empty";
 import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
 import { useBalance } from "../../api/hooks/useBalance";
 import { Emails } from "../../helpers/urls";
-import { useWebUrl } from "../../hooks/urls";
 import Spinner from "ink-spinner";
 import {
   centicentsToDollarsFormatted,
+  formatSecondsShort,
   type Centicents,
 } from "../../helpers/units";
 import { Check, OpenCircle } from "../../ui/symbols";
 import SelectInput from "ink-select-input";
 import { UTCLive } from "../../ui/lib/UTCLive";
+import { useWebUrl } from "../../hooks/urls";
 
 type SFBuyProps = {
   placeholder: string;
@@ -156,7 +157,11 @@ const SelectInstanceType = ({
   return (
     <Box marginTop={1}>
       <Text>
-        <Text color="green">✓</Text> Instance Type{"          "}
+        <Text color="green">✓</Text> Instance Type
+        <Text color="gray" dimColor>
+          {"  "}
+          ~~~~~~~~{"  "}
+        </Text>
         <Text color="gray">{label}</Text>
       </Text>
     </Box>
@@ -177,17 +182,24 @@ const SelectTotalNodes = ({
 
   const Label = () => {
     if (!totalNodesSet) {
-      const color = selectionInProgress ? "magenta" : "gray";
-      return (
-        <Text color={color} dimColor={!selectionInProgress}>
-          Select Total Nodes
-        </Text>
-      );
+      if (!selectionInProgress) {
+        return (
+          <Text color="gray" dimColor>
+            Select Total Nodes
+          </Text>
+        );
+      } else {
+        return <Text color="magenta">Select Total Nodes</Text>;
+      }
     }
 
     return (
       <Text>
-        Total Nodes {"           "}
+        Total Nodes
+        <Text color="gray" dimColor>
+          {"  "}
+          ~~~~~~~~~~{"  "}
+        </Text>
         <Text color="gray">{totalNodes}</Text>
       </Text>
     );
@@ -228,19 +240,42 @@ const SelectDuration = ({
 
   const Label = () => {
     if (!durationSecondsSet) {
-      const color = selectionInProgress ? "magenta" : "gray";
-      return (
-        <Text color={color} dimColor={!selectionInProgress}>
-          Select Duration
-        </Text>
-      );
+      if (!selectionInProgress) {
+        return (
+          <Text color="gray" dimColor>
+            Select Duration
+          </Text>
+        );
+      } else {
+        return <Text color="magenta">Select Duration</Text>;
+      }
     }
 
     return (
       <Text>
-        Duration <Text color="gray">{durationSeconds}</Text>
+        Duration
+        <Text color="gray" dimColor>
+          {"  "}
+          ~~~~~~~~~~~~~{"  "}
+        </Text>
+        <Text color="gray">{formatSecondsShort(durationSeconds)}</Text>
       </Text>
     );
+  };
+
+  const items = [
+    ["1 hr", 60 * 60],
+    ["2 hr", 2 * 60 * 60],
+    ["3 hr", 3 * 60 * 60],
+    ["4 hr", 4 * 60 * 60],
+    ["5 hr", 5 * 60 * 60],
+    ["6 hr", 6 * 60 * 60],
+  ].map(([label, value]) => ({
+    label: label as string,
+    value: value as number,
+  }));
+  const handleSelect = ({ value }: { label: string; value: number }) => {
+    setDurationSeconds(value);
   };
 
   return (
@@ -248,7 +283,9 @@ const SelectDuration = ({
       <Text>
         {StatusSymbol} <Label />
       </Text>
-      {selectionInProgress && <Text>select</Text>}
+      {selectionInProgress && (
+        <SelectInput items={items} isFocused onSelect={handleSelect} />
+      )}
     </Box>
   );
 };

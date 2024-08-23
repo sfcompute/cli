@@ -96,7 +96,7 @@ async function buyOrderAction(options: SfBuyOptions) {
 //   const totalNodesLabel = c.green(options.totalNodes);
 //   const instanceTypeLabel = c.green(options.instanceType);
 //   const nodesLabel = options.totalNodes > 1 ? "nodes" : "node";
-//   const durationHumanReadable = formatDuration(options.durationSeconds * 1000);
+// const durationHumanReadable = formatDuration(options.durationSeconds * 1000);
 //   const startAtLabel = c.green(
 //     dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"),
 //   );

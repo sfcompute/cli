@@ -1,8 +1,5 @@
 import Table from "cli-table3";
 import type { Command } from "commander";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
   logAndQuit,
@@ -13,35 +10,12 @@ import { getApiUrl } from "../helpers/urls";
 import type { ListResponseBody } from "../api/types";
 import { ApiErrorCode, type ApiError } from "../api";
 import type { HydratedOrder } from "../api/orders";
+import { formatSecondsShort } from "../helpers/units";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 });
-
-dayjs.extend(relativeTime);
-dayjs.extend(duration);
-
-export function formatDuration(ms: number) {
-  const d = dayjs.duration(ms);
-
-  const years = Math.floor(d.asYears());
-  const weeks = Math.floor(d.asWeeks()) % 52;
-  const days = d.days();
-  const hours = d.hours();
-  const minutes = d.minutes();
-  const seconds = d.seconds();
-  const milliseconds = d.milliseconds();
-
-  if (years > 0) return `${years}y`;
-  if (weeks > 0) return `${weeks}w`;
-  if (days > 0) return `${days}d`;
-  if (hours > 0) return `${hours}h`;
-  if (minutes > 0) return `${minutes}m`;
-  if (seconds > 0) return `${seconds}s`;
-  if (milliseconds > 0) return `${milliseconds}ms`;
-  return "0ms";
-}
 
 export type PlaceSellOrderParameters = {
   side: "sell";
@@ -107,7 +81,7 @@ function printAsTable(orders: Array<HydratedOrder>) {
         order.instance_type,
         usdFormatter.format(order.price / 10000),
         order.quantity.toString(),
-        formatDuration(order.duration * 1000),
+        formatSecondsShort(order.duration),
         startDate.toLocaleString(),
         status,
         executionPrice ? usdFormatter.format(executionPrice / 10000) : "-",

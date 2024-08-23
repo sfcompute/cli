@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   centicentsToDollarsFormatted,
+  formatSecondsShort,
   priceWholeToCenticents,
   type Centicents,
 } from "../units";
@@ -100,5 +101,21 @@ describe("units", () => {
 
       expect(result).toEqual(expected as string);
     }
+  });
+
+  test("format seconds short", () => {
+    expect(formatSecondsShort(0)).toEqual("0s");
+    expect(formatSecondsShort(1)).toEqual("1s");
+    expect(formatSecondsShort(59)).toEqual("59s");
+    expect(formatSecondsShort(60)).toEqual("1m");
+    expect(formatSecondsShort(61)).toEqual("1m 1s");
+    expect(formatSecondsShort(3599)).toEqual("59m 59s");
+    expect(formatSecondsShort(3600)).toEqual("1h");
+    expect(formatSecondsShort(86_399)).toEqual("23h 59m 59s");
+    expect(formatSecondsShort(86_400)).toEqual("1d");
+    expect(formatSecondsShort(86_401)).toEqual("1d 1s");
+    expect(formatSecondsShort(86_401)).toEqual("1d 1s");
+    expect(formatSecondsShort(604_800)).toEqual("1w");
+    expect(formatSecondsShort(864_000)).toEqual("1w 3d");
   });
 });

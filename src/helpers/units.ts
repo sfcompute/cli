@@ -1,4 +1,12 @@
+import dayjs from "dayjs";
 import type { Nullable } from "../types/empty";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
+
+// --
 
 export type Cents = number;
 export type Centicents = number;
@@ -48,4 +56,25 @@ export function centicentsToDollarsFormatted(centicents: Centicents): string {
 
 export function centicentsToWhole(centicents: Centicents): number {
   return centicents / 10_000;
+}
+
+// -- duration
+
+export function formatSecondsShort(secs: number) {
+  const d = dayjs.duration(secs * 1000); // convert seconds to milliseconds
+
+  const units = [
+    { unit: "y", value: d.years() },
+    { unit: "w", value: d.weeks() % 52 },
+    { unit: "d", value: d.days() % 7 },
+    { unit: "h", value: d.hours() },
+    { unit: "m", value: d.minutes() },
+    { unit: "s", value: d.seconds() },
+  ];
+
+  const parts = units
+    .filter(({ value }) => value > 0)
+    .map(({ unit, value }) => `${value}${unit}`);
+
+  return parts.length > 0 ? parts.join(" ") : "0s";
 }
