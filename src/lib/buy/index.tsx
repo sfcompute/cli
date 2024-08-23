@@ -28,7 +28,7 @@ interface SfBuyOptions {
 export function registerBuy(program: Command) {
   program
     .command("buy")
-    .description("Place a buy order")
+    .description("Place a buy order for compute")
     .action(() => {
       render(React.createElement(SFBuy));
     });

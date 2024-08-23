@@ -16,7 +16,10 @@ type SFBuyProps = {
 
 const SFBuy: React.FC<SFBuyProps> = () => {
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
-  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(0);
+  const [totalNodes, setTotalNodes] = useState<number>(1);
+  const [durationSeconds, setDurationSeconds] =
+    useState<Nullable<number>>(null);
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
 
   return (
     <Box width={COMMAND_CONTAINER_MAX_WIDTH}>
@@ -43,19 +46,35 @@ const InfoBanner = () => {
         justifyContent="space-between"
         marginBottom={1}
       >
-        <Box alignItems="flex-start">
+        <Box>
           <Text color="gray">{CLICommand.Buy}</Text>
         </Box>
         <AvailableBalance />
       </Box>
-      <Box alignItems="flex-start">
+      <Box marginBottom={1}>
         <Text>
           This is a compute marketplace. You are about to submit a{" "}
           <Text color="green">buy</Text> order. Compute is not granted
-          immediately, instead, we try our best to get it for you, at the{" "}
+          immediately, instead, we try our best to get it for you at the{" "}
           <Text color="green">lowest</Text> price possible, as{" "}
           <Text color="green">soon</Text> as possible.
         </Text>
+      </Box>
+      <Box flexDirection="column">
+        <Text>Once a buy order is submitted, 1 of 3 things can happen:</Text>
+        <Box flexDirection="column" marginLeft={2}>
+          <Text>
+            — it can get <Text color="green">filled</Text>{" "}
+            <Text color="gray">(you get the compute you requested)</Text>
+          </Text>
+          <Text>
+            — you can <Text color="red">cancel</Text> it
+          </Text>
+          <Text>
+            — <Text color="gray">or,</Text> the order can{" "}
+            <Text color="yellow">expire</Text>
+          </Text>
+        </Box>
       </Box>
     </Box>
   );
@@ -85,7 +104,7 @@ const AvailableBalanceLabel = ({
     return <Text color="gray">(loading balance)</Text>;
   }
 
-  if (!balance) {
+  if (balance === null || balance === undefined) {
     return <Text color="gray">$--.--</Text>;
   }
 
@@ -100,7 +119,7 @@ const AvailableBalanceLabel = ({
 
   return (
     <Box>
-      <Text color="gray">spending power: </Text>
+      <Text color="gray">spending power </Text>
       <Text color={balanceColor}>{centicentsToDollarsFormatted(balance)}</Text>
     </Box>
   );

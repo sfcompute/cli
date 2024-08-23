@@ -10,7 +10,7 @@ import { priceWholeToCenticents } from "../helpers/units";
 export function registerSell(program: Command) {
   program
     .command("sell")
-    .description("Place a sell order")
+    .description("Place a sell order for compute you own")
     .requiredOption("-p, --price <price>", "Specify the price in centicents")
     .requiredOption("-c, --contract-id <id>", "Specify the contract ID")
     .option("-n, --nodes <quantity>", "Specify the number of nodes")
