@@ -58,6 +58,13 @@ export function centicentsToWhole(centicents: Centicents): number {
   return centicents / 10_000;
 }
 
+export function truncateToFourDecimals(num: number): number {
+  return Math.floor(num * 10000) / 10000;
+}
+export function totalSignificantDecimals(num: number): number {
+  return num.toString().split(".")[1]?.length || 0;
+}
+
 // -- duration
 
 export function formatSecondsShort(secs: number) {

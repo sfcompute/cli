@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, Box } from "ink";
+import { Text, Box, useInput } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
@@ -11,6 +11,8 @@ import Spinner from "ink-spinner";
 import {
   centicentsToDollarsFormatted,
   formatSecondsShort,
+  priceWholeToCenticents,
+  totalSignificantDecimals,
   type Centicents,
 } from "../../helpers/units";
 import { Check, OpenCircle } from "../../ui/symbols";
@@ -29,10 +31,14 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const [orderId, setOrderId] = useState<Nullable<string>>(null);
 
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
-  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(null);
-  const [durationSeconds, setDurationSeconds] =
-    useState<Nullable<number>>(null);
-  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
+  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(1);
+  const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
+    60 * 60,
+  );
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
+    dayjs().add(1, "hour").startOf("hour").toISOString(),
+  );
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
 
   const { balance, loadingBalance } = useBalance();
 
@@ -47,9 +53,11 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         totalNodes={totalNodes}
         durationSeconds={durationSeconds}
         startAtIso={startAtIso}
+        limitPrice={limitPrice}
         setTotalNodes={setTotalNodes}
         setDurationSeconds={setDurationSeconds}
         setStartAtIso={setStartAtIso}
+        setLimitPrice={setLimitPrice}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
       />
@@ -64,9 +72,11 @@ const OrderInfoCollection = ({
   totalNodes,
   durationSeconds,
   startAtIso,
+  limitPrice,
   setTotalNodes,
   setDurationSeconds,
   setStartAtIso,
+  setLimitPrice,
   noFunds,
   showLoading,
 }: {
@@ -74,9 +84,11 @@ const OrderInfoCollection = ({
   totalNodes: Nullable<number>;
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
   setTotalNodes: (totalNodes: number) => void;
   setDurationSeconds: (durationSeconds: number) => void;
   setStartAtIso: (startAtIso: string) => void;
+  setLimitPrice: (limitPrice: number) => void;
   noFunds: boolean;
   showLoading: boolean;
 }) => {
@@ -84,12 +96,14 @@ const OrderInfoCollection = ({
     isSelectingTotalNodes,
     isSelectingDurationSeconds,
     isSelectingStartAtIso,
+    isSelectingLimitPrice,
     allStepsComplete,
   } = useSteps({
     instanceType,
     totalNodes,
     durationSeconds,
     startAtIso,
+    limitPrice,
   });
 
   const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
@@ -152,12 +166,19 @@ const OrderInfoCollection = ({
         selectionInProgress={isSelectingStartAtIso}
         durationSeconds={durationSeconds}
       />
+      <SelectLimitPrice
+        limitPrice={limitPrice}
+        setLimitPrice={setLimitPrice}
+        quotePrice={quotePrice}
+        selectionInProgress={isSelectingLimitPrice}
+      />
       <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
           instanceType={instanceType}
           totalNodes={totalNodes}
           durationSeconds={durationSeconds}
           startAtIso={startAtIso}
+          limitPrice={limitPrice}
         />
       </Box>
     </Box>
@@ -449,22 +470,245 @@ const SelectStartAt = ({
   );
 };
 
+const SelectLimitPrice = ({
+  limitPrice,
+  setLimitPrice,
+  quotePrice,
+  selectionInProgress,
+}: {
+  limitPrice: Nullable<Centicents>;
+  setLimitPrice: (limitPrice: Centicents) => void;
+  quotePrice: Nullable<Centicents>;
+  selectionInProgress: boolean;
+}) => {
+  const quoteAvailable = quotePrice !== null && quotePrice !== undefined;
+  const limitPriceSet = limitPrice !== null && limitPrice !== undefined;
+  const StatusSymbol = limitPriceSet ? (
+    Check
+  ) : (
+    <OpenCircle color="gray" dimColor={!selectionInProgress} />
+  );
+
+  const manualLimitPriceInputInProgress =
+    selectionInProgress && !quoteAvailable && !limitPriceSet;
+  const { limitPriceInputField } = useLimitPriceInput({ setLimitPrice });
+
+  const Label = () => {
+    const LabelText = () => {
+      const getLabelColor = () => {
+        if (limitPriceSet) {
+          return "white";
+        }
+        if (selectionInProgress) {
+          return "magenta";
+        }
+
+        return "gray";
+      };
+      const labelColor = getLabelColor();
+
+      return <Text color={labelColor}>Limit Price</Text>;
+    };
+    const LabelValue = () => {
+      if (manualLimitPriceInputInProgress) {
+        return <Text color="magenta">{limitPriceInputField}</Text>;
+      }
+      if (limitPriceSet) {
+        return (
+          <Text color="green">{centicentsToDollarsFormatted(limitPrice)}</Text>
+        );
+      }
+
+      return null;
+    };
+
+    return (
+      <Text>
+        <LabelText />
+        <Text color="gray" dimColor>
+          {"  "}
+          ~~~~~~~~~~{"  "}
+        </Text>
+        <LabelValue />
+      </Text>
+    );
+  };
+
+  const showManualLimitPriceInputEducation = manualLimitPriceInputInProgress;
+
+  return (
+    <Box flexDirection="column">
+      <Text>
+        {StatusSymbol} <Label />
+      </Text>
+      {showManualLimitPriceInputEducation && <ManualLimitPriceEucation />}
+    </Box>
+  );
+};
+const useLimitPriceInput = ({
+  setLimitPrice,
+}: {
+  setLimitPrice: (limitPrice: Centicents) => void;
+}) => {
+  const [limitPriceInputField, setLimitPriceInputField] = useState<string>("$");
+
+  useInput((input, key) => {
+    // remove or clear
+    if (key.backspace || key.delete) {
+      setLimitPriceInputField((prev) =>
+        prev.length > 1 ? prev.slice(0, -1) : "$",
+      );
+      return;
+    }
+    if (key.escape) {
+      setLimitPriceInputField("$");
+      return;
+    }
+
+    // helpers
+    const cleanFieldInput = (input: string): string => {
+      return input.replace("$", "");
+    };
+    const inputValueIsValid = (input: string): boolean => {
+      const num = Number(cleanFieldInput(input));
+
+      const conditions = [
+        !Number.isNaN(num),
+        totalSignificantDecimals(num) <= 4,
+        num >= 0,
+        num <= 100_000,
+      ];
+
+      return conditions.every(Boolean);
+    };
+
+    // increment
+    const incrementPrice = () => {
+      setLimitPriceInputField((prev) => {
+        const clean = cleanFieldInput(prev);
+        const num = Number(clean);
+        const newNum = num + 1;
+        return `$${newNum}`;
+      });
+    };
+    const decrementPrice = () => {
+      setLimitPriceInputField((prev) => {
+        const clean = cleanFieldInput(prev);
+        const num = Number(clean);
+        const newNum = num - 1;
+        if (newNum >= 0) {
+          return `$${newNum}`;
+        }
+
+        return prev;
+      });
+    };
+    if (key.upArrow || key.rightArrow) {
+      incrementPrice();
+
+      return;
+    }
+    if (key.downArrow || key.leftArrow) {
+      decrementPrice();
+
+      return;
+    }
+
+    // submit
+    if (key.return) {
+      const isValid = inputValueIsValid(limitPriceInputField);
+      if (isValid) {
+        const { centicents, invalid } =
+          priceWholeToCenticents(limitPriceInputField);
+        if (!invalid && centicents !== null && centicents !== undefined) {
+          setLimitPrice(centicents);
+        }
+      }
+
+      return;
+    }
+
+    // digit input
+    const inputIsDigitOrDot = /^[0-9.]$/.test(input);
+    setLimitPriceInputField((prev) => {
+      if (inputIsDigitOrDot) {
+        const newInputValue = prev + input;
+        if (inputValueIsValid(newInputValue)) {
+          return newInputValue;
+        }
+      }
+
+      return prev;
+    });
+  });
+
+  return { limitPriceInputField };
+};
+const ManualLimitPriceEucation = () => {
+  return (
+    <Box flexDirection="column" width={60} marginTop={1} paddingLeft={2}>
+      <Text>
+        We could not quote a price for your order. You will have to manually set
+        a <Text backgroundColor="black">limit price</Text>.
+      </Text>
+      <Box
+        flexDirection="column"
+        paddingX={2}
+        paddingY={1}
+        marginTop={1}
+        borderStyle="singleDouble"
+        borderColor="gray"
+      >
+        <Box flexDirection="column">
+          <Text>
+            A <Text backgroundColor="black">limit price</Text> is the{" "}
+            <Text bold>most</Text> you are willing to pay to get the compute
+            block. You will pay at most, or less, than this price (if your order
+            gets filled).
+          </Text>
+        </Box>
+        <Box marginTop={1} flexDirection="column">
+          <Text>
+            For example, if you enter <Text color="green">$10</Text>, you will
+            <Text bold> at most</Text> pay <Text color="green">$10</Text> for
+            the compute block. You could also get it for,{" "}
+            <Text color="yellow">$9.90</Text>, <Text color="yellow">$9.80</Text>
+            , <Text color="gray">$9</Text>, <Text color="gray">$8</Text>, and so
+            on (with the lower prices less & less likely to get filled).
+          </Text>
+        </Box>
+      </Box>
+      <Box marginTop={1} flexDirection="column">
+        <Text>
+          Type it now.{" "}
+          <Text color="gray">
+            (hit <Text color="magenta">enter ↵ </Text>when finished)
+          </Text>
+        </Text>
+      </Box>
+    </Box>
+  );
+};
+
 const TotalStepsCompleteLabel = ({
   instanceType,
   totalNodes,
   durationSeconds,
   startAtIso,
+  limitPrice,
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
 }) => {
   const { stepsComplete, totalSteps, allStepsComplete } = useSteps({
     instanceType,
     totalNodes,
     durationSeconds,
     startAtIso,
+    limitPrice,
   });
 
   const ratioLabelColor = allStepsComplete ? "green" : "white";
@@ -483,26 +727,34 @@ const useSteps = ({
   totalNodes,
   durationSeconds,
   startAtIso,
+  limitPrice,
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
 }) => {
   const instanceTypeSet = instanceType !== null && instanceType !== undefined;
   const totalNodesSet = totalNodes !== null && totalNodes !== undefined;
   const durationSecondsSet =
     durationSeconds !== null && durationSeconds !== undefined;
   const startAtIsoSet = startAtIso !== null && startAtIso !== undefined;
+  const limitPriceSet = limitPrice !== null && limitPrice !== undefined;
 
   const stepsComplete = [
     instanceTypeSet,
     totalNodesSet,
     durationSecondsSet,
     startAtIsoSet,
+    limitPriceSet,
   ].filter(Boolean).length;
   const allStepsComplete =
-    instanceTypeSet && totalNodesSet && durationSecondsSet && startAtIsoSet;
+    instanceTypeSet &&
+    totalNodesSet &&
+    durationSecondsSet &&
+    startAtIsoSet &&
+    limitPriceSet;
 
   const isSelectingInstanceType = !instanceTypeSet;
   const isSelectingTotalNodes = instanceTypeSet && !totalNodesSet;
@@ -510,16 +762,23 @@ const useSteps = ({
     instanceTypeSet && totalNodesSet && !durationSecondsSet;
   const isSelectingStartAtIso =
     instanceTypeSet && totalNodesSet && durationSecondsSet && !startAtIsoSet;
+  const isSelectingLimitPrice =
+    instanceTypeSet &&
+    totalNodesSet &&
+    durationSecondsSet &&
+    startAtIsoSet &&
+    !limitPriceSet;
 
   return {
     stepsComplete,
-    totalSteps: 4,
+    totalSteps: 5,
     allStepsComplete,
 
     isSelectingInstanceType,
     isSelectingTotalNodes,
     isSelectingDurationSeconds,
     isSelectingStartAtIso,
+    isSelectingLimitPrice,
   };
 };
 

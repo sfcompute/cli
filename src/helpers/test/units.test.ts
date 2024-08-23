@@ -3,6 +3,8 @@ import {
   centicentsToDollarsFormatted,
   formatSecondsShort,
   priceWholeToCenticents,
+  totalSignificantDecimals,
+  truncateToFourDecimals,
   type Centicents,
 } from "../units";
 
@@ -101,6 +103,24 @@ describe("units", () => {
 
       expect(result).toEqual(expected as string);
     }
+  });
+
+  test("truncate to four decimals", () => {
+    expect(truncateToFourDecimals(0)).toEqual(0);
+    expect(truncateToFourDecimals(1.1)).toEqual(1.1);
+    expect(truncateToFourDecimals(1.12345)).toEqual(1.1234);
+    expect(truncateToFourDecimals(1.123456)).toEqual(1.1234);
+    expect(truncateToFourDecimals(1.123456789)).toEqual(1.1234);
+  });
+
+  test("total significant decimals", () => {
+    expect(totalSignificantDecimals(0)).toEqual(0);
+    expect(totalSignificantDecimals(1)).toEqual(0);
+    expect(totalSignificantDecimals(1.1)).toEqual(1);
+    expect(totalSignificantDecimals(1.12345)).toEqual(5);
+    expect(totalSignificantDecimals(1.123456)).toEqual(6);
+    expect(totalSignificantDecimals(1.123456789)).toEqual(9);
+    expect(totalSignificantDecimals(1.12345)).toEqual(5);
   });
 
   test("format seconds short", () => {
