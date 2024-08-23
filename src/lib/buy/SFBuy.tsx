@@ -490,7 +490,7 @@ const LiveQuote = () => {
 
   return (
     <Box flexDirection="row">
-      <Text color="gray">estimated cost </Text>
+      <Text color="gray">market price </Text>
       <QuoteLabel />
     </Box>
   );
