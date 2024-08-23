@@ -178,7 +178,11 @@ const SelectTotalNodes = ({
   selectionInProgress: boolean;
 }) => {
   const totalNodesSet = totalNodes !== null && totalNodes !== undefined;
-  const StatusSymbol = totalNodesSet ? Check : <OpenCircle color="gray" />;
+  const StatusSymbol = totalNodesSet ? (
+    Check
+  ) : (
+    <OpenCircle color="gray" dimColor={!selectionInProgress} />
+  );
 
   const Label = () => {
     if (!totalNodesSet) {
@@ -236,7 +240,11 @@ const SelectDuration = ({
 }) => {
   const durationSecondsSet =
     durationSeconds !== null && durationSeconds !== undefined;
-  const StatusSymbol = durationSecondsSet ? Check : <OpenCircle color="gray" />;
+  const StatusSymbol = durationSecondsSet ? (
+    Check
+  ) : (
+    <OpenCircle color="gray" dimColor={!selectionInProgress} />
+  );
 
   const Label = () => {
     if (!durationSecondsSet) {
