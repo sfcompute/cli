@@ -4,18 +4,22 @@ import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
 import type { Nullable } from "../../types/empty";
-import { UTCLive } from "../../ui/lib/UTCLive";
 import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
 import { useBalance } from "../../api/hooks/useBalance";
 import { Emails } from "../../helpers/urls";
 import { useWebUrl } from "../../ui/urls";
 import Spinner from "ink-spinner";
+import { UTCLive } from "../../ui/lib/UTCLive";
+import type { Centicents } from "../../helpers/units";
 
 type SFBuyProps = {
   placeholder: string;
 };
 
 const SFBuy: React.FC<SFBuyProps> = () => {
+  const [orderPlaced, setOrderPlaced] = useState<boolean>(false);
+  const [orderId, setOrderId] = useState<Nullable<string>>(null);
+
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
   const [totalNodes, setTotalNodes] = useState<number>(1);
   const [durationSeconds, setDurationSeconds] =
@@ -37,6 +41,8 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     </Box>
   );
 };
+
+// --
 
 const OrderInfoCollection = ({
   noFunds,
@@ -62,10 +68,46 @@ const OrderInfoCollection = ({
       borderColor="white"
       borderStyle="single"
     >
-      <Text>asdfasdfasdfasdf</Text>
+      <Box flexDirection="row" width="100%" justifyContent="space-between">
+        <LiveQuote />
+        <Box>
+          <UTCLive color="gray" />
+        </Box>
+      </Box>
+      <Box marginTop={1}>
+        <Text>asdfasdfasdfasdf</Text>
+      </Box>
     </Box>
   );
 };
+
+const LiveQuote = () => {
+  const [quotePrice, setQuotePrice] = useState<Nullable<Centicents>>(null);
+  const [loadingQuotePrice, setLoadingQuotePrice] = useState<boolean>(false);
+
+  const QuoteLabel = () => {
+    if (loadingQuotePrice) {
+      return <Spinner type="dots" />;
+    }
+    if (quotePrice === null || quotePrice === undefined) {
+      return (
+        <Text color="gray" dimColor>
+          (quote unavailable)
+        </Text>
+      );
+    }
+
+    return <Text color="green">{quotePrice}</Text>;
+  };
+
+  return (
+    <Box flexDirection="row">
+      <Text color="gray">estimated cost </Text>
+      <QuoteLabel />
+    </Box>
+  );
+};
+
 const AddFundsGoToWebsite = () => {
   const dashboardUrl = useWebUrl("dashboard") ?? "";
 
@@ -93,6 +135,8 @@ const AddFundsGoToWebsite = () => {
     </Box>
   );
 };
+
+// --
 
 const InfoBanner = ({
   balance,
@@ -142,9 +186,6 @@ const InfoBanner = ({
             <Text color="yellow">expire</Text>
           </Text>
         </Box>
-      </Box>
-      <Box width="100%" justifyContent="flex-end">
-        <UTCLive color="gray" />
       </Box>
     </Box>
   );

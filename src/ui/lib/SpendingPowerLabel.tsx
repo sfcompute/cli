@@ -1,12 +1,15 @@
 import { Box, Text } from "ink";
 import type { Nullable } from "../../types/empty";
-import { centicentsToDollarsFormatted } from "../../helpers/units";
+import {
+  centicentsToDollarsFormatted,
+  type Centicents,
+} from "../../helpers/units";
 import Spinner from "ink-spinner";
 
 export const SpendingPowerLabel = ({
   balance,
   loading,
-}: { balance: Nullable<number>; loading: boolean }) => {
+}: { balance: Nullable<Centicents>; loading: boolean }) => {
   if (loading) {
     return <Spinner type="dots" />;
   }

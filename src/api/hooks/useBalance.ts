@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { centicentsToWhole } from "../../helpers/units";
+import { centicentsToWhole, type Centicents } from "../../helpers/units";
 import { getBalance } from "../balance";
 import type { Nullable } from "../../types/empty";
 
 export function useBalance() {
-  const [balance, setBalance] = useState<Nullable<number>>(null);
+  const [balance, setBalance] = useState<Nullable<Centicents>>(null);
   const [fetching, setFetching] = useState<boolean>(false);
   useEffect(() => {
     setFetching(true);
