@@ -10,7 +10,10 @@ import { Emails } from "../../helpers/urls";
 import { useWebUrl } from "../../ui/urls";
 import Spinner from "ink-spinner";
 import { UTCLive } from "../../ui/lib/UTCLive";
-import type { Centicents } from "../../helpers/units";
+import {
+  centicentsToDollarsFormatted,
+  type Centicents,
+} from "../../helpers/units";
 
 type SFBuyProps = {
   placeholder: string;
@@ -89,9 +92,7 @@ const OrderInfoCollection = ({
           <UTCLive color="gray" />
         </Box>
       </Box>
-      <Box marginTop={1}>
-        <Text>instance type</Text>
-      </Box>
+      <SelectInstanceType instanceType={instanceType} />
       <Box flexDirection="row" justifyContent="flex-end">
         <TotalStepsCompleteLabel
           instanceType={instanceType}
@@ -100,6 +101,21 @@ const OrderInfoCollection = ({
           startAtIso={startAtIso}
         />
       </Box>
+    </Box>
+  );
+};
+
+const SelectInstanceType = ({
+  instanceType,
+}: {
+  instanceType: Nullable<InstanceType>;
+}) => {
+  return (
+    <Box marginTop={1}>
+      <Text>
+        <Text color="green">✓</Text> Instance Type{" "}
+        <Text color="gray">{instanceType}</Text>
+      </Text>
     </Box>
   );
 };
@@ -158,7 +174,9 @@ const LiveQuote = () => {
       );
     }
 
-    return <Text color="green">{quotePrice}</Text>;
+    return (
+      <Text color="green">{centicentsToDollarsFormatted(quotePrice)}</Text>
+    );
   };
 
   return (
