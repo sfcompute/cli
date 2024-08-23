@@ -345,7 +345,7 @@ const SelectStartAt = ({
           {"  "}
           ~~~~~~~~~~~{"  "}
         </Text>
-        <Text color="gray">
+        <Text color="white">
           {dayjs(startAtIso).format(finalDisplayFormatter)}
         </Text>
       </Text>
