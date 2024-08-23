@@ -26,7 +26,7 @@ export type OrderQuote = BuyOrderQuote | SellOrderQuote;
 
 // -- quote buy order
 
-type QuoteBuyOrderOptions = {
+export type QuoteBuyOrderRequestOptions = {
   instance_type: string;
   quantity: number;
   duration: number;
@@ -39,7 +39,7 @@ interface QuoteBuyOrderReturn {
   err: Nullable<ApiError>;
 }
 export async function quoteBuyOrderRequest(
-  query: QuoteBuyOrderOptions,
+  query: QuoteBuyOrderRequestOptions,
 ): Promise<QuoteBuyOrderReturn> {
   const urlBase = await getApiUrl("quote_get");
   const queryParams = {

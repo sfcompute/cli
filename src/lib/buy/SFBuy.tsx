@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, Box } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
@@ -18,6 +18,7 @@ import SelectInput from "ink-select-input";
 import { UTCLive } from "../../ui/lib/UTCLive";
 import { useWebUrl } from "../../hooks/urls";
 import dayjs from "dayjs";
+import { quoteBuyOrderRequest } from "../../api/quoting";
 
 type SFBuyProps = {
   placeholder: string;
@@ -91,6 +92,17 @@ const OrderInfoCollection = ({
     startAtIso,
   });
 
+  const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
+    useState<Nullable<string>>(null);
+
+  const startAtIsoToQuoteFor = startAtIso ?? highlightedStartTimeIso ?? null;
+  const { quotePrice, loadingQuotePrice } = useQuotePrice({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso: startAtIsoToQuoteFor,
+  });
+
   if (showLoading) {
     return (
       <Box marginTop={1}>
@@ -114,7 +126,10 @@ const OrderInfoCollection = ({
       borderStyle="single"
     >
       <Box flexDirection="row" width="100%" justifyContent="space-between">
-        <LiveQuote />
+        <MarketPriceLabel
+          quotePrice={quotePrice}
+          loadingQuotePrice={loadingQuotePrice}
+        />
         <Box>
           <UTCLive color="gray" />
         </Box>
@@ -133,6 +148,7 @@ const OrderInfoCollection = ({
       <SelectStartAt
         startAtIso={startAtIso}
         setStartAtIso={setStartAtIso}
+        setHighlightedStartTimeIso={setHighlightedStartTimeIso}
         selectionInProgress={isSelectingStartAtIso}
         durationSeconds={durationSeconds}
       />
@@ -144,6 +160,36 @@ const OrderInfoCollection = ({
           startAtIso={startAtIso}
         />
       </Box>
+    </Box>
+  );
+};
+const MarketPriceLabel = ({
+  quotePrice,
+  loadingQuotePrice,
+}: { quotePrice: Nullable<number>; loadingQuotePrice: boolean }) => {
+  const QuoteLabel = () => {
+    if (loadingQuotePrice) {
+      return <Spinner type="dots" />;
+    }
+
+    const quoteUnavailable = quotePrice === null || quotePrice === undefined;
+    if (quoteUnavailable) {
+      return (
+        <Text color="gray" dimColor>
+          (quote unavailable)
+        </Text>
+      );
+    }
+
+    return (
+      <Text color="green">{centicentsToDollarsFormatted(quotePrice)}</Text>
+    );
+  };
+
+  return (
+    <Box flexDirection="row">
+      <Text color="gray">market price </Text>
+      <QuoteLabel />
     </Box>
   );
 };
@@ -309,11 +355,13 @@ const SelectDuration = ({
 const SelectStartAt = ({
   startAtIso,
   setStartAtIso,
+  setHighlightedStartTimeIso,
   selectionInProgress,
   durationSeconds,
 }: {
   startAtIso: Nullable<string>;
   setStartAtIso: (startAtIso: string) => void;
+  setHighlightedStartTimeIso: (startAtIso: string) => void;
   selectionInProgress: boolean;
   durationSeconds: Nullable<number>;
 }) => {
@@ -366,6 +414,9 @@ const SelectStartAt = ({
   const handleSelect = ({ value }: { label: string; value: string }) => {
     setStartAtIso(value);
   };
+  const handleHighlight = ({ value }: { label: string; value: string }) => {
+    setHighlightedStartTimeIso(value);
+  };
 
   const endAtIso = dayjs(startAtIso).add(durationSeconds ?? 0, "second");
 
@@ -387,7 +438,12 @@ const SelectStartAt = ({
         </Box>
       )}
       {selectionInProgress && (
-        <SelectInput items={items} isFocused onSelect={handleSelect} />
+        <SelectInput
+          items={items}
+          isFocused
+          onSelect={handleSelect}
+          onHighlight={handleHighlight}
+        />
       )}
     </Box>
   );
@@ -465,35 +521,6 @@ const useSteps = ({
     isSelectingDurationSeconds,
     isSelectingStartAtIso,
   };
-};
-
-const LiveQuote = () => {
-  const [quotePrice, setQuotePrice] = useState<Nullable<Centicents>>(null);
-  const [loadingQuotePrice, setLoadingQuotePrice] = useState<boolean>(false);
-
-  const QuoteLabel = () => {
-    if (loadingQuotePrice) {
-      return <Spinner type="dots" />;
-    }
-    if (quotePrice === null || quotePrice === undefined) {
-      return (
-        <Text color="gray" dimColor>
-          (quote unavailable)
-        </Text>
-      );
-    }
-
-    return (
-      <Text color="green">{centicentsToDollarsFormatted(quotePrice)}</Text>
-    );
-  };
-
-  return (
-    <Box flexDirection="row">
-      <Text color="gray">market price </Text>
-      <QuoteLabel />
-    </Box>
-  );
 };
 
 const AddFundsGoToWebsite = () => {
@@ -578,5 +605,44 @@ const InfoBanner = ({
     </Box>
   );
 };
+
+// --
+
+export function useQuotePrice({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+}) {
+  const [quotePrice, setQuotePrice] = useState<Nullable<Centicents>>(null);
+  const [loadingQuotePrice, setLoadingQuotePrice] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!!instanceType && !!totalNodes && !!durationSeconds && !!startAtIso) {
+      setLoadingQuotePrice(true);
+
+      quoteBuyOrderRequest({
+        instance_type: instanceType,
+        quantity: totalNodes,
+        duration: durationSeconds,
+        min_start_date: startAtIso,
+        max_start_date: startAtIso,
+      }).then(({ data }) => {
+        if (data) {
+          setQuotePrice(data.price);
+        }
+
+        setLoadingQuotePrice(false);
+      });
+    }
+  }, [instanceType, totalNodes, durationSeconds, startAtIso]);
+
+  return { quotePrice, loadingQuotePrice };
+}
 
 export default SFBuy;
