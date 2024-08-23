@@ -7,13 +7,14 @@ import type { Nullable } from "../../types/empty";
 import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
 import { useBalance } from "../../api/hooks/useBalance";
 import { Emails } from "../../helpers/urls";
-import { useWebUrl } from "../../ui/urls";
+import { useWebUrl } from "../../hooks/urls";
 import Spinner from "ink-spinner";
-import { UTCLive } from "../../ui/lib/UTCLive";
 import {
   centicentsToDollarsFormatted,
   type Centicents,
 } from "../../helpers/units";
+import { Check, OpenCircle } from "../../ui/symbols";
+import SelectInput from "ink-select-input";
 
 type SFBuyProps = {
   placeholder: string;
@@ -47,8 +48,11 @@ const SFBuy: React.FC<SFBuyProps> = () => {
       <OrderInfoCollection
         instanceType={instanceType}
         totalNodes={totalNodes}
+        setTotalNodes={setTotalNodes}
         durationSeconds={durationSeconds}
+        setDurationSeconds={setDurationSeconds}
         startAtIso={startAtIso}
+        setStartAtIso={setStartAtIso}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
         isFocused={!allStepsComplete}
@@ -62,6 +66,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
 const OrderInfoCollection = ({
   instanceType,
   totalNodes,
+  setTotalNodes,
   durationSeconds,
   startAtIso,
   noFunds,
@@ -70,8 +75,11 @@ const OrderInfoCollection = ({
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
+  setTotalNodes: (totalNodes: number) => void;
   durationSeconds: Nullable<number>;
+  setDurationSeconds: (durationSeconds: number) => void;
   startAtIso: Nullable<string>;
+  setStartAtIso: (startAtIso: string) => void;
   noFunds: boolean;
   showLoading: boolean;
   isFocused: boolean;
@@ -100,12 +108,11 @@ const OrderInfoCollection = ({
     >
       <Box flexDirection="row" width="100%" justifyContent="space-between">
         <LiveQuote />
-        <Box>
-          <UTCLive color="gray" />
-        </Box>
+        <Box>{/* <UTCLive color="gray" /> */}</Box>
       </Box>
       <SelectInstanceType instanceType={instanceType} />
-      <Box flexDirection="row" justifyContent="flex-end">
+      <SelectTotalNodes totalNodes={totalNodes} setTotalNodes={setTotalNodes} />
+      <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
           instanceType={instanceType}
           totalNodes={totalNodes}
@@ -137,6 +144,51 @@ const SelectInstanceType = ({
         <Text color="green">✓</Text> Instance Type{" "}
         <Text color="gray">{label}</Text>
       </Text>
+    </Box>
+  );
+};
+
+const SelectTotalNodes = ({
+  totalNodes,
+  setTotalNodes,
+}: {
+  totalNodes: Nullable<number>;
+  setTotalNodes: (totalNodes: number) => void;
+}) => {
+  const totalNodesSet = totalNodes !== null && totalNodes !== undefined;
+  const StatusSymbol = totalNodesSet ? Check : <OpenCircle color="gray" />;
+
+  const HeaderLabel = totalNodesSet ? (
+    <Text>
+      Total Nodes <Text color="gray">{totalNodes}</Text>
+    </Text>
+  ) : (
+    <Text color="magenta">Select Total Nodes</Text>
+  );
+
+  const handleSelect = ({ value }: { label: string; value: number }) => {
+    setTotalNodes(value);
+  };
+
+  return (
+    <Box flexDirection="column">
+      <Text>
+        {StatusSymbol} {HeaderLabel}
+      </Text>
+      <SelectInput
+        items={[
+          {
+            label: "1",
+            value: 1,
+          },
+          {
+            label: "2",
+            value: 2,
+          },
+        ]}
+        isFocused
+        onSelect={handleSelect}
+      />
     </Box>
   );
 };

@@ -8,9 +8,8 @@ import type { Nullable } from "../../types/empty";
 import parseDuration from "parse-duration";
 import { priceWholeToCenticents, type Centicents } from "../../helpers/units";
 import * as chrono from "chrono-node";
-import React from "react";
-import { render } from "ink";
 import SFBuy from "./SFBuy";
+import { renderCommand } from "../../ui/render";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -30,7 +29,7 @@ export function registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order for compute")
     .action(() => {
-      render(React.createElement(SFBuy));
+      renderCommand(<SFBuy placeholder="" />);
     });
 }
 
