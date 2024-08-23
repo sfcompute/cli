@@ -134,6 +134,7 @@ const OrderInfoCollection = ({
         startAtIso={startAtIso}
         setStartAtIso={setStartAtIso}
         selectionInProgress={isSelectingStartAtIso}
+        durationSeconds={durationSeconds}
       />
       <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
@@ -309,10 +310,12 @@ const SelectStartAt = ({
   startAtIso,
   setStartAtIso,
   selectionInProgress,
+  durationSeconds,
 }: {
   startAtIso: Nullable<string>;
   setStartAtIso: (startAtIso: string) => void;
   selectionInProgress: boolean;
+  durationSeconds: Nullable<number>;
 }) => {
   const startAtIsoSet = startAtIso !== null && startAtIso !== undefined;
   const StatusSymbol = startAtIsoSet ? (
@@ -321,6 +324,7 @@ const SelectStartAt = ({
     <OpenCircle color="gray" dimColor={!selectionInProgress} />
   );
 
+  const finalDisplayFormatter = "MM/DD/YYYY hh:mm A";
   const Label = () => {
     if (!startAtIsoSet) {
       if (!selectionInProgress) {
@@ -342,7 +346,7 @@ const SelectStartAt = ({
           ~~~~~~~~~~~{"  "}
         </Text>
         <Text color="gray">
-          {dayjs(startAtIso).format("MM/DD/YYYY hh:mm A")}
+          {dayjs(startAtIso).format(finalDisplayFormatter)}
         </Text>
       </Text>
     );
@@ -363,11 +367,25 @@ const SelectStartAt = ({
     setStartAtIso(value);
   };
 
+  const endAtIso = dayjs(startAtIso).add(durationSeconds ?? 0, "second");
+
   return (
     <Box flexDirection="column">
       <Text>
         {StatusSymbol} <Label />
       </Text>
+      {startAtIsoSet && (
+        <Box>
+          <Text color="gray">{"    "}End Time</Text>
+          <Text color="gray" dimColor>
+            {"  "}
+            ~~~~~~~~~~~{"  "}
+          </Text>
+          <Text color="gray">
+            {dayjs(endAtIso).format(finalDisplayFormatter)}
+          </Text>
+        </Box>
+      )}
       {selectionInProgress && (
         <SelectInput items={items} isFocused onSelect={handleSelect} />
       )}
