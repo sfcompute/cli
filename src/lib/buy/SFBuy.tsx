@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Text, Box } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
 import type { Nullable } from "../../types/empty";
-import { getBalance } from "../../api/balance";
-import {
-  centicentsToDollarsFormatted,
-  centicentsToWhole,
-} from "../../helpers/units";
+import { UTCLive } from "../../ui/lib/UTCLive";
+import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
+import { useBalance } from "../../api/hooks/useBalance";
 
 type SFBuyProps = {
   light: string;
@@ -21,14 +19,19 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     useState<Nullable<number>>(null);
   const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
 
+  const { balance, loadingBalance } = useBalance();
+
   return (
     <Box width={COMMAND_CONTAINER_MAX_WIDTH}>
-      <InfoBanner />
+      <InfoBanner balance={balance} loadingBalance={loadingBalance} />
     </Box>
   );
 };
 
-const InfoBanner = () => {
+const InfoBanner = ({
+  balance,
+  loadingBalance,
+}: { balance: Nullable<number>; loadingBalance: boolean }) => {
   return (
     <Box
       width={COMMAND_CONTAINER_MAX_WIDTH}
@@ -49,7 +52,7 @@ const InfoBanner = () => {
         <Box>
           <Text color="gray">{CLICommand.Buy}</Text>
         </Box>
-        <AvailableBalance />
+        <SpendingPowerLabel balance={balance} loading={loadingBalance} />
       </Box>
       <Box marginBottom={1}>
         <Text>
@@ -76,51 +79,9 @@ const InfoBanner = () => {
           </Text>
         </Box>
       </Box>
-    </Box>
-  );
-};
-
-const AvailableBalance = () => {
-  const [balance, setBalance] = useState<Nullable<number>>(0);
-  const [fetching, setFetching] = useState<boolean>(false);
-  useEffect(() => {
-    setFetching(true);
-
-    getBalance().then(({ data }) => {
-      if (data) {
-        setBalance(centicentsToWhole(data.available.amount));
-      }
-
-      setFetching(false);
-    });
-  }, []);
-  return <AvailableBalanceLabel balance={balance} loading={fetching} />;
-};
-const AvailableBalanceLabel = ({
-  balance,
-  loading,
-}: { balance: Nullable<number>; loading: boolean }) => {
-  if (loading) {
-    return <Text color="gray">(loading balance)</Text>;
-  }
-
-  if (balance === null || balance === undefined) {
-    return <Text color="gray">$--.--</Text>;
-  }
-
-  const getBalanceColor = () => {
-    if (balance === 0) {
-      return "white";
-    }
-
-    return "green";
-  };
-  const balanceColor = getBalanceColor();
-
-  return (
-    <Box>
-      <Text color="gray">spending power </Text>
-      <Text color={balanceColor}>{centicentsToDollarsFormatted(balance)}</Text>
+      <Box width="100%" justifyContent="flex-end">
+        <UTCLive color="gray" />
+      </Box>
     </Box>
   );
 };
