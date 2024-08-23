@@ -15,6 +15,7 @@ import {
 } from "../../helpers/units";
 import { Check, OpenCircle } from "../../ui/symbols";
 import SelectInput from "ink-select-input";
+import { UTCLive } from "../../ui/lib/UTCLive";
 
 type SFBuyProps = {
   placeholder: string;
@@ -35,27 +36,19 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const noFunds = balance !== null && balance !== undefined && balance === 0;
   const showOrderInfoCollectionLoading = loadingBalance;
 
-  const { allStepsComplete } = useTotalSteps({
-    instanceType,
-    totalNodes,
-    durationSeconds,
-    startAtIso,
-  });
-
   return (
     <Box width={COMMAND_CONTAINER_MAX_WIDTH} flexDirection="column" marginY={1}>
       <InfoBanner balance={balance} loadingBalance={loadingBalance} />
       <OrderInfoCollection
         instanceType={instanceType}
         totalNodes={totalNodes}
-        setTotalNodes={setTotalNodes}
         durationSeconds={durationSeconds}
-        setDurationSeconds={setDurationSeconds}
         startAtIso={startAtIso}
+        setTotalNodes={setTotalNodes}
+        setDurationSeconds={setDurationSeconds}
         setStartAtIso={setStartAtIso}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
-        isFocused={!allStepsComplete}
       />
     </Box>
   );
@@ -66,24 +59,35 @@ const SFBuy: React.FC<SFBuyProps> = () => {
 const OrderInfoCollection = ({
   instanceType,
   totalNodes,
-  setTotalNodes,
   durationSeconds,
   startAtIso,
+  setTotalNodes,
+  setDurationSeconds,
+  setStartAtIso,
   noFunds,
   showLoading,
-  isFocused,
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
-  setTotalNodes: (totalNodes: number) => void;
   durationSeconds: Nullable<number>;
-  setDurationSeconds: (durationSeconds: number) => void;
   startAtIso: Nullable<string>;
+  setTotalNodes: (totalNodes: number) => void;
+  setDurationSeconds: (durationSeconds: number) => void;
   setStartAtIso: (startAtIso: string) => void;
   noFunds: boolean;
   showLoading: boolean;
-  isFocused: boolean;
 }) => {
+  const {
+    isSelectingTotalNodes,
+    isSelectingDurationSeconds,
+    allStepsComplete,
+  } = useSteps({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+  });
+
   if (showLoading) {
     return (
       <Box marginTop={1}>
@@ -95,7 +99,7 @@ const OrderInfoCollection = ({
     return <AddFundsGoToWebsite />;
   }
 
-  const borderColor = isFocused ? "white" : "gray";
+  const borderColor = !allStepsComplete ? "white" : "gray";
 
   return (
     <Box
@@ -108,10 +112,21 @@ const OrderInfoCollection = ({
     >
       <Box flexDirection="row" width="100%" justifyContent="space-between">
         <LiveQuote />
-        <Box>{/* <UTCLive color="gray" /> */}</Box>
+        <Box>
+          <UTCLive color="gray" />
+        </Box>
       </Box>
       <SelectInstanceType instanceType={instanceType} />
-      <SelectTotalNodes totalNodes={totalNodes} setTotalNodes={setTotalNodes} />
+      <SelectTotalNodes
+        totalNodes={totalNodes}
+        setTotalNodes={setTotalNodes}
+        selectionInProgress={isSelectingTotalNodes}
+      />
+      <SelectDuration
+        durationSeconds={durationSeconds}
+        setDurationSeconds={setDurationSeconds}
+        selectionInProgress={isSelectingDurationSeconds}
+      />
       <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
           instanceType={instanceType}
@@ -141,7 +156,7 @@ const SelectInstanceType = ({
   return (
     <Box marginTop={1}>
       <Text>
-        <Text color="green">✓</Text> Instance Type{" "}
+        <Text color="green">✓</Text> Instance Type{"          "}
         <Text color="gray">{label}</Text>
       </Text>
     </Box>
@@ -151,21 +166,37 @@ const SelectInstanceType = ({
 const SelectTotalNodes = ({
   totalNodes,
   setTotalNodes,
+  selectionInProgress,
 }: {
   totalNodes: Nullable<number>;
   setTotalNodes: (totalNodes: number) => void;
+  selectionInProgress: boolean;
 }) => {
   const totalNodesSet = totalNodes !== null && totalNodes !== undefined;
   const StatusSymbol = totalNodesSet ? Check : <OpenCircle color="gray" />;
 
-  const HeaderLabel = totalNodesSet ? (
-    <Text>
-      Total Nodes <Text color="gray">{totalNodes}</Text>
-    </Text>
-  ) : (
-    <Text color="magenta">Select Total Nodes</Text>
-  );
+  const Label = () => {
+    if (!totalNodesSet) {
+      const color = selectionInProgress ? "magenta" : "gray";
+      return (
+        <Text color={color} dimColor={!selectionInProgress}>
+          Select Total Nodes
+        </Text>
+      );
+    }
 
+    return (
+      <Text>
+        Total Nodes {"           "}
+        <Text color="gray">{totalNodes}</Text>
+      </Text>
+    );
+  };
+
+  const items = [1, 2].map((v) => ({
+    label: v.toString(),
+    value: v,
+  }));
   const handleSelect = ({ value }: { label: string; value: number }) => {
     setTotalNodes(value);
   };
@@ -173,22 +204,51 @@ const SelectTotalNodes = ({
   return (
     <Box flexDirection="column">
       <Text>
-        {StatusSymbol} {HeaderLabel}
+        {StatusSymbol} <Label />
       </Text>
-      <SelectInput
-        items={[
-          {
-            label: "1",
-            value: 1,
-          },
-          {
-            label: "2",
-            value: 2,
-          },
-        ]}
-        isFocused
-        onSelect={handleSelect}
-      />
+      {selectionInProgress && (
+        <SelectInput items={items} isFocused onSelect={handleSelect} />
+      )}
+    </Box>
+  );
+};
+
+const SelectDuration = ({
+  durationSeconds,
+  setDurationSeconds,
+  selectionInProgress,
+}: {
+  durationSeconds: Nullable<number>;
+  setDurationSeconds: (durationSeconds: number) => void;
+  selectionInProgress: boolean;
+}) => {
+  const durationSecondsSet =
+    durationSeconds !== null && durationSeconds !== undefined;
+  const StatusSymbol = durationSecondsSet ? Check : <OpenCircle color="gray" />;
+
+  const Label = () => {
+    if (!durationSecondsSet) {
+      const color = selectionInProgress ? "magenta" : "gray";
+      return (
+        <Text color={color} dimColor={!selectionInProgress}>
+          Select Duration
+        </Text>
+      );
+    }
+
+    return (
+      <Text>
+        Duration <Text color="gray">{durationSeconds}</Text>
+      </Text>
+    );
+  };
+
+  return (
+    <Box flexDirection="column">
+      <Text>
+        {StatusSymbol} <Label />
+      </Text>
+      {selectionInProgress && <Text>select</Text>}
     </Box>
   );
 };
@@ -204,7 +264,7 @@ const TotalStepsCompleteLabel = ({
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
 }) => {
-  const { stepsComplete, totalSteps, allStepsComplete } = useTotalSteps({
+  const { stepsComplete, totalSteps, allStepsComplete } = useSteps({
     instanceType,
     totalNodes,
     durationSeconds,
@@ -222,7 +282,7 @@ const TotalStepsCompleteLabel = ({
     </Text>
   );
 };
-const useTotalSteps = ({
+const useSteps = ({
   instanceType,
   totalNodes,
   durationSeconds,
@@ -248,10 +308,22 @@ const useTotalSteps = ({
   const allStepsComplete =
     instanceTypeSet && totalNodesSet && durationSecondsSet && startAtIsoSet;
 
+  const isSelectingInstanceType = !instanceTypeSet;
+  const isSelectingTotalNodes = instanceTypeSet && !totalNodesSet;
+  const isSelectingDurationSeconds =
+    instanceTypeSet && totalNodesSet && !durationSecondsSet;
+  const isSelectingStartAtIso =
+    instanceTypeSet && totalNodesSet && durationSecondsSet && !startAtIsoSet;
+
   return {
     stepsComplete,
     totalSteps: 4,
     allStepsComplete,
+
+    isSelectingInstanceType,
+    isSelectingTotalNodes,
+    isSelectingDurationSeconds,
+    isSelectingStartAtIso,
   };
 };
 
