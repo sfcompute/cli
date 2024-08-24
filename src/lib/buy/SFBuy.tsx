@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, Box, useInput, useApp } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
@@ -34,9 +34,10 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     60 * 60,
   );
   const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
-    dayjs().add(1, "hour").startOf("hour").toISOString(),
+    // dayjs().add(1, "hour").startOf("hour").toISOString(),
+    null,
   );
-  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(150_000);
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
   const [immediateOrCancel, setImmediateOrCancel] =
     useState<Nullable<boolean>>(null);
 
@@ -153,13 +154,22 @@ const PlaceOrder = ({
     limitPrice !== null &&
     immediateOrCancel !== null;
 
+  const getBorderColor = () => {
+    if (isReadyToPlaceOrder) {
+      return "magenta";
+    }
+
+    return "white";
+  };
+  const borderColor = getBorderColor();
+
   return (
     <Box
       flexDirection="column"
       marginTop={1}
       paddingX={2}
       paddingY={1}
-      borderColor="white"
+      borderColor={borderColor}
       borderStyle="single"
     >
       <Box flexDirection="row" width="100%" justifyContent="space-between">
@@ -645,17 +655,19 @@ const SelectStartAt = ({
     );
   };
 
-  const items = Array(18)
-    .fill(0)
-    .map((_, i) => {
-      const offset = i + 1; // start on next hour
+  const items = React.useMemo(() => {
+    return Array(18)
+      .fill(0)
+      .map((_, i) => {
+        const offset = i + 1; // start on next hour
 
-      const date = dayjs().add(offset, "hour").startOf("hour");
-      return {
-        label: date.format("ddd h A"),
-        value: date.toISOString(),
-      };
-    });
+        const date = dayjs().add(offset, "hour").startOf("hour");
+        return {
+          label: date.format("ddd h A"),
+          value: date.toISOString(),
+        };
+      });
+  }, []);
   const handleSelect = ({ value }: { label: string; value: string }) => {
     setStartAtIso(value);
   };
@@ -715,7 +727,10 @@ const SelectLimitPrice = ({
 
   const manualLimitPriceInputInProgress =
     selectionInProgress && !quoteAvailable && !limitPriceSet;
-  const { limitPriceInputField } = useLimitPriceInput({ setLimitPrice });
+  const { limitPriceInputField } = useLimitPriceInput({
+    setLimitPrice,
+    disable: !selectionInProgress,
+  });
 
   const Label = () => {
     const LabelText = () => {
@@ -749,10 +764,12 @@ const SelectLimitPrice = ({
     return (
       <Text>
         <LabelText />
-        <Text color="gray" dimColor>
-          {"  "}
-          ~~~~~~~~~~{"  "}
-        </Text>
+        {(selectionInProgress || limitPriceSet) && (
+          <Text color="gray" dimColor>
+            {"  "}
+            ~~~~~~~~~~{"  "}
+          </Text>
+        )}
         <LabelValue />
       </Text>
     );
@@ -771,12 +788,18 @@ const SelectLimitPrice = ({
 };
 const useLimitPriceInput = ({
   setLimitPrice,
+  disable,
 }: {
   setLimitPrice: (limitPrice: Centicents) => void;
+  disable: boolean;
 }) => {
   const [limitPriceInputField, setLimitPriceInputField] = useState<string>("$");
 
   useInput((input, key) => {
+    if (disable) {
+      return;
+    }
+
     // remove or clear
     if (key.backspace || key.delete) {
       setLimitPriceInputField((prev) =>
