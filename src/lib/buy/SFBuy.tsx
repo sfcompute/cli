@@ -31,17 +31,16 @@ type SFBuyProps = {
 
 const SFBuy: React.FC<SFBuyProps> = () => {
   // fields to collect
-  const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
-  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(1);
-  const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
-    60 * 60,
+  const [instanceType, _] = useState<Nullable<InstanceType>>(
+    InstanceType.H100i,
   );
-  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
-    dayjs().add(1, "hour").startOf("hour").toISOString(),
-  );
-  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(1_000);
+  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(null);
+  const [durationSeconds, setDurationSeconds] =
+    useState<Nullable<number>>(null);
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
   const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(false);
+    useState<Nullable<boolean>>(null);
 
   // quote fields
   const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
@@ -387,14 +386,14 @@ const OrderPlacementStatus = ({
   const orderPlacementFailed =
     placeOrderError !== null && placeOrderError !== undefined;
 
-  // exit if order is successfully placed
+  // exit if order is successfully placed or placement failed
   useEffect(() => {
-    if (orderSuccessfullyPlaced) {
+    if (orderSuccessfullyPlaced || orderPlacementFailed) {
       setTimeout(() => {
         process.exit(0); // allow Ink to update UI before exiting (TODO: find a better way to do this)
       }, 500);
     }
-  }, [orderSuccessfullyPlaced]);
+  }, [orderSuccessfullyPlaced, orderPlacementFailed]);
 
   if (hide) {
     return null;
