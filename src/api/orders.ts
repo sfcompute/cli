@@ -55,6 +55,7 @@ interface PlaceBuyOrderRequestOptions {
   duration: number;
   start_at: string;
   price: Centicents;
+  flags: OrderFlags;
 }
 
 interface PlaceBuyOrderReturn {

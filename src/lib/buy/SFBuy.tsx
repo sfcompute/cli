@@ -27,7 +27,6 @@ type SFBuyProps = {
 };
 
 const SFBuy: React.FC<SFBuyProps> = () => {
-  const [orderPlaced, setOrderPlaced] = useState<boolean>(false);
   const [orderId, setOrderId] = useState<Nullable<string>>(null);
 
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
@@ -38,12 +37,20 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
     dayjs().add(1, "hour").startOf("hour").toISOString(),
   );
-  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(150_000);
 
   const { balance, loadingBalance } = useBalance();
+  const { allStepsComplete } = useOrderInfoEntrySteps({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+    limitPrice,
+  });
 
   const noFunds = balance !== null && balance !== undefined && balance === 0;
   const showOrderInfoCollectionLoading = loadingBalance;
+  const hidePlaceOrderScene = !allStepsComplete;
 
   return (
     <Box width={COMMAND_CONTAINER_MAX_WIDTH} flexDirection="column" marginY={1}>
@@ -61,6 +68,162 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
       />
+      <PlaceOrder
+        instanceType={instanceType}
+        totalNodes={totalNodes}
+        durationSeconds={durationSeconds}
+        startAtIso={startAtIso}
+        limitPrice={limitPrice}
+        hide={hidePlaceOrderScene}
+      />
+    </Box>
+  );
+};
+
+// --
+
+const PlaceOrder = ({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
+  limitPrice,
+  hide,
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
+  hide: boolean;
+}) => {
+  const [immediateOrCancel, setImmediateOrCancel] =
+    useState<Nullable<boolean>>(null);
+  const immediateOrCancelSet =
+    immediateOrCancel !== null && immediateOrCancel !== undefined;
+
+  if (hide) {
+    return null;
+  }
+  if (
+    instanceType === null ||
+    totalNodes === null ||
+    durationSeconds === null ||
+    startAtIso === null ||
+    limitPrice === null
+  ) {
+    return null; // make typescript happy
+  }
+
+  const instanceTypeLabel = instanceTypeToLabel(instanceType);
+  const nodesLabel = totalNodes === 1 ? "node" : "nodes";
+
+  const endsAtIso = dayjs(startAtIso)
+    .add(durationSeconds as number, "seconds")
+    .toISOString();
+  const startAtLabelFormatted = dayjs(startAtIso).format(
+    "ddd MMM D [at] h:mma",
+  );
+  const endAtLabelFormatted = dayjs(endsAtIso).format("ddd MMM D [at] h:mma");
+
+  const limitPriceLabel = centicentsToDollarsFormatted(limitPrice);
+
+  return (
+    <Box
+      flexDirection="column"
+      marginTop={1}
+      paddingX={2}
+      paddingY={1}
+      borderColor="white"
+      borderStyle="single"
+    >
+      <Box flexDirection="row" width="100%" justifyContent="space-between">
+        <Text color="gray">place order</Text>
+        <Box>
+          <UTCLive color="gray" />
+        </Box>
+      </Box>
+      <Box flexDirection="column" marginTop={1}>
+        <Text>
+          You are about to place a <Text color="green">buy</Text> order for{" "}
+          <Text color="green">{totalNodes}</Text>{" "}
+          <Text color="green">{instanceTypeLabel}</Text> {nodesLabel}, with a
+          reservation starting{" "}
+          <Text color="green">{startAtLabelFormatted}</Text>, and ending{" "}
+          <Text color="green">{endAtLabelFormatted}</Text>. The maximum price
+          you are willing to pay to get this compute block is{" "}
+          <Text color="green">{limitPriceLabel}</Text>.
+        </Text>
+      </Box>
+      <SelectExpirationBehavior
+        immediateOrCancel={immediateOrCancel}
+        setImmediateOrCancel={setImmediateOrCancel}
+        selectionInProgress={!immediateOrCancelSet}
+        endsAtIso={endsAtIso}
+      />
+    </Box>
+  );
+};
+
+const SelectExpirationBehavior = ({
+  immediateOrCancel,
+  setImmediateOrCancel,
+  selectionInProgress,
+  endsAtIso,
+}: {
+  immediateOrCancel: Nullable<boolean>;
+  setImmediateOrCancel: (immediateOrCancel: boolean) => void;
+  selectionInProgress: boolean;
+  endsAtIso: Nullable<string>;
+}) => {
+  const immediateOrCancelSet =
+    immediateOrCancel !== null && immediateOrCancel !== undefined;
+
+  const expiresAtLabel = dayjs(endsAtIso).format("ddd MMM D [at] h:mma");
+  const Label = () => {
+    if (!immediateOrCancelSet) {
+      return (
+        <Text>
+          <OpenCircle color="gray" /> When should this order expire?
+        </Text>
+      );
+    }
+
+    return (
+      <Text>
+        {immediateOrCancel ? (
+          <Text>
+            If we cannot fill this order immediately, it will be{" "}
+            <Text color="red">cancelled</Text> immediately.
+          </Text>
+        ) : (
+          <Text>
+            It will stay on the market until it expires at{" "}
+            <Text color="yellow">{expiresAtLabel}</Text>{" "}
+            <Text color="gray">(the end time will have passed)</Text>.
+          </Text>
+        )}
+      </Text>
+    );
+  };
+
+  const items = [
+    [`Leave on market (expires ${expiresAtLabel})`, false],
+    ["Cancel immediately if not filled", true],
+  ].map(([label, value]) => ({
+    label: label as string,
+    value: value as boolean,
+  }));
+  const handleSelect = ({ value }: { label: string; value: boolean }) => {
+    setImmediateOrCancel(value);
+  };
+
+  return (
+    <Box flexDirection="column" marginTop={1}>
+      <Label />
+      {selectionInProgress && (
+        <SelectInput items={items} isFocused onSelect={handleSelect} />
+      )}
     </Box>
   );
 };
@@ -98,7 +261,7 @@ const OrderInfoCollection = ({
     isSelectingStartAtIso,
     isSelectingLimitPrice,
     allStepsComplete,
-  } = useSteps({
+  } = useOrderInfoEntrySteps({
     instanceType,
     totalNodes,
     durationSeconds,
@@ -139,14 +302,11 @@ const OrderInfoCollection = ({
       borderColor={borderColor}
       borderStyle="single"
     >
-      <Box flexDirection="row" width="100%" justifyContent="space-between">
+      <Box flexDirection="row">
         <MarketPriceLabel
           quotePrice={quotePrice}
           loadingQuotePrice={loadingQuotePrice}
         />
-        <Box>
-          <UTCLive color="gray" />
-        </Box>
       </Box>
       <SelectInstanceType instanceType={instanceType} />
       <SelectTotalNodes
@@ -703,13 +863,14 @@ const TotalStepsCompleteLabel = ({
   startAtIso: Nullable<string>;
   limitPrice: Nullable<Centicents>;
 }) => {
-  const { stepsComplete, totalSteps, allStepsComplete } = useSteps({
-    instanceType,
-    totalNodes,
-    durationSeconds,
-    startAtIso,
-    limitPrice,
-  });
+  const { stepsComplete, totalSteps, allStepsComplete } =
+    useOrderInfoEntrySteps({
+      instanceType,
+      totalNodes,
+      durationSeconds,
+      startAtIso,
+      limitPrice,
+    });
 
   const ratioLabelColor = allStepsComplete ? "green" : "white";
 
@@ -722,7 +883,7 @@ const TotalStepsCompleteLabel = ({
     </Text>
   );
 };
-const useSteps = ({
+const useOrderInfoEntrySteps = ({
   instanceType,
   totalNodes,
   durationSeconds,
