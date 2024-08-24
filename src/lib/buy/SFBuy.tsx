@@ -41,7 +41,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   );
   const [limitPrice, setLimitPrice] = useState<Nullable<number>>(1_000);
   const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(null);
+    useState<Nullable<boolean>>(false);
 
   // quote fields
   const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
