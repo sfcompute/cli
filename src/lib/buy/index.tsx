@@ -9,11 +9,13 @@ import { priceWholeToCenticents } from "../../helpers/units";
 import * as chrono from "chrono-node";
 import SFBuy from "./SFBuy";
 import { renderCommand } from "../../ui/render";
+import type { InstanceType } from "../../api/instances";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 interface SfBuyOptions {
+  type?: string;
   nodes?: string;
   duration?: string;
   start?: string;
@@ -26,6 +28,7 @@ export function registerBuy(program: Command) {
   program
     .command("buy")
     .description("Place a buy order for compute")
+    .option("-t, --type <type>", "Specify the type of node")
     .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .option(
       "-d, --duration <duration>",
@@ -42,6 +45,7 @@ export function registerBuy(program: Command) {
     .option("--ioc", "Cancel immediately if not filled")
     .option("-y, --yes", "Automatically confirm and place the order")
     .action((options: SfBuyOptions) => {
+      const argInstanceType = (options.type as InstanceType) ?? null;
       const argTotalNodes = options.nodes ? Number(options.nodes) : null;
       const argDurationSeconds = options.duration
         ? nullifyIfEmpty(parseDuration(options.duration, "s"))
@@ -65,6 +69,7 @@ export function registerBuy(program: Command) {
 
       renderCommand(
         <SFBuy
+          instanceType={argInstanceType}
           totalNodes={argTotalNodes}
           durationSeconds={argDurationSeconds}
           startAtIso={argStartAtIso}

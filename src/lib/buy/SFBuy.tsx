@@ -27,6 +27,7 @@ import type { ApiError } from "../../api";
 import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
 
 type SFBuyProps = {
+  instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
@@ -35,6 +36,7 @@ type SFBuyProps = {
 };
 
 const SFBuy: React.FC<SFBuyProps> = ({
+  instanceType: argInstanceType,
   totalNodes: argTotalNodes,
   durationSeconds: argDurationSeconds,
   startAtIso: argStartAtIso,
@@ -43,7 +45,7 @@ const SFBuy: React.FC<SFBuyProps> = ({
 }) => {
   // fields to collect
   const [instanceType, _] = useState<Nullable<InstanceType>>(
-    InstanceType.H100i,
+    argInstanceType ?? InstanceType.H100i,
   );
   const [totalNodes, setTotalNodes] = useState<Nullable<number>>(argTotalNodes);
   const [durationSeconds, setDurationSeconds] =
