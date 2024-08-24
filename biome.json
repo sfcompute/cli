@@ -11,12 +11,14 @@
 		"enabled": true,
 		"rules": {
 			"correctness": {
-        "noUnusedImports": "warn"
+        "noUnusedImports": "warn",
+				"useExhaustiveDependencies": "off"
       },
 			"suspicious": {
         "noExplicitAny": "warn"
       },
 			"style": {
+				"noNonNullAssertion": "off",
 				"noUselessElse": "off",
 				"useTemplate": "off"
 			},

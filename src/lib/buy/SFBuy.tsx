@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, Box, useInput } from "ink";
+import { Text, Box, useInput, useApp } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
@@ -21,14 +21,13 @@ import { useWebUrl } from "../../hooks/urls";
 import dayjs from "dayjs";
 import { quoteBuyOrderRequest } from "../../api/quoting";
 import { NowLive } from "../../ui/lib/NowLive";
+import { OrderStatus, placeBuyOrderRequest } from "../../api/orders";
 
 type SFBuyProps = {
   placeholder: string;
 };
 
 const SFBuy: React.FC<SFBuyProps> = () => {
-  const [orderId, setOrderId] = useState<Nullable<string>>(null);
-
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
   const [totalNodes, setTotalNodes] = useState<Nullable<number>>(1);
   const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
@@ -38,6 +37,8 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     dayjs().add(1, "hour").startOf("hour").toISOString(),
   );
   const [limitPrice, setLimitPrice] = useState<Nullable<number>>(150_000);
+  const [immediateOrCancel, setImmediateOrCancel] =
+    useState<Nullable<boolean>>(null);
 
   const { balance, loadingBalance } = useBalance();
   const { allStepsComplete } = useOrderInfoEntrySteps({
@@ -46,6 +47,14 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     durationSeconds,
     startAtIso,
     limitPrice,
+  });
+  const { placeBuyOrder, placingOrder, orderId } = usePlaceBuyOrder({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+    limitPrice,
+    immediateOrCancel,
   });
 
   const noFunds = balance !== null && balance !== undefined && balance === 0;
@@ -74,6 +83,9 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         durationSeconds={durationSeconds}
         startAtIso={startAtIso}
         limitPrice={limitPrice}
+        immediateOrCancel={immediateOrCancel}
+        setImmediateOrCancel={setImmediateOrCancel}
+        placeBuyOrder={placeBuyOrder}
         hide={hidePlaceOrderScene}
       />
     </Box>
@@ -88,6 +100,9 @@ const PlaceOrder = ({
   durationSeconds,
   startAtIso,
   limitPrice,
+  immediateOrCancel,
+  setImmediateOrCancel,
+  placeBuyOrder,
   hide,
 }: {
   instanceType: Nullable<InstanceType>;
@@ -95,10 +110,11 @@ const PlaceOrder = ({
   durationSeconds: Nullable<number>;
   startAtIso: Nullable<string>;
   limitPrice: Nullable<Centicents>;
+  immediateOrCancel: Nullable<boolean>;
+  setImmediateOrCancel: (immediateOrCancel: boolean) => void;
+  placeBuyOrder: () => void;
   hide: boolean;
 }) => {
-  const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(null);
   const immediateOrCancelSet =
     immediateOrCancel !== null && immediateOrCancel !== undefined;
 
@@ -127,6 +143,15 @@ const PlaceOrder = ({
   const endAtLabelFormatted = dayjs(endsAtIso).format("ddd MMM D [at] h:mma");
 
   const limitPriceLabel = centicentsToDollarsFormatted(limitPrice);
+
+  const isSelectingImmediateOrCancelFlag = !immediateOrCancelSet;
+  const isReadyToPlaceOrder =
+    instanceType !== null &&
+    totalNodes !== null &&
+    durationSeconds !== null &&
+    startAtIso !== null &&
+    limitPrice !== null &&
+    immediateOrCancel !== null;
 
   return (
     <Box
@@ -158,9 +183,48 @@ const PlaceOrder = ({
       <SelectExpirationBehavior
         immediateOrCancel={immediateOrCancel}
         setImmediateOrCancel={setImmediateOrCancel}
-        selectionInProgress={!immediateOrCancelSet}
+        selectionInProgress={isSelectingImmediateOrCancelFlag}
         endsAtIso={endsAtIso}
       />
+      <EnterToPlaceOrder
+        placeBuyOrder={placeBuyOrder}
+        hide={!isReadyToPlaceOrder}
+      />
+    </Box>
+  );
+};
+
+const EnterToPlaceOrder = ({
+  placeBuyOrder,
+  hide,
+}: {
+  placeBuyOrder: () => void;
+  hide: boolean;
+}) => {
+  const PressEnterBlinking = () => {
+    const [blinking, setBlinking] = useState(false);
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setBlinking((blinking) => !blinking);
+      }, 750);
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <Text backgroundColor="magenta" color="white">
+        {blinking ? "Press enter ↵ to place it." : ""}
+      </Text>
+    );
+  };
+
+  return (
+    <Box flexDirection="row" marginTop={1}>
+      <Box marginRight={2}>
+        <Text bold>Your order is ready.</Text>
+      </Box>
+      <Box>
+        <PressEnterBlinking />
+      </Box>
     </Box>
   );
 };
@@ -1028,7 +1092,7 @@ const InfoBanner = ({
 
 // --
 
-export function useQuotePrice({
+function useQuotePrice({
   instanceType,
   totalNodes,
   durationSeconds,
@@ -1063,6 +1127,63 @@ export function useQuotePrice({
   }, [instanceType, totalNodes, durationSeconds, startAtIso]);
 
   return { quotePrice, loadingQuotePrice };
+}
+
+function usePlaceBuyOrder({
+  instanceType,
+  totalNodes,
+  durationSeconds,
+  startAtIso,
+  limitPrice,
+  immediateOrCancel,
+}: {
+  instanceType: Nullable<InstanceType>;
+  totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
+  immediateOrCancel: Nullable<boolean>;
+}) {
+  const { exit } = useApp();
+
+  const [orderId, setOrderId] = useState<Nullable<string>>(null);
+  const [placingOrder, setPlacingOrder] = useState<boolean>(false);
+
+  const canPlaceOrder = [
+    instanceType !== null && instanceType !== undefined,
+    totalNodes !== null && totalNodes !== undefined,
+    durationSeconds !== null && durationSeconds !== undefined,
+    startAtIso !== null && startAtIso !== undefined,
+    limitPrice !== null && limitPrice !== undefined,
+    immediateOrCancel !== null && immediateOrCancel !== undefined,
+  ].every(Boolean);
+  const placeBuyOrder = () => {
+    if (canPlaceOrder) {
+      setPlacingOrder(true);
+
+      placeBuyOrderRequest({
+        instance_type: instanceType!,
+        quantity: totalNodes!,
+        duration: durationSeconds!,
+        start_at: startAtIso!,
+        price: limitPrice!,
+        flags: {
+          ioc: immediateOrCancel!,
+        },
+      }).then(({ data, err }) => {
+        if (!!data && data.status === OrderStatus.Pending) {
+          setOrderId(data.id);
+        } else if (err) {
+          console.error(`Error: ${err.message}`);
+          exit();
+        }
+
+        setPlacingOrder(false);
+      });
+    }
+  };
+
+  return { placeBuyOrder, placingOrder, orderId };
 }
 
 export default SFBuy;

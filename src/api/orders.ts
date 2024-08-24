@@ -17,10 +17,10 @@ export enum OrderStatus {
   Expired = "expired",
 }
 export interface OrderFlags {
-  market: boolean;
-  post_only: boolean;
-  ioc: boolean;
-  prorate: boolean;
+  market?: boolean;
+  post_only?: boolean;
+  ioc?: boolean;
+  prorate?: boolean;
 }
 
 export interface HydratedOrder {
