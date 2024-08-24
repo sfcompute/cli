@@ -356,6 +356,10 @@ const OrderPlacementStatus = ({
   hide: boolean;
 }) => {
   const orderSuccessfullyPlaced = orderId !== null && orderId !== undefined;
+  const orderPlacementFailed =
+    placeOrderError !== null && placeOrderError !== undefined;
+
+  // exit if order is successfully placed
   useEffect(() => {
     if (orderSuccessfullyPlaced) {
       setTimeout(() => {
@@ -394,11 +398,11 @@ const OrderPlacementStatus = ({
     >
       <Box flexDirection="row" justifyContent="space-between" width="100%">
         <Text color="gray">order status</Text>
-        {orderSuccessfullyPlaced && (
-          <Box>
-            <Text color="green">order successfully placed! 🎉</Text>
-          </Box>
-        )}
+        <OrderStatusIndicator
+          orderRequestInflight={orderRequestInflight}
+          orderId={orderId}
+          placeOrderError={placeOrderError}
+        />
       </Box>
       <Box marginTop={1}>
         {orderRequestInflight && (
@@ -412,6 +416,13 @@ const OrderPlacementStatus = ({
         {orderSuccessfullyPlaced && (
           <Box flexDirection="column">
             <Box flexDirection="column">
+              <Text>
+                Your order has been{" "}
+                <Text color="green">successfully placed</Text>. It will reach
+                the market shortly.
+              </Text>
+            </Box>
+            <Box flexDirection="column" marginTop={1}>
               <Text>Your order id is:</Text>
               <Box
                 flexDirection="row"
@@ -464,9 +475,38 @@ const OrderPlacementStatus = ({
             </Box>
           </Box>
         )}
+        {orderPlacementFailed && (
+          <Box>
+            <Text color="red">{placeOrderError?.message}</Text>
+          </Box>
+        )}
       </Box>
     </Box>
   );
+};
+
+const OrderStatusIndicator = ({
+  orderRequestInflight,
+  orderId,
+  placeOrderError,
+}: {
+  orderRequestInflight: boolean;
+  orderId: Nullable<string>;
+  placeOrderError: Nullable<ApiError>;
+}) => {
+  if (orderRequestInflight) {
+    return <Spinner type="dots" />;
+  }
+  if (placeOrderError) {
+    return <Text color="red">order placement failed</Text>;
+  }
+
+  const orderIdAvailable = orderId !== null && orderId !== undefined;
+  if (orderIdAvailable) {
+    return <Text color="magenta">{orderId}</Text>;
+  }
+
+  return null;
 };
 
 // --
