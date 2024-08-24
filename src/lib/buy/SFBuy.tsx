@@ -17,10 +17,10 @@ import {
 } from "../../helpers/units";
 import { Check, OpenCircle } from "../../ui/symbols";
 import SelectInput from "ink-select-input";
-import { UTCLive } from "../../ui/lib/UTCLive";
 import { useWebUrl } from "../../hooks/urls";
 import dayjs from "dayjs";
 import { quoteBuyOrderRequest } from "../../api/quoting";
+import { NowLive } from "../../ui/lib/NowLive";
 
 type SFBuyProps = {
   placeholder: string;
@@ -140,7 +140,7 @@ const PlaceOrder = ({
       <Box flexDirection="row" width="100%" justifyContent="space-between">
         <Text color="gray">place order</Text>
         <Box>
-          <UTCLive color="gray" />
+          <NowLive color="gray" />
         </Box>
       </Box>
       <Box flexDirection="column" marginTop={1}>
