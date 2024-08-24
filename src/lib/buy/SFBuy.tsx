@@ -184,7 +184,8 @@ const SelectExpirationBehavior = ({
     if (!immediateOrCancelSet) {
       return (
         <Text>
-          <OpenCircle color="gray" /> When should this order expire?
+          <OpenCircle color="gray" /> When should this order{" "}
+          <Text color="yellow">expire</Text>?
         </Text>
       );
     }
