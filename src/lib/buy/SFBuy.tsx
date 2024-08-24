@@ -30,6 +30,7 @@ type SFBuyProps = {
 };
 
 const SFBuy: React.FC<SFBuyProps> = () => {
+  // fields to collect
   const [instanceType, _] = useState<InstanceType>(InstanceType.H100i);
   const [totalNodes, setTotalNodes] = useState<Nullable<number>>(1);
   const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
@@ -40,8 +41,21 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   );
   const [limitPrice, setLimitPrice] = useState<Nullable<number>>(1_000);
   const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(false);
+    useState<Nullable<boolean>>(null);
 
+  // quote fields
+  const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
+    useState<Nullable<string>>(null);
+
+  const startAtIsoToQuoteFor = startAtIso ?? highlightedStartTimeIso ?? null;
+  const { quotePrice, loadingQuotePrice } = useQuotePrice({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso: startAtIsoToQuoteFor,
+  });
+
+  // place order utils
   const {
     placeBuyOrder,
     orderRequestInitiated,
@@ -83,6 +97,9 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         setDurationSeconds={setDurationSeconds}
         setStartAtIso={setStartAtIso}
         setLimitPrice={setLimitPrice}
+        quotePrice={quotePrice}
+        loadingQuotePrice={loadingQuotePrice}
+        setHighlightedStartTimeIso={setHighlightedStartTimeIso}
         noFunds={noFunds}
         showLoading={showOrderInfoCollectionLoading}
       />
@@ -94,6 +111,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         limitPrice={limitPrice}
         immediateOrCancel={immediateOrCancel}
         setImmediateOrCancel={setImmediateOrCancel}
+        quotePrice={quotePrice}
         placeBuyOrder={placeBuyOrder}
         orderRequestInitiated={orderRequestInitiated}
         placingOrder={placingOrder}
@@ -119,6 +137,7 @@ const PlaceOrder = ({
   limitPrice,
   immediateOrCancel,
   setImmediateOrCancel,
+  quotePrice,
   placeBuyOrder,
   orderRequestInitiated,
   placingOrder,
@@ -131,6 +150,7 @@ const PlaceOrder = ({
   limitPrice: Nullable<Centicents>;
   immediateOrCancel: Nullable<boolean>;
   setImmediateOrCancel: (immediateOrCancel: boolean) => void;
+  quotePrice: Nullable<number>;
   placeBuyOrder: () => void;
   orderRequestInitiated: boolean;
   placingOrder: boolean;
@@ -218,6 +238,7 @@ const PlaceOrder = ({
         setImmediateOrCancel={setImmediateOrCancel}
         selectionInProgress={isSelectingImmediateOrCancelFlag}
         endsAtIso={endsAtIso}
+        quoteUnavailable={quotePrice === null || quotePrice === undefined}
       />
       <EnterToPlaceOrder
         placeBuyOrder={placeBuyOrder}
@@ -284,14 +305,21 @@ const SelectExpirationBehavior = ({
   setImmediateOrCancel,
   selectionInProgress,
   endsAtIso,
+  quoteUnavailable,
 }: {
   immediateOrCancel: Nullable<boolean>;
   setImmediateOrCancel: (immediateOrCancel: boolean) => void;
   selectionInProgress: boolean;
   endsAtIso: Nullable<string>;
+  quoteUnavailable: boolean;
 }) => {
   const immediateOrCancelSet =
     immediateOrCancel !== null && immediateOrCancel !== undefined;
+  useEffect(() => {
+    if (selectionInProgress && quoteUnavailable) {
+      setImmediateOrCancel(false);
+    }
+  }, [selectionInProgress, quoteUnavailable]);
 
   const expiresAtLabel = dayjs(endsAtIso).format("ddd MMM D [at] h:mma");
   const Label = () => {
@@ -423,7 +451,7 @@ const OrderPlacementStatus = ({
               </Text>
             </Box>
             <Box flexDirection="column" marginTop={1}>
-              <Text>Your order id is:</Text>
+              <Text>Your order id:</Text>
               <Box
                 flexDirection="row"
                 width="70%"
@@ -521,6 +549,9 @@ const OrderInfoCollection = ({
   setDurationSeconds,
   setStartAtIso,
   setLimitPrice,
+  quotePrice,
+  loadingQuotePrice,
+  setHighlightedStartTimeIso,
   noFunds,
   showLoading,
 }: {
@@ -533,6 +564,9 @@ const OrderInfoCollection = ({
   setDurationSeconds: (durationSeconds: number) => void;
   setStartAtIso: (startAtIso: string) => void;
   setLimitPrice: (limitPrice: number) => void;
+  quotePrice: Nullable<number>;
+  loadingQuotePrice: boolean;
+  setHighlightedStartTimeIso: (startAtIso: string) => void;
   noFunds: boolean;
   showLoading: boolean;
 }) => {
@@ -548,17 +582,6 @@ const OrderInfoCollection = ({
     durationSeconds,
     startAtIso,
     limitPrice,
-  });
-
-  const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
-    useState<Nullable<string>>(null);
-
-  const startAtIsoToQuoteFor = startAtIso ?? highlightedStartTimeIso ?? null;
-  const { quotePrice, loadingQuotePrice } = useQuotePrice({
-    instanceType,
-    totalNodes,
-    durationSeconds,
-    startAtIso: startAtIsoToQuoteFor,
   });
 
   if (showLoading) {
