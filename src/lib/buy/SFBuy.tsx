@@ -199,8 +199,7 @@ const SelectExpirationBehavior = ({
         ) : (
           <Text>
             It will stay on the market until it expires at{" "}
-            <Text color="yellow">{expiresAtLabel}</Text>{" "}
-            <Text color="gray">(the end time will have passed)</Text>.
+            <Text color="yellow">{expiresAtLabel}</Text>.
           </Text>
         )}
       </Text>
