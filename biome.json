@@ -12,7 +12,8 @@
 		"rules": {
 			"correctness": {
         "noUnusedImports": "warn",
-				"useExhaustiveDependencies": "off"
+				"useExhaustiveDependencies": "off",
+				"useHookAtTopLevel": "error"
       },
 			"suspicious": {
 				"noArrayIndexKey": "off",

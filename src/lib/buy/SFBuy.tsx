@@ -10,6 +10,7 @@ import { Emails } from "../../helpers/urls";
 import Spinner from "ink-spinner";
 import {
   centicentsToDollarsFormatted,
+  centicentsToWhole,
   formatSecondsShort,
   priceWholeToCenticents,
   totalSignificantDecimals,
@@ -34,10 +35,13 @@ const SFBuy: React.FC<SFBuyProps> = () => {
   const [instanceType, _] = useState<Nullable<InstanceType>>(
     InstanceType.H100i,
   );
-  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(null);
-  const [durationSeconds, setDurationSeconds] =
-    useState<Nullable<number>>(null);
-  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
+  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(2);
+  const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
+    60 * 60 * 2,
+  );
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
+    dayjs().add(2, "hour").startOf("hour").toISOString(),
+  );
   const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
   const [immediateOrCancel, setImmediateOrCancel] =
     useState<Nullable<boolean>>(null);
@@ -79,7 +83,6 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     limitPrice,
   });
 
-  const noFunds = balance !== null && balance !== undefined && balance === 0;
   const showOrderInfoCollectionLoading = loadingBalance;
   const hidePlaceOrderScene = !allStepsComplete;
 
@@ -99,7 +102,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         quotePrice={quotePrice}
         loadingQuotePrice={loadingQuotePrice}
         setHighlightedStartTimeIso={setHighlightedStartTimeIso}
-        noFunds={noFunds}
+        balance={balance}
         showLoading={showOrderInfoCollectionLoading}
       />
       <PlaceOrder
@@ -445,7 +448,7 @@ const OrderPlacementStatus = ({
             <Box flexDirection="column">
               <Text>
                 Your order has been{" "}
-                <Text color="green">successfully placed</Text>. It will reach
+                <Text color="green">successfully placed</Text>. It will be on
                 the market shortly.
               </Text>
             </Box>
@@ -551,7 +554,7 @@ const OrderInfoCollection = ({
   quotePrice,
   loadingQuotePrice,
   setHighlightedStartTimeIso,
-  noFunds,
+  balance,
   showLoading,
 }: {
   instanceType: Nullable<InstanceType>;
@@ -566,7 +569,7 @@ const OrderInfoCollection = ({
   quotePrice: Nullable<number>;
   loadingQuotePrice: boolean;
   setHighlightedStartTimeIso: (startAtIso: string) => void;
-  noFunds: boolean;
+  balance: Nullable<Centicents>;
   showLoading: boolean;
 }) => {
   const {
@@ -590,6 +593,8 @@ const OrderInfoCollection = ({
       </Box>
     );
   }
+
+  const noFunds = balance !== null && balance !== undefined && balance === 0;
   if (noFunds) {
     return <AddFundsGoToWebsite />;
   }
@@ -634,6 +639,7 @@ const OrderInfoCollection = ({
         setLimitPrice={setLimitPrice}
         quotePrice={quotePrice}
         selectionInProgress={isSelectingLimitPrice}
+        balance={balance}
       />
       <Box flexDirection="row" justifyContent="flex-end" marginTop={1}>
         <TotalStepsCompleteLabel
@@ -940,11 +946,13 @@ const SelectLimitPrice = ({
   setLimitPrice,
   quotePrice,
   selectionInProgress,
+  balance,
 }: {
   limitPrice: Nullable<Centicents>;
   setLimitPrice: (limitPrice: Centicents) => void;
   quotePrice: Nullable<Centicents>;
   selectionInProgress: boolean;
+  balance: Nullable<Centicents>;
 }) => {
   const quoteAvailable = quotePrice !== null && quotePrice !== undefined;
   const limitPriceSet = limitPrice !== null && limitPrice !== undefined;
@@ -954,12 +962,12 @@ const SelectLimitPrice = ({
     <OpenCircle color="gray" dimColor={!selectionInProgress} />
   );
 
-  const manualLimitPriceInputInProgress =
-    selectionInProgress && !quoteAvailable && !limitPriceSet;
-  const { limitPriceInputField } = useLimitPriceInput({
-    setLimitPrice,
-    disable: !selectionInProgress,
-  });
+  const { limitPriceInputField, limitPriceInputFieldValue } =
+    useLimitPriceInput({
+      setLimitPrice,
+      balance,
+      disable: !selectionInProgress,
+    });
 
   const Label = () => {
     const LabelText = () => {
@@ -978,7 +986,19 @@ const SelectLimitPrice = ({
       return <Text color={labelColor}>Limit Price</Text>;
     };
     const LabelValue = () => {
-      if (manualLimitPriceInputInProgress) {
+      if (selectionInProgress) {
+        if (quoteAvailable) {
+          const belowQuote =
+            limitPriceInputFieldValue && limitPriceInputFieldValue < quotePrice;
+          if (belowQuote) {
+            return <Text color="white">{limitPriceInputField}</Text>;
+          }
+
+          // otherwise at or above quote — highlight green (good)
+          return <Text color="green">{limitPriceInputField}</Text>;
+        }
+
+        // if no quote just highlight magenta
         return <Text color="magenta">{limitPriceInputField}</Text>;
       }
       if (limitPriceSet) {
@@ -1004,25 +1024,60 @@ const SelectLimitPrice = ({
     );
   };
 
-  const showManualLimitPriceInputEducation = manualLimitPriceInputInProgress;
-
   return (
     <Box flexDirection="column">
       <Text>
         {StatusSymbol} <Label />
       </Text>
-      {showManualLimitPriceInputEducation && <ManualLimitPriceEucation />}
+      {selectionInProgress && <LimitPriceEucation quotePrice={quotePrice} />}
     </Box>
   );
 };
 const useLimitPriceInput = ({
   setLimitPrice,
+  balance,
   disable,
 }: {
   setLimitPrice: (limitPrice: Centicents) => void;
+  balance: Nullable<Centicents>;
   disable: boolean;
 }) => {
+  const balanceSet = balance !== null && balance !== undefined;
+
   const [limitPriceInputField, setLimitPriceInputField] = useState<string>("$");
+  const [limitPriceInputFieldValue, setLimitPriceInputFieldValue] =
+    useState<Nullable<Centicents>>(null);
+
+  // helpers
+  const cleanFieldInput = (input: string): string => {
+    return input.replace("$", "");
+  };
+  const inputValueIsValid = (input: string): boolean => {
+    const num = Number(cleanFieldInput(input));
+
+    const conditions = [
+      !Number.isNaN(num),
+      totalSignificantDecimals(num) <= 4,
+      num >= 0,
+      num <= 100_000,
+      balanceSet && num <= centicentsToWhole(balance),
+    ];
+
+    return conditions.every(Boolean);
+  };
+
+  // parse actual numeric value
+  useEffect(() => {
+    const isValid = inputValueIsValid(limitPriceInputField);
+    if (isValid) {
+      const { centicents, invalid } =
+        priceWholeToCenticents(limitPriceInputField);
+
+      if (!invalid && centicents !== null && centicents !== undefined) {
+        setLimitPriceInputFieldValue(centicents);
+      }
+    }
+  }, [limitPriceInputField]);
 
   useInput((input, key) => {
     if (disable) {
@@ -1040,23 +1095,6 @@ const useLimitPriceInput = ({
       setLimitPriceInputField("$");
       return;
     }
-
-    // helpers
-    const cleanFieldInput = (input: string): string => {
-      return input.replace("$", "");
-    };
-    const inputValueIsValid = (input: string): boolean => {
-      const num = Number(cleanFieldInput(input));
-
-      const conditions = [
-        !Number.isNaN(num),
-        totalSignificantDecimals(num) <= 4,
-        num >= 0,
-        num <= 100_000,
-      ];
-
-      return conditions.every(Boolean);
-    };
 
     // increment
     const incrementPrice = () => {
@@ -1092,13 +1130,8 @@ const useLimitPriceInput = ({
 
     // submit
     if (key.return) {
-      const isValid = inputValueIsValid(limitPriceInputField);
-      if (isValid) {
-        const { centicents, invalid } =
-          priceWholeToCenticents(limitPriceInputField);
-        if (!invalid && centicents !== null && centicents !== undefined) {
-          setLimitPrice(centicents);
-        }
+      if (limitPriceInputFieldValue) {
+        setLimitPrice(limitPriceInputFieldValue);
       }
 
       return;
@@ -1118,15 +1151,53 @@ const useLimitPriceInput = ({
     });
   });
 
-  return { limitPriceInputField };
+  return { limitPriceInputField, limitPriceInputFieldValue };
 };
-const ManualLimitPriceEucation = () => {
+const LimitPriceEucation = ({
+  quotePrice,
+}: {
+  quotePrice: Nullable<Centicents>;
+}) => {
+  const quoteAvailable = quotePrice !== null && quotePrice !== undefined;
+
   return (
     <Box flexDirection="column" width={60} marginTop={1} paddingLeft={2}>
-      <Text>
-        We could not quote a price for your order. You will have to manually set
-        a <Text backgroundColor="black">limit price</Text>.
-      </Text>
+      {quoteAvailable ? (
+        <Box flexDirection="column">
+          <Text>
+            Set a <Text backgroundColor="black">limit price</Text> for your
+            order.
+          </Text>
+          <Box marginTop={1}>
+            <Text>
+              The current market price for this block is{" "}
+              <Text color="green">
+                {centicentsToDollarsFormatted(quotePrice)}
+              </Text>
+              . If you bid{" "}
+              <Text color="green">
+                {centicentsToDollarsFormatted(quotePrice)}
+              </Text>{" "}
+              or more, your order is very likely to get filled.
+            </Text>
+          </Box>
+          <Box flexDirection="column" marginTop={1}>
+            <Text bold>Why "very likely"?</Text>
+            <Box marginTop={1}>
+              <Text>
+                If another buyer frontruns your exact order for the same (or
+                higher) price, or if availability disappears before you submit
+                this order, then your order will not get filled.
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      ) : (
+        <Text>
+          We could not quote a price for your order. You will have to manually
+          set a <Text backgroundColor="black">limit price</Text>.
+        </Text>
+      )}
       <Box
         flexDirection="column"
         paddingX={2}
@@ -1378,7 +1449,7 @@ function useQuotePrice({
     }
   }, [instanceType, totalNodes, durationSeconds, startAtIso]);
 
-  return { quotePrice, loadingQuotePrice };
+  return { quotePrice: 90_000, loadingQuotePrice: false };
 }
 
 function usePlaceBuyOrder({
