@@ -33,6 +33,7 @@ type SFBuyProps = {
   startAtIso: Nullable<string>;
   limitPrice: Nullable<Centicents>;
   immediateOrCancel: Nullable<boolean>;
+  forceAutomaticallyPlaceOrder: boolean;
 };
 
 const SFBuy: React.FC<SFBuyProps> = ({
@@ -42,6 +43,7 @@ const SFBuy: React.FC<SFBuyProps> = ({
   startAtIso: argStartAtIso,
   limitPrice: argLimitPrice,
   immediateOrCancel: argImmediateOrCancel,
+  forceAutomaticallyPlaceOrder,
 }) => {
   // fields to collect
   const [instanceType, _] = useState<Nullable<InstanceType>>(
@@ -127,6 +129,7 @@ const SFBuy: React.FC<SFBuyProps> = ({
         orderRequestInitiated={orderRequestInitiated}
         placingOrder={placingOrder}
         hide={hidePlaceOrderScene}
+        forceAutomaticallyPlaceOrder={forceAutomaticallyPlaceOrder}
       />
       <OrderPlacementStatus
         orderRequestInflight={placingOrder}
@@ -153,6 +156,7 @@ const PlaceOrder = ({
   orderRequestInitiated,
   placingOrder,
   hide,
+  forceAutomaticallyPlaceOrder,
 }: {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
@@ -166,6 +170,7 @@ const PlaceOrder = ({
   orderRequestInitiated: boolean;
   placingOrder: boolean;
   hide: boolean;
+  forceAutomaticallyPlaceOrder: boolean;
 }) => {
   const immediateOrCancelSet =
     immediateOrCancel !== null && immediateOrCancel !== undefined;
@@ -204,6 +209,8 @@ const PlaceOrder = ({
     startAtIso !== null &&
     limitPrice !== null &&
     immediateOrCancel !== null;
+  const canPlaceOrder =
+    isReadyToPlaceOrder && !orderRequestInitiated && !placingOrder;
 
   const getBorderColor = () => {
     if (orderRequestInitiated) {
@@ -253,7 +260,8 @@ const PlaceOrder = ({
       />
       <EnterToPlaceOrder
         placeBuyOrder={placeBuyOrder}
-        canPlaceOrder={isReadyToPlaceOrder && !placingOrder}
+        canPlaceOrder={canPlaceOrder}
+        shouldAutomaticallyPlaceOrder={forceAutomaticallyPlaceOrder}
         hide={!isReadyToPlaceOrder || orderRequestInitiated}
       />
     </Box>
@@ -263,12 +271,15 @@ const PlaceOrder = ({
 const EnterToPlaceOrder = ({
   placeBuyOrder,
   canPlaceOrder,
+  shouldAutomaticallyPlaceOrder,
   hide,
 }: {
   placeBuyOrder: () => void;
   canPlaceOrder: boolean;
+  shouldAutomaticallyPlaceOrder: boolean;
   hide: boolean;
 }) => {
+  // place order on enter
   useInput((_, key) => {
     if (hide) {
       return;
@@ -278,6 +289,13 @@ const EnterToPlaceOrder = ({
       placeBuyOrder();
     }
   });
+
+  // also, handle automatically placing the order if that flag is set
+  useEffect(() => {
+    if (canPlaceOrder && shouldAutomaticallyPlaceOrder) {
+      placeBuyOrder();
+    }
+  }, [canPlaceOrder]);
 
   const PressEnterBlinking = () => {
     const [blinking, setBlinking] = useState(false);

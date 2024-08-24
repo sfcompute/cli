@@ -66,6 +66,7 @@ export function registerBuy(program: Command) {
       }
 
       const argImmediateOrCancel = options.ioc ?? null;
+      const automaticallyPlaceOrder = options.yes ?? false;
 
       renderCommand(
         <SFBuy
@@ -75,6 +76,7 @@ export function registerBuy(program: Command) {
           startAtIso={argStartAtIso}
           limitPrice={argLimitPrice}
           immediateOrCancel={argImmediateOrCancel}
+          forceAutomaticallyPlaceOrder={automaticallyPlaceOrder}
         />,
       );
     });
