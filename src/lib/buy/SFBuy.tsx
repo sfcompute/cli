@@ -99,7 +99,7 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         placingOrder={placingOrder}
         hide={hidePlaceOrderScene}
       />
-      <LiveOrderStatus
+      <OrderPlacementStatus
         orderRequestInflight={placingOrder}
         placeOrderError={placeOrderError}
         orderId={orderId}
@@ -344,7 +344,7 @@ const SelectExpirationBehavior = ({
 
 // --
 
-const LiveOrderStatus = ({
+const OrderPlacementStatus = ({
   orderRequestInflight,
   placeOrderError,
   orderId,
@@ -437,7 +437,7 @@ const LiveOrderStatus = ({
                   commandColumnWidth={15}
                   items={[
                     {
-                      Label: <Text color="gray">cancel order</Text>,
+                      Label: <Text color="red">cancel order</Text>,
                       Command: (
                         <Text>
                           {CLICommand.Orders.Cancel.Bare}{" "}
