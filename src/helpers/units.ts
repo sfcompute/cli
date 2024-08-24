@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import type { Nullable } from "./empty";
+import type { Nullable, Optional } from "./empty";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -18,7 +18,7 @@ interface PriceWholeToCenticentsReturn {
   invalid: boolean;
 }
 export function priceWholeToCenticents(
-  price: string | number,
+  price: Optional<string | number>,
 ): PriceWholeToCenticentsReturn {
   if (
     price === null ||

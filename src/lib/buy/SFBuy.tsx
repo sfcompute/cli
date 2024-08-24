@@ -28,21 +28,30 @@ import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
 
 type SFBuyProps = {
   totalNodes: Nullable<number>;
+  durationSeconds: Nullable<number>;
+  startAtIso: Nullable<string>;
+  limitPrice: Nullable<Centicents>;
+  immediateOrCancel: Nullable<boolean>;
 };
 
-const SFBuy: React.FC<SFBuyProps> = ({ totalNodes: initialTotalNodes }) => {
+const SFBuy: React.FC<SFBuyProps> = ({
+  totalNodes: argTotalNodes,
+  durationSeconds: argDurationSeconds,
+  startAtIso: argStartAtIso,
+  limitPrice: argLimitPrice,
+  immediateOrCancel: argImmediateOrCancel,
+}) => {
   // fields to collect
   const [instanceType, _] = useState<Nullable<InstanceType>>(
     InstanceType.H100i,
   );
-  const [totalNodes, setTotalNodes] =
-    useState<Nullable<number>>(initialTotalNodes);
+  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(argTotalNodes);
   const [durationSeconds, setDurationSeconds] =
-    useState<Nullable<number>>(null);
-  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
-  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
+    useState<Nullable<number>>(argDurationSeconds);
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(argStartAtIso);
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(argLimitPrice);
   const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(null);
+    useState<Nullable<boolean>>(argImmediateOrCancel);
 
   // quote fields
   const [highlightedStartTimeIso, setHighlightedStartTimeIso] =
@@ -981,7 +990,11 @@ const SelectLimitPrice = ({
       };
       const labelColor = getLabelColor();
 
-      return <Text color={labelColor}>Limit Price</Text>;
+      return (
+        <Text color={labelColor} dimColor={!selectionInProgress}>
+          Limit Price
+        </Text>
+      );
     };
     const LabelValue = () => {
       if (selectionInProgress) {
