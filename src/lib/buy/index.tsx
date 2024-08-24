@@ -2,7 +2,6 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
-import { logAndQuit } from "../../helpers/errors";
 import { nullifyIfEmpty } from "../../helpers/empty";
 import parseDuration from "parse-duration";
 import { priceWholeToCenticents } from "../../helpers/units";
@@ -57,14 +56,9 @@ export function registerBuy(program: Command) {
         : null;
       const argStartAtIso = startAtDate?.toISOString() ?? null;
 
-      // parse limit price
-      const { centicents: argLimitPrice, invalid: argPriceInvalid } =
-        priceWholeToCenticents(options.price);
-      if (argPriceInvalid) {
-        logAndQuit(`Invalid price: ${options.price}`); // TODO: remove this when validation properly moves into the component
-        process.exit(1);
-      }
-
+      const { centicents: argLimitPrice } = priceWholeToCenticents(
+        options.price,
+      );
       const argImmediateOrCancel = options.ioc ?? null;
       const automaticallyPlaceOrder = options.yes ?? false;
 
