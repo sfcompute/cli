@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "../helpers/empty";
 import { getWebAppUrl, type webPaths } from "../helpers/urls";
 
 export const useWebUrl = (key: keyof typeof webPaths, params?: any) => {

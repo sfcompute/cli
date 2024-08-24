@@ -1,7 +1,7 @@
 import { unlinkSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { EmptyObject } from "../types/empty";
+import type { EmptyObject } from "./empty";
 
 export interface Config {
   api_url: string;

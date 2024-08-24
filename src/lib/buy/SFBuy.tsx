@@ -3,7 +3,7 @@ import { Text, Box, useInput } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
-import type { Nullable } from "../../types/empty";
+import type { Nullable } from "../../helpers/empty";
 import { SpendingPowerLabel } from "../../ui/lib/SpendingPowerLabel";
 import { useBalance } from "../../api/hooks/useBalance";
 import { Emails } from "../../helpers/urls";
@@ -27,21 +27,19 @@ import type { ApiError } from "../../api";
 import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
 
 type SFBuyProps = {
-  placeholder: string;
+  totalNodes: Nullable<number>;
 };
 
-const SFBuy: React.FC<SFBuyProps> = () => {
+const SFBuy: React.FC<SFBuyProps> = ({ totalNodes: initialTotalNodes }) => {
   // fields to collect
   const [instanceType, _] = useState<Nullable<InstanceType>>(
     InstanceType.H100i,
   );
-  const [totalNodes, setTotalNodes] = useState<Nullable<number>>(2);
-  const [durationSeconds, setDurationSeconds] = useState<Nullable<number>>(
-    60 * 60 * 2,
-  );
-  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
-    dayjs().add(2, "hour").startOf("hour").toISOString(),
-  );
+  const [totalNodes, setTotalNodes] =
+    useState<Nullable<number>>(initialTotalNodes);
+  const [durationSeconds, setDurationSeconds] =
+    useState<Nullable<number>>(null);
+  const [startAtIso, setStartAtIso] = useState<Nullable<string>>(null);
   const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
   const [immediateOrCancel, setImmediateOrCancel] =
     useState<Nullable<boolean>>(null);
@@ -990,7 +988,7 @@ const SelectLimitPrice = ({
         if (quoteAvailable) {
           const belowQuote =
             limitPriceInputFieldValue && limitPriceInputFieldValue < quotePrice;
-          if (belowQuote) {
+          if (belowQuote || !limitPriceInputFieldValue) {
             return <Text color="white">{limitPriceInputField}</Text>;
           }
 
@@ -1180,16 +1178,6 @@ const LimitPriceEucation = ({
               </Text>{" "}
               or more, your order is very likely to get filled.
             </Text>
-          </Box>
-          <Box flexDirection="column" marginTop={1}>
-            <Text bold>Why "very likely"?</Text>
-            <Box marginTop={1}>
-              <Text>
-                If another buyer frontruns your exact order for the same (or
-                higher) price, or if availability disappears before you submit
-                this order, then your order will not get filled.
-              </Text>
-            </Box>
           </Box>
         </Box>
       ) : (
@@ -1449,7 +1437,7 @@ function useQuotePrice({
     }
   }, [instanceType, totalNodes, durationSeconds, startAtIso]);
 
-  return { quotePrice: 90_000, loadingQuotePrice: false };
+  return { quotePrice, loadingQuotePrice };
 }
 
 function usePlaceBuyOrder({

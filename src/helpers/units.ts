@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "./empty";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 

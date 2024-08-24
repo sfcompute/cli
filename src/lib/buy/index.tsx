@@ -4,7 +4,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import { isLoggedIn } from "../../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../../helpers/errors";
-import type { Nullable } from "../../types/empty";
+import type { Nullable } from "../../helpers/empty";
 import parseDuration from "parse-duration";
 import { priceWholeToCenticents, type Centicents } from "../../helpers/units";
 import * as chrono from "chrono-node";
@@ -15,7 +15,6 @@ dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 interface SfBuyOptions {
-  type: string;
   nodes?: string;
   duration: string;
   price: string;
@@ -28,8 +27,11 @@ export function registerBuy(program: Command) {
   program
     .command("buy")
     .description("Place a buy order for compute")
-    .action(() => {
-      renderCommand(<SFBuy placeholder="" />);
+    .option("-n, --nodes <quantity>", "Specify the number of nodes")
+    .action((options: SfBuyOptions) => {
+      const argTotalNodes = options.nodes ? Number(options.nodes) : null;
+
+      renderCommand(<SFBuy totalNodes={argTotalNodes} />);
     });
 }
 

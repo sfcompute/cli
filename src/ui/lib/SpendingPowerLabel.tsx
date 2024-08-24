@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import type { Nullable } from "../../types/empty";
+import type { Nullable } from "../../helpers/empty";
 import {
   centicentsToDollarsFormatted,
   type Centicents,

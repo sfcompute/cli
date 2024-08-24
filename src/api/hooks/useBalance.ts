@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { centicentsToWhole, type Centicents } from "../../helpers/units";
 import { getBalance } from "../balance";
-import type { Nullable } from "../../types/empty";
+import type { Nullable } from "../../helpers/empty";
 
 export function useBalance() {
   const [balance, setBalance] = useState<Nullable<Centicents>>(null);

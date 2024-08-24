@@ -2,7 +2,7 @@ import { objToQueryString, type ApiError } from ".";
 import { getAuthToken } from "../helpers/config";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "../helpers/empty";
 
 export interface BuyOrderQuote {
   object: "quote";
