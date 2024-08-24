@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, Box, useInput, useApp } from "ink";
+import { Text, Box, useInput } from "ink";
 import { InstanceType } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
@@ -22,6 +22,8 @@ import dayjs from "dayjs";
 import { quoteBuyOrderRequest } from "../../api/quoting";
 import { NowLive } from "../../ui/lib/NowLive";
 import { OrderStatus, placeBuyOrderRequest } from "../../api/orders";
+import type { ApiError } from "../../api";
+import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
 
 type SFBuyProps = {
   placeholder: string;
@@ -34,12 +36,26 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     60 * 60,
   );
   const [startAtIso, setStartAtIso] = useState<Nullable<string>>(
-    // dayjs().add(1, "hour").startOf("hour").toISOString(),
-    null,
+    dayjs().add(1, "hour").startOf("hour").toISOString(),
   );
-  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(null);
+  const [limitPrice, setLimitPrice] = useState<Nullable<number>>(1_000);
   const [immediateOrCancel, setImmediateOrCancel] =
-    useState<Nullable<boolean>>(null);
+    useState<Nullable<boolean>>(false);
+
+  const {
+    placeBuyOrder,
+    orderRequestInitiated,
+    placingOrder,
+    placeOrderError,
+    orderId,
+  } = usePlaceBuyOrder({
+    instanceType,
+    totalNodes,
+    durationSeconds,
+    startAtIso,
+    limitPrice,
+    immediateOrCancel,
+  });
 
   const { balance, loadingBalance } = useBalance();
   const { allStepsComplete } = useOrderInfoEntrySteps({
@@ -48,14 +64,6 @@ const SFBuy: React.FC<SFBuyProps> = () => {
     durationSeconds,
     startAtIso,
     limitPrice,
-  });
-  const { placeBuyOrder, placingOrder, orderId } = usePlaceBuyOrder({
-    instanceType,
-    totalNodes,
-    durationSeconds,
-    startAtIso,
-    limitPrice,
-    immediateOrCancel,
   });
 
   const noFunds = balance !== null && balance !== undefined && balance === 0;
@@ -87,7 +95,15 @@ const SFBuy: React.FC<SFBuyProps> = () => {
         immediateOrCancel={immediateOrCancel}
         setImmediateOrCancel={setImmediateOrCancel}
         placeBuyOrder={placeBuyOrder}
+        orderRequestInitiated={orderRequestInitiated}
+        placingOrder={placingOrder}
         hide={hidePlaceOrderScene}
+      />
+      <LiveOrderStatus
+        orderRequestInflight={placingOrder}
+        placeOrderError={placeOrderError}
+        orderId={orderId}
+        hide={!orderRequestInitiated}
       />
     </Box>
   );
@@ -104,6 +120,8 @@ const PlaceOrder = ({
   immediateOrCancel,
   setImmediateOrCancel,
   placeBuyOrder,
+  orderRequestInitiated,
+  placingOrder,
   hide,
 }: {
   instanceType: Nullable<InstanceType>;
@@ -114,6 +132,8 @@ const PlaceOrder = ({
   immediateOrCancel: Nullable<boolean>;
   setImmediateOrCancel: (immediateOrCancel: boolean) => void;
   placeBuyOrder: () => void;
+  orderRequestInitiated: boolean;
+  placingOrder: boolean;
   hide: boolean;
 }) => {
   const immediateOrCancelSet =
@@ -155,6 +175,9 @@ const PlaceOrder = ({
     immediateOrCancel !== null;
 
   const getBorderColor = () => {
+    if (orderRequestInitiated) {
+      return "gray";
+    }
     if (isReadyToPlaceOrder) {
       return "magenta";
     }
@@ -198,7 +221,8 @@ const PlaceOrder = ({
       />
       <EnterToPlaceOrder
         placeBuyOrder={placeBuyOrder}
-        hide={!isReadyToPlaceOrder}
+        canPlaceOrder={isReadyToPlaceOrder && !placingOrder}
+        hide={!isReadyToPlaceOrder || orderRequestInitiated}
       />
     </Box>
   );
@@ -206,11 +230,23 @@ const PlaceOrder = ({
 
 const EnterToPlaceOrder = ({
   placeBuyOrder,
+  canPlaceOrder,
   hide,
 }: {
   placeBuyOrder: () => void;
+  canPlaceOrder: boolean;
   hide: boolean;
 }) => {
+  useInput((_, key) => {
+    if (hide) {
+      return;
+    }
+
+    if (key.return && canPlaceOrder) {
+      placeBuyOrder();
+    }
+  });
+
   const PressEnterBlinking = () => {
     const [blinking, setBlinking] = useState(false);
     useEffect(() => {
@@ -226,6 +262,10 @@ const EnterToPlaceOrder = ({
       </Text>
     );
   };
+
+  if (hide) {
+    return null;
+  }
 
   return (
     <Box flexDirection="row" marginTop={1}>
@@ -298,6 +338,133 @@ const SelectExpirationBehavior = ({
       {selectionInProgress && (
         <SelectInput items={items} isFocused onSelect={handleSelect} />
       )}
+    </Box>
+  );
+};
+
+// --
+
+const LiveOrderStatus = ({
+  orderRequestInflight,
+  placeOrderError,
+  orderId,
+  hide,
+}: {
+  orderRequestInflight: boolean;
+  placeOrderError: Nullable<ApiError>;
+  orderId: Nullable<string>;
+  hide: boolean;
+}) => {
+  const orderSuccessfullyPlaced = orderId !== null && orderId !== undefined;
+  useEffect(() => {
+    if (orderSuccessfullyPlaced) {
+      setTimeout(() => {
+        process.exit(0); // allow Ink to update UI before exiting (TODO: find a better way to do this)
+      }, 500);
+    }
+  }, [orderSuccessfullyPlaced]);
+
+  if (hide) {
+    return null;
+  }
+
+  const getBorderColor = () => {
+    if (orderRequestInflight) {
+      return "blue";
+    }
+    if (placeOrderError) {
+      return "red";
+    }
+    if (orderId) {
+      return "green";
+    }
+
+    return "white";
+  };
+  const borderColor = getBorderColor();
+
+  return (
+    <Box
+      flexDirection="column"
+      marginTop={1}
+      paddingX={2}
+      paddingY={1}
+      borderColor={borderColor}
+      borderStyle="single"
+    >
+      <Box flexDirection="row" justifyContent="space-between" width="100%">
+        <Text color="gray">order status</Text>
+        {orderSuccessfullyPlaced && (
+          <Box>
+            <Text color="green">order successfully placed! 🎉</Text>
+          </Box>
+        )}
+      </Box>
+      <Box marginTop={1}>
+        {orderRequestInflight && (
+          <Box>
+            <Box marginRight={2}>
+              <Text color="gray">Placing order</Text>
+            </Box>
+            <Spinner type="dots" />
+          </Box>
+        )}
+        {orderSuccessfullyPlaced && (
+          <Box flexDirection="column">
+            <Box flexDirection="column">
+              <Text>Your order id is:</Text>
+              <Box
+                flexDirection="row"
+                width="70%"
+                justifyContent="center"
+                borderStyle="classic"
+                borderColor="gray"
+                borderDimColor
+              >
+                <Text color="magenta">{orderId}</Text>
+              </Box>
+            </Box>
+            <Box flexDirection="column" marginTop={1}>
+              <Text>Here are some helpful follow-on commands:</Text>
+              <Box
+                flexDirection="column"
+                paddingX={1}
+                borderStyle="single"
+                borderColor="gray"
+                borderDimColor
+              >
+                <RecommendedCommands
+                  commandColumnWidth={15}
+                  items={[
+                    {
+                      Label: <Text color="gray">cancel order</Text>,
+                      Command: (
+                        <Text>
+                          {CLICommand.Orders.Cancel.Bare}{" "}
+                          <Text color="magenta">{orderId}</Text>
+                        </Text>
+                      ),
+                    },
+                    {
+                      Label: <Text color="gray">check status</Text>,
+                      Command: (
+                        <Text>
+                          {CLICommand.Orders.Status.Bare}{" "}
+                          <Text color="magenta">{orderId}</Text>
+                        </Text>
+                      ),
+                    },
+                    {
+                      Label: <Text color="gray">list orders</Text>,
+                      Command: <Text>{CLICommand.Orders.List}</Text>,
+                    },
+                  ]}
+                />
+              </Box>
+            </Box>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
@@ -1167,10 +1334,12 @@ function usePlaceBuyOrder({
   limitPrice: Nullable<Centicents>;
   immediateOrCancel: Nullable<boolean>;
 }) {
-  const { exit } = useApp();
-
   const [orderId, setOrderId] = useState<Nullable<string>>(null);
+  const [orderRequestInitiated, setOrderRequestInitiated] =
+    useState<boolean>(false);
   const [placingOrder, setPlacingOrder] = useState<boolean>(false);
+  const [placeOrderError, setPlaceOrderError] =
+    useState<Nullable<ApiError>>(null);
 
   const canPlaceOrder = [
     instanceType !== null && instanceType !== undefined,
@@ -1183,6 +1352,7 @@ function usePlaceBuyOrder({
   const placeBuyOrder = () => {
     if (canPlaceOrder) {
       setPlacingOrder(true);
+      setOrderRequestInitiated(true);
 
       placeBuyOrderRequest({
         instance_type: instanceType!,
@@ -1194,19 +1364,26 @@ function usePlaceBuyOrder({
           ioc: immediateOrCancel!,
         },
       }).then(({ data, err }) => {
-        if (!!data && data.status === OrderStatus.Pending) {
-          setOrderId(data.id);
-        } else if (err) {
-          console.error(`Error: ${err.message}`);
-          exit();
-        }
+        Bun.sleep(3000).then(() => {
+          if (!!data && data.status === OrderStatus.Pending) {
+            setOrderId(data.id);
+          } else if (err) {
+            setPlaceOrderError(err);
+          }
 
-        setPlacingOrder(false);
+          setPlacingOrder(false);
+        });
       });
     }
   };
 
-  return { placeBuyOrder, placingOrder, orderId };
+  return {
+    placeBuyOrder,
+    orderRequestInitiated,
+    placingOrder,
+    placeOrderError,
+    orderId,
+  };
 }
 
 export default SFBuy;

@@ -168,7 +168,10 @@ async function createTokenAction() {
     colWidths: [20, 30],
   });
   table.push(["View All Tokens", chalk.magenta(`${CLICommand.Tokens.List}`)]);
-  table.push(["Delete a Token", chalk.magenta(`${CLICommand.Tokens.Delete}`)]);
+  table.push([
+    "Delete a Token",
+    chalk.magenta(`${CLICommand.Tokens.Delete.BareWithParams}`),
+  ]);
 
   console.log(`${chalk.gray("And other commands you can try:")}`);
   console.log(table.toString());

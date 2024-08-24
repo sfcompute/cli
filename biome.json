@@ -15,6 +15,7 @@
 				"useExhaustiveDependencies": "off"
       },
 			"suspicious": {
+				"noArrayIndexKey": "off",
         "noExplicitAny": "warn"
       },
 			"style": {
