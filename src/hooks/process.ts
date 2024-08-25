@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 export function useExit() {
   const exit = useCallback(() => {
@@ -8,4 +8,14 @@ export function useExit() {
   }, []);
 
   return exit;
+}
+
+export function useExitAfterCondition(condition: boolean) {
+  const exit = useExit();
+
+  useEffect(() => {
+    if (condition) {
+      exit();
+    }
+  }, [condition, exit]);
 }

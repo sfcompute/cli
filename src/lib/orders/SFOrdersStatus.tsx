@@ -7,6 +7,9 @@ import type { ApiError } from "../../api";
 import dayjs from "dayjs";
 import { centicentsToDollarsFormatted } from "../../helpers/units";
 import { type InstanceType, instanceTypeToLabel } from "../../api/instances";
+import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
+import { CLICommand } from "../../helpers/commands";
+import { useExitAfterCondition } from "../../hooks/process";
 
 interface SFBuyProps {
   orderId: string;
@@ -15,6 +18,7 @@ interface SFBuyProps {
 const SFOrdersStatus: React.FC<SFBuyProps> = ({ orderId }) => {
   const { order, loadingOrder, orderNotFound, orderFetchError } =
     useOrder(orderId);
+  useExitAfterCondition(!!order || orderNotFound || !!orderFetchError);
 
   const primaryColor = usePrimaryColor(
     order,
@@ -55,6 +59,7 @@ const SFOrdersStatus: React.FC<SFBuyProps> = ({ orderId }) => {
             orderId={orderId}
           />
           <OrderBreakdown order={order} />
+          <OtherCommands order={order} primaryColor={primaryColor} />
         </>
       )}
     </Box>
@@ -257,6 +262,55 @@ const usePrimaryColor = (
     default:
       return "gray";
   }
+};
+
+const OtherCommands = ({
+  order,
+  primaryColor,
+}: { order: Nullable<HydratedOrder>; primaryColor: string }) => {
+  if (!order) {
+    return null;
+  }
+
+  const onOrNearMarket =
+    order.status === OrderStatus.Pending || order.status === OrderStatus.Open;
+
+  return (
+    <Box
+      flexDirection="column"
+      paddingX={2}
+      paddingY={1}
+      borderStyle="singleDouble"
+      borderColor="gray"
+      marginTop={1}
+    >
+      <Text color="gray">Other commands you can run:</Text>
+      <Box marginTop={1}>
+        <RecommendedCommands
+          commandColumnWidth={17}
+          items={[
+            ...(onOrNearMarket
+              ? [
+                  {
+                    Label: <Text bold>cancel order</Text>,
+                    Command: (
+                      <Text>
+                        {CLICommand.Orders.Cancel.Bare}{" "}
+                        <Text color={primaryColor}>{order.id}</Text>
+                      </Text>
+                    ),
+                  },
+                ]
+              : []),
+            {
+              Label: <Text color="gray">list all orders</Text>,
+              Command: <Text>{CLICommand.Orders.List}</Text>,
+            },
+          ]}
+        />
+      </Box>
+    </Box>
+  );
 };
 
 export default SFOrdersStatus;
