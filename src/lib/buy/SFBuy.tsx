@@ -1635,18 +1635,18 @@ function usePlaceBuyOrder({
       setPlacingOrder(true);
       setOrderRequestInitiated(true);
 
-      placeBuyOrderRequest({
-        instance_type: instanceType!,
-        quantity: totalNodes!,
-        duration: durationSeconds!,
-        start_at: startAtIso!,
-        price: limitPrice!,
-        flags: {
-          ioc: immediateOrCancel!,
-        },
-      }).then(({ data, err }) => {
-        // make order submission feel substantial w/ artificial sleep
-        Bun.sleep(3000).then(() => {
+      // make order submission feel substantial w/ artificial sleep
+      Bun.sleep(3000).then(() => {
+        placeBuyOrderRequest({
+          instance_type: instanceType!,
+          quantity: totalNodes!,
+          duration: durationSeconds!,
+          start_at: startAtIso!,
+          price: limitPrice!,
+          flags: {
+            ioc: immediateOrCancel!,
+          },
+        }).then(({ data, err }) => {
           if (!!data && data.status === OrderStatus.Pending) {
             setOrderId(data.id);
           } else if (err) {

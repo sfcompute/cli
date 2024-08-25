@@ -5,41 +5,44 @@ import { getOrderById, type HydratedOrder } from "../orders";
 
 interface UseOrderReturn {
   order: Nullable<HydratedOrder>;
-  err: Nullable<ApiError>;
-  orderNotFound?: boolean;
+  orderFetchError: Nullable<ApiError>;
+  orderNotFound: Nullable<boolean>;
   loadingOrder: boolean;
 }
 export function useOrder(orderId: string): UseOrderReturn {
   const [order, setOrder] = useState<Nullable<HydratedOrder>>(null);
   const [fetching, setFetching] = useState<boolean>(false);
-  const [err, setErr] = useState<Nullable<ApiError>>(null);
+  const [orderFetchError, setOrderFetchError] =
+    useState<Nullable<ApiError>>(null);
   const [orderNotFound, setOrderNotFound] = useState<boolean>(false);
 
   useEffect(() => {
     if (orderId) {
       setFetching(true);
       setOrderNotFound(false);
-      setErr(null);
+      setOrderFetchError(null);
 
-      getOrderById(orderId).then(({ data, err }) => {
-        if (data) {
-          setOrder(data);
-        } else if (err) {
-          setErr(err);
+      Bun.sleep(1500).then(() => {
+        getOrderById(orderId).then(({ data, err }) => {
+          if (data) {
+            setOrder(data);
+          } else if (err) {
+            setOrderFetchError(err);
 
-          if (err.code === ApiErrorCode.Orders.NotFound) {
-            setOrderNotFound(true);
+            if (err.code === ApiErrorCode.Orders.NotFound) {
+              setOrderNotFound(true);
+            }
           }
-        }
 
-        setFetching(false);
+          setFetching(false);
+        });
       });
     }
   }, []);
 
   return {
     order,
-    err,
+    orderFetchError,
     orderNotFound,
     loadingOrder: fetching,
   };
