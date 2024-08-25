@@ -11,6 +11,8 @@ import type { ListResponseBody } from "../../api/types";
 import { ApiErrorCode, type ApiError } from "../../api";
 import type { HydratedOrder } from "../../api/orders";
 import { formatSecondsShort } from "../../helpers/units";
+import { renderCommand } from "../../ui/render";
+import SFOrdersStatus from "./SFOrdersStatus";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -98,7 +100,16 @@ export function registerOrders(program: Command) {
   ordersCommand
     .command("status <order-id>")
     .description("Get order status")
-    .action(() => {});
+    .action(async (orderId: string) => {
+      // check auth
+      const loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        logLoginMessageAndQuit();
+        return;
+      }
+
+      renderCommand(<SFOrdersStatus orderId={orderId} />);
+    });
 
   ordersCommand
     .command("ls")

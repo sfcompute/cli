@@ -26,6 +26,7 @@ import { NowLive } from "../../ui/lib/NowLive";
 import { OrderStatus, placeBuyOrderRequest } from "../../api/orders";
 import type { ApiError } from "../../api";
 import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
+import { useExit } from "../../hooks/process";
 
 interface SFBuyProps {
   instanceType: Nullable<InstanceType>;
@@ -502,11 +503,10 @@ const OrderPlacementStatus = ({
     placeOrderError !== null && placeOrderError !== undefined;
 
   // exit if order is successfully placed or placement failed
+  const exit = useExit();
   useEffect(() => {
     if (orderSuccessfullyPlaced || orderPlacementFailed) {
-      setTimeout(() => {
-        process.exit(0); // allow Ink to update UI before exiting (TODO: find a better way to do this)
-      }, 500);
+      exit();
     }
   }, [orderSuccessfullyPlaced, orderPlacementFailed]);
 
