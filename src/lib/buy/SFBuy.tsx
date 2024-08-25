@@ -456,7 +456,7 @@ const SelectExpirationBehavior = ({
           </Text>
         ) : (
           <Text>
-            It will stay on the market until it expires{" "}
+            Your order will stay on the market until it expires{" "}
             <Text color="yellow">{expiresAtLabel}</Text>.
           </Text>
         )}

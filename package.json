@@ -1,5 +1,5 @@
 {
-  "version": "0.0.21",
+  "version": "0.0.21-pre.1724617945083",
   "scripts": {
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
