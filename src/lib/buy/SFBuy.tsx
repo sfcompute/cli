@@ -174,7 +174,7 @@ const PlaceOrder = ({
 }) => {
   const immediateOrCancelSet =
     immediateOrCancel !== null && immediateOrCancel !== undefined;
-  const quoteUnavailable = quotePrice === null || quotePrice === undefined;
+  const quoteAvailable = quotePrice !== null && quotePrice !== undefined;
 
   if (hide) {
     return null;
@@ -225,6 +225,8 @@ const PlaceOrder = ({
   };
   const borderColor = getBorderColor();
 
+  const limitPriceBelowQuote = quoteAvailable && limitPrice < quotePrice;
+
   return (
     <Box
       flexDirection="column"
@@ -257,37 +259,96 @@ const PlaceOrder = ({
         setImmediateOrCancel={setImmediateOrCancel}
         selectionInProgress={isSelectingImmediateOrCancelFlag}
         endsAtIso={endsAtIso}
-        quoteUnavailable={quoteUnavailable}
+        quoteUnavailable={!quoteAvailable}
       />
-      {quoteUnavailable && (
-        <Box
-          marginTop={1}
-          borderStyle="doubleSingle"
-          borderColor="gray"
-          borderDimColor
-          paddingX={1}
-        >
-          <Box width={8}>
-            <Text>
-              <Text bold underline>
-                Note:
-              </Text>{" "}
-            </Text>
-          </Box>
-          <Box>
-            <Text>
-              We do not have an immediate match for this order. It will stay on
-              the market until we can find a match for it.
-            </Text>
-          </Box>
-        </Box>
-      )}
+      <ExecutionRiskHeadsup
+        quoteAvailable={quoteAvailable}
+        limitPriceBelowQuote={limitPriceBelowQuote}
+        limitPrice={limitPrice}
+        quotePrice={quotePrice}
+        hide={!isReadyToPlaceOrder || orderRequestInitiated}
+      />
       <EnterToPlaceOrder
         placeBuyOrder={placeBuyOrder}
         canPlaceOrder={canPlaceOrder}
         shouldAutomaticallyPlaceOrder={forceAutomaticallyPlaceOrder}
         hide={!isReadyToPlaceOrder || orderRequestInitiated}
       />
+    </Box>
+  );
+};
+const ExecutionRiskHeadsup = ({
+  quoteAvailable,
+  limitPriceBelowQuote,
+  limitPrice,
+  quotePrice,
+  hide,
+}: {
+  quoteAvailable: boolean;
+  limitPriceBelowQuote: boolean;
+  limitPrice: Nullable<number>;
+  quotePrice: Nullable<number>;
+  hide: boolean;
+}) => {
+  const isKnownToBeMarketable = quoteAvailable && !limitPriceBelowQuote;
+  if (hide || isKnownToBeMarketable) {
+    return null;
+  }
+
+  const HeadsupLabel = () => {
+    if (!quoteAvailable) {
+      return (
+        <Text>
+          We do not have an immediate match for this order. It will stay on the
+          market until we can find a match for it.
+        </Text>
+      );
+    }
+    if (limitPriceBelowQuote) {
+      return (
+        <Box flexDirection="column">
+          <Text>
+            Your bid price of{" "}
+            <Text color="green" bold>
+              {centicentsToDollarsFormatted(limitPrice!)}
+            </Text>{" "}
+            is below the current market price of{" "}
+            <Text color="green">
+              {centicentsToDollarsFormatted(quotePrice!)}
+            </Text>
+            .
+          </Text>
+          <Box marginTop={1}>
+            <Text>
+              This order is unlikely to be filled immediately, but it will stay
+              on the market until we can find a match for it.
+            </Text>
+          </Box>
+        </Box>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Box
+      marginTop={1}
+      borderStyle="doubleSingle"
+      borderColor="gray"
+      borderDimColor
+      paddingX={1}
+    >
+      <Box width={8}>
+        <Text>
+          <Text bold underline>
+            Note:
+          </Text>{" "}
+        </Text>
+      </Box>
+      <Box>
+        <HeadsupLabel />
+      </Box>
     </Box>
   );
 };
@@ -1260,7 +1321,7 @@ const LimitPriceEducation = ({
               <Text color="green">
                 {centicentsToDollarsFormatted(quotePrice)}
               </Text>{" "}
-              or more, your order is very likely to get filled.
+              or more, you are likely to get this compute block.
             </Text>
           </Box>
         </Box>
@@ -1536,7 +1597,7 @@ function useQuotePrice({
     }
   }, [instanceType, totalNodes, durationSeconds, startAtIso]);
 
-  return { quotePrice, loadingQuotePrice };
+  return { quotePrice: 90_000, loadingQuotePrice: false };
 }
 
 function usePlaceBuyOrder({
