@@ -9,6 +9,8 @@ import * as chrono from "chrono-node";
 import SFBuy from "./SFBuy";
 import { renderCommand } from "../../ui/render";
 import type { InstanceType } from "../../api/instances";
+import { isLoggedIn } from "../../helpers/config";
+import { logLoginMessageAndQuit } from "../../helpers/errors";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -43,7 +45,15 @@ export function registerBuy(program: Command) {
     )
     .option("--ioc", "Cancel immediately if not filled")
     .option("-y, --yes", "Automatically confirm and place the order")
-    .action((options: SfBuyOptions) => {
+    .action(async (options: SfBuyOptions) => {
+      // check auth
+      const loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        logLoginMessageAndQuit();
+        return;
+      }
+
+      // collect args
       const argInstanceType = (options.type as InstanceType) ?? null;
       const argTotalNodes = options.nodes ? Number(options.nodes) : null;
       const argDurationSeconds = options.duration

@@ -1,16 +1,16 @@
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../../helpers/config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
-import type { ListResponseBody } from "../api/types";
-import { ApiErrorCode, type ApiError } from "../api";
-import type { HydratedOrder } from "../api/orders";
-import { formatSecondsShort } from "../helpers/units";
+} from "../../helpers/errors";
+import { getApiUrl } from "../../helpers/urls";
+import type { ListResponseBody } from "../../api/types";
+import { ApiErrorCode, type ApiError } from "../../api";
+import type { HydratedOrder } from "../../api/orders";
+import { formatSecondsShort } from "../../helpers/units";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -96,6 +96,11 @@ export function registerOrders(program: Command) {
   const ordersCommand = program.command("orders").description("Manage orders");
 
   ordersCommand
+    .command("status <order-id>")
+    .description("Get order status")
+    .action(() => {});
+
+  ordersCommand
     .command("ls")
     .alias("list")
     .description("List orders")
@@ -120,7 +125,7 @@ export function registerOrders(program: Command) {
     });
 
   ordersCommand
-    .command("cancel <id>")
+    .command("cancel <order-id>")
     .description("Cancel an order")
     .action(submitOrderCancellationByIdAction);
 }

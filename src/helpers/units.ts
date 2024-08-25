@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import type { Nullable, Optional } from "./empty";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { InstanceType } from "../api/instances";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -84,4 +85,22 @@ export function formatSecondsShort(secs: number) {
     .map(({ unit, value }) => `${value}${unit}`);
 
   return parts.length > 0 ? parts.join(" ") : "0s";
+}
+
+// --
+
+export function toGPUHours({
+  instanceType,
+  quantity,
+  durationSeconds,
+}: {
+  instanceType: InstanceType;
+  quantity: number;
+  durationSeconds: number;
+}): Nullable<number> {
+  if (instanceType === InstanceType.H100i) {
+    return (quantity * 8 * durationSeconds) / (60 * 60);
+  }
+
+  return null;
 }

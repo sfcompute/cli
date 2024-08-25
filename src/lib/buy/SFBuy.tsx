@@ -26,7 +26,7 @@ import { OrderStatus, placeBuyOrderRequest } from "../../api/orders";
 import type { ApiError } from "../../api";
 import { RecommendedCommands } from "../../ui/lib/RecommendedCommands";
 
-type SFBuyProps = {
+interface SFBuyProps {
   instanceType: Nullable<InstanceType>;
   totalNodes: Nullable<number>;
   durationSeconds: Nullable<number>;
@@ -34,10 +34,9 @@ type SFBuyProps = {
   limitPrice: Nullable<Centicents>;
   immediateOrCancel: Nullable<boolean>;
   forceAutomaticallyPlaceOrder: boolean;
-};
+}
 
 const SFBuy: React.FC<SFBuyProps> = ({
-  instanceType: argInstanceType,
   totalNodes: argTotalNodes,
   durationSeconds: argDurationSeconds,
   startAtIso: argStartAtIso,
@@ -47,7 +46,7 @@ const SFBuy: React.FC<SFBuyProps> = ({
 }) => {
   // fields to collect
   const [instanceType, _] = useState<Nullable<InstanceType>>(
-    argInstanceType ?? InstanceType.H100i,
+    InstanceType.H100i, // default to h100i regardless of arg (TODO: change when more instance types are supported)
   );
   const [totalNodes, setTotalNodes] = useState<Nullable<number>>(argTotalNodes);
   const [durationSeconds, setDurationSeconds] =
@@ -1214,10 +1213,12 @@ const LimitPriceEucation = ({
           </Box>
         </Box>
       ) : (
-        <Text>
-          We could not quote a price for your order. You will have to manually
-          set a <Text backgroundColor="black">limit price</Text>.
-        </Text>
+        <Box>
+          <Text>
+            We could not quote a price for your order. You will have to manually
+            set a <Text backgroundColor="black">limit price</Text>.
+          </Text>
+        </Box>
       )}
       <Box
         flexDirection="column"

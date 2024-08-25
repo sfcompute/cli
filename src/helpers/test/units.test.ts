@@ -3,10 +3,12 @@ import {
   centicentsToDollarsFormatted,
   formatSecondsShort,
   priceWholeToCenticents,
+  toGPUHours,
   totalSignificantDecimals,
   truncateToFourDecimals,
   type Centicents,
 } from "../units";
+import { InstanceType } from "../../api/instances";
 
 describe("units", () => {
   test("price whole to centicents", () => {
@@ -137,5 +139,36 @@ describe("units", () => {
     expect(formatSecondsShort(86_401)).toEqual("1d 1s");
     expect(formatSecondsShort(604_800)).toEqual("1w");
     expect(formatSecondsShort(864_000)).toEqual("1w 3d");
+  });
+
+  test("to GPU hours", () => {
+    expect(
+      toGPUHours({
+        instanceType: InstanceType.H100i,
+        quantity: 1,
+        durationSeconds: 1 * 60 * 60,
+      }),
+    ).toEqual(8);
+    expect(
+      toGPUHours({
+        instanceType: InstanceType.H100i,
+        quantity: 2,
+        durationSeconds: 1 * 60 * 60,
+      }),
+    ).toEqual(16);
+    expect(
+      toGPUHours({
+        instanceType: InstanceType.H100i,
+        quantity: 1,
+        durationSeconds: 2 * 60 * 60,
+      }),
+    ).toEqual(16);
+    expect(
+      toGPUHours({
+        instanceType: InstanceType.H100i,
+        quantity: 3,
+        durationSeconds: 4.5 * 60 * 60,
+      }),
+    ).toEqual(108);
   });
 });
