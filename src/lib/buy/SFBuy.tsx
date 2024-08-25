@@ -13,6 +13,7 @@ import {
   centicentsToWhole,
   formatSecondsShort,
   priceWholeToCenticents,
+  toGPUHours,
   totalSignificantDecimals,
   type Centicents,
 } from "../../helpers/units";
@@ -173,6 +174,7 @@ const PlaceOrder = ({
 }) => {
   const immediateOrCancelSet =
     immediateOrCancel !== null && immediateOrCancel !== undefined;
+  const quoteUnavailable = quotePrice === null || quotePrice === undefined;
 
   if (hide) {
     return null;
@@ -255,8 +257,31 @@ const PlaceOrder = ({
         setImmediateOrCancel={setImmediateOrCancel}
         selectionInProgress={isSelectingImmediateOrCancelFlag}
         endsAtIso={endsAtIso}
-        quoteUnavailable={quotePrice === null || quotePrice === undefined}
+        quoteUnavailable={quoteUnavailable}
       />
+      {quoteUnavailable && (
+        <Box
+          marginTop={1}
+          borderStyle="doubleSingle"
+          borderColor="gray"
+          borderDimColor
+          paddingX={1}
+        >
+          <Box width={8}>
+            <Text>
+              <Text bold underline>
+                Note:
+              </Text>{" "}
+            </Text>
+          </Box>
+          <Box>
+            <Text>
+              We do not have an immediate match for this order. It will stay on
+              the market until we can find a match for it.
+            </Text>
+          </Box>
+        </Box>
+      )}
       <EnterToPlaceOrder
         placeBuyOrder={placeBuyOrder}
         canPlaceOrder={canPlaceOrder}
@@ -598,6 +623,12 @@ const OrderInfoCollection = ({
   balance: Nullable<Centicents>;
   showLoading: boolean;
 }) => {
+  const totalGPUHours = toGPUHours({
+    instanceType,
+    quantity: totalNodes,
+    durationSeconds,
+  });
+
   const {
     isSelectingTotalNodes,
     isSelectingDurationSeconds,
@@ -664,6 +695,7 @@ const OrderInfoCollection = ({
         limitPrice={limitPrice}
         setLimitPrice={setLimitPrice}
         quotePrice={quotePrice}
+        totalGPUHours={totalGPUHours}
         selectionInProgress={isSelectingLimitPrice}
         balance={balance}
       />
@@ -971,12 +1003,14 @@ const SelectLimitPrice = ({
   limitPrice,
   setLimitPrice,
   quotePrice,
+  totalGPUHours,
   selectionInProgress,
   balance,
 }: {
   limitPrice: Nullable<Centicents>;
   setLimitPrice: (limitPrice: Centicents) => void;
   quotePrice: Nullable<Centicents>;
+  totalGPUHours: Nullable<number>;
   selectionInProgress: boolean;
   balance: Nullable<Centicents>;
 }) => {
@@ -1059,7 +1093,12 @@ const SelectLimitPrice = ({
       <Text>
         {StatusSymbol} <Label />
       </Text>
-      {selectionInProgress && <LimitPriceEucation quotePrice={quotePrice} />}
+      {selectionInProgress && (
+        <LimitPriceEducation
+          quotePrice={quotePrice}
+          totalGPUHours={totalGPUHours}
+        />
+      )}
     </Box>
   );
 };
@@ -1183,12 +1222,25 @@ const useLimitPriceInput = ({
 
   return { limitPriceInputField, limitPriceInputFieldValue };
 };
-const LimitPriceEucation = ({
+const LimitPriceEducation = ({
   quotePrice,
+  totalGPUHours,
 }: {
   quotePrice: Nullable<Centicents>;
+  totalGPUHours: Nullable<number>;
 }) => {
   const quoteAvailable = quotePrice !== null && quotePrice !== undefined;
+  const totalGPUHoursSet =
+    totalGPUHours !== null && totalGPUHours !== undefined;
+
+  const totalGPUHoursLabel = totalGPUHoursSet
+    ? Number.parseFloat(totalGPUHours.toFixed(2)).toString()
+    : "";
+  const totalGPUHoursUnitLabel = totalGPUHoursSet
+    ? totalGPUHours === 1
+      ? "hour"
+      : "hours"
+    : "";
 
   return (
     <Box flexDirection="column" width={60} marginTop={1} paddingLeft={2}>
@@ -1213,11 +1265,23 @@ const LimitPriceEucation = ({
           </Box>
         </Box>
       ) : (
-        <Box>
+        <Box flexDirection="column">
           <Text>
             We could not quote a price for your order. You will have to manually
             set a <Text backgroundColor="black">limit price</Text>.
           </Text>
+          {totalGPUHoursSet && (
+            <Box marginTop={1}>
+              <Text>
+                You are requesting{" "}
+                <Text underline>
+                  <Text bold>{totalGPUHoursLabel}</Text> GPU{" "}
+                  {totalGPUHoursUnitLabel}
+                </Text>
+                . Estimate the maximum price you would pay for this compute.
+              </Text>
+            </Box>
+          )}
         </Box>
       )}
       <Box
@@ -1243,7 +1307,8 @@ const LimitPriceEucation = ({
             the compute block. You could also get it for,{" "}
             <Text color="yellow">$9.90</Text>, <Text color="yellow">$9.80</Text>
             , <Text color="gray">$9</Text>, <Text color="gray">$8</Text>, and so
-            on (with the lower prices less & less likely to get filled).
+            on (with the lower prices less & less likely to find a matching
+            seller).
           </Text>
         </Box>
       </Box>
@@ -1408,7 +1473,7 @@ const InfoBanner = ({
       </Box>
       <Box marginBottom={1}>
         <Text>
-          This is a compute marketplace. You are about to submit a{" "}
+          This is a compute market. You are about to submit a{" "}
           <Text color="green">buy</Text> order. Compute is not granted
           immediately, instead, we try our best to get it for you at the{" "}
           <Text color="green">lowest</Text> price possible, as{" "}

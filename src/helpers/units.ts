@@ -94,10 +94,14 @@ export function toGPUHours({
   quantity,
   durationSeconds,
 }: {
-  instanceType: InstanceType;
-  quantity: number;
-  durationSeconds: number;
+  instanceType: Nullable<InstanceType>;
+  quantity: Nullable<number>;
+  durationSeconds: Nullable<number>;
 }): Nullable<number> {
+  if (instanceType === null || quantity === null || durationSeconds === null) {
+    return null;
+  }
+
   if (instanceType === InstanceType.H100i) {
     return (quantity * 8 * durationSeconds) / (60 * 60);
   }
