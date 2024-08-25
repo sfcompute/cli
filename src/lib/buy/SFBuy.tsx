@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, Box, useInput } from "ink";
-import { InstanceType } from "../../api/instances";
+import { InstanceType, instanceTypeToLabel } from "../../api/instances";
 import { CLICommand } from "../../helpers/commands";
 import { COMMAND_CONTAINER_MAX_WIDTH } from "../../ui/dimensions";
 import type { Nullable } from "../../helpers/empty";
@@ -803,13 +803,6 @@ const MarketPriceLabel = ({
   );
 };
 
-const instanceTypeToLabel = (instanceType: Nullable<InstanceType>): string => {
-  if (instanceType === InstanceType.H100i) {
-    return "8x H100 InfiniBand";
-  }
-
-  return "";
-};
 const SelectInstanceType = ({
   instanceType,
 }: {

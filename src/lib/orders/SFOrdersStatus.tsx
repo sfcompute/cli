@@ -1,11 +1,12 @@
 import { Box, Text } from "ink";
 import { useOrder } from "../../api/hooks/useOrder";
-import { OrderStatus, type HydratedOrder } from "../../api/orders";
+import { OrderSide, OrderStatus, type HydratedOrder } from "../../api/orders";
 import type { Nullable } from "../../helpers/empty";
 import Spinner from "ink-spinner";
 import type { ApiError } from "../../api";
 import dayjs from "dayjs";
 import { centicentsToDollarsFormatted } from "../../helpers/units";
+import { type InstanceType, instanceTypeToLabel } from "../../api/instances";
 
 interface SFBuyProps {
   orderId: string;
@@ -65,9 +66,60 @@ const OrderBreakdown = ({ order }: { order: Nullable<HydratedOrder> }) => {
     return null;
   }
 
+  const instanceTypeLabel = instanceTypeToLabel(
+    order.instance_type as InstanceType,
+  );
+  const isBuyOrder = order.side === OrderSide.Buy;
+
   return (
-    <Box marginTop={1}>
-      <Text>Order breakdown</Text>
+    <Box flexDirection="column" marginTop={1}>
+      <Text>
+        <Text color="gray">instances type</Text>{" "}
+        <Text color="gray" dimColor>
+          ~~~~~~~
+        </Text>{" "}
+        <Text color="white">{instanceTypeLabel}</Text>
+      </Text>
+      <Text color="gray">
+        <Text color="gray">total nodes</Text>{" "}
+        <Text color="gray" dimColor>
+          ~~~~~~~~~~
+        </Text>{" "}
+        <Text color="white">{order.quantity}</Text>
+      </Text>
+      <Text color="gray">
+        <Text color="gray">reservation start</Text>{" "}
+        <Text color="gray" dimColor>
+          ~~~~
+        </Text>{" "}
+        <Text color="white">
+          {dayjs(order.start_at).format("ddd MMM D [at] h:mma")}
+        </Text>
+      </Text>
+      <Text color="gray">
+        <Text color="gray">reservation end</Text>{" "}
+        <Text color="gray" dimColor>
+          ~~~~~~
+        </Text>{" "}
+        <Text color="white">
+          {dayjs(order.start_at)
+            .add(order.duration, "seconds")
+            .format("ddd MMM D [at] h:mma")}
+        </Text>
+      </Text>
+      <Box marginTop={1}>
+        <Text color="gray">
+          <Text>
+            <Text color="gray">limit price</Text>{" "}
+            <Text>
+              (the {isBuyOrder ? "most you will pay" : "least you will receive"}
+              )
+            </Text>
+            :
+          </Text>{" "}
+          <Text color="white">{centicentsToDollarsFormatted(order.price)}</Text>
+        </Text>
+      </Box>
     </Box>
   );
 };

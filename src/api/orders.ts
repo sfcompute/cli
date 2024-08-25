@@ -4,7 +4,7 @@ import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { Nullable } from "../helpers/empty";
 
-enum OrderType {
+export enum OrderSide {
   Buy = "buy",
   Sell = "sell",
 }
@@ -26,7 +26,7 @@ export interface OrderFlags {
 export interface HydratedOrder {
   object: "order";
   id: string;
-  side: OrderType;
+  side: OrderSide;
   instance_type: string;
   price: number;
   start_at: string;
