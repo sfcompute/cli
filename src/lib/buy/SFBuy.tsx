@@ -1511,7 +1511,7 @@ const AddFundsGoToWebsite = () => {
 const InfoBanner = ({
   balance,
   loadingBalance,
-}: { balance: Nullable<number>; loadingBalance: boolean }) => {
+}: { balance: Nullable<Centicents>; loadingBalance: boolean }) => {
   return (
     <Box
       width={COMMAND_CONTAINER_MAX_WIDTH}
@@ -1597,7 +1597,7 @@ function useQuotePrice({
     }
   }, [instanceType, totalNodes, durationSeconds, startAtIso]);
 
-  return { quotePrice: 90_000, loadingQuotePrice: false };
+  return { quotePrice, loadingQuotePrice };
 }
 
 function usePlaceBuyOrder({

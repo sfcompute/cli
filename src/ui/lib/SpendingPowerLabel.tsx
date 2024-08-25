@@ -1,10 +1,10 @@
 import { Box, Text } from "ink";
 import type { Nullable } from "../../helpers/empty";
+import Spinner from "ink-spinner";
 import {
   centicentsToDollarsFormatted,
   type Centicents,
 } from "../../helpers/units";
-import Spinner from "ink-spinner";
 
 export const SpendingPowerLabel = ({
   balance,

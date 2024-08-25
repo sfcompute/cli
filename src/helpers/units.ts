@@ -52,7 +52,13 @@ export function priceWholeToCenticents(
 }
 
 export function centicentsToDollarsFormatted(centicents: Centicents): string {
-  return `$${(centicents / 10_000).toFixed(2)}`;
+  const dollars = centicentsToWhole(centicents).toFixed(2);
+
+  // add commas
+  const [integerPart, decimalPart] = dollars.split(".");
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  return `$${formattedInteger}.${decimalPart}`;
 }
 
 export function centicentsToWhole(centicents: Centicents): number {
