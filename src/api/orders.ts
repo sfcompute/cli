@@ -47,6 +47,33 @@ export interface PlacedOrder {
 
 export type Order = PlacedOrder | HydratedOrder;
 
+// -- get order by id
+
+interface GetOrderByIdReturn {
+  data: Nullable<HydratedOrder>;
+  err: Nullable<ApiError>;
+}
+export async function getOrderById(id: string): Promise<GetOrderByIdReturn> {
+  const url = await getApiUrl("orders_get", { id });
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+  });
+  if (!response.ok) {
+    return {
+      data: null,
+      err: await response.json(),
+    };
+  }
+
+  return {
+    data: await response.json(),
+    err: null,
+  };
+}
+
 // -- place buy order
 
 interface PlaceBuyOrderRequestOptions {
