@@ -1645,6 +1645,7 @@ function usePlaceBuyOrder({
           ioc: immediateOrCancel!,
         },
       }).then(({ data, err }) => {
+        // make order submission feel substantial w/ artificial sleep
         Bun.sleep(3000).then(() => {
           if (!!data && data.status === OrderStatus.Pending) {
             setOrderId(data.id);

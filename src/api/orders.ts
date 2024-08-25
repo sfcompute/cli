@@ -61,6 +61,7 @@ export async function getOrderById(id: string): Promise<GetOrderByIdReturn> {
       Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
+  await Bun.sleep(5000);
   if (!response.ok) {
     return {
       data: null,
