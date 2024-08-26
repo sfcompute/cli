@@ -22,20 +22,18 @@ export function useOrder(orderId: string): UseOrderReturn {
       setOrderNotFound(false);
       setOrderFetchError(null);
 
-      Bun.sleep(1500).then(() => {
-        getOrderById(orderId).then(({ data, err }) => {
-          if (data) {
-            setOrder(data);
-          } else if (err) {
-            setOrderFetchError(err);
+      getOrderById(orderId).then(({ data, err }) => {
+        if (data) {
+          setOrder(data);
+        } else if (err) {
+          setOrderFetchError(err);
 
-            if (err.code === ApiErrorCode.Orders.NotFound) {
-              setOrderNotFound(true);
-            }
+          if (err.code === ApiErrorCode.Orders.NotFound) {
+            setOrderNotFound(true);
           }
+        }
 
-          setFetching(false);
-        });
+        setFetching(false);
       });
     }
   }, []);
