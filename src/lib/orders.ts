@@ -33,7 +33,7 @@ export function formatDuration(ms: number) {
   const seconds = d.seconds();
   const milliseconds = d.milliseconds();
 
-  let result = '';
+  let result = "";
 
   if (years > 0) result += `${years}y`;
   if (weeks > 0) result += `${weeks}w`;
@@ -43,7 +43,7 @@ export function formatDuration(ms: number) {
   if (seconds > 0) result += `${seconds}s`;
   if (milliseconds > 0) result += `${milliseconds}ms`;
 
-  return result || '0ms';
+  return result || "0ms";
 }
 
 export type PlaceSellOrderParameters = {
@@ -81,7 +81,7 @@ function printAsTable(orders: Array<HydratedOrder>) {
   for (const order of orders) {
     if (order.status === "pending") {
       table.push([
-        order.id.slice(0, 8),
+        order.id,
         "-",
         "-",
         "-",
