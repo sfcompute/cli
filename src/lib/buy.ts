@@ -68,7 +68,41 @@ async function buyOrderAction(options: SfBuyOptions) {
 
 async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
   if (!options.priceCenticents) {
-    return;
+    const { data: quote, err } = await quoteBuyOrderRequest({
+      instance_type: options.instanceType,
+      quantity: options.totalNodes,
+      duration: options.durationSeconds,
+      min_start_date: options.startsAt.iso,
+      max_start_date: options.startsAt.iso,
+    });
+
+    if (err?.code === ApiErrorCode.Quotes.NoAvailability) {
+      const durationInHours = options.durationSeconds / 3600;
+      const quantity = options.totalNodes;
+
+      // In the future, we should read from a price chart of yesterday's prices.
+      const todoEstimatedPriceInCents = 250;
+      const estimatedPrice = todoEstimatedPriceInCents * quantity * durationInHours;
+      const estimatedPriceInDollars = estimatedPrice
+
+
+      console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
+
+  sf buy -i ${options.instanceType} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInDollars / 100).toFixed(2)}" 
+        `)
+
+      return process.exit(1);
+    }
+
+    if (err) {
+      return logAndQuit(`Failed to get quote: ${err.message}`);
+    }
+
+    if (!quote) {
+      return logAndQuit("Failed to get quote: No quote data received");
+    }
+
+    options.priceCenticents = quote.price;
   }
 
   if (options.confirmWithUser) {
@@ -181,19 +215,13 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
 
   // parse price
   let priceCenticents: Nullable<Centicents> = null;
-  if (!isQuoteOnly) {
-    if (!options.price) {
-      logAndQuit("Please provide a price.");
-      process.exit(1);
-    }
-
+  if (options.price) {
     const { centicents: priceParsed, invalid: priceInputInvalid } =
       priceWholeToCenticents(options.price);
     if (priceInputInvalid) {
       logAndQuit(`Invalid price: ${options.price}`);
       process.exit(1);
     }
-
     priceCenticents = priceParsed;
   }
 
