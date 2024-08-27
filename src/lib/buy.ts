@@ -18,6 +18,7 @@ import { OrderStatus, placeBuyOrderRequest } from "../api/orders";
 import { quoteBuyOrderRequest } from "../api/quoting";
 import { ApiErrorCode } from "../api";
 import type { Nullable } from "../types/empty";
+import { apiClient } from "../apiClient";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -62,6 +63,29 @@ async function buyOrderAction(options: SfBuyOptions) {
   } else {
     await placeBuyOrderAction(optionsNormalized);
   }
+}
+
+async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function getOrder(orderId: string) {
+  const api = await apiClient()
+
+  const { data: order } = await api.GET("/v0/orders/{id}", { params: { path: { id: orderId } } })
+  return order
+}
+
+async function tryToGetOrder(orderId: string) {
+  for (let i = 0; i < 10; i++) {
+    const order = await getOrder(orderId)
+    if (order) {
+      return order
+    }
+    await sleep(50)
+  }
+
+  return undefined
 }
 
 // --
@@ -130,8 +154,53 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
   if (pendingOrder && pendingOrder.status === OrderStatus.Pending) {
     const orderId = pendingOrder.id;
+    const printOrderNumber = (status: string) => console.log(`\n${c.dim(`${orderId}\n\n`)}`);
 
-    console.log(`\n${c.green(`Order ${orderId} placed successfully`)}`);
+    const order = await tryToGetOrder(orderId)
+
+    if (!order) {
+      console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
+      return;
+    }
+    printOrderNumber(order.status)
+
+    if (order.status === "filled") {
+      const now = new Date();
+      const startAt = new Date(order.start_at);
+      const timeDiff = startAt.getTime() - now.getTime();
+      const oneMinuteInMs = 60 * 1000;
+
+      if (now >= startAt || timeDiff <= oneMinuteInMs) {
+        console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
+
+  sf instances ls
+
+`);
+      } else {
+        const contractStartTime = dayjs(startAt);
+        const timeFromNow = contractStartTime.fromNow();
+        console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
+
+  sf contracts ls
+
+`);
+      }
+
+      return;
+    } else {
+
+      console.log(`Your order wasn't accepted yet. You can check it's status with:
+
+  sf contracts ls
+
+If you want to cancel the order, you can do so with:
+
+  sf orders cancel ${orderId}
+
+  `)
+
+      return;
+    }
   }
 }
 
