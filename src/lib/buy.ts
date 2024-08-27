@@ -66,26 +66,28 @@ async function buyOrderAction(options: SfBuyOptions) {
 }
 
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getOrder(orderId: string) {
-  const api = await apiClient()
+  const api = await apiClient();
 
-  const { data: order } = await api.GET("/v0/orders/{id}", { params: { path: { id: orderId } } })
-  return order
+  const { data: order } = await api.GET("/v0/orders/{id}", {
+    params: { path: { id: orderId } },
+  });
+  return order;
 }
 
 async function tryToGetOrder(orderId: string) {
   for (let i = 0; i < 10; i++) {
-    const order = await getOrder(orderId)
+    const order = await getOrder(orderId);
     if (order) {
-      return order
+      return order;
     }
-    await sleep(50)
+    await sleep(50);
   }
 
-  return undefined
+  return undefined;
 }
 
 // --
@@ -106,14 +108,14 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
       // In the future, we should read from a price chart of yesterday's prices.
       const todoEstimatedPriceInCents = 250;
-      const estimatedPrice = todoEstimatedPriceInCents * quantity * durationInHours;
-      const estimatedPriceInDollars = estimatedPrice
-
+      const estimatedPrice =
+        todoEstimatedPriceInCents * quantity * durationInHours;
+      const estimatedPriceInDollars = estimatedPrice;
 
       console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
 
   sf buy -i ${options.instanceType} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInDollars / 100).toFixed(2)}" 
-        `)
+        `);
 
       return process.exit(1);
     }
@@ -154,15 +156,16 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
   if (pendingOrder && pendingOrder.status === OrderStatus.Pending) {
     const orderId = pendingOrder.id;
-    const printOrderNumber = (status: string) => console.log(`\n${c.dim(`${orderId}\n\n`)}`);
+    const printOrderNumber = (status: string) =>
+      console.log(`\n${c.dim(`${orderId}\n\n`)}`);
 
-    const order = await tryToGetOrder(orderId)
+    const order = await tryToGetOrder(orderId);
 
     if (!order) {
       console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
       return;
     }
-    printOrderNumber(order.status)
+    printOrderNumber(order.status);
 
     if (order.status === "filled") {
       const now = new Date();
@@ -188,7 +191,6 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
       return;
     } else {
-
       console.log(`Your order wasn't accepted yet. You can check it's status with:
 
   sf orders ls
@@ -197,7 +199,7 @@ If you want to cancel the order, you can do so with:
 
   sf orders cancel ${orderId}
 
-  `)
+  `);
 
       return;
     }
@@ -232,14 +234,21 @@ function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.totalNodes > 1 ? "nodes" : "node";
   const durationHumanReadable = formatDuration(actualDuration(options) * 1000);
-  const endsAtLabel = c.green(dayjs(options.endsAt.iso).format("MM/DD/YYYY hh:mm A"));
+  const endsAtLabel = c.green(
+    dayjs(options.endsAt.iso).format("MM/DD/YYYY hh:mm A"),
+  );
   const fromNowTime = dayjs(options.startsAt.iso).fromNow();
 
   let timeDescription: string;
-  if (fromNowTime === "a few seconds ago" || fromNowTime === "in a few seconds") {
+  if (
+    fromNowTime === "a few seconds ago" ||
+    fromNowTime === "in a few seconds"
+  ) {
     timeDescription = `from ${c.green("now")} until ${endsAtLabel}`;
   } else {
-    const startAtLabel = c.green(dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"));
+    const startAtLabel = c.green(
+      dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"),
+    );
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
 
