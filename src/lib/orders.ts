@@ -33,14 +33,17 @@ export function formatDuration(ms: number) {
   const seconds = d.seconds();
   const milliseconds = d.milliseconds();
 
-  if (years > 0) return `${years}y`;
-  if (weeks > 0) return `${weeks}w`;
-  if (days > 0) return `${days}d`;
-  if (hours > 0) return `${hours}h`;
-  if (minutes > 0) return `${minutes}m`;
-  if (seconds > 0) return `${seconds}s`;
-  if (milliseconds > 0) return `${milliseconds}ms`;
-  return "0ms";
+  let result = '';
+
+  if (years > 0) result += `${years}y`;
+  if (weeks > 0) result += `${weeks}w`;
+  if (days > 0) result += `${days}d`;
+  if (hours > 0) result += `${hours}h`;
+  if (minutes > 0) result += `${minutes}m`;
+  if (seconds > 0) result += `${seconds}s`;
+  if (milliseconds > 0) result += `${milliseconds}ms`;
+
+  return result || '0ms';
 }
 
 export type PlaceSellOrderParameters = {

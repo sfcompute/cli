@@ -204,6 +204,25 @@ If you want to cancel the order, you can do so with:
   }
 }
 
+function actualDuration(options: SfBuyParamsNormalized): number {
+  const now = new Date();
+  const startAt = new Date(options.startsAt.iso);
+  const requestedDuration = options.durationSeconds;
+
+  // If start time is in the future, return the requested duration
+  if (startAt > now) {
+    return requestedDuration;
+  }
+
+  // Calculate the time to the next hour
+  const nextHour = new Date(now);
+  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+  const timeToNextHour = Math.ceil((nextHour.getTime() - now.getTime()) / 1000);
+
+  // Return the sum of time to next hour and requested duration
+  return timeToNextHour + requestedDuration;
+}
+
 function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
   if (!options.priceCenticents) {
     return "";
@@ -212,13 +231,19 @@ function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
   const totalNodesLabel = c.green(options.totalNodes);
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.totalNodes > 1 ? "nodes" : "node";
-  const durationHumanReadable = formatDuration(options.durationSeconds * 1000);
-  const startAtLabel = c.green(
-    dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"),
-  );
-  const fromNowTime = c.green(dayjs(options.startsAt.iso).fromNow());
+  const durationHumanReadable = formatDuration(actualDuration(options) * 1000);
+  const endsAtLabel = c.green(dayjs(options.endsAt.iso).format("MM/DD/YYYY hh:mm A"));
+  const fromNowTime = dayjs(options.startsAt.iso).fromNow();
 
-  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} for ${c.green(durationHumanReadable)} starting ${startAtLabel} (${c.green(fromNowTime)})`;
+  let timeDescription: string;
+  if (fromNowTime === "a few seconds ago" || fromNowTime === "in a few seconds") {
+    timeDescription = `from ${c.green("now")} until ${endsAtLabel}`;
+  } else {
+    const startAtLabel = c.green(dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"));
+    timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
+  }
+
+  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
   const dollarsLabel = c.green(
     centicentsToDollarsFormatted(options.priceCenticents),
