@@ -77,7 +77,6 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     });
 
     if (err?.code === ApiErrorCode.Quotes.NoAvailability) {
-
       const durationInHours = options.durationSeconds / 3600;
       const quantity = options.totalNodes;
 
@@ -92,10 +91,18 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
   sf buy -i ${options.instanceType} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInDollars / 100).toFixed(2)}" 
         `)
 
-      process.exit(1);
+      return process.exit(1);
     }
 
-    return
+    if (err) {
+      return logAndQuit(`Failed to get quote: ${err.message}`);
+    }
+
+    if (!quote) {
+      return logAndQuit("Failed to get quote: No quote data received");
+    }
+
+    options.priceCenticents = quote.price;
   }
 
   if (options.confirmWithUser) {
