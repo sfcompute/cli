@@ -191,7 +191,7 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
       console.log(`Your order wasn't accepted yet. You can check it's status with:
 
-  sf contracts ls
+  sf orders ls
 
 If you want to cancel the order, you can do so with:
 
