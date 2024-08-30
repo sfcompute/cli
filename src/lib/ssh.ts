@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import { getAuthorizationHeader } from "../helpers/config";
 import { getApiUrl } from "../helpers/urls";
+import { logAndQuit } from "../helpers/errors";
 
 function isPubkey(key: string): boolean {
   const pubKeyPattern = /^ssh-/;
@@ -36,6 +37,10 @@ export function registerSSH(program: Command) {
     .command("ssh")
     .description("SSH into nodes")
     .option("--add <key>", "Add an acceptable pubkey to all nodes")
+    .option(
+      "--user <username>",
+      "Specify the username associated with the pubkey",
+    )
     .argument("[name]", "The name of the node to SSH into");
 
   cmd.action(async (name, options) => {
@@ -45,9 +50,16 @@ export function registerSSH(program: Command) {
     }
 
     if (options.add) {
+      if (!options.user) {
+        logAndQuit(
+          "Username is required when adding an SSH key (add it with --user <username>)",
+        );
+      }
+
       const key = await readFileOrKey(options.add);
-      const credential = await postSSHKeys(key);
+      await postSSHKeys(key, options.user);
       console.log("Added ssh key");
+
       process.exit(0);
     }
 
@@ -78,7 +90,7 @@ export async function getSSHKeys() {
   return data as SSHCredential[];
 }
 
-export async function postSSHKeys(key: string) {
+export async function postSSHKeys(key: string, username: string) {
   const res = await fetch(await getApiUrl("credentials_create"), {
     method: "POST",
     headers: {
@@ -87,7 +99,7 @@ export async function postSSHKeys(key: string) {
     },
     body: JSON.stringify({
       pubkey: key,
-      username: "user",
+      username,
     }),
   });
   if (!res.ok) {
