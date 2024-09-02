@@ -42,7 +42,7 @@ function forceAsNumber(value: string | number): number {
 async function placeSellOrder(options: {
   price: number;
   contractId: string;
-  quantity: number;
+  nodes: number;
   start?: string;
   duration: string;
   flags?: Record<string, any>;
@@ -73,7 +73,7 @@ async function placeSellOrder(options: {
 
   const params: PlaceSellOrderParameters = {
     side: "sell",
-    quantity: forceAsNumber(options.quantity),
+    quantity: forceAsNumber(options.nodes),
     price: priceCenticents,
     contract_id: options.contractId,
     duration: durationSecs,
