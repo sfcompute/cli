@@ -9,6 +9,7 @@ import {
 } from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -86,7 +87,7 @@ async function getBalance(): Promise<{
   }
   const config = await loadConfig();
 
-  const response = await fetch(await getApiUrl("balance_get"), {
+  const response = await fetchAndHandleErrors(await getApiUrl("balance_get"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

@@ -3,6 +3,7 @@ import { Command } from "commander";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 
 interface Contract {
   object: string;
@@ -80,7 +81,7 @@ async function listContracts() {
     return logLoginMessageAndQuit();
   }
 
-  const response = await fetch(await getApiUrl("contracts_list"), {
+  const response = await fetchAndHandleErrors(await getApiUrl("contracts_list"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

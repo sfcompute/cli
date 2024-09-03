@@ -17,3 +17,9 @@ export async function logSessionTokenExpiredAndQuit() {
   await clearAuthFromConfig();
   logAndQuit("\nYour session has expired. Please login again.");
 }
+
+export function failedToConnect() {
+  logAndQuit(
+    "Failed to connect to the server. Please check your internet connection and try again.",
+  );
+}

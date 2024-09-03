@@ -13,6 +13,7 @@ import { getApiUrl } from "../helpers/urls";
 import type { ListResponseBody } from "../api/types";
 import { ApiErrorCode, type ApiError } from "../api";
 import type { HydratedOrder } from "../api/orders";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -181,7 +182,7 @@ export async function getOrders(props: {
 
   const url = `${await getApiUrl("orders_list")}?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await fetchAndHandleErrors(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -206,7 +207,7 @@ export async function submitOrderCancellationByIdAction(
   }
 
   const url = await getApiUrl("orders_cancel", { id: orderId });
-  const response = await fetch(url, {
+  const response = await fetchAndHandleErrors(url, {
     method: "DELETE",
     body: JSON.stringify({}),
     headers: {

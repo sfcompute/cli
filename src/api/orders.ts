@@ -61,7 +61,7 @@ interface PlaceBuyOrderReturn {
 export async function placeBuyOrderRequest(
   body: PlaceBuyOrderRequestOptions,
 ): Promise<PlaceBuyOrderReturn> {
-  const response = await fetch(await getApiUrl("orders_create"), {
+  const response = await fetchAndHandleErrors(await getApiUrl("orders_create"), {
     method: "POST",
     body: JSON.stringify({
       side: "buy",

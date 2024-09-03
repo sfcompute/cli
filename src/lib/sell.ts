@@ -6,6 +6,7 @@ import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
 import type { PlaceSellOrderParameters } from "./orders";
 import { priceWholeToCenticents } from "../helpers/units";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 
 export function registerSell(program: Command) {
   program
@@ -91,7 +92,7 @@ async function placeSellOrder(options: {
 }
 
 async function postSellOrder(params: PlaceSellOrderParameters) {
-  return await fetch(await getApiUrl("orders_create"), {
+  return await fetchAndHandleErrors(await getApiUrl("orders_create"), {
     method: "POST",
     body: JSON.stringify(params),
     headers: {
