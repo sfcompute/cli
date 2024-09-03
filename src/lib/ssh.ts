@@ -1,7 +1,7 @@
 import type { Command } from "commander";
 import { getAuthorizationHeader } from "../helpers/config";
-import { getApiUrl } from "../helpers/urls";
 import { logAndQuit } from "../helpers/errors";
+import { getApiUrl } from "../helpers/urls";
 
 function isPubkey(key: string): boolean {
   const pubKeyPattern = /^ssh-/;

@@ -3,10 +3,10 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { fetchAndHandleErrors } from "../helpers/fetch";
+import { priceWholeToCenticents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { PlaceSellOrderParameters } from "./orders";
-import { priceWholeToCenticents } from "../helpers/units";
-import { fetchAndHandleErrors } from "../helpers/fetch";
 
 export function registerSell(program: Command) {
   program

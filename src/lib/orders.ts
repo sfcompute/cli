@@ -3,17 +3,17 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { type ApiError, ApiErrorCode } from "../api";
+import type { HydratedOrder } from "../api/orders";
+import type { ListResponseBody } from "../api/types";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
-import type { ListResponseBody } from "../api/types";
-import { ApiErrorCode, type ApiError } from "../api";
-import type { HydratedOrder } from "../api/orders";
 import { fetchAndHandleErrors } from "../helpers/fetch";
+import { getApiUrl } from "../helpers/urls";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -81,16 +81,7 @@ function printAsTable(orders: Array<HydratedOrder>) {
   });
   for (const order of orders) {
     if (order.status === "pending") {
-      table.push([
-        order.id,
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        "-",
-        order.status,
-      ]);
+      table.push([order.id, "-", "-", "-", "-", "-", "-", order.status]);
     } else {
       let status: string;
       let executionPrice: number | undefined;

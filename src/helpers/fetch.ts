@@ -1,6 +1,5 @@
 import { failedToConnect } from "./errors";
 
-
 export const fetchAndHandleErrors: typeof fetch = async (url, init) => {
   try {
     return await fetch(url, init);
@@ -13,4 +12,4 @@ export const fetchAndHandleErrors: typeof fetch = async (url, init) => {
 
     throw e;
   }
-}
+};

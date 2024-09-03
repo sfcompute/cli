@@ -7,9 +7,9 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
-import { fetchAndHandleErrors } from "../helpers/fetch";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
