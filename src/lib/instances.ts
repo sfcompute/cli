@@ -1,9 +1,13 @@
 import chalk, { type ChalkInstance } from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
 import { apiClient } from "../apiClient";
+import { isLoggedIn } from "../helpers/config";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 
 export function registerInstances(program: Command) {
   const instances = program
@@ -156,7 +160,6 @@ async function getInstances({
     logLoginMessageAndQuit();
   }
 
-
   const api = await apiClient();
 
   const { data, response } = await api.GET("/v0/instances");
@@ -171,14 +174,16 @@ async function getInstances({
   }
 
   if (!data) {
-    return logAndQuit(`Failed to get instances: Unexpected response from server: ${response}`);
+    return logAndQuit(
+      `Failed to get instances: Unexpected response from server: ${response}`,
+    );
   }
 
-  return data.data.map(instance => ({
+  return data.data.map((instance) => ({
     object: instance.object,
     id: instance.id,
     type: instance.type as InstanceType,
     ip: instance.ip,
     status: instance.status,
-  }))
+  }));
 }

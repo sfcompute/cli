@@ -1,14 +1,14 @@
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { isLoggedIn, } from "../helpers/config";
+import { apiClient } from "../apiClient";
+import { isLoggedIn } from "../helpers/config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
-import { apiClient } from "../apiClient";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -74,7 +74,7 @@ export function registerBalance(program: Command) {
 export type BalanceUsdCenticents = {
   available: { centicents: Centicents; whole: number };
   reserved: { centicents: Centicents; whole: number };
-}
+};
 async function getBalance(): Promise<BalanceUsdCenticents> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
@@ -87,7 +87,7 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
   }
   const client = await apiClient();
 
-  const { data, error, response }= await client.GET("/v0/balance");
+  const { data, error, response } = await client.GET("/v0/balance");
 
   if (!response.ok) {
     switch (response.status) {
@@ -101,7 +101,9 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
   }
 
   if (!data) {
-    return logAndQuit(`Failed to get balance: Unexpected response from server: ${response}`);
+    return logAndQuit(
+      `Failed to get balance: Unexpected response from server: ${response}`,
+    );
   }
 
   let available: number;
@@ -131,5 +133,5 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
       centicents: reserved,
       whole: reserved / 10_000,
     },
-  }
+  };
 }

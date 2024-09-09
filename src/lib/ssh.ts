@@ -1,7 +1,7 @@
 import type { Command } from "commander";
+import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
-import { apiClient } from "../apiClient";
 
 function isPubkey(key: string): boolean {
   const pubKeyPattern = /^ssh-/;

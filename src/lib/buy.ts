@@ -8,7 +8,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import {
   type Centicents,
   centicentsToDollarsFormatted,
@@ -119,7 +123,9 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     }
 
     if (!data) {
-      return logAndQuit(`Failed to get quote: Unexpected response from server: ${response}`);
+      return logAndQuit(
+        `Failed to get quote: Unexpected response from server: ${response}`,
+      );
     }
 
     if (!data.quote) {
@@ -206,10 +212,11 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
         return logAndQuit(`Failed to place order: ${response.statusText}`);
     }
   }
-  
 
   if (!data) {
-    return logAndQuit(`Failed to place order: Unexpected response from server: ${response}`);
+    return logAndQuit(
+      `Failed to place order: Unexpected response from server: ${response}`,
+    );
   }
 
   switch (data.status) {
@@ -264,7 +271,9 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
       }
     }
     default:
-      return logAndQuit(`Failed to place order: Unexpected order status: ${data.status}`);
+      return logAndQuit(
+        `Failed to place order: Unexpected order status: ${data.status}`,
+      );
   }
 }
 
@@ -355,7 +364,9 @@ async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
   }
 
   if (!data) {
-    return logAndQuit(`Failed to get quote: Unexpected response from server: ${response}`);
+    return logAndQuit(
+      `Failed to get quote: Unexpected response from server: ${response}`,
+    );
   }
 
   if (!data.quote) {

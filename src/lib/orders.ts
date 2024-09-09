@@ -100,7 +100,6 @@ interface ListResponseBody<T> {
   object: "list";
 }
 
-
 function printAsTable(orders: Array<HydratedOrder>) {
   const table = new Table({
     head: [
@@ -247,7 +246,7 @@ export async function submitOrderCancellationByIdAction(
       return await logSessionTokenExpiredAndQuit();
     }
 
-    const error = (await response.json());
+    const error = await response.json();
     switch (error.code) {
       case "order.not_found":
         return logAndQuit(`Order ${orderId} not found`);

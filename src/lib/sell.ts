@@ -1,12 +1,16 @@
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
+import dayjs from "dayjs";
 import parseDuration from "parse-duration";
+import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
-import { priceWholeToCenticents, roundEndDate, roundStartDate } from "../helpers/units";
+import {
+  priceWholeToCenticents,
+  roundEndDate,
+  roundStartDate,
+} from "../helpers/units";
 import type { PlaceSellOrderParameters } from "./orders";
-import dayjs from "dayjs";
-import { apiClient } from "../apiClient";
 
 export function registerSell(program: Command) {
   program
@@ -66,7 +70,9 @@ async function placeSellOrder(options: {
   }
 
   if (startDate !== roundStartDate(startDate)) {
-    return logAndQuit("Start date must either be the next minute or on the hour")
+    return logAndQuit(
+      "Start date must either be the next minute or on the hour",
+    );
   }
 
   const endDate = dayjs(startDate).add(durationSecs, "s").toDate();
@@ -93,7 +99,7 @@ async function placeSellOrder(options: {
 
   const api = await apiClient();
   const { response } = await api.POST("/v0/orders", {
-    body: params
+    body: params,
   });
 
   if (!response.ok) {

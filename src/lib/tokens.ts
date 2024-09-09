@@ -310,7 +310,7 @@ async function deleteTokenById(id: string) {
       await logSessionTokenExpiredAndQuit();
     }
 
-    const error = (await response.json());
+    const error = await response.json();
     if (error.code === "token.not_found") {
       loadingSpinner.fail("Token not found");
       process.exit(1);

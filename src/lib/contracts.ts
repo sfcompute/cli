@@ -1,8 +1,12 @@
 import Table from "cli-table3";
 import { Command } from "commander";
-import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
 import { apiClient } from "../apiClient";
+import { isLoggedIn } from "../helpers/config";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 
 interface Contract {
   object: string;
@@ -94,13 +98,15 @@ async function listContracts(): Promise<Contract[]> {
   }
 
   if (!data) {
-    return logAndQuit(`Failed to get contracts: Unexpected response from server: ${response}`);
+    return logAndQuit(
+      `Failed to get contracts: Unexpected response from server: ${response}`,
+    );
   }
 
   // filter out pending contracts
   // we use loop instead of filter bc type
   const contracts: Contract[] = [];
-  for (const contract of data.data) { 
+  for (const contract of data.data) {
     if (contract.status === "active") {
       contracts.push({
         ...contract,

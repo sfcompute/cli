@@ -1,4 +1,3 @@
-
 import type { Nullable } from "../types/empty";
 
 export type Cents = number;
@@ -69,7 +68,7 @@ export function roundStartDate(startDate: Date): Date {
     return epochToDate(now + 1);
   } else {
     return epochToDate(roundEpochUpToHour(startEpoch));
-  } 
+  }
 }
 
 export function roundEndDate(endDate: Date): Date {
