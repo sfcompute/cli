@@ -1,12 +1,12 @@
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
 import parseDuration from "parse-duration";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
-import { fetchAndHandleErrors } from "../helpers/fetch";
-import { priceWholeToCenticents } from "../helpers/units";
-import { getApiUrl } from "../helpers/urls";
+import { priceWholeToCenticents, roundEndDate, roundStartDate } from "../helpers/units";
 import type { PlaceSellOrderParameters } from "./orders";
+import dayjs from "dayjs";
+import { apiClient } from "../apiClient";
 
 export function registerSell(program: Command) {
   program
@@ -65,6 +65,15 @@ async function placeSellOrder(options: {
     return logAndQuit("Invalid start date");
   }
 
+  if (startDate !== roundStartDate(startDate)) {
+    return logAndQuit("Start date must either be the next minute or on the hour")
+  }
+
+  const endDate = dayjs(startDate).add(durationSecs, "s").toDate();
+  if (endDate !== roundEndDate(endDate)) {
+    return logAndQuit("End date must be in the on the hour");
+  }
+
   const { centicents: priceCenticents, invalid } = priceWholeToCenticents(
     options.price,
   );
@@ -77,27 +86,24 @@ async function placeSellOrder(options: {
     quantity: forceAsNumber(options.nodes),
     price: priceCenticents,
     contract_id: options.contractId,
-    duration: durationSecs,
     start_at: startDate.toISOString(),
+    end_at: endDate.toISOString(),
     ...flags,
   };
 
-  const res = await postSellOrder(params);
-  if (!res.ok) {
+  const { response } = await postSellOrder(params);
+  if (!response.ok) {
     return logAndQuit("Failed to place sell order");
   }
-  const data = await res.json();
+  const data = await response.json();
   console.log(data);
   process.exit(0);
 }
 
 async function postSellOrder(params: PlaceSellOrderParameters) {
-  return await fetchAndHandleErrors(await getApiUrl("orders_create"), {
-    method: "POST",
-    body: JSON.stringify(params),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
-    },
+  const api = await apiClient();
+
+  return await api.POST("/v0/orders", {
+    body: params
   });
 }

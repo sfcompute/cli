@@ -81,8 +81,8 @@ export type PlaceSellOrderParameters = {
   side: "sell";
   quantity: number;
   price: number;
-  duration: number;
   start_at: string;
+  end_at: string;
   contract_id: string;
 };
 
