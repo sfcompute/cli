@@ -1,7 +1,7 @@
 import type { Command } from "commander";
-import { getAuthorizationHeader } from "../helpers/config";
-import { logAndQuit } from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
+import { isLoggedIn } from "../helpers/config";
+import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { apiClient } from "../apiClient";
 
 function isPubkey(key: string): boolean {
   const pubKeyPattern = /^ssh-/;
@@ -44,6 +44,11 @@ export function registerSSH(program: Command) {
     .argument("[name]", "The name of the node to SSH into");
 
   cmd.action(async (name, options) => {
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
+      logLoginMessageAndQuit();
+    }
+
     if (Object.keys(options).length === 0 && !name) {
       cmd.help();
       return;
@@ -57,7 +62,15 @@ export function registerSSH(program: Command) {
       }
 
       const key = await readFileOrKey(options.add);
-      await postSSHKeys(key, options.user);
+
+      const api = await apiClient();
+      await api.POST("/v0/credentials", {
+        body: {
+          pubkey: key,
+          username: options.user,
+        },
+      });
+
       console.log("Added ssh key");
 
       process.exit(0);
@@ -65,47 +78,4 @@ export function registerSSH(program: Command) {
 
     cmd.help();
   });
-}
-
-export type SSHCredential = {
-  object: "ssh_credential";
-  id: string;
-  pubkey: string;
-  username: string;
-};
-
-export type CredentialObject = SSHCredential;
-
-export type PostSSHCredentialBody = {
-  pubkey: string;
-  username: string;
-};
-
-export async function getSSHKeys() {
-  const res = await fetch(await getApiUrl("credentials_list"), {
-    headers: await getAuthorizationHeader(),
-  });
-
-  const data = await res.json();
-  return data as SSHCredential[];
-}
-
-export async function postSSHKeys(key: string, username: string) {
-  const res = await fetch(await getApiUrl("credentials_create"), {
-    method: "POST",
-    headers: {
-      ...(await getAuthorizationHeader()),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      pubkey: key,
-      username,
-    }),
-  });
-  if (!res.ok) {
-    console.error(await res.text());
-    throw new Error("Failed to add SSH key");
-  }
-  const data = await res.json();
-  return data as SSHCredential;
 }

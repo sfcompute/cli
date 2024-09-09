@@ -91,19 +91,15 @@ async function placeSellOrder(options: {
     ...flags,
   };
 
-  const { response } = await postSellOrder(params);
+  const api = await apiClient();
+  const { response } = await api.POST("/v0/orders", {
+    body: params
+  });
+
   if (!response.ok) {
     return logAndQuit("Failed to place sell order");
   }
   const data = await response.json();
   console.log(data);
   process.exit(0);
-}
-
-async function postSellOrder(params: PlaceSellOrderParameters) {
-  const api = await apiClient();
-
-  return await api.POST("/v0/orders", {
-    body: params
-  });
 }
