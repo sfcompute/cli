@@ -1,9 +1,9 @@
 import chalk, { type ChalkInstance } from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
-import { logLoginMessageAndQuit } from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
+import { isLoggedIn } from "../helpers/config";
+import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
+import { apiClient } from "../apiClient";
 
 export function registerInstances(program: Command) {
   const instances = program
@@ -150,28 +150,35 @@ const colorInstanceType = (instanceType: InstanceType) =>
 
 async function getInstances({
   clusterId,
-}: { clusterId?: string }): Promise<Array<InstanceObject>> {
+}: { clusterId?: string }): Promise<InstanceObject[]> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
-  let url = await getApiUrl("instances_list");
-  if (clusterId) {
-    url += `?cluster_id=${clusterId}`;
-  }
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
-    },
-  });
+
+  const api = await apiClient();
+
+  const { data, response } = await api.GET("/v0/instances");
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch instances: ${response.statusText}`);
+    switch (response.status) {
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      default:
+        return logAndQuit(`Failed to get instances: ${response.statusText}`);
+    }
   }
 
-  const responseData: ListResponseBody<InstanceObject> = await response.json();
-  return responseData.data;
+  if (!data) {
+    return logAndQuit(`Failed to get instances: Unexpected response from server: ${response}`);
+  }
+
+  return data.data.map(instance => ({
+    object: instance.object,
+    id: instance.id,
+    type: instance.type as InstanceType,
+    ip: instance.ip,
+    status: instance.status,
+  }))
 }

@@ -3,9 +3,6 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { type ApiError, ApiErrorCode } from "../api";
-import type { HydratedOrder } from "../api/orders";
-import type { ListResponseBody } from "../api/types";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
   logAndQuit,
@@ -47,6 +44,39 @@ export function formatDuration(ms: number) {
   return result || "0ms";
 }
 
+export type OrderType = "buy" | "sell";
+export enum OrderStatus {
+  Pending = "pending",
+  Rejected = "rejected",
+  Open = "open",
+  Cancelled = "cancelled",
+  Filled = "filled",
+  Expired = "expired",
+}
+export interface OrderFlags {
+  market: boolean;
+  post_only: boolean;
+  ioc: boolean;
+  prorate: boolean;
+}
+
+export interface HydratedOrder {
+  object: "order";
+  id: string;
+  side: OrderType;
+  instance_type: string;
+  price: number;
+  start_at: string;
+  duration: number;
+  quantity: number;
+  flags: OrderFlags;
+  created_at: string;
+  executed: boolean;
+  execution_price?: number;
+  cancelled: boolean;
+  status: OrderStatus;
+}
+
 export type PlaceSellOrderParameters = {
   side: "sell";
   quantity: number;
@@ -64,6 +94,12 @@ export type PlaceOrderParameters = {
   duration: number;
   start_at: string;
 };
+
+interface ListResponseBody<T> {
+  data: T[];
+  object: "list";
+}
+
 
 function printAsTable(orders: Array<HydratedOrder>) {
   const table = new Table({
@@ -191,7 +227,7 @@ export async function getOrders(props: {
 
 export async function submitOrderCancellationByIdAction(
   orderId: string,
-): Promise<void> {
+): Promise<never> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
@@ -202,31 +238,31 @@ export async function submitOrderCancellationByIdAction(
     method: "DELETE",
     body: JSON.stringify({}),
     headers: {
-      "Content-Type": "application/json",
+      "Content-ype": "application/json",
       Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
   if (!response.ok) {
     if (response.status === 401) {
-      await logSessionTokenExpiredAndQuit();
+      return await logSessionTokenExpiredAndQuit();
     }
 
-    const error = (await response.json()) as ApiError;
-    if (error.code === ApiErrorCode.Orders.NotFound) {
-      logAndQuit(`Order ${orderId} not found`);
-    } else if (error.code === ApiErrorCode.Orders.AlreadyCancelled) {
-      logAndQuit(`Order ${orderId} is already cancelled`);
+    const error = (await response.json());
+    switch (error.code) {
+      case "order.not_found":
+        return logAndQuit(`Order ${orderId} not found`);
+      case "order.already_cancelled":
+        return logAndQuit(`Order ${orderId} is already cancelled`);
+      default:
+        // TODO: handle more specific errors
+        return logAndQuit(`Failed to cancel order ${orderId}`);
     }
-
-    // TODO: handle more specific errors
-
-    logAndQuit(`Failed to cancel order ${orderId}`);
   }
 
   const resp = await response.json();
   const cancellationSubmitted = resp.object === "pending";
   if (!cancellationSubmitted) {
-    logAndQuit(`Failed to cancel order ${orderId}`);
+    return logAndQuit(`Failed to cancel order ${orderId}`);
   }
 
   // cancellation submitted successfully
