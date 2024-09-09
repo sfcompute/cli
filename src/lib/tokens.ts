@@ -5,6 +5,7 @@ import Table from "cli-table3";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import ora from "ora";
+import { type ApiError, ApiErrorCode } from "../api";
 import { getCommandBase } from "../helpers/command";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
@@ -12,7 +13,6 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
-import { ApiErrorCode, type ApiError } from "../api";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,

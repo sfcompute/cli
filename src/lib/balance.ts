@@ -7,6 +7,7 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 
@@ -86,7 +87,7 @@ async function getBalance(): Promise<{
   }
   const config = await loadConfig();
 
-  const response = await fetch(await getApiUrl("balance_get"), {
+  const response = await fetchAndHandleErrors(await getApiUrl("balance_get"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

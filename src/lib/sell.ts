@@ -3,9 +3,10 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { fetchAndHandleErrors } from "../helpers/fetch";
+import { priceWholeToCenticents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { PlaceSellOrderParameters } from "./orders";
-import { priceWholeToCenticents } from "../helpers/units";
 
 export function registerSell(program: Command) {
   program
@@ -91,7 +92,7 @@ async function placeSellOrder(options: {
 }
 
 async function postSellOrder(params: PlaceSellOrderParameters) {
-  return await fetch(await getApiUrl("orders_create"), {
+  return await fetchAndHandleErrors(await getApiUrl("orders_create"), {
     method: "POST",
     body: JSON.stringify(params),
     headers: {

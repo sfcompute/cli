@@ -1,5 +1,6 @@
 import type { ApiError } from ".";
 import { getAuthToken } from "../helpers/config";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { Nullable } from "../types/empty";
@@ -61,17 +62,20 @@ interface PlaceBuyOrderReturn {
 export async function placeBuyOrderRequest(
   body: PlaceBuyOrderRequestOptions,
 ): Promise<PlaceBuyOrderReturn> {
-  const response = await fetch(await getApiUrl("orders_create"), {
-    method: "POST",
-    body: JSON.stringify({
-      side: "buy",
-      ...body,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
+  const response = await fetchAndHandleErrors(
+    await getApiUrl("orders_create"),
+    {
+      method: "POST",
+      body: JSON.stringify({
+        side: "buy",
+        ...body,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getAuthToken()}`,
+      },
     },
-  });
+  );
   if (!response.ok) {
     return {
       data: null,

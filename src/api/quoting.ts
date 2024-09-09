@@ -1,5 +1,6 @@
-import { objToQueryString, type ApiError } from ".";
+import { type ApiError, objToQueryString } from ".";
 import { getAuthToken } from "../helpers/config";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 import type { Centicents } from "../helpers/units";
 import { getApiUrl } from "../helpers/urls";
 import type { Nullable } from "../types/empty";
@@ -53,7 +54,7 @@ export async function quoteBuyOrderRequest(
   const queryString = objToQueryString(queryParams);
   const url = `${urlBase}?${queryString}`;
 
-  const response = await fetch(url, {
+  const response = await fetchAndHandleErrors(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

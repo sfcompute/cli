@@ -2,6 +2,7 @@ import Table from "cli-table3";
 import { Command } from "commander";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import { logLoginMessageAndQuit } from "../helpers/errors";
+import { fetchAndHandleErrors } from "../helpers/fetch";
 import { getApiUrl } from "../helpers/urls";
 
 interface Contract {
@@ -80,13 +81,16 @@ async function listContracts() {
     return logLoginMessageAndQuit();
   }
 
-  const response = await fetch(await getApiUrl("contracts_list"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
+  const response = await fetchAndHandleErrors(
+    await getApiUrl("contracts_list"),
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getAuthToken()}`,
+      },
     },
-  });
+  );
 
   const data = await response.json();
   return data;
