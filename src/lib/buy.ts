@@ -189,7 +189,8 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
       side: "buy",
       instance_type: options.instanceType,
       quantity: options.totalNodes,
-      start_at: options.startsAt.iso,
+      // round start date again because the user might take a long time to confirm
+      start_at: roundStartDate(options.startsAt.date).toISOString(),
       end_at: options.endsAt.iso,
       price: options.priceCenticents,
     },
