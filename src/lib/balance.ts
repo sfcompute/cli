@@ -1,14 +1,14 @@
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { isLoggedIn, loadConfig } from "../helpers/config";
+import { isLoggedIn, } from "../helpers/config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import type { Centicents } from "../helpers/units";
-import { getApiUrl } from "../helpers/urls";
+import { apiClient } from "../apiClient";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -71,10 +71,11 @@ export function registerBalance(program: Command) {
     });
 }
 
-async function getBalance(): Promise<{
+export type BalanceUsdCenticents = {
   available: { centicents: Centicents; whole: number };
   reserved: { centicents: Centicents; whole: number };
-}> {
+}
+async function getBalance(): Promise<BalanceUsdCenticents> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
@@ -84,44 +85,53 @@ async function getBalance(): Promise<{
       reserved: { centicents: 0, whole: 0 },
     };
   }
-  const config = await loadConfig();
+  const client = await apiClient();
 
-  const response = await fetchAndHandleErrors(await getApiUrl("balance_get"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
-    },
-  });
+  const { data, error, response }= await client.GET("/v0/balance");
 
   if (!response.ok) {
-    if (response.status === 401) {
-      logSessionTokenExpiredAndQuit();
-
-      return {
-        available: { centicents: 0, whole: 0 },
-        reserved: { centicents: 0, whole: 0 },
-      };
+    switch (response.status) {
+      case 401:
+        await logSessionTokenExpiredAndQuit();
+        break;
+      case 500:
+        logAndQuit(`Failed to get balance: ${error?.message}`);
+        break;
+      default:
+        logAndQuit(`Failed to fetch balance: ${response.statusText}`);
     }
-
-    logAndQuit(`Failed to fetch balance: ${response.statusText}`);
-
-    return {
-      available: { centicents: 0, whole: 0 },
-      reserved: { centicents: 0, whole: 0 },
-    };
   }
 
-  const data = await response.json();
+  if (data) {
+    let available: number;
+    switch (data.available.currency) {
+      case "usd":
+        available = data.available.amount / 10_000;
+        break;
+      default:
+        logAndQuit(`Unsupported currency: ${data.available.currency}`);
+    }
 
-  return {
-    available: {
-      centicents: data.available.amount,
-      whole: data.available.amount / 10_000,
-    },
-    reserved: {
-      centicents: data.reserved.amount,
-      whole: data.reserved.amount / 10_000,
-    },
-  };
+    let reserved: number;
+    switch (data.reserved.currency) {
+      case "usd":
+        reserved = data.reserved.amount / 10_000;
+        break;
+      default:
+        logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
+    }
+
+    return {
+      available: {
+        centicents: available,
+        whole: available / 10_000,
+      },
+      reserved: {
+        centicents: reserved,
+        whole: reserved / 10_000,
+      },
+    }
+  }
+
+  throw new Error(`Unexpected response from server: ${response}`, );
 }

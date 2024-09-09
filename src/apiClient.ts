@@ -14,6 +14,7 @@ export const apiClient = async () => {
     baseUrl: config.api_url,
     headers: {
       Authorization: `Bearer ${await getAuthToken()}`,
+      "Content-Type": "application/json",
     },
   });
 
