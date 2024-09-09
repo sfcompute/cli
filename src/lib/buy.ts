@@ -143,6 +143,16 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     }
   }
 
+  // If the user is requesting the order to be placed immediately,
+  // we need to set the start time to the current time
+  // to avoid causing any delay from quoting
+  if (!options.startsAt.wasSetByUser) {
+    options.startsAt = {
+      iso: new Date().toISOString(),
+      date: new Date(),
+      wasSetByUser: false
+    };
+  }
   const { data: pendingOrder, err } = await placeBuyOrderRequest({
     instance_type: options.instanceType,
     quantity: options.totalNodes,
@@ -298,6 +308,7 @@ interface SfBuyParamsNormalized {
   startsAt: {
     iso: string;
     date: Date;
+    wasSetByUser: boolean;
   };
   endsAt: {
     iso: string;
@@ -348,6 +359,7 @@ function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
     startsAt: {
       iso: startDate.toISOString(),
       date: startDate,
+      wasSetByUser: options.start !== undefined,
     },
     endsAt: {
       iso: dayjs(startDate).add(durationSeconds, "s").toISOString(),
