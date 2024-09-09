@@ -1,3 +1,4 @@
+
 import type { Nullable } from "../types/empty";
 
 export type Cents = number;
@@ -44,4 +45,33 @@ export function priceWholeToCenticents(
 
 export function centicentsToDollarsFormatted(centicents: Centicents): string {
   return `$${(centicents / 10_000).toFixed(2)}`;
+}
+
+const MILLS_PER_EPOCH = 1000 * 60; // 1 minute
+const EPOCHS_PER_HOUR = (3600 * 1000) / MILLS_PER_EPOCH;
+function currentEpoch(): number {
+  return Math.floor(Date.now() / MILLS_PER_EPOCH);
+}
+function dateToEpoch(date: Date): number {
+  return Math.ceil(date.getTime() / MILLS_PER_EPOCH);
+}
+function epochToDate(epoch: number): Date {
+  return new Date(epoch * MILLS_PER_EPOCH);
+}
+function roundEpochUpToHour(epoch: number): number {
+  return Math.ceil(epoch / EPOCHS_PER_HOUR) * EPOCHS_PER_HOUR;
+}
+
+export function roundStartDate(startDate: Date): Date {
+  const now = currentEpoch();
+  const startEpoch = dateToEpoch(startDate);
+  if (startEpoch <= now + 1) {
+    return epochToDate(now + 1);
+  } else {
+    return epochToDate(roundEpochUpToHour(startEpoch));
+  } 
+}
+
+export function roundEndDate(endDate: Date): Date {
+  return epochToDate(roundEpochUpToHour(dateToEpoch(endDate)));
 }

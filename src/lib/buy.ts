@@ -6,9 +6,6 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
-import { ApiErrorCode } from "../api";
-import { OrderStatus, placeBuyOrderRequest } from "../api/orders";
-import { quoteBuyOrderRequest } from "../api/quoting";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
@@ -16,6 +13,8 @@ import {
   type Centicents,
   centicentsToDollarsFormatted,
   priceWholeToCenticents,
+  roundEndDate,
+  roundStartDate,
 } from "../helpers/units";
 import type { Nullable } from "../types/empty";
 import { formatDuration } from "./orders";
@@ -93,16 +92,37 @@ async function tryToGetOrder(orderId: string) {
 // --
 
 async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
+  const api = await apiClient();
   if (!options.priceCenticents) {
-    const { data: quote, err } = await quoteBuyOrderRequest({
-      instance_type: options.instanceType,
-      quantity: options.totalNodes,
-      duration: options.durationSeconds,
-      min_start_date: options.startsAt.iso,
-      max_start_date: options.startsAt.iso,
+    const { data, error, response } = await api.GET("/v0/quote", {
+      params: {
+        query: {
+          side: "buy",
+          instance_type: options.instanceType,
+          quantity: options.totalNodes,
+          duration: options.durationSeconds,
+          min_start_date: options.startsAt.iso,
+          max_start_date: options.startsAt.iso,
+        },
+      },
     });
 
-    if (err?.code === ApiErrorCode.Quotes.NoAvailability) {
+    if (!response.ok) {
+      switch (response.status) {
+        case 401:
+          return logLoginMessageAndQuit();
+        case 500:
+          return logAndQuit(`Failed to get quote: ${error?.code}`);
+        default:
+          return logAndQuit(`Failed to get quote: ${response.statusText}`);
+      }
+    }
+
+    if (!data) {
+      return logAndQuit(`Failed to get quote: Unexpected response from server: ${response}`);
+    }
+
+    if (!data.quote) {
       const durationInHours = options.durationSeconds / 3600;
       const quantity = options.totalNodes;
 
@@ -120,15 +140,36 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
       return process.exit(1);
     }
 
-    if (err) {
-      return logAndQuit(`Failed to get quote: ${err.message}`);
-    }
+    options.priceCenticents = data.quote.price;
+    options.totalNodes = data.quote.quantity;
+    options.startsAt = {
+      iso: data.quote.start_at,
+      date: new Date(data.quote.start_at),
+    };
 
-    if (!quote) {
-      return logAndQuit("Failed to get quote: No quote data received");
-    }
-
-    options.priceCenticents = quote.price;
+    options.durationSeconds = data.quote.duration;
+    const end = dayjs(data.quote.start_at).add(data.quote.duration, "s");
+    options.endsAt = {
+      iso: end.toISOString(),
+      date: end.toDate(),
+    };
+  } else {
+    // if we didn't quote, we need to round the start and end date (quoting guaranteed to return valid start and end dates, modulo race conditions)
+    // For start dates:
+    //   - If it's before the next minute (including in the past), round it up to the next minute.
+    //   - Otherwise, round it up to the nearest hour.
+    // For end dates:
+    //   - Always round it up to the nearest hour.
+    const startDateRounded = roundStartDate(options.startsAt.date);
+    const endDateRounded = roundEndDate(options.endsAt.date);
+    options.startsAt = {
+      iso: startDateRounded.toISOString(),
+      date: startDateRounded,
+    };
+    options.endsAt = {
+      iso: endDateRounded.toISOString(),
+      date: endDateRounded,
+    };
   }
 
   if (options.confirmWithUser) {
@@ -143,66 +184,86 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     }
   }
 
-  const { data: pendingOrder, err } = await placeBuyOrderRequest({
-    instance_type: options.instanceType,
-    quantity: options.totalNodes,
-    duration: options.durationSeconds,
-    start_at: options.startsAt.iso,
-    price: options.priceCenticents,
+  const { data, error, response } = await api.POST("/v0/orders", {
+    body: {
+      side: "buy",
+      instance_type: options.instanceType,
+      quantity: options.totalNodes,
+      start_at: options.startsAt.iso,
+      end_at: options.endsAt.iso,
+      price: options.priceCenticents,
+    },
   });
-  if (err) {
-    return logAndQuit(`Failed to place order: ${err.message}`);
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 401:
+        return logLoginMessageAndQuit();
+      case 500:
+        return logAndQuit(`Failed to place order: ${error?.message}`);
+      default:
+        return logAndQuit(`Failed to place order: ${response.statusText}`);
+    }
+  }
+  
+
+  if (!data) {
+    return logAndQuit(`Failed to place order: Unexpected response from server: ${response}`);
   }
 
-  if (pendingOrder && pendingOrder.status === OrderStatus.Pending) {
-    const orderId = pendingOrder.id;
-    const printOrderNumber = (status: string) =>
-      console.log(`\n${c.dim(`${orderId}\n\n`)}`);
+  switch (data.status) {
+    case "pending": {
+      const orderId = data.id;
+      const printOrderNumber = (status: string) =>
+        console.log(`\n${c.dim(`${orderId}\n\n`)}`);
 
-    const order = await tryToGetOrder(orderId);
+      const order = await tryToGetOrder(orderId);
 
-    if (!order) {
-      console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
-      return;
-    }
-    printOrderNumber(order.status);
-
-    if (order.status === "filled") {
-      const now = new Date();
-      const startAt = new Date(order.start_at);
-      const timeDiff = startAt.getTime() - now.getTime();
-      const oneMinuteInMs = 60 * 1000;
-
-      if (now >= startAt || timeDiff <= oneMinuteInMs) {
-        console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
-
-  sf instances ls
-
-`);
-      } else {
-        const contractStartTime = dayjs(startAt);
-        const timeFromNow = contractStartTime.fromNow();
-        console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
-
-  sf contracts ls
-
-`);
+      if (!order) {
+        console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
+        return;
       }
+      printOrderNumber(order.status);
 
-      return;
-    } else {
-      console.log(`Your order wasn't accepted yet. You can check it's status with:
+      if (order.status === "filled") {
+        const now = new Date();
+        const startAt = new Date(order.start_at);
+        const timeDiff = startAt.getTime() - now.getTime();
+        const oneMinuteInMs = 60 * 1000;
 
-  sf orders ls
+        if (now >= startAt || timeDiff <= oneMinuteInMs) {
+          console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
 
-If you want to cancel the order, you can do so with:
-
-  sf orders cancel ${orderId}
+    sf instances ls
 
   `);
+        } else {
+          const contractStartTime = dayjs(startAt);
+          const timeFromNow = contractStartTime.fromNow();
+          console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
 
-      return;
+    sf contracts ls
+
+  `);
+        }
+
+        return;
+      } else {
+        console.log(`Your order wasn't accepted yet. You can check it's status with:
+
+    sf orders ls
+
+  If you want to cancel the order, you can do so with:
+
+    sf orders cancel ${orderId}
+
+    `);
+
+        return;
+      }
     }
+    default:
+      return logAndQuit(`Failed to place order: Unexpected order status: ${data.status}`);
   }
 }
 
@@ -266,26 +327,43 @@ function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
 // --
 
 async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
-  const { data: quote, err } = await quoteBuyOrderRequest({
-    instance_type: options.instanceType,
-    quantity: options.totalNodes,
-    duration: options.durationSeconds,
-    min_start_date: options.startsAt.iso,
-    max_start_date: options.startsAt.iso,
+  const api = await apiClient();
+
+  const { data, error, response } = await api.GET("/v0/quote", {
+    params: {
+      query: {
+        side: "buy",
+        instance_type: options.instanceType,
+        quantity: options.totalNodes,
+        duration: options.durationSeconds,
+        min_start_date: options.startsAt.iso,
+        max_start_date: options.startsAt.iso,
+      },
+    },
   });
-  if (err) {
-    if (err.code === ApiErrorCode.Quotes.NoAvailability) {
-      return logAndQuit("Not enough data exists to quote this order.");
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 401:
+        return logLoginMessageAndQuit();
+      case 500:
+        return logAndQuit(`Failed to get quote: ${error?.code}`);
+      default:
+        return logAndQuit(`Failed to get quote: ${response.statusText}`);
     }
-
-    return logAndQuit(`Failed to quote order: ${err.message}`);
   }
 
-  if (quote) {
-    const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
-
-    console.log(`This order is projected to cost ${priceLabelUsd}`);
+  if (!data) {
+    return logAndQuit(`Failed to get quote: Unexpected response from server: ${response}`);
   }
+
+  if (!data.quote) {
+    return logAndQuit("Not enough data exists to quote this order.");
+  }
+
+  const priceLabelUsd = c.green(centicentsToDollarsFormatted(data.quote.price));
+
+  console.log(`This order is projected to cost ${priceLabelUsd}`);
 }
 
 // --

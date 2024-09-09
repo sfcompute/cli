@@ -92,46 +92,44 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
   if (!response.ok) {
     switch (response.status) {
       case 401:
-        await logSessionTokenExpiredAndQuit();
-        break;
+        return await logSessionTokenExpiredAndQuit();
       case 500:
-        logAndQuit(`Failed to get balance: ${error?.message}`);
-        break;
+        return logAndQuit(`Failed to get balance: ${error?.message}`);
       default:
-        logAndQuit(`Failed to fetch balance: ${response.statusText}`);
+        return logAndQuit(`Failed to fetch balance: ${response.statusText}`);
     }
   }
 
-  if (data) {
-    let available: number;
-    switch (data.available.currency) {
-      case "usd":
-        available = data.available.amount / 10_000;
-        break;
-      default:
-        logAndQuit(`Unsupported currency: ${data.available.currency}`);
-    }
-
-    let reserved: number;
-    switch (data.reserved.currency) {
-      case "usd":
-        reserved = data.reserved.amount / 10_000;
-        break;
-      default:
-        logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
-    }
-
-    return {
-      available: {
-        centicents: available,
-        whole: available / 10_000,
-      },
-      reserved: {
-        centicents: reserved,
-        whole: reserved / 10_000,
-      },
-    }
+  if (!data) {
+    return logAndQuit(`Failed to get balance: Unexpected response from server: ${response}`);
   }
 
-  throw new Error(`Unexpected response from server: ${response}`, );
+  let available: number;
+  switch (data.available.currency) {
+    case "usd":
+      available = data.available.amount / 10_000;
+      break;
+    default:
+      logAndQuit(`Unsupported currency: ${data.available.currency}`);
+  }
+
+  let reserved: number;
+  switch (data.reserved.currency) {
+    case "usd":
+      reserved = data.reserved.amount / 10_000;
+      break;
+    default:
+      logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
+  }
+
+  return {
+    available: {
+      centicents: available,
+      whole: available / 10_000,
+    },
+    reserved: {
+      centicents: reserved,
+      whole: reserved / 10_000,
+    },
+  }
 }

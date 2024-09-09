@@ -339,90 +339,102 @@ export interface operations {
                         object: "quote";
                         /** @constant */
                         side: "buy";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        /** @description The instance type. */
-                        instance_type: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            /** @description The instance type. */
+                            instance_type: string;
+                        } | null;
                     } | {
                         /** @constant */
                         object: "quote";
                         /** @constant */
                         side: "sell";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        contract_id: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            contract_id: string;
+                        } | null;
                     };
                     "multipart/form-data": {
                         /** @constant */
                         object: "quote";
                         /** @constant */
                         side: "buy";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        /** @description The instance type. */
-                        instance_type: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            /** @description The instance type. */
+                            instance_type: string;
+                        } | null;
                     } | {
                         /** @constant */
                         object: "quote";
                         /** @constant */
                         side: "sell";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        contract_id: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            contract_id: string;
+                        } | null;
                     };
                     "text/plain": {
                         /** @constant */
                         object: "quote";
                         /** @constant */
                         side: "buy";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        /** @description The instance type. */
-                        instance_type: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            /** @description The instance type. */
+                            instance_type: string;
+                        } | null;
                     } | {
                         /** @constant */
                         object: "quote";
                         /** @constant */
                         side: "sell";
-                        /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
-                        price: number;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                        duration: number;
-                        contract_id: string;
+                        quote: {
+                            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                            price: number;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+                            duration: number;
+                            contract_id: string;
+                        } | null;
                     };
                 };
             };
