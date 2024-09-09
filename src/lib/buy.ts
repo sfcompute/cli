@@ -8,7 +8,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
 import {
   type Centicents,
   centicentsToDollarsFormatted,
@@ -110,7 +110,7 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     if (!response.ok) {
       switch (response.status) {
         case 401:
-          return logLoginMessageAndQuit();
+          return await logSessionTokenExpiredAndQuit();
         case 500:
           return logAndQuit(`Failed to get quote: ${error?.code}`);
         default:
@@ -198,7 +198,7 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
   if (!response.ok) {
     switch (response.status) {
       case 401:
-        return logLoginMessageAndQuit();
+        return await logSessionTokenExpiredAndQuit();
       case 500:
         return logAndQuit(`Failed to place order: ${error?.message}`);
       default:
@@ -345,7 +345,7 @@ async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
   if (!response.ok) {
     switch (response.status) {
       case 401:
-        return logLoginMessageAndQuit();
+        return await logSessionTokenExpiredAndQuit();
       case 500:
         return logAndQuit(`Failed to get quote: ${error?.code}`);
       default:

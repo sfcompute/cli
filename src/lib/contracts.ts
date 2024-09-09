@@ -1,9 +1,8 @@
 import Table from "cli-table3";
 import { Command } from "commander";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
-import { logLoginMessageAndQuit } from "../helpers/errors";
-import { fetchAndHandleErrors } from "../helpers/fetch";
-import { getApiUrl } from "../helpers/urls";
+import { isLoggedIn } from "../helpers/config";
+import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
+import { apiClient } from "../apiClient";
 
 interface Contract {
   object: string;
@@ -17,7 +16,7 @@ interface Contract {
     quantities: number[];
   };
   colocate_with: string[];
-  cluster_id: string;
+  cluster_id?: string;
 }
 
 function printTable(data: Contract[]) {
@@ -68,30 +67,47 @@ export function registerContracts(program: Command) {
             console.log(await listContracts());
           } else {
             const data = await listContracts();
-            printTable(data.data);
+            printTable(data);
           }
           process.exit(0);
         }),
     );
 }
 
-async function listContracts() {
+async function listContracts(): Promise<Contract[]> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     return logLoginMessageAndQuit();
   }
 
-  const response = await fetchAndHandleErrors(
-    await getApiUrl("contracts_list"),
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${await getAuthToken()}`,
-      },
-    },
-  );
+  const api = await apiClient();
 
-  const data = await response.json();
-  return data;
+  const { data, error, response } = await api.GET("/v0/contracts");
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      default:
+        return logAndQuit(`Failed to get contracts: ${response.statusText}`);
+    }
+  }
+
+  if (!data) {
+    return logAndQuit(`Failed to get contracts: Unexpected response from server: ${response}`);
+  }
+
+  // filter out pending contracts
+  // we use loop instead of filter bc type
+  const contracts: Contract[] = [];
+  for (const contract of data.data) { 
+    if (contract.status === "active") {
+      contracts.push({
+        ...contract,
+        colocate_with: contract.colocate_with ?? [],
+      });
+    }
+  }
+
+  return contracts;
 }
