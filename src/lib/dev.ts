@@ -1,5 +1,8 @@
 import { confirm } from "@inquirer/prompts";
+import chalk from "chalk";
 import type { Command } from "commander";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import {
   deleteConfig,
   getConfigPath,
@@ -11,11 +14,8 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
 import { currentEpoch, epochToDate } from "../helpers/units";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import chalk from "chalk";
+import { getApiUrl } from "../helpers/urls";
 
 dayjs.extend(utc);
 
