@@ -5,7 +5,6 @@ import Table from "cli-table3";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import ora from "ora";
-import { type ApiError, ApiErrorCode } from "../api";
 import { getCommandBase } from "../helpers/command";
 import { getAuthToken, isLoggedIn } from "../helpers/config";
 import {
@@ -311,8 +310,8 @@ async function deleteTokenById(id: string) {
       await logSessionTokenExpiredAndQuit();
     }
 
-    const error = (await response.json()) as ApiError;
-    if (error.code === ApiErrorCode.Tokens.TokenNotFound) {
+    const error = await response.json();
+    if (error.code === "token.not_found") {
       loadingSpinner.fail("Token not found");
       process.exit(1);
     }
