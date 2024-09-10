@@ -37,7 +37,7 @@ export function registerBuy(program: Command) {
   program
     .command("buy")
     .description("Place a buy order")
-    .requiredOption("-t, --type <type>", "Specify the type of node")
+    .option("-t, --type <type>", "Specify the type of node", "h100i")
     .option("-n, --nodes <quantity>", "Specify the number of nodes")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
     .option("-p, --price <price>", "Specify the price")
@@ -150,7 +150,7 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
     options.startsAt = {
       iso: new Date().toISOString(),
       date: new Date(),
-      wasSetByUser: false
+      wasSetByUser: false,
     };
   }
   const { data: pendingOrder, err } = await placeBuyOrderRequest({
