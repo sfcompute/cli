@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
 import {
   priceWholeToCenticents,
   roundEndDate,
@@ -62,23 +62,18 @@ async function placeSellOrder(options: {
   if (!durationSecs) {
     return logAndQuit("Invalid duration");
   }
-  const startDate = options.start
+
+  let startDate = options.start
     ? chrono.parseDate(options.start)
     : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
 
-  if (startDate !== roundStartDate(startDate)) {
-    return logAndQuit(
-      "Start date must either be the next minute or on the hour",
-    );
-  }
+  startDate = roundStartDate(startDate);
 
-  const endDate = dayjs(startDate).add(durationSecs, "s").toDate();
-  if (endDate !== roundEndDate(endDate)) {
-    return logAndQuit("End date must be in the on the hour");
-  }
+  let endDate = dayjs(startDate).add(durationSecs, "s").toDate();
+  endDate = roundEndDate(endDate);
 
   const { centicents: priceCenticents, invalid } = priceWholeToCenticents(
     options.price,
@@ -98,14 +93,22 @@ async function placeSellOrder(options: {
   };
 
   const api = await apiClient();
-  const { response } = await api.POST("/v0/orders", {
+  const { data, error, response } = await api.POST("/v0/orders", {
     body: params,
   });
 
   if (!response.ok) {
-    return logAndQuit("Failed to place sell order");
+    switch (response.status) {
+      case 400:
+        return logAndQuit(`Bad Request: ${error?.message}: ${JSON.stringify(error?.details, null, 2)}`);
+        // return logAndQuit(`Bad Request: ${error?.message}`);
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      default:
+        return logAndQuit(`Failed to place sell order: ${response.statusText}`);
+    }
   }
-  const data = await response.json();
+
   console.log(data);
   process.exit(0);
 }

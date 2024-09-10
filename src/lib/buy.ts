@@ -114,6 +114,8 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
     if (!response.ok) {
       switch (response.status) {
+        case 400:
+          return logAndQuit(`Bad Request: ${error?.message}`);
         case 401:
           return await logSessionTokenExpiredAndQuit();
         case 500:
@@ -205,6 +207,8 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
 
   if (!response.ok) {
     switch (response.status) {
+      case 400:
+        return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
@@ -355,6 +359,8 @@ async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
 
   if (!response.ok) {
     switch (response.status) {
+      case 400:
+        return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
