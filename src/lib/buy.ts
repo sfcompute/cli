@@ -98,6 +98,7 @@ async function tryToGetOrder(orderId: string) {
 async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
   const api = await apiClient();
   if (!options.priceCenticents) {
+    console.log("getting quote", options);
     const { data, error, response } = await api.GET("/v0/quote", {
       params: {
         query: {

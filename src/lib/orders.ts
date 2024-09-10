@@ -101,6 +101,7 @@ interface ListResponseBody<T> {
 }
 
 function printAsTable(orders: Array<HydratedOrder>) {
+  orders.sort((a, b) => a.start_at.localeCompare(b.start_at));
   const table = new Table({
     head: [
       "ID",
