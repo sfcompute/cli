@@ -65,7 +65,6 @@ export function roundStartDate(startDate: Date): Date {
   const now = currentEpoch();
   const startEpoch = dateToEpoch(startDate);
   if (startEpoch <= now + 1) {
-    console.log("startEpoch <= now + 1", startEpoch, now + 1);
     return epochToDate(now + 1);
   } else {
     return epochToDate(roundEpochUpToHour(startEpoch));
