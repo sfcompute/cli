@@ -67,7 +67,7 @@ export interface HydratedOrder {
   instance_type: string;
   price: number;
   start_at: string;
-  duration: number;
+  end_at: string;
   quantity: number;
   flags: OrderFlags;
   created_at: string;
@@ -132,13 +132,14 @@ function printAsTable(orders: Array<HydratedOrder>) {
       }
 
       const startDate = new Date(order.start_at);
+      const duration = formatDuration(dayjs(order.end_at).diff(dayjs(startDate), "ms"));
       table.push([
         order.id,
         order.side,
         order.instance_type,
         usdFormatter.format(order.price / 10000),
         order.quantity.toString(),
-        formatDuration(order.duration * 1000),
+        duration,
         startDate.toLocaleString(),
         status,
         executionPrice ? usdFormatter.format(executionPrice / 10000) : "-",
