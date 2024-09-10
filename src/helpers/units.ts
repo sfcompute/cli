@@ -51,10 +51,10 @@ const EPOCHS_PER_HOUR = (3600 * 1000) / MILLS_PER_EPOCH;
 function currentEpoch(): number {
   return Math.floor(Date.now() / MILLS_PER_EPOCH);
 }
-export function dateToEpoch(date: Date): number {
+function dateToEpoch(date: Date): number {
   return Math.ceil(date.getTime() / MILLS_PER_EPOCH);
 }
-export function epochToDate(epoch: number): Date {
+function epochToDate(epoch: number): Date {
   return new Date(epoch * MILLS_PER_EPOCH);
 }
 function roundEpochUpToHour(epoch: number): number {
