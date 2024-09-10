@@ -24,6 +24,15 @@ interface Contract {
 }
 
 function printTable(data: Contract[]) {
+  if (data.length === 0) {
+    const table = new Table();
+    table.push([
+      { colSpan: 6, content: "No contracts found", hAlign: "center" },
+    ]);
+
+    console.log(table.toString());
+  }
+
   for (const contract of data) {
     // print the contract shape in a table
     // if the contract is empty, will print empty shape table
