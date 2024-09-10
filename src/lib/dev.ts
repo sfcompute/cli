@@ -120,7 +120,7 @@ function registerEpoch(program: Command) {
         timestamps.forEach((epochTimestamp, i) => {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
-            `${colorDiffedEpochs[i]} | ${chalk.yellow(dayjs(date).format("hh:mm MM-DD-YYYY A"))} Local`,
+            `${colorDiffedEpochs[i]} | ${chalk.yellow(dayjs(date).format("hh:mm A MM-DD-YYYY"))} Local`,
           );
         });
       }
