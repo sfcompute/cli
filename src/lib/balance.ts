@@ -96,7 +96,7 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
       case 500:
         return logAndQuit(`Failed to get balance: ${error?.message}`);
       default:
-        return logAndQuit(`Failed to fetch balance: ${response.statusText}`);
+        return logAndQuit(`Failed to get balance: ${response.statusText}`);
     }
   }
 
