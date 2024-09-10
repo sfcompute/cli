@@ -107,7 +107,7 @@ async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
       const quantity = options.totalNodes;
 
       // In the future, we should read from a price chart of yesterday's prices.
-      const todoEstimatedPriceInCents = 250;
+      const todoEstimatedPriceInCents = 250 * 8; // 8 gpus
       const estimatedPrice =
         todoEstimatedPriceInCents * quantity * durationInHours;
       const estimatedPriceInDollars = estimatedPrice;
