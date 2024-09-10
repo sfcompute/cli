@@ -81,9 +81,7 @@ async function buyOrderAction(options: SfBuyOptions) {
   const confirmWithUser = yesFlagOmitted || !options.yes;
 
   // parse starts at
-  let startDate = options.start
-    ? chrono.parseDate(options.start)
-    : new Date();
+  let startDate = options.start ? chrono.parseDate(options.start) : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
@@ -149,7 +147,6 @@ async function buyOrderAction(options: SfBuyOptions) {
     startDate = roundStartDate(startDate);
     let endDate = dayjs(startDate).add(durationSeconds, "s").toDate();
     endDate = roundEndDate(endDate);
-
 
     if (confirmWithUser) {
       const confirmationMessage = confirmPlaceOrderMessage({
@@ -251,7 +248,9 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.quantity > 1 ? "nodes" : "node";
 
-  const durationHumanReadable = formatDuration(options.endsAt.getTime() - options.startsAt.getTime());
+  const durationHumanReadable = formatDuration(
+    options.endsAt.getTime() - options.startsAt.getTime(),
+  );
   const endsAtLabel = c.green(
     dayjs(options.endsAt).format("MM/DD/YYYY hh:mm A"),
   );
@@ -289,7 +288,7 @@ type BuyOptions = {
   endsAt: Date;
   confirmWithUser: boolean;
   quoteOnly: boolean;
-}
+};
 export async function placeBuyOrder(options: BuyOptions) {
   const api = await apiClient();
   const { data, error, response } = await api.POST("/v0/orders", {
@@ -326,7 +325,6 @@ export async function placeBuyOrder(options: BuyOptions) {
   return data;
 }
 
-
 type QuoteOptions = {
   instanceType: string;
   priceCenticents: Nullable<number>;
@@ -335,7 +333,7 @@ type QuoteOptions = {
   durationSeconds: number;
   confirmWithUser: boolean;
   quoteOnly: boolean;
-}
+};
 async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 

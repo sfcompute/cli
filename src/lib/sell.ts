@@ -4,7 +4,11 @@ import dayjs from "dayjs";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import {
   priceWholeToCenticents,
   roundEndDate,
@@ -63,9 +67,7 @@ async function placeSellOrder(options: {
     return logAndQuit("Invalid duration");
   }
 
-  let startDate = options.start
-    ? chrono.parseDate(options.start)
-    : new Date();
+  let startDate = options.start ? chrono.parseDate(options.start) : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
@@ -100,8 +102,10 @@ async function placeSellOrder(options: {
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error?.message}: ${JSON.stringify(error?.details, null, 2)}`);
-        // return logAndQuit(`Bad Request: ${error?.message}`);
+        return logAndQuit(
+          `Bad Request: ${error?.message}: ${JSON.stringify(error?.details, null, 2)}`,
+        );
+      // return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       default:

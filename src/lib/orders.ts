@@ -132,7 +132,9 @@ function printAsTable(orders: Array<HydratedOrder>) {
       }
 
       const startDate = new Date(order.start_at);
-      const duration = formatDuration(dayjs(order.end_at).diff(dayjs(startDate), "ms"));
+      const duration = formatDuration(
+        dayjs(order.end_at).diff(dayjs(startDate), "ms"),
+      );
       table.push([
         order.id,
         order.side,
