@@ -12,24 +12,40 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import { getApiUrl } from "../helpers/urls";
+import { currentEpoch, epochToDate } from "../helpers/units";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import chalk from "chalk";
+
+dayjs.extend(utc);
 
 // development only commands
 export function registerDev(program: Command) {
   if (process.env.IS_DEVELOPMENT_CLI_ENV) {
+    // config
     registerConfig(program);
 
+    // time
+    registerEpoch(program);
+    program.command("utc").action(async () => {
+      const unixEpochSecondsNow = dayjs().unix();
+      console.log(unixEpochSecondsNow);
+      console.log(
+        chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A")),
+      );
+
+      process.exit(0);
+    });
+
+    // self
     program.command("me").action(async () => {
       const accountId = await getLoggedInAccountId();
       console.log(accountId);
 
       process.exit(0);
     });
-    program.command("epoch").action(async () => {
-      const MILLS_PER_EPOCH = 1000 * 60 * 60;
-      console.log(Math.floor(Date.now() / MILLS_PER_EPOCH));
 
-      process.exit(0);
-    });
+    // connection
     program.command("ping").action(async () => {
       const data = await pingServer();
       console.log(data);
@@ -90,6 +106,70 @@ async function removeConfigAction() {
 
 // --
 
+function registerEpoch(program: Command) {
+  const epochCmd = program
+    .command("epoch [timestamps...]")
+    .description("Get current epoch timestamp or convert given timestamps")
+    .action(async (timestamps: string[]) => {
+      if (timestamps.length === 0) {
+        const epoch = currentEpoch();
+        console.log(epoch);
+      } else {
+        const colorDiffedEpochs = colorDiffEpochs(timestamps);
+
+        timestamps.forEach((epochTimestamp, i) => {
+          const date = epochToDate(Number.parseInt(epochTimestamp));
+          console.log(
+            `${colorDiffedEpochs[i]} | ${chalk.yellow(dayjs(date).format("hh:mm MM-DD-YYYY A"))} Local`,
+          );
+        });
+      }
+
+      process.exit(0);
+    });
+
+  epochCmd
+    .command("now")
+    .description("Get current epoch timestamp")
+    .action(async () => {
+      const epoch = currentEpoch();
+      console.log(epoch);
+      process.exit(0);
+    });
+}
+
+function colorDiffEpochs(epochStrings: string[]): string[] {
+  const minLength = Math.min(...epochStrings.map((num) => num.length));
+
+  // function to find the common prefix between all numbers
+  const findCommonPrefix = (arr: string[]): string => {
+    let prefix = "";
+    for (let i = 0; i < minLength; i++) {
+      const currentChar = arr[0][i];
+      if (arr.every((num) => num[i] === currentChar)) {
+        prefix += currentChar;
+      } else {
+        break;
+      }
+    }
+
+    return prefix;
+  };
+
+  // find the common prefix for all numbers
+  const commonPrefix = findCommonPrefix(epochStrings);
+
+  return epochStrings.map((num) => {
+    const prefix = num.startsWith(commonPrefix) ? commonPrefix : "";
+    const rest = num.slice(prefix.length);
+
+    // return the string with appropriate coloring (gray for common prefix, white for the rest)
+    return chalk.gray(prefix) + chalk.white(rest);
+  });
+}
+
+// --
+
 async function getLoggedInAccountId() {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
@@ -108,6 +188,7 @@ async function getLoggedInAccountId() {
     if (response.status === 401) {
       logSessionTokenExpiredAndQuit();
     }
+    console.log(response);
 
     logAndQuit("Failed to fetch account info");
   }
