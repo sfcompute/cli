@@ -1,9 +1,23 @@
 import type { Nullable } from "../types/empty";
 
+// -- time
+
+export type Epoch = number;
+
+const MILLS_PER_EPOCH = 1000 * 60;
+
+export function currentEpoch(): Epoch {
+  return Math.floor(Date.now() / MILLS_PER_EPOCH);
+}
+
+export function epochToDate(epoch: Epoch): Date {
+  return new Date(epoch * MILLS_PER_EPOCH);
+}
+
+// -- currency
+
 export type Cents = number;
 export type Centicents = number;
-
-// --
 
 interface PriceWholeToCenticentsReturn {
   centicents: Nullable<Centicents>;
