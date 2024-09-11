@@ -1,8 +1,13 @@
+import { confirm } from "@inquirer/prompts";
 import type { Command } from "commander";
 import { apiClient } from "../apiClient";
 import parseDuration from "parse-duration";
 import { logAndQuit } from "../helpers/errors";
 import { getBalance } from "./balance";
+import c from "chalk";
+import { formatDuration } from "./orders";
+import { centicentsToDollarsFormatted } from "../helpers/units";
+import { getQuote } from "./buy";
 
 export function registerUp(program: Command) {
     const cmd = program
@@ -22,7 +27,9 @@ export function registerUp(program: Command) {
     });
 }
 
-function getDefaultProcurementOptions(props: {
+const DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTICENTS = 2.65 * 8 * 10_000;
+
+async function getDefaultProcurementOptions(props: {
     duration?: string;
     n?: string;
     pricePerNodeHour?: string;
@@ -31,24 +38,83 @@ function getDefaultProcurementOptions(props: {
     // Minimum block duration is 2 hours
     // which is a bit of a smoother experience (we might want to increase this)
     const duration = props.duration ?? "2h";
-    const durationHours = parseDuration(duration, "h");
+    let durationHours = parseDuration(duration, "h");
     if (!durationHours) {
         logAndQuit(`Failed to parse duration: ${duration}`);
     }
+    durationHours = Math.ceil(durationHours);
+    const n = Number.parseInt(props.n ?? "1");
+    const type = props.type ?? "h100i";
 
-    const defaultPrice = 2.65 * 8;
-    const pricePerNodeHourInDollars = props.pricePerNodeHour ? Number.parseInt(props.pricePerNodeHour) : defaultPrice;
-    const pricePerNodeHourInCenticents = Math.ceil(pricePerNodeHourInDollars * 10_000);
+    const quote = await getQuote({
+        instanceType: type,
+        quantity: n,
+        // Start immediately
+        startsAt: new Date(),
+        durationSeconds: durationHours * 60 * 60,
+    });
+
+    // Eventually we should replace this price with yesterday's index price 
+    let quotePrice = DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTICENTS;
+    if (quote) {
+        // per hour price
+        quotePrice = quote.price / durationHours;
+    }
+
+    const pricePerNodeHourInDollars = props.pricePerNodeHour ? Number.parseInt(props.pricePerNodeHour) : quotePrice;
+    const pricePerNodeHourInCenticents = Math.ceil(pricePerNodeHourInDollars);
 
     const totalPriceInCenticents = pricePerNodeHourInCenticents * Number.parseInt(props.n ?? "1") * durationHours;
 
     return {
-        durationHours: Math.ceil(durationHours),
-        pricePerNodeHourInCenticents: pricePerNodeHourInCenticents,
-        n: Number.parseInt(props.n ?? "1"),
-        type: props.type ?? "h100i",
+        durationHours,
+        pricePerNodeHourInCenticents,
+        n,
+        type,
         totalPriceInCenticents
     };
+}
+
+
+// Instruct the user to set a price that's lower
+function getSuggestedCommandWhenBalanceLow(props: {
+    durationHours: number;
+    pricePerNodeHourInCenticents: number;
+    n: number;
+    totalPriceInCenticents: number;
+    balance: number;
+}) {
+    const affordablePrice = (props.balance / 100) / (props.n * props.durationHours);
+
+    const cmd = `sf up -n ${props.n} -d ${props.durationHours}h -p ${affordablePrice.toFixed(2)}`;
+    return `You could try setting a lower price and your nodes will turn on\nif the market price dips this low:\n\n\t${cmd}\n`;
+}
+
+
+function confirmPlaceOrderMessage(options: {
+    durationHours: number;
+    pricePerNodeHourInCenticents: number;
+    n: number;
+    totalPriceInCenticents: number;
+    type: string;
+}) {
+
+    const totalNodesLabel = c.green(options.n);
+    const instanceTypeLabel = c.green(options.type);
+    const nodesLabel = options.n > 1 ? "nodes" : "node";
+    const durationInMilliseconds = options.durationHours * 60 * 60 * 1000;
+
+    const timeDescription = `starting ${c.green("ASAP")} until you turn it off`;
+
+    const topLine = `Turn on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${c.green(formatDuration(durationInMilliseconds))} ${timeDescription}`;
+
+    const dollarsLabel = c.green(
+        centicentsToDollarsFormatted(options.pricePerNodeHourInCenticents * options.durationHours * options.n),
+    );
+
+    const priceLine = `\n Pay a minimum of ${dollarsLabel}?`;
+
+    return `${topLine}\n${priceLine} `;
 }
 
 async function up(props: {
@@ -56,19 +122,47 @@ async function up(props: {
     type: string;
     duration?: string;
     price?: string;
+    y: boolean;
 }) {
     const client = await apiClient();
 
-    const { durationHours, n, type, pricePerNodeHourInCenticents, totalPriceInCenticents } = getDefaultProcurementOptions(props);
+    const { durationHours, n, type, pricePerNodeHourInCenticents, totalPriceInCenticents } = await getDefaultProcurementOptions(props);
 
     if (durationHours && durationHours < 1) {
         console.error("Minimum duration is 1 hour");
         return;
     }
 
+    if (!props.y) {
+        const confirmationMessage = confirmPlaceOrderMessage({
+            durationHours,
+            pricePerNodeHourInCenticents,
+            n,
+            totalPriceInCenticents,
+            type,
+        })
+        const confirmed = await confirm({
+            message: confirmationMessage,
+            default: false,
+        });
+
+        if (!confirmed) {
+            logAndQuit("Order cancelled");
+        }
+    }
+
     const balance = await getBalance();
+
     if (balance.available.centicents < totalPriceInCenticents) {
-        console.error(`Insufficient balance to purchase nodes. Available balance: $${(balance.available.centicents / 1000000).toFixed(2)}, Total price: $${(totalPriceInCenticents / 1000000).toFixed(2)}`);
+        console.log(`You can't afford this. Available balance: $${(balance.available.centicents / 1000000).toFixed(2)}, Minimum price: $${(totalPriceInCenticents / 1000000).toFixed(2)}\n`);
+        const cmd = getSuggestedCommandWhenBalanceLow({
+            durationHours,
+            pricePerNodeHourInCenticents,
+            n,
+            totalPriceInCenticents,
+            balance: balance.available.whole,
+        });
+        console.log(cmd);
         return;
     }
 

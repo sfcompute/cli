@@ -92,12 +92,9 @@ async function buyOrderAction(options: SfBuyOptions) {
   if (options.quote) {
     const quote = await getQuote({
       instanceType: options.type,
-      priceCenticents,
       quantity: quantity,
       startsAt: startDate,
       durationSeconds,
-      confirmWithUser,
-      quoteOnly: isQuoteOnly,
     });
 
     if (!quote) {
@@ -112,12 +109,9 @@ async function buyOrderAction(options: SfBuyOptions) {
     if (!priceCenticents) {
       const quote = await getQuote({
         instanceType: options.type,
-        priceCenticents,
         quantity: quantity,
         startsAt: startDate,
         durationSeconds,
-        confirmWithUser,
-        quoteOnly: isQuoteOnly,
       });
 
       if (!quote) {
@@ -335,14 +329,11 @@ export async function placeBuyOrder(options: BuyOptions) {
 
 type QuoteOptions = {
   instanceType: string;
-  priceCenticents: Nullable<number>;
   quantity: number;
   startsAt: Date;
   durationSeconds: number;
-  confirmWithUser: boolean;
-  quoteOnly: boolean;
 };
-async function getQuote(options: QuoteOptions) {
+export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
   const { data, error, response } = await api.GET("/v0/quote", {
