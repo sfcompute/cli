@@ -6,16 +6,19 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
-import { ApiErrorCode } from "../api";
-import { OrderStatus, placeBuyOrderRequest } from "../api/orders";
-import { quoteBuyOrderRequest } from "../api/quoting";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import {
   type Centicents,
   centicentsToDollarsFormatted,
   priceWholeToCenticents,
+  roundEndDate,
+  roundStartDate,
 } from "../helpers/units";
 import type { Nullable } from "../types/empty";
 import { formatDuration } from "./orders";
@@ -47,8 +50,6 @@ export function registerBuy(program: Command) {
     .action(buyOrderAction);
 }
 
-// --
-
 async function buyOrderAction(options: SfBuyOptions) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
@@ -56,13 +57,327 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // normalize inputs
-  const optionsNormalized = normalizeSfBuyOptions(options);
+
+  const isQuoteOnly = options.quote ?? false;
+
+  // parse duration
+  let durationSeconds = parseDuration(options.duration, "s");
+  if (!durationSeconds) {
+    return logAndQuit(`Invalid duration: ${options.duration}`);
+  }
+
+  // parse price
+  let priceCenticents: Nullable<Centicents> = null;
+  if (options.price) {
+    const { centicents: priceParsed, invalid: priceInputInvalid } =
+      priceWholeToCenticents(options.price);
+    if (priceInputInvalid) {
+      return logAndQuit(`Invalid price: ${options.price}`);
+    }
+    priceCenticents = priceParsed;
+  }
+
+  const yesFlagOmitted = options.yes === undefined || options.yes === null;
+  const confirmWithUser = yesFlagOmitted || !options.yes;
+
+  // parse starts at
+  let startDate = options.start ? chrono.parseDate(options.start) : new Date();
+  if (!startDate) {
+    return logAndQuit("Invalid start date");
+  }
+
+  // default to 1 node if not specified
+  const quantity = options.nodes ? Number(options.nodes) : 1;
 
   if (options.quote) {
-    await quoteBuyOrderAction(optionsNormalized);
+    const quote = await getQuote({
+      instanceType: options.type,
+      priceCenticents,
+      quantity: quantity,
+      startsAt: startDate,
+      durationSeconds,
+      confirmWithUser,
+      quoteOnly: isQuoteOnly,
+    });
+
+    if (!quote) {
+      return logAndQuit("Not enough data exists to quote this order.");
+    }
+
+    const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
+
+    console.log(`This order is projected to cost ${priceLabelUsd}`);
   } else {
-    await placeBuyOrderAction(optionsNormalized);
+    // quote if no price was provided
+    if (!priceCenticents) {
+      const quote = await getQuote({
+        instanceType: options.type,
+        priceCenticents,
+        quantity: quantity,
+        startsAt: startDate,
+        durationSeconds,
+        confirmWithUser,
+        quoteOnly: isQuoteOnly,
+      });
+
+      if (!quote) {
+        const durationInHours = durationSeconds / 3600;
+
+        // In the future, we should read from a price chart of yesterday's prices.
+        // For now, we'll just suggest 2.50 / gpu-hour as a default
+        const todoEstimatedPricePerNodeCents = 250 * 8; // $2.50 / gpu-hour * 8 gpus
+        const estimatedPriceInCents =
+          todoEstimatedPricePerNodeCents * quantity * durationInHours; // multiply by desired quantity and duration to get total estimated price in cents
+
+        console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
+
+    sf buy -i ${options.type} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInCents / 100).toFixed(2)}" 
+          `);
+
+        return process.exit(1);
+      }
+
+      priceCenticents = quote.price;
+      durationSeconds = quote.duration;
+      startDate = new Date(quote.start_at);
+    }
+
+    if (!durationSeconds) {
+      throw new Error("unexpectly no duration provided");
+    }
+
+    if (!priceCenticents) {
+      throw new Error("unexpectly no price provided");
+    }
+
+    // round the start and end dates. If we came from a quote, they should already be rounded,
+    // however, there may have been a delay between the quote and now, so we may need to move the start time up to the next minute
+    startDate = roundStartDate(startDate);
+    let endDate = dayjs(startDate).add(durationSeconds, "s").toDate();
+    endDate = roundEndDate(endDate);
+
+    if (confirmWithUser) {
+      const confirmationMessage = confirmPlaceOrderMessage({
+        instanceType: options.type,
+        priceCenticents,
+        quantity,
+        startsAt: startDate,
+        endsAt: endDate,
+        confirmWithUser,
+        quoteOnly: isQuoteOnly,
+      });
+      const confirmed = await confirm({
+        message: confirmationMessage,
+        default: false,
+      });
+
+      if (!confirmed) {
+        logAndQuit("Order cancelled");
+      }
+    }
+
+    const res = await placeBuyOrder({
+      instanceType: options.type,
+      priceCenticents,
+      quantity,
+      // round start date again because the user might have taken a long time to confirm
+      // most of the time this will do nothing, but when it does it will move the start date forwrd one minute
+      startsAt: roundStartDate(startDate),
+      endsAt: endDate,
+      confirmWithUser,
+      quoteOnly: isQuoteOnly,
+    });
+
+    switch (res.status) {
+      case "pending": {
+        const orderId = res.id;
+        const printOrderNumber = (status: string) =>
+          console.log(`\n${c.dim(`${orderId}\n\n`)}`);
+
+        const order = await tryToGetOrder(orderId);
+
+        if (!order) {
+          console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
+          return;
+        }
+        printOrderNumber(order.status);
+
+        if (order.status === "filled") {
+          const now = new Date();
+          const startAt = new Date(order.start_at);
+          const timeDiff = startAt.getTime() - now.getTime();
+          const oneMinuteInMs = 60 * 1000;
+
+          if (now >= startAt || timeDiff <= oneMinuteInMs) {
+            console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
+
+      sf instances ls
+
+    `);
+          } else {
+            const contractStartTime = dayjs(startAt);
+            const timeFromNow = contractStartTime.fromNow();
+            console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
+
+      sf contracts ls
+
+    `);
+          }
+
+          return;
+        } else {
+          console.log(`Your order wasn't accepted yet. You can check it's status with:
+
+      sf orders ls
+
+    If you want to cancel the order, you can do so with:
+
+      sf orders cancel ${orderId}
+
+      `);
+
+          return;
+        }
+      }
+      default:
+        return logAndQuit(
+          `Failed to place order: Unexpected order status: ${res.status}`,
+        );
+    }
   }
+}
+
+function confirmPlaceOrderMessage(options: BuyOptions) {
+  if (!options.priceCenticents) {
+    return "";
+  }
+
+  const totalNodesLabel = c.green(options.quantity);
+  const instanceTypeLabel = c.green(options.instanceType);
+  const nodesLabel = options.quantity > 1 ? "nodes" : "node";
+
+  const durationHumanReadable = formatDuration(
+    options.endsAt.getTime() - options.startsAt.getTime(),
+  );
+  const endsAtLabel = c.green(
+    dayjs(options.endsAt).format("MM/DD/YYYY hh:mm A"),
+  );
+  const fromNowTime = dayjs(options.startsAt).fromNow();
+
+  let timeDescription: string;
+  if (
+    fromNowTime === "a few seconds ago" ||
+    fromNowTime === "in a few seconds"
+  ) {
+    timeDescription = `from ${c.green("now")} until ${endsAtLabel}`;
+  } else {
+    const startAtLabel = c.green(
+      dayjs(options.startsAt).format("MM/DD/YYYY hh:mm A"),
+    );
+    timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
+  }
+
+  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} for ${c.green(durationHumanReadable)} ${timeDescription}`;
+
+  const dollarsLabel = c.green(
+    centicentsToDollarsFormatted(options.priceCenticents),
+  );
+
+  const priceLine = `\nBuy for ${dollarsLabel}?`;
+
+  return `${topLine}\n${priceLine} `;
+}
+
+type BuyOptions = {
+  instanceType: string;
+  priceCenticents: number;
+  quantity: number;
+  startsAt: Date;
+  endsAt: Date;
+  confirmWithUser: boolean;
+  quoteOnly: boolean;
+};
+export async function placeBuyOrder(options: BuyOptions) {
+  const api = await apiClient();
+  const { data, error, response } = await api.POST("/v0/orders", {
+    body: {
+      side: "buy",
+      instance_type: options.instanceType,
+      quantity: options.quantity,
+      // round start date again because the user might take a long time to confirm
+      start_at: roundStartDate(options.startsAt).toISOString(),
+      end_at: options.endsAt.toISOString(),
+      price: options.priceCenticents,
+    },
+  });
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 400:
+        return logAndQuit(`Bad Request: ${error?.message}`);
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      case 500:
+        return logAndQuit(`Failed to place order: ${error?.message}`);
+      default:
+        return logAndQuit(`Failed to place order: ${response.statusText}`);
+    }
+  }
+
+  if (!data) {
+    return logAndQuit(
+      `Failed to place order: Unexpected response from server: ${response}`,
+    );
+  }
+
+  return data;
+}
+
+type QuoteOptions = {
+  instanceType: string;
+  priceCenticents: Nullable<number>;
+  quantity: number;
+  startsAt: Date;
+  durationSeconds: number;
+  confirmWithUser: boolean;
+  quoteOnly: boolean;
+};
+async function getQuote(options: QuoteOptions) {
+  const api = await apiClient();
+
+  const { data, error, response } = await api.GET("/v0/quote", {
+    params: {
+      query: {
+        side: "buy",
+        instance_type: options.instanceType,
+        quantity: options.quantity,
+        duration: options.durationSeconds,
+        min_start_date: options.startsAt.toISOString(),
+        max_start_date: options.startsAt.toISOString(),
+      },
+    },
+  });
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 400:
+        return logAndQuit(`Bad Request: ${error?.message}`);
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      case 500:
+        return logAndQuit(`Failed to get quote: ${error?.code}`);
+      default:
+        return logAndQuit(`Failed to get quote: ${response.statusText}`);
+    }
+  }
+
+  if (!data) {
+    return logAndQuit(
+      `Failed to get quote: Unexpected response from server: ${response}`,
+    );
+  }
+
+  return data.quote;
 }
 
 async function sleep(ms: number) {
@@ -88,284 +403,4 @@ async function tryToGetOrder(orderId: string) {
   }
 
   return undefined;
-}
-
-// --
-
-async function placeBuyOrderAction(options: SfBuyParamsNormalized) {
-  if (!options.priceCenticents) {
-    const { data: quote, err } = await quoteBuyOrderRequest({
-      instance_type: options.instanceType,
-      quantity: options.totalNodes,
-      duration: options.durationSeconds,
-      min_start_date: options.startsAt.iso,
-      max_start_date: options.startsAt.iso,
-    });
-
-    if (err?.code === ApiErrorCode.Quotes.NoAvailability) {
-      const durationInHours = options.durationSeconds / 3600;
-      const quantity = options.totalNodes;
-
-      // In the future, we should read from a price chart of yesterday's prices.
-      const todoEstimatedPriceInCents = 250;
-      const estimatedPrice =
-        todoEstimatedPriceInCents * quantity * durationInHours;
-      const estimatedPriceInDollars = estimatedPrice;
-
-      console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
-
-  sf buy -i ${options.instanceType} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInDollars / 100).toFixed(2)}" 
-        `);
-
-      return process.exit(1);
-    }
-
-    if (err) {
-      return logAndQuit(`Failed to get quote: ${err.message}`);
-    }
-
-    if (!quote) {
-      return logAndQuit("Failed to get quote: No quote data received");
-    }
-
-    options.priceCenticents = quote.price;
-  }
-
-  if (options.confirmWithUser) {
-    const confirmationMessage = confirmPlaceOrderMessage(options);
-    const confirmed = await confirm({
-      message: confirmationMessage,
-      default: false,
-    });
-
-    if (!confirmed) {
-      logAndQuit("Order cancelled");
-    }
-  }
-
-  // If the user is requesting the order to be placed immediately,
-  // we need to set the start time to the current time
-  // to avoid causing any delay from quoting
-  if (!options.startsAt.wasSetByUser) {
-    options.startsAt = {
-      iso: new Date().toISOString(),
-      date: new Date(),
-      wasSetByUser: false,
-    };
-  }
-  const { data: pendingOrder, err } = await placeBuyOrderRequest({
-    instance_type: options.instanceType,
-    quantity: options.totalNodes,
-    duration: options.durationSeconds,
-    start_at: options.startsAt.iso,
-    price: options.priceCenticents,
-  });
-  if (err) {
-    return logAndQuit(`Failed to place order: ${err.message}`);
-  }
-
-  if (pendingOrder && pendingOrder.status === OrderStatus.Pending) {
-    const orderId = pendingOrder.id;
-    const printOrderNumber = (status: string) =>
-      console.log(`\n${c.dim(`${orderId}\n\n`)}`);
-
-    const order = await tryToGetOrder(orderId);
-
-    if (!order) {
-      console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
-      return;
-    }
-    printOrderNumber(order.status);
-
-    if (order.status === "filled") {
-      const now = new Date();
-      const startAt = new Date(order.start_at);
-      const timeDiff = startAt.getTime() - now.getTime();
-      const oneMinuteInMs = 60 * 1000;
-
-      if (now >= startAt || timeDiff <= oneMinuteInMs) {
-        console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
-
-  sf instances ls
-
-`);
-      } else {
-        const contractStartTime = dayjs(startAt);
-        const timeFromNow = contractStartTime.fromNow();
-        console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
-
-  sf contracts ls
-
-`);
-      }
-
-      return;
-    } else {
-      console.log(`Your order wasn't accepted yet. You can check it's status with:
-
-  sf orders ls
-
-If you want to cancel the order, you can do so with:
-
-  sf orders cancel ${orderId}
-
-  `);
-
-      return;
-    }
-  }
-}
-
-function actualDuration(options: SfBuyParamsNormalized): number {
-  const now = new Date();
-  const startAt = new Date(options.startsAt.iso);
-  const requestedDuration = options.durationSeconds;
-
-  // If start time is in the future, return the requested duration
-  if (startAt > now) {
-    return requestedDuration;
-  }
-
-  // Calculate the time to the next hour
-  const nextHour = new Date(now);
-  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
-  const timeToNextHour = Math.ceil((nextHour.getTime() - now.getTime()) / 1000);
-
-  // Return the sum of time to next hour and requested duration
-  return timeToNextHour + requestedDuration;
-}
-
-function confirmPlaceOrderMessage(options: SfBuyParamsNormalized) {
-  if (!options.priceCenticents) {
-    return "";
-  }
-
-  const totalNodesLabel = c.green(options.totalNodes);
-  const instanceTypeLabel = c.green(options.instanceType);
-  const nodesLabel = options.totalNodes > 1 ? "nodes" : "node";
-  const durationHumanReadable = formatDuration(actualDuration(options) * 1000);
-  const endsAtLabel = c.green(
-    dayjs(options.endsAt.iso).format("MM/DD/YYYY hh:mm A"),
-  );
-  const fromNowTime = dayjs(options.startsAt.iso).fromNow();
-
-  let timeDescription: string;
-  if (
-    fromNowTime === "a few seconds ago" ||
-    fromNowTime === "in a few seconds"
-  ) {
-    timeDescription = `from ${c.green("now")} until ${endsAtLabel}`;
-  } else {
-    const startAtLabel = c.green(
-      dayjs(options.startsAt.iso).format("MM/DD/YYYY hh:mm A"),
-    );
-    timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
-  }
-
-  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} for ${c.green(durationHumanReadable)} ${timeDescription}`;
-
-  const dollarsLabel = c.green(
-    centicentsToDollarsFormatted(options.priceCenticents),
-  );
-
-  const priceLine = `\nBuy for ${dollarsLabel}?`;
-
-  return `${topLine}\n${priceLine} `;
-}
-
-// --
-
-async function quoteBuyOrderAction(options: SfBuyParamsNormalized) {
-  const { data: quote, err } = await quoteBuyOrderRequest({
-    instance_type: options.instanceType,
-    quantity: options.totalNodes,
-    duration: options.durationSeconds,
-    min_start_date: options.startsAt.iso,
-    max_start_date: options.startsAt.iso,
-  });
-  if (err) {
-    if (err.code === ApiErrorCode.Quotes.NoAvailability) {
-      return logAndQuit("Not enough data exists to quote this order.");
-    }
-
-    return logAndQuit(`Failed to quote order: ${err.message}`);
-  }
-
-  if (quote) {
-    const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
-
-    console.log(`This order is projected to cost ${priceLabelUsd}`);
-  }
-}
-
-// --
-
-interface SfBuyParamsNormalized {
-  instanceType: string;
-  totalNodes: number;
-  durationSeconds: number;
-  priceCenticents: Nullable<number>;
-  startsAt: {
-    iso: string;
-    date: Date;
-    wasSetByUser: boolean;
-  };
-  endsAt: {
-    iso: string;
-    date: Date;
-  };
-  confirmWithUser: boolean;
-  quoteOnly: boolean;
-}
-function normalizeSfBuyOptions(options: SfBuyOptions): SfBuyParamsNormalized {
-  const isQuoteOnly = options.quote ?? false;
-
-  // parse duration
-  const durationSeconds = parseDuration(options.duration, "s");
-  if (!durationSeconds) {
-    logAndQuit(`Invalid duration: ${options.duration}`);
-    process.exit(1); // make typescript happy
-  }
-
-  // parse price
-  let priceCenticents: Nullable<Centicents> = null;
-  if (options.price) {
-    const { centicents: priceParsed, invalid: priceInputInvalid } =
-      priceWholeToCenticents(options.price);
-    if (priceInputInvalid) {
-      logAndQuit(`Invalid price: ${options.price}`);
-      process.exit(1);
-    }
-    priceCenticents = priceParsed;
-  }
-
-  // parse starts at
-  const startDate = options.start
-    ? chrono.parseDate(options.start)
-    : new Date();
-  if (!startDate) {
-    logAndQuit("Invalid start date");
-    process.exit(1);
-  }
-
-  const yesFlagOmitted = options.yes === undefined || options.yes === null;
-  const confirmWithUser = yesFlagOmitted || !options.yes;
-
-  return {
-    instanceType: options.type,
-    totalNodes: options.nodes ? Number(options.nodes) : 1,
-    durationSeconds,
-    priceCenticents,
-    startsAt: {
-      iso: startDate.toISOString(),
-      date: startDate,
-      wasSetByUser: options.start !== undefined,
-    },
-    endsAt: {
-      iso: dayjs(startDate).add(durationSeconds, "s").toISOString(),
-      date: dayjs(startDate).add(durationSeconds, "s").toDate(),
-    },
-    confirmWithUser: confirmWithUser,
-    quoteOnly: isQuoteOnly,
-  };
 }

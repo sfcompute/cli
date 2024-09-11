@@ -1,11 +1,19 @@
 import * as chrono from "chrono-node";
 import type { Command } from "commander";
+import dayjs from "dayjs";
 import parseDuration from "parse-duration";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
-import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
-import { fetchAndHandleErrors } from "../helpers/fetch";
-import { priceWholeToCenticents } from "../helpers/units";
-import { getApiUrl } from "../helpers/urls";
+import { apiClient } from "../apiClient";
+import { isLoggedIn } from "../helpers/config";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
+import {
+  priceWholeToCenticents,
+  roundEndDate,
+  roundStartDate,
+} from "../helpers/units";
 import type { PlaceSellOrderParameters } from "./orders";
 
 export function registerSell(program: Command) {
@@ -58,12 +66,16 @@ async function placeSellOrder(options: {
   if (!durationSecs) {
     return logAndQuit("Invalid duration");
   }
-  const startDate = options.start
-    ? chrono.parseDate(options.start)
-    : new Date();
+
+  let startDate = options.start ? chrono.parseDate(options.start) : new Date();
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
+
+  startDate = roundStartDate(startDate);
+
+  let endDate = dayjs(startDate).add(durationSecs, "s").toDate();
+  endDate = roundEndDate(endDate);
 
   const { centicents: priceCenticents, invalid } = priceWholeToCenticents(
     options.price,
@@ -77,27 +89,30 @@ async function placeSellOrder(options: {
     quantity: forceAsNumber(options.nodes),
     price: priceCenticents,
     contract_id: options.contractId,
-    duration: durationSecs,
     start_at: startDate.toISOString(),
+    end_at: endDate.toISOString(),
     ...flags,
   };
 
-  const res = await postSellOrder(params);
-  if (!res.ok) {
-    return logAndQuit("Failed to place sell order");
+  const api = await apiClient();
+  const { data, error, response } = await api.POST("/v0/orders", {
+    body: params,
+  });
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 400:
+        return logAndQuit(
+          `Bad Request: ${error?.message}: ${JSON.stringify(error?.details, null, 2)}`,
+        );
+      // return logAndQuit(`Bad Request: ${error?.message}`);
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      default:
+        return logAndQuit(`Failed to place sell order: ${response.statusText}`);
+    }
   }
-  const data = await res.json();
+
   console.log(data);
   process.exit(0);
-}
-
-async function postSellOrder(params: PlaceSellOrderParameters) {
-  return await fetchAndHandleErrors(await getApiUrl("orders_create"), {
-    method: "POST",
-    body: JSON.stringify(params),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
-    },
-  });
 }
