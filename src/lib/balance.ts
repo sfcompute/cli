@@ -75,7 +75,7 @@ export type BalanceUsdCenticents = {
   available: { centicents: Centicents; whole: number };
   reserved: { centicents: Centicents; whole: number };
 };
-async function getBalance(): Promise<BalanceUsdCenticents> {
+export async function getBalance(): Promise<BalanceUsdCenticents> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
@@ -109,7 +109,7 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
   let available: number;
   switch (data.available.currency) {
     case "usd":
-      available = data.available.amount / 10_000;
+      available = data.available.amount;
       break;
     default:
       logAndQuit(`Unsupported currency: ${data.available.currency}`);
@@ -118,7 +118,7 @@ async function getBalance(): Promise<BalanceUsdCenticents> {
   let reserved: number;
   switch (data.reserved.currency) {
     case "usd":
-      reserved = data.reserved.amount / 10_000;
+      reserved = data.reserved.amount;
       break;
     default:
       logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
