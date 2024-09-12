@@ -27,6 +27,17 @@ export function registerUp(program: Command) {
     });
 }
 
+export function registerDown(program: Command) {
+    const cmd = program
+        .command("down")
+        .description("Turn off nodes")
+        .option("-t, --type <type>", "Specify the type of node", "h100i");
+
+    cmd.action(async (options) => {
+        down(options);
+    });
+}
+
 const DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTICENTS = 2.65 * 8 * 10_000;
 
 async function getDefaultProcurementOptions(props: {
@@ -106,13 +117,13 @@ function confirmPlaceOrderMessage(options: {
 
     const timeDescription = `starting ${c.green("ASAP")} until you turn it off`;
 
-    const topLine = `Turn on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${c.green(formatDuration(durationInMilliseconds))} ${timeDescription}`;
+    const topLine = `Turning on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${c.green(formatDuration(durationInMilliseconds))} ${timeDescription}`;
 
     const dollarsLabel = c.green(
-        centicentsToDollarsFormatted(options.pricePerNodeHourInCenticents * options.durationHours * options.n),
+        centicentsToDollarsFormatted(options.pricePerNodeHourInCenticents),
     );
 
-    const priceLine = `\n Pay a minimum of ${dollarsLabel}?`;
+    const priceLine = `\n Pay ${dollarsLabel} per node hour?`;
 
     return `${topLine}\n${priceLine} `;
 }
@@ -187,7 +198,7 @@ async function up(props: {
                     quantity: n,
 
                     // we only update the duration & price if it's set
-                    block_duration_in_hours: props.duration ? durationHours : undefined,
+                    min_duration_in_hours: props.duration ? durationHours : undefined,
                     max_price_per_node_hour: props.price ? pricePerNodeHourInCenticents : undefined,
                 },
             });
@@ -200,7 +211,7 @@ async function up(props: {
             instance_type: type,
             quantity: n,
             max_price_per_node_hour: pricePerNodeHourInCenticents,
-            block_duration_in_hours: Math.max(durationHours, 1),
+            min_duration_in_hours: Math.max(durationHours, 1),
         },
     });
 
@@ -212,3 +223,41 @@ async function up(props: {
     return res.data;
 }
 
+async function down(props: {
+    type: string;
+}) {
+    const client = await apiClient();
+
+    // check if there's already a procurement like this
+    const procurements = await client.GET("/v0/procurements");
+    if (!procurements.response.ok) {
+        console.error(procurements.error?.message, procurements.error?.details);
+        throw new Error("Failed to list procurements");
+    }
+
+    const procurement = procurements.data?.data.find((p: any) => p.instance_group === props.type);
+
+    if (!procurement) {
+        console.error(`No procurement found for ${props.type}`);
+        return;
+    }
+
+    const res = await client.PUT("/v0/procurements/{id}", {
+        params: {
+            path: {
+                id: procurement.id,
+            },
+        },
+        body: {
+            quantity: 0,
+            block_duration_in_hours: 0,
+        },
+    });
+
+    if (!res.response.ok) {
+        console.error(res.error?.message, res.error?.details);
+        throw new Error("Failed to turn off nodes");
+    }
+
+    return res.data;
+}
