@@ -135,7 +135,6 @@ function printAsTable(orders: Array<HydratedOrder>) {
       const duration = formatDuration(
         dayjs(order.end_at).diff(dayjs(startDate), "ms"),
       );
-      console.log(order.price);
       table.push([
         order.id,
         order.side,
