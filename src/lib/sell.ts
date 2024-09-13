@@ -18,6 +18,9 @@ import type { PlaceSellOrderParameters } from "./orders";
 import { GPUS_PER_NODE } from "./constants";
 import { pricePerGPUHourToTotalPrice } from "../helpers/price";
 import ora from "ora";
+import chalk from "chalk";
+import { getContract, getOrder } from "../helpers/fetchers";
+import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 
 export function registerSell(program: Command) {
   program
@@ -51,18 +54,6 @@ function forceAsNumber(value: string | number): number {
   return Number.parseFloat(value);
 }
 
-async function getContract(contractId: string) {
-  const api = await apiClient();
-  const { data, response } = await api.GET("/v0/contracts/{id}", {
-    params: {
-      path: { id: contractId },
-    },
-  });
-  if (!response.ok) {
-    return logAndQuit(`Failed to get contract: ${response.statusText}`);
-  }
-  return data;
-}
 
 function contractStartAndEnd(contract: {
   shape: {
@@ -74,41 +65,6 @@ function contractStartAndEnd(contract: {
   const endDate = dayjs(contract.shape.intervals[contract.shape.intervals.length - 1]).toDate();
 
   return { startDate, endDate };
-}
-
-async function getOrder(orderId: string) {
-  const api = await apiClient();
-  const { data, response, error } = await api.GET("/v0/orders/{id}", {
-    params: {
-      path: { id: orderId },
-    },
-  });
-  if (!response.ok) {
-    // @ts-ignore
-    if (error?.code === "order.not_found") {
-      return null;
-    }
-    return logAndQuit(`Failed to get order: ${response.statusText}`);
-  }
-  return data;
-}
-
-async function waitForOrderToNotBePending(orderId: string) {
-  const spinner = ora(`Order ${orderId} - pending`).start();
-  const maxTries = 10;
-  for (let i = 0; i < maxTries; i++) {
-    const order = await getOrder(orderId);
-
-    if (order && order?.status !== "pending") {
-      spinner.text = `Order ${orderId} - ${order?.status}`;
-      spinner.succeed();
-      return order;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-
-  spinner.fail();
-  return logAndQuit(`Order ${orderId} - possibly failed`);
 }
 
 async function placeSellOrder(options: {
@@ -139,6 +95,11 @@ async function placeSellOrder(options: {
     return logAndQuit(`Contract ${options.contractId} is currently pending. Please try again in a few seconds.`);
   }
 
+  if (options.accelerators % GPUS_PER_NODE !== 0) {
+    const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
+    return logAndQuit(`At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`);
+  }
+
   const { startDate: contractStartDate, endDate: contractEndDate } = contractStartAndEnd({
     shape: {
       intervals: contract.shape.intervals,
@@ -165,15 +126,16 @@ async function placeSellOrder(options: {
   endDate = roundEndDate(endDate);
   // if the end date is longer than the contract, use the contract end date
   if (endDate > contractEndDate) {
-    endDate = contractEndDate;
+    endDate = roundEndDate(contractEndDate);
   }
   const totalDurationSecs = dayjs(endDate).diff(startDate, "s");
+  const nodes = Math.ceil(options.accelerators / GPUS_PER_NODE);
 
-  const totalPrice = pricePerGPUHourToTotalPrice(priceCenticents, totalDurationSecs, options.accelerators, GPUS_PER_NODE);
+  const totalPrice = pricePerGPUHourToTotalPrice(priceCenticents, totalDurationSecs, nodes, GPUS_PER_NODE);
 
   const params: PlaceSellOrderParameters = {
     side: "sell",
-    quantity: forceAsNumber(options.accelerators) * GPUS_PER_NODE,
+    quantity: forceAsNumber(options.accelerators) / GPUS_PER_NODE,
     price: totalPrice,
     contract_id: options.contractId,
     start_at: startDate.toISOString(),

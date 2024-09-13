@@ -24,6 +24,7 @@ import type { Nullable } from "../types/empty";
 import { formatDuration } from "./orders";
 import { pricePerGPUHourToTotalPrice, totalPriceToPricePerGPUHour } from "../helpers/price";
 import { GPUS_PER_NODE } from "./constants";
+import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -197,7 +198,12 @@ async function buyOrderAction(options: SfBuyOptions) {
       quoteOnly: isQuoteOnly,
     });
 
-    switch (res.status) {
+    const order = await waitForOrderToNotBePending(res.id);
+    if (!order) {
+      return;
+    }
+
+    switch (order.status) {
       case "pending": {
         const orderId = res.id;
         const printOrderNumber = (status: string) =>
