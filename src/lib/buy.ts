@@ -295,12 +295,13 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
 
   const dollarsLabel = c.green(
     centicentsToDollarsFormatted(
-      pricePerGPUHour * options.quantity * GPUS_PER_NODE,
+      pricePerGPUHour,
     ),
   );
 
+  const gpusLabel = c.green(options.quantity * GPUS_PER_NODE);
 
-  const priceLine = `\nBuy at ${dollarsLabel} per hour?`;
+  const priceLine = `\nBuy ${gpusLabel} GPUs at ${dollarsLabel} per GPU hour?`;
 
   return `${topLine}\n${priceLine} `;
 }
