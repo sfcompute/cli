@@ -23,6 +23,7 @@ import {
 import type { Nullable } from "../types/empty";
 import { formatDuration } from "./orders";
 import { pricePerGPUHourToTotalPrice, totalPriceToPricePerGPUHour } from "../helpers/price";
+import { GPUS_PER_NODE } from "./constants";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -36,8 +37,6 @@ interface SfBuyOptions {
   yes?: boolean;
   quote?: boolean;
 }
-
-const GPUS_PER_NODE = 8;
 
 export function registerBuy(program: Command) {
   program

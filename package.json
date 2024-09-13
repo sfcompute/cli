@@ -21,7 +21,7 @@
     "inquirer": "^10.1.2",
     "node-fetch": "^3.3.2",
     "openapi-fetch": "^0.11.1",
-    "ora": "^8.0.1",
+    "ora": "^8.1.0",
     "parse-duration": "^1.1.0"
   },
   "devDependencies": {
