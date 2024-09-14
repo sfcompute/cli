@@ -154,15 +154,9 @@ async function buyOrderAction(options: SfBuyOptions) {
       if (!quote) {
         const durationInHours = durationSeconds / 3600;
 
-        // In the future, we should read from a price chart of yesterday's prices.
-        // For now, we'll just suggest 2.50 / gpu-hour as a default
-        const todoEstimatedPricePerNodeCents = 250 * 8; // $2.50 / gpu-hour * 8 gpus
-        const estimatedPriceInCents =
-          todoEstimatedPricePerNodeCents * quantity * durationInHours; // multiply by desired quantity and duration to get total estimated price in cents
-
         console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
 
-    sf buy -i ${options.type} -d "${durationInHours}h" -n ${quantity} -p "$${(estimatedPriceInCents / 100).toFixed(2)}" 
+    sf buy -d "${durationInHours}h" -n ${quantity * GPUS_PER_NODE} -p "2.50" 
           `);
 
         return process.exit(1);
