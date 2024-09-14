@@ -218,62 +218,48 @@ async function buyOrderAction(options: SfBuyOptions) {
       return;
     }
 
-    switch (order.status) {
-      case "pending": {
-        const orderId = res.id;
-        const printOrderNumber = (status: string) =>
-          console.log(`\n${c.dim(`${orderId}\n\n`)}`);
+    if (order.status === "filled") {
+      const now = new Date();
+      const startAt = new Date(order.start_at);
+      const timeDiff = startAt.getTime() - now.getTime();
+      const oneMinuteInMs = 60 * 1000;
 
-        const order = await tryToGetOrder(orderId);
+      if (now >= startAt || timeDiff <= oneMinuteInMs) {
+        console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
 
-        if (!order) {
-          console.log(`\n${c.dim(`Order ${orderId} is pending`)}`);
-          return;
-        }
-        printOrderNumber(order.status);
+  sf instances ls
 
-        if (order.status === "filled") {
-          const now = new Date();
-          const startAt = new Date(order.start_at);
-          const timeDiff = startAt.getTime() - now.getTime();
-          const oneMinuteInMs = 60 * 1000;
+`);
+      } else {
+        const contractStartTime = dayjs(startAt);
+        const timeFromNow = contractStartTime.fromNow();
+        console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
 
-          if (now >= startAt || timeDiff <= oneMinuteInMs) {
-            console.log(`Your nodes are currently spinning up. Once they're online, you can view them using:
+  sf contracts ls
 
-      sf instances ls
+`);
+      }
+      return
+    }
 
-    `);
-          } else {
-            const contractStartTime = dayjs(startAt);
-            const timeFromNow = contractStartTime.fromNow();
-            console.log(`Your contract begins ${c.green(timeFromNow)}. You can view more details using:
+    if (order.status === "open") {
+      console.log(`Your order wasn't accepted yet. You can check it's status with:
 
-      sf contracts ls
+        sf orders ls
+  
+      If you want to cancel the order, you can do so with:
+  
+        sf orders cancel ${order.id}
+  
+        `);
+      return
+    }
 
-    `);
-          }
-
-          return;
-        } else {
-          console.log(`Your order wasn't accepted yet. You can check it's status with:
+    console.error(`Order likely did not execute. Check the status with:
 
       sf orders ls
 
-    If you want to cancel the order, you can do so with:
-
-      sf orders cancel ${orderId}
-
-      `);
-
-          return;
-        }
-      }
-      default:
-        return logAndQuit(
-          `Failed to place order: Unexpected order status: ${res.status}`,
-        );
-    }
+    `);
   }
 }
 
