@@ -9,18 +9,16 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
+import { getContract } from "../helpers/fetchers";
+import { pricePerGPUHourToTotalPrice } from "../helpers/price";
 import {
   priceWholeToCenticents,
   roundEndDate,
   roundStartDate,
 } from "../helpers/units";
-import type { PlaceSellOrderParameters } from "./orders";
-import { GPUS_PER_NODE } from "./constants";
-import { pricePerGPUHourToTotalPrice } from "../helpers/price";
-import ora from "ora";
-import chalk from "chalk";
-import { getContract, getOrder } from "../helpers/fetchers";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
+import { GPUS_PER_NODE } from "./constants";
+import type { PlaceSellOrderParameters } from "./orders";
 
 export function registerSell(program: Command) {
   program
@@ -29,14 +27,8 @@ export function registerSell(program: Command) {
     .requiredOption("-p, --price <price>", "The price in dollars, per GPU hour")
     .requiredOption("-c, --contract-id <id>", "Specify the contract ID")
     .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
-    .option(
-      "-s, --start <start>",
-      "Specify the start time (ISO 8601 format)",
-    )
-    .option(
-      "-d, --duration <duration>",
-      "Specify the duration in seconds",
-    )
+    .option("-s, --start <start>", "Specify the start time (ISO 8601 format)")
+    .option("-d, --duration <duration>", "Specify the duration in seconds")
     .option(
       "-f, --flags <flags>",
       "Specify additional flags as JSON",
@@ -54,15 +46,16 @@ function forceAsNumber(value: string | number): number {
   return Number.parseFloat(value);
 }
 
-
 function contractStartAndEnd(contract: {
   shape: {
-    intervals: string[] // date strings
-    quantities: number[]
-  }
+    intervals: string[]; // date strings
+    quantities: number[];
+  };
 }) {
   const startDate = dayjs(contract.shape.intervals[0]).toDate();
-  const endDate = dayjs(contract.shape.intervals[contract.shape.intervals.length - 1]).toDate();
+  const endDate = dayjs(
+    contract.shape.intervals[contract.shape.intervals.length - 1],
+  ).toDate();
 
   return { startDate, endDate };
 }
@@ -92,22 +85,29 @@ async function placeSellOrder(options: {
   }
 
   if (contract?.status === "pending") {
-    return logAndQuit(`Contract ${options.contractId} is currently pending. Please try again in a few seconds.`);
+    return logAndQuit(
+      `Contract ${options.contractId} is currently pending. Please try again in a few seconds.`,
+    );
   }
 
   if (options.accelerators % GPUS_PER_NODE !== 0) {
     const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
-    return logAndQuit(`At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`);
+    return logAndQuit(
+      `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
+    );
   }
 
-  const { startDate: contractStartDate, endDate: contractEndDate } = contractStartAndEnd({
-    shape: {
-      intervals: contract.shape.intervals,
-      quantities: contract.shape.quantities,
-    }
-  });
+  const { startDate: contractStartDate, endDate: contractEndDate } =
+    contractStartAndEnd({
+      shape: {
+        intervals: contract.shape.intervals,
+        quantities: contract.shape.quantities,
+      },
+    });
 
-  let startDate = options.start ? chrono.parseDate(options.start) : contractStartDate;
+  let startDate = options.start
+    ? chrono.parseDate(options.start)
+    : contractStartDate;
   if (!startDate) {
     return logAndQuit("Invalid start date");
   }
@@ -131,7 +131,12 @@ async function placeSellOrder(options: {
   const totalDurationSecs = dayjs(endDate).diff(startDate, "s");
   const nodes = Math.ceil(options.accelerators / GPUS_PER_NODE);
 
-  const totalPrice = pricePerGPUHourToTotalPrice(priceCenticents, totalDurationSecs, nodes, GPUS_PER_NODE);
+  const totalPrice = pricePerGPUHourToTotalPrice(
+    priceCenticents,
+    totalDurationSecs,
+    nodes,
+    GPUS_PER_NODE,
+  );
 
   const params: PlaceSellOrderParameters = {
     side: "sell",

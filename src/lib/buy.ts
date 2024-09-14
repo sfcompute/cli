@@ -14,17 +14,20 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import {
+  pricePerGPUHourToTotalPrice,
+  totalPriceToPricePerGPUHour,
+} from "../helpers/price";
+import {
   type Centicents,
   centicentsToDollarsFormatted,
   priceWholeToCenticents,
   roundEndDate,
   roundStartDate,
 } from "../helpers/units";
-import type { Nullable } from "../types/empty";
-import { formatDuration } from "./orders";
-import { pricePerGPUHourToTotalPrice, totalPriceToPricePerGPUHour } from "../helpers/price";
-import { GPUS_PER_NODE } from "./constants";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
+import type { Nullable } from "../types/empty";
+import { GPUS_PER_NODE } from "./constants";
+import { formatDuration } from "./orders";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -74,7 +77,9 @@ async function buyOrderAction(options: SfBuyOptions) {
 
   if (accelerators % GPUS_PER_NODE !== 0) {
     const exampleCommand = `sf buy -n ${GPUS_PER_NODE} -d "${options.duration}"`;
-    return logAndQuit(`At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`);
+    return logAndQuit(
+      `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
+    );
   }
   const quantity = Math.ceil(accelerators / GPUS_PER_NODE);
 
@@ -89,10 +94,15 @@ async function buyOrderAction(options: SfBuyOptions) {
     priceCenticents = priceParsed;
   }
 
-  // Convert the price to the total price of the contract 
+  // Convert the price to the total price of the contract
   // (price per gpu hour * gpus per node * quantity * duration in hours)
   if (priceCenticents) {
-    priceCenticents = pricePerGPUHourToTotalPrice(priceCenticents, durationSeconds, quantity, GPUS_PER_NODE);
+    priceCenticents = pricePerGPUHourToTotalPrice(
+      priceCenticents,
+      durationSeconds,
+      quantity,
+      GPUS_PER_NODE,
+    );
   }
 
   const yesFlagOmitted = options.yes === undefined || options.yes === null;
@@ -117,9 +127,20 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
 
     const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
-    const priceLabelPerGPUHour = c.green(centicentsToDollarsFormatted(totalPriceToPricePerGPUHour(quote.price, durationSeconds, quantity, GPUS_PER_NODE)));
+    const priceLabelPerGPUHour = c.green(
+      centicentsToDollarsFormatted(
+        totalPriceToPricePerGPUHour(
+          quote.price,
+          durationSeconds,
+          quantity,
+          GPUS_PER_NODE,
+        ),
+      ),
+    );
 
-    console.log(`This order is projected to cost ${priceLabelUsd} total or ${priceLabelPerGPUHour} per GPU hour`);
+    console.log(
+      `This order is projected to cost ${priceLabelUsd} total or ${priceLabelPerGPUHour} per GPU hour`,
+    );
   } else {
     // quote if no price was provided
     if (!priceCenticents) {
@@ -292,17 +313,21 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
 
-  const durationInSeconds = options.endsAt.getTime() / 1000 - options.startsAt.getTime() / 1000;
-  const pricePerGPUHour = totalPriceToPricePerGPUHour(options.priceCenticents, durationInSeconds, options.quantity, GPUS_PER_NODE);
-  const pricePerHourLabel = c.green(centicentsToDollarsFormatted(pricePerGPUHour));
+  const durationInSeconds =
+    options.endsAt.getTime() / 1000 - options.startsAt.getTime() / 1000;
+  const pricePerGPUHour = totalPriceToPricePerGPUHour(
+    options.priceCenticents,
+    durationInSeconds,
+    options.quantity,
+    GPUS_PER_NODE,
+  );
+  const pricePerHourLabel = c.green(
+    centicentsToDollarsFormatted(pricePerGPUHour),
+  );
 
   const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
-  const dollarsLabel = c.green(
-    centicentsToDollarsFormatted(
-      pricePerGPUHour,
-    ),
-  );
+  const dollarsLabel = c.green(centicentsToDollarsFormatted(pricePerGPUHour));
 
   const gpusLabel = c.green(options.quantity * GPUS_PER_NODE);
 
