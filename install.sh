@@ -5,13 +5,13 @@ GITHUB_REPO="sfcompute/cli"
 BINARY_NAME="sf"
 
 # Check the operating system
-OS="$(uname)"
+OS="$(uname -ms)"
 
 # If the operating system is Linux, set the target directory to '/usr/local/bin'
 # If the operating system is Darwin (macOS), set the target directory to '${HOME}/.local/bin'
-if [[ "$OS" == "Linux" ]]; then
+if [[ "$OS" == "Linux"* ]]; then
   TARGET_DIR="/usr/local/bin"
-elif [[ "$OS" == "Darwin" ]]; then
+elif [[ "$OS" == "Darwin"* ]]; then
   TARGET_DIR="${HOME}/.local/bin"
 else
   echo "Unsupported operating system: $OS"
@@ -48,20 +48,20 @@ mkdir -p "${TARGET_DIR}"
 # Define the target file path for the 'sf' CLI binary.
 TARGET_FILE="${TARGET_DIR}/${BINARY_NAME}"
 
-case $(uname -ms) in
-'Darwin x86_64')
-    target=bun-darwin-x64
-    ;;
-'Darwin arm64')
-    target=bun-darwin-arm64
-    ;;
-'Linux x86_64' | *)
-    target=bun-linux-x64
-    ;;
-'Linux aarch64')
-    target=bun-linux-arm64
-    ;;
-esac
+if [[ "$OS" == "Linux"* ]]; then
+  if [[ "$OS" == 'Linux aarch64' ]]; then
+    target='bun-linux-arm64'
+  else 
+    target='bun-linux-x64'
+  fi  
+elif [[ "$OS" == "Darwin"* ]]; then
+  sys="$(sysctl -n machdep.cpu.brand_string)"
+  if [[ $sys == *"M1"* || $sys == *"M2"* ]]; then
+    target='bun-darwin-arm64'
+  else
+    target='bun-darwin-x64'
+  fi  
+fi
 
 # Set up temporary directory for download and extraction
 TMPDIR=$(mktemp -d)
