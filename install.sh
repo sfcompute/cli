@@ -57,8 +57,10 @@ if [[ "$OS" == "Linux"* ]]; then
 elif [[ "$OS" == "Darwin"* ]]; then
   sys="$(sysctl -n machdep.cpu.brand_string)"
   if [[ $sys == *"M1"* || $sys == *"M2"* || $sys == *"M3"* ]]; then
+    echo "Installing for Apple Silicon"
     target='bun-darwin-arm64'
   else
+    echo "Installing for Intel Mac"
     target='bun-darwin-x64'
   fi  
 fi
