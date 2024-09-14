@@ -164,6 +164,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/procurements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getV0Procurements"];
+    put?: never;
+    post: operations["postV0Procurements"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/procurements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getV0ProcurementsById"];
+    put: operations["putV0ProcurementsById"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1455,6 +1487,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description SSH credentials and associated Linux user to be set up on the VM when it spins up. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -1985,6 +2018,428 @@ export interface operations {
             code: "not_authenticated";
             message: string;
             details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0Procurements: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The TOTAL price (in centicents) to buy the duration */
+              max_price: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The TOTAL price (in centicents) to buy the duration */
+              max_price: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The TOTAL price (in centicents) to buy the duration */
+              max_price: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            /** @constant */
+            object: "list";
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  postV0Procurements: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          block_duration_in_hours: number;
+        };
+        "multipart/form-data": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          block_duration_in_hours: number;
+        };
+        "text/plain": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          block_duration_in_hours: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0ProcurementsById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  putV0ProcurementsById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          quantity?: number;
+          /** @description The TOTAL price (in centicents) to buy the duration */
+          max_price?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+        "multipart/form-data": {
+          quantity?: number;
+          /** @description The TOTAL price (in centicents) to buy the duration */
+          max_price?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+        "text/plain": {
+          quantity?: number;
+          /** @description The TOTAL price (in centicents) to buy the duration */
+          max_price?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The TOTAL price (in centicents) to buy the duration */
+            max_price: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
           };
         };
       };

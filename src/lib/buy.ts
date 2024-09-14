@@ -22,13 +22,16 @@ import {
 } from "../helpers/units";
 import type { Nullable } from "../types/empty";
 import { formatDuration } from "./orders";
+import { pricePerGPUHourToTotalPrice, totalPriceToPricePerGPUHour } from "../helpers/price";
+import { GPUS_PER_NODE } from "./constants";
+import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 interface SfBuyOptions {
   type: string;
-  nodes?: string;
+  accelerators?: string;
   duration: string;
   price: string;
   start?: string;
@@ -40,10 +43,10 @@ export function registerBuy(program: Command) {
   program
     .command("buy")
     .description("Place a buy order")
-    .requiredOption("-t, --type <type>", "Specify the type of node")
-    .option("-n, --nodes <quantity>", "Specify the number of nodes")
+    .requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
+    .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
-    .option("-p, --price <price>", "Specify the price")
+    .option("-p, --price <price>", "The price in dollars, per GPU hour")
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option("--quote", "Only provide a quote for the order")
@@ -66,6 +69,15 @@ async function buyOrderAction(options: SfBuyOptions) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
   }
 
+  // default to 1 node if not specified
+  const accelerators = options.accelerators ? Number(options.accelerators) : 1;
+
+  if (accelerators % GPUS_PER_NODE !== 0) {
+    const exampleCommand = `sf buy -n ${GPUS_PER_NODE} -d "${options.duration}"`;
+    return logAndQuit(`At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`);
+  }
+  const quantity = Math.ceil(accelerators / GPUS_PER_NODE);
+
   // parse price
   let priceCenticents: Nullable<Centicents> = null;
   if (options.price) {
@@ -77,6 +89,12 @@ async function buyOrderAction(options: SfBuyOptions) {
     priceCenticents = priceParsed;
   }
 
+  // Convert the price to the total price of the contract 
+  // (price per gpu hour * gpus per node * quantity * duration in hours)
+  if (priceCenticents) {
+    priceCenticents = pricePerGPUHourToTotalPrice(priceCenticents, durationSeconds, quantity, GPUS_PER_NODE);
+  }
+
   const yesFlagOmitted = options.yes === undefined || options.yes === null;
   const confirmWithUser = yesFlagOmitted || !options.yes;
 
@@ -86,18 +104,12 @@ async function buyOrderAction(options: SfBuyOptions) {
     return logAndQuit("Invalid start date");
   }
 
-  // default to 1 node if not specified
-  const quantity = options.nodes ? Number(options.nodes) : 1;
-
   if (options.quote) {
     const quote = await getQuote({
       instanceType: options.type,
-      priceCenticents,
       quantity: quantity,
       startsAt: startDate,
       durationSeconds,
-      confirmWithUser,
-      quoteOnly: isQuoteOnly,
     });
 
     if (!quote) {
@@ -105,19 +117,17 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
 
     const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
+    const priceLabelPerGPUHour = c.green(centicentsToDollarsFormatted(totalPriceToPricePerGPUHour(quote.price, durationSeconds, quantity, GPUS_PER_NODE)));
 
-    console.log(`This order is projected to cost ${priceLabelUsd}`);
+    console.log(`This order is projected to cost ${priceLabelUsd} total or ${priceLabelPerGPUHour} per GPU hour`);
   } else {
     // quote if no price was provided
     if (!priceCenticents) {
       const quote = await getQuote({
         instanceType: options.type,
-        priceCenticents,
         quantity: quantity,
         startsAt: startDate,
         durationSeconds,
-        confirmWithUser,
-        quoteOnly: isQuoteOnly,
       });
 
       if (!quote) {
@@ -140,6 +150,14 @@ async function buyOrderAction(options: SfBuyOptions) {
       priceCenticents = quote.price;
       durationSeconds = quote.duration;
       startDate = new Date(quote.start_at);
+    }
+
+    if (!durationSeconds) {
+      throw new Error("unexpectly no duration provided");
+    }
+
+    if (!priceCenticents) {
+      throw new Error("unexpectly no price provided");
     }
 
     // round the start and end dates. If we came from a quote, they should already be rounded,
@@ -180,7 +198,12 @@ async function buyOrderAction(options: SfBuyOptions) {
       quoteOnly: isQuoteOnly,
     });
 
-    switch (res.status) {
+    const order = await waitForOrderToNotBePending(res.id);
+    if (!order) {
+      return;
+    }
+
+    switch (order.status) {
       case "pending": {
         const orderId = res.id;
         const printOrderNumber = (status: string) =>
@@ -269,13 +292,21 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
 
-  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} for ${c.green(durationHumanReadable)} ${timeDescription}`;
+  const durationInSeconds = options.endsAt.getTime() / 1000 - options.startsAt.getTime() / 1000;
+  const pricePerGPUHour = totalPriceToPricePerGPUHour(options.priceCenticents, durationInSeconds, options.quantity, GPUS_PER_NODE);
+  const pricePerHourLabel = c.green(centicentsToDollarsFormatted(pricePerGPUHour));
+
+  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
   const dollarsLabel = c.green(
-    centicentsToDollarsFormatted(options.priceCenticents),
+    centicentsToDollarsFormatted(
+      pricePerGPUHour,
+    ),
   );
 
-  const priceLine = `\nBuy for ${dollarsLabel}?`;
+  const gpusLabel = c.green(options.quantity * GPUS_PER_NODE);
+
+  const priceLine = `\nBuy ${gpusLabel} GPUs at ${dollarsLabel} per GPU hour?`;
 
   return `${topLine}\n${priceLine} `;
 }
@@ -327,14 +358,11 @@ export async function placeBuyOrder(options: BuyOptions) {
 
 type QuoteOptions = {
   instanceType: string;
-  priceCenticents: Nullable<number>;
   quantity: number;
   startsAt: Date;
   durationSeconds: number;
-  confirmWithUser: boolean;
-  quoteOnly: boolean;
 };
-async function getQuote(options: QuoteOptions) {
+export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
   const { data, error, response } = await api.GET("/v0/quote", {
