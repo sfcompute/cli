@@ -56,7 +56,7 @@ if [[ "$OS" == "Linux"* ]]; then
   fi  
 elif [[ "$OS" == "Darwin"* ]]; then
   sys="$(sysctl -n machdep.cpu.brand_string)"
-  if [[ $sys == *"M1"* || $sys == *"M2"* ]]; then
+  if [[ $sys == *"M1"* || $sys == *"M2"* || $sys == *"M3"* ]]; then
     target='bun-darwin-arm64'
   else
     target='bun-darwin-x64'
