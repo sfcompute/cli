@@ -159,15 +159,78 @@ export function registerOrders(program: Command) {
     .command("ls")
     .alias("list")
     .description("List orders")
-    .option("--public", "Include public orders")
+    .option("--side <side>", "Filter by order side (buy or sell)")
     .option("-t, --type <type>", "Filter by instance type")
-    .option("-s, --start <date>", "Filter by minimum start date")
+    .option("--public", "Include public orders")
+    .option("--min-price <price>", "Filter by minimum price")
+    .option("--max-price <price>", "Filter by maximum price")
+    .option("--min-start <date>", "Filter by minimum start date")
+    .option("--max-start <date>", "Filter by maximum start date")
+    .option(
+      "--min-duration <duration>",
+      "Filter by minimum duration (in seconds)",
+    )
+    .option(
+      "--max-duration <duration>",
+      "Filter by maximum duration (in seconds)",
+    )
+    .option("--min-quantity <quantity>", "Filter by minimum quantity")
+    .option("--max-quantity <quantity>", "Filter by maximum quantity")
+    .option("--contract-id <id>", "Filter by contract ID")
+    .option("--only-open", "Show only open orders")
+    .option("--exclude-filled", "Exclude filled orders")
+    .option("--only-filled", "Show only filled orders")
+    .option("--min-filled-at <date>", "Filter by minimum filled date")
+    .option("--max-filled-at <date>", "Filter by maximum filled date")
+    .option("--min-fill-price <price>", "Filter by minimum fill price")
+    .option("--max-fill-price <price>", "Filter by maximum fill price")
+    .option("--exclude-cancelled", "Exclude cancelled orders")
+    .option("--only-cancelled", "Show only cancelled orders")
+    .option("--min-cancelled-at <date>", "Filter by minimum cancelled date")
+    .option("--max-cancelled-at <date>", "Filter by maximum cancelled date")
+    .option("--min-placed-at <date>", "Filter by minimum placed date")
+    .option("--max-placed-at <date>", "Filter by maximum placed date")
+    .option("--limit <number>", "Limit the number of results")
+    .option("--offset <number>", "Offset the results")
+
     .option("--json", "Output in JSON format")
     .action(async (options) => {
       const orders = await getOrders({
-        include_public: options.public,
+        side: options.side,
         instance_type: options.type,
-        min_start_date: options.start,
+
+        include_public: options.public,
+
+        min_price: options.minPrice,
+        max_price: options.maxPrice,
+        min_start_date: options.minStart,
+        max_start_date: options.maxStart,
+        min_duration: options.minDuration,
+        max_duration: options.maxDuration,
+        min_quantity: options.minQuantity,
+        max_quantity: options.maxQuantity,
+
+        contract_id: options.contractId,
+
+        only_open: options.onlyOpen,
+
+        exclude_filled: options.excludeFilled,
+        only_filled: options.onlyFilled,
+        min_filled_at: options.minFilledAt,
+        max_filled_at: options.maxFilledAt,
+        min_fill_price: options.minFillPrice,
+        max_fill_price: options.maxFillPrice,
+
+        exclude_cancelled: options.excludeCancelled,
+        only_cancelled: options.onlyCancelled,
+        min_cancelled_at: options.minCancelledAt,
+        max_cancelled_at: options.maxCancelledAt,
+
+        min_placed_at: options.minPlacedAt,
+        max_placed_at: options.maxPlacedAt,
+
+        limit: options.limit,
+        offset: options.offset,
       });
 
       if (options.json) {
@@ -186,17 +249,41 @@ export function registerOrders(program: Command) {
 }
 
 export async function getOrders(props: {
+  side?: "buy" | "sell";
   instance_type?: string;
-  limit?: number;
-  offset?: number;
+
+  include_public?: boolean;
+
+  min_price?: number;
+  max_price?: number;
   min_start_date?: string;
   max_start_date?: string;
-  min_duration?: string;
-  max_duration?: string;
-  min_quantity?: string;
-  max_quantity?: string;
-  side?: "buy" | "sell";
-  include_public?: boolean;
+  min_duration?: number;
+  max_duration?: number;
+  min_quantity?: number;
+  max_quantity?: number;
+
+  contract_id?: string;
+
+  only_open?: boolean;
+
+  exclude_filled?: boolean;
+  only_filled?: boolean;
+  min_filled_at?: string;
+  max_filled_at?: string;
+  min_fill_price?: number;
+  max_fill_price?: number;
+
+  exclude_cancelled?: boolean;
+  only_cancelled?: boolean;
+  min_cancelled_at?: string;
+  max_cancelled_at?: string;
+
+  min_placed_at?: string;
+  max_placed_at?: string;
+
+  limit?: number;
+  offset?: number;
 }) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
