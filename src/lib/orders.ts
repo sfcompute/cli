@@ -124,8 +124,7 @@ function printAsTable(orders: Array<HydratedOrder>) {
       if (order.cancelled) {
         status = "cancelled";
       } else if (order.executed) {
-        status = "executed";
-        // ! this could be undefined if the order was placed before this feature was implemented
+        status = "filled";
         executionPrice = order.execution_price;
       } else {
         status = order.status;
