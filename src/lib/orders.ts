@@ -162,10 +162,16 @@ export function registerOrders(program: Command) {
     .option("--side <side>", "Filter by order side (buy or sell)")
     .option("-t, --type <type>", "Filter by instance type")
     .option("--public", "Include public orders")
-    .option("--min-price <price>", "Filter by minimum price")
-    .option("--max-price <price>", "Filter by maximum price")
-    .option("--min-start <date>", "Filter by minimum start date")
-    .option("--max-start <date>", "Filter by maximum start date")
+    .option("--min-price <price>", "Filter by minimum price (in Centicents)")
+    .option("--max-price <price>", "Filter by maximum price (in Centicents)")
+    .option(
+      "--min-start <date>",
+      "Filter by minimum start date (ISO 8601 datestring)",
+    )
+    .option(
+      "--max-start <date>",
+      "Filter by maximum start date (ISO 8601 datestring)",
+    )
     .option(
       "--min-duration <duration>",
       "Filter by minimum duration (in seconds)",
@@ -176,22 +182,49 @@ export function registerOrders(program: Command) {
     )
     .option("--min-quantity <quantity>", "Filter by minimum quantity")
     .option("--max-quantity <quantity>", "Filter by maximum quantity")
-    .option("--contract-id <id>", "Filter by contract ID")
+    .option(
+      "--contract-id <id>",
+      "Filter by contract ID (only for sell orders)",
+    )
     .option("--only-open", "Show only open orders")
     .option("--exclude-filled", "Exclude filled orders")
     .option("--only-filled", "Show only filled orders")
-    .option("--min-filled-at <date>", "Filter by minimum filled date")
-    .option("--max-filled-at <date>", "Filter by maximum filled date")
-    .option("--min-fill-price <price>", "Filter by minimum fill price")
-    .option("--max-fill-price <price>", "Filter by maximum fill price")
+    .option(
+      "--min-filled-at <date>",
+      "Filter by minimum filled date (ISO 8601 datestring)",
+    )
+    .option(
+      "--max-filled-at <date>",
+      "Filter by maximum filled date (ISO 8601 datestring)",
+    )
+    .option(
+      "--min-fill-price <price>",
+      "Filter by minimum fill price (in Centicents)",
+    )
+    .option(
+      "--max-fill-price <price>",
+      "Filter by maximum fill price (in Centicents)",
+    )
     .option("--exclude-cancelled", "Exclude cancelled orders")
     .option("--only-cancelled", "Show only cancelled orders")
-    .option("--min-cancelled-at <date>", "Filter by minimum cancelled date")
-    .option("--max-cancelled-at <date>", "Filter by maximum cancelled date")
-    .option("--min-placed-at <date>", "Filter by minimum placed date")
-    .option("--max-placed-at <date>", "Filter by maximum placed date")
+    .option(
+      "--min-cancelled-at <date>",
+      "Filter by minimum cancelled date (ISO 8601 datestring)",
+    )
+    .option(
+      "--max-cancelled-at <date>",
+      "Filter by maximum cancelled date (ISO 8601 datestring)",
+    )
+    .option(
+      "--min-placed-at <date>",
+      "Filter by minimum placed date (ISO 8601 datestring)",
+    )
+    .option(
+      "--max-placed-at <date>",
+      "Filter by maximum placed date (ISO 8601 datestring)",
+    )
     .option("--limit <number>", "Limit the number of results")
-    .option("--offset <number>", "Offset the results")
+    .option("--offset <number>", "Offset the results (for pagination)")
 
     .option("--json", "Output in JSON format")
     .action(async (options) => {
