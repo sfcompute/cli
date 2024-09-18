@@ -239,7 +239,7 @@ async function buyOrderAction(options: SfBuyOptions) {
 
 `);
       }
-      return
+      return;
     }
 
     if (order.status === "open") {
@@ -252,7 +252,7 @@ async function buyOrderAction(options: SfBuyOptions) {
         sf orders cancel ${order.id}
   
         `);
-      return
+      return;
     }
 
     console.error(`Order likely did not execute. Check the status with:

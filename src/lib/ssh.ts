@@ -40,7 +40,7 @@ export function registerSSH(program: Command) {
     .option(
       "--user <username>",
       "Specify the username associated with the pubkey",
-      "ubuntu"
+      "ubuntu",
     )
     .argument("[name]", "The name of the node to SSH into");
 
