@@ -224,7 +224,6 @@ export function registerOrders(program: Command) {
     )
     .option("--limit <number>", "Limit the number of results")
     .option("--offset <number>", "Offset the results (for pagination)")
-
     .option("--json", "Output in JSON format")
     .action(async (options) => {
       const orders = await getOrders({
