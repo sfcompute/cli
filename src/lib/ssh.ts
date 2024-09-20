@@ -67,8 +67,8 @@ export function registerSSH(program: Command) {
       if (!instance) {
         logAndQuit(`Instance ${name} not found`);
       }
-      if (instance.ip.split(':').length == 2) {
-        const [ip, port] = instance.ip.split(':');
+      if (instance.ip.split(":").length === 2) {
+        const [ip, port] = instance.ip.split(":");
         await $`ssh -p ${port} ${options.user}@${ip}`;
       } else {
         await $`ssh ${options.user}@${instance.ip}`;

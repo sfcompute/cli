@@ -87,7 +87,11 @@ async function listInstancesAction({
           instance.status,
         ]),
       );
-      console.log(table.toString() + "\n" + "To ssh into an instance, run `sf ssh <instance-id>`.\n");
+      console.log(
+        table.toString() +
+          "\n" +
+          "To ssh into an instance, run `sf ssh <instance-id>`.\n",
+      );
     }
   }
 
