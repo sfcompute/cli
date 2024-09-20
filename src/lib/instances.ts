@@ -152,7 +152,7 @@ const colorInstanceType = (instanceType: InstanceType) =>
 
 // --
 
-async function getInstances({
+export async function getInstances({
   clusterId,
 }: { clusterId?: string }): Promise<InstanceObject[]> {
   const loggedIn = await isLoggedIn();
