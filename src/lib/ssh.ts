@@ -1,7 +1,9 @@
+import { $ } from "bun";
 import type { Command } from "commander";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
 import { logAndQuit, logLoginMessageAndQuit } from "../helpers/errors";
+import { getInstances } from "./instances";
 
 function isPubkey(key: string): boolean {
   const pubKeyPattern = /^ssh-/;
@@ -53,6 +55,25 @@ export function registerSSH(program: Command) {
     if (Object.keys(options).length === 0 && !name) {
       cmd.help();
       return;
+    }
+
+    if (options.add && name) {
+      logAndQuit("You can only add a key to all nodes at once");
+    }
+
+    if (name) {
+      const instances = await getInstances({ clusterId: undefined });
+      const instance = instances.find((instance) => instance.id === name);
+      if (!instance) {
+        logAndQuit(`Instance ${name} not found`);
+      }
+      if (instance.ip.split(":").length === 2) {
+        const [ip, port] = instance.ip.split(":");
+        await $`ssh -p ${port} ${options.user}@${ip}`;
+      } else {
+        await $`ssh ${options.user}@${instance.ip}`;
+      }
+      process.exit(0);
     }
 
     if (options.add) {

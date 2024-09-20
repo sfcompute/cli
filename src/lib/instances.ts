@@ -76,7 +76,7 @@ async function listInstancesAction({
     } else {
       const table = new Table({
         head: tableHeaders,
-        colWidths: [32, 10, 20],
+        // colWidths: [32, 10, 20],
       });
 
       table.push(
@@ -87,7 +87,11 @@ async function listInstancesAction({
           instance.status,
         ]),
       );
-      console.log(table.toString() + "\n\n");
+      console.log(
+        table.toString() +
+          "\n" +
+          "To ssh into an instance, run `sf ssh <instance-id>`.\n",
+      );
     }
   }
 
@@ -152,7 +156,7 @@ const colorInstanceType = (instanceType: InstanceType) =>
 
 // --
 
-async function getInstances({
+export async function getInstances({
   clusterId,
 }: { clusterId?: string }): Promise<InstanceObject[]> {
   const loggedIn = await isLoggedIn();
