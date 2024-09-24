@@ -56,7 +56,7 @@ export function registerBuy(program: Command) {
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-c, --colocate_with <contract_id_array>",
-      "The IDs of the contract to colocate with. Your order will be placed on the same cluster as the contract.",
+      "The IDs of the contracts to colocate with. Your order will be placed on the same cluster as the contracts.",
       (value) => value.split(","),
       [],
     )
@@ -361,7 +361,6 @@ export async function placeBuyOrder(options: BuyOptions) {
       start_at: roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCenticents,
-      // for now let's just do one colocation contract
       colocate_with: options.colocate_with,
     },
   });
