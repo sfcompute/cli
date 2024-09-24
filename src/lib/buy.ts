@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  colocate_with?: string;
+  colocate_with?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -55,8 +55,10 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-c, --colocate_with <contract_id>",
-      "The ID of the contract to colocate with. Your order will be placed on the same cluster as the contract.",
+      "-c, --colocate_with <contract_id_array>",
+      "The IDs of the contract to colocate with. Your order will be placed on the same cluster as the contract.",
+      (value) => value.split(","),
+      [],
     )
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
@@ -79,14 +81,16 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // parse colocation contract id and assign it if it exists
-  const colocateWithContractId = options.colocate_with
+  const colocateWithContractIds = options.colocate_with
     ? options.colocate_with
-    : null;
-  if (colocateWithContractId) {
+    : [];
+  if (colocateWithContractIds) {
     // check if contract actually exists
-    const contract = await getContract(colocateWithContractId);
-    if (!contract || contract.status !== "active") {
-      return logAndQuit(`Contract ${options.colocate_with} not found`);
+    for (const contractId of colocateWithContractIds) {
+      const contract = await getContract(contractId);
+      if (!contract || contract.status !== "active") {
+        return logAndQuit(`Contract ${contractId} not found`);
+      }
     }
   }
 
@@ -208,7 +212,7 @@ async function buyOrderAction(options: SfBuyOptions) {
         endsAt: endDate,
         confirmWithUser,
         quoteOnly: isQuoteOnly,
-        colocate_with: colocateWithContractId,
+        colocate_with: colocateWithContractIds,
       });
       const confirmed = await confirm({
         message: confirmationMessage,
@@ -230,7 +234,7 @@ async function buyOrderAction(options: SfBuyOptions) {
       endsAt: endDate,
       confirmWithUser,
       quoteOnly: isQuoteOnly,
-      colocate_with: colocateWithContractId,
+      colocate_with: colocateWithContractIds,
     });
 
     const order = await waitForOrderToNotBePending(res.id);
@@ -344,7 +348,7 @@ type BuyOptions = {
   endsAt: Date;
   confirmWithUser: boolean;
   quoteOnly: boolean;
-  colocate_with: string | null;
+  colocate_with: Array<string>;
 };
 export async function placeBuyOrder(options: BuyOptions) {
   const api = await apiClient();
@@ -357,8 +361,8 @@ export async function placeBuyOrder(options: BuyOptions) {
       start_at: roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCenticents,
-      // for now let's just do once colocation contract
-      colocate_with: options.colocate_with ? [options.colocate_with] : [],
+      // for now let's just do one colocation contract
+      colocate_with: options.colocate_with,
     },
   });
 
