@@ -13,6 +13,7 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
+import { getContract } from "../helpers/fetchers";
 import {
   pricePerGPUHourToTotalPrice,
   totalPriceToPricePerGPUHour,
@@ -28,7 +29,6 @@ import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 import type { Nullable } from "../types/empty";
 import { GPUS_PER_NODE } from "./constants";
 import { formatDuration } from "./orders";
-import { getContract } from "../helpers/fetchers";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -56,7 +56,7 @@ export function registerBuy(program: Command) {
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-c, --colocate_with <contract_id>",
-      "Specify the contract ID to colocate with",
+      "The ID of the contract to colocate with. Your order will be placed on the same cluster as the contract.",
     )
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
@@ -85,7 +85,7 @@ async function buyOrderAction(options: SfBuyOptions) {
   if (colocateWithContractId) {
     // check if contract actually exists
     const contract = await getContract(colocateWithContractId);
-    if (!contract || !(contract.status === "active")) {
+    if (!contract || contract.status !== "active") {
       return logAndQuit(`Contract ${options.colocate_with} not found`);
     }
   }
