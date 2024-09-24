@@ -55,7 +55,7 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-c, --colocate-with <contract_id>",
+      "-c, --colocate_with <contract_id>",
       "Specify the contract ID to colocate with",
     )
     .option("--quote", "Only provide a quote for the order")
