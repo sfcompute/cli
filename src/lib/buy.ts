@@ -293,8 +293,9 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
 
-  const durationInSeconds =
-    options.endsAt.getTime() / 1000 - options.startsAt.getTime() / 1000;
+  const durationInSeconds = Math.ceil(
+    (options.endsAt.getTime() - options.startsAt.getTime()) / 1000,
+  );
   const pricePerGPUHour = totalPriceToPricePerGPUHour(
     options.priceCenticents,
     durationInSeconds,
