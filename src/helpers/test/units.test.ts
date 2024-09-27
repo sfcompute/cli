@@ -6,7 +6,7 @@ import {
 } from "../units";
 
 describe("units", () => {
-  test.only("price whole to cents", () => {
+  test("price whole to cents", () => {
     const inputToExpectedValids = [
       // formatted as USD
       ["$0", 0],
