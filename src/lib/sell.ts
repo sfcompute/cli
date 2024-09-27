@@ -10,15 +10,15 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import { getContract } from "../helpers/fetchers";
-import { pricePerGPUHourToTotalPrice } from "../helpers/price";
 import {
-  priceWholeToCenticents,
+  priceWholeToCents,
   roundEndDate,
   roundStartDate,
 } from "../helpers/units";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 import { GPUS_PER_NODE } from "./constants";
 import type { PlaceSellOrderParameters } from "./orders";
+import { pricePerGPUHourToTotalPriceCents } from "../helpers/price";
 
 export function registerSell(program: Command) {
   program
@@ -72,10 +72,8 @@ async function placeSellOrder(options: {
     return logLoginMessageAndQuit();
   }
 
-  const { centicents: priceCenticents, invalid } = priceWholeToCenticents(
-    options.price,
-  );
-  if (invalid || !priceCenticents) {
+  const { cents: priceCents, invalid } = priceWholeToCents(options.price);
+  if (invalid || !priceCents) {
     return logAndQuit(`Invalid price: ${options.price}`);
   }
 
@@ -131,8 +129,8 @@ async function placeSellOrder(options: {
   const totalDurationSecs = dayjs(endDate).diff(startDate, "s");
   const nodes = Math.ceil(options.accelerators / GPUS_PER_NODE);
 
-  const totalPrice = pricePerGPUHourToTotalPrice(
-    priceCenticents,
+  const totalPrice = pricePerGPUHourToTotalPriceCents(
+    priceCents,
     totalDurationSecs,
     nodes,
     GPUS_PER_NODE,

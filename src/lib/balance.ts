@@ -8,7 +8,7 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
-import type { Centicents } from "../helpers/units";
+import type { Cents } from "../helpers/units";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -22,19 +22,19 @@ export function registerBalance(program: Command) {
     .option("--json", "Output in JSON format")
     .action(async (options) => {
       const {
-        available: { whole: availableWhole, centicents: availableCenticents },
-        reserved: { whole: reservedWhole, centicents: reservedCenticents },
+        available: { whole: availableWhole, cents: availableCents },
+        reserved: { whole: reservedWhole, cents: reservedCents },
       } = await getBalance();
 
       if (options.json) {
         const jsonOutput = {
           available: {
             whole: availableWhole,
-            centicents: availableCenticents,
+            cents: availableCents,
           },
           reserved: {
             whole: reservedWhole,
-            centicents: reservedCenticents,
+            cents: reservedCents,
           },
         };
         console.log(JSON.stringify(jsonOutput, null, 2));
@@ -43,11 +43,7 @@ export function registerBalance(program: Command) {
         const formattedReserved = usdFormatter.format(reservedWhole);
 
         const table = new Table({
-          head: [
-            chalk.gray("Type"),
-            chalk.gray("Amount"),
-            chalk.gray("Centicents (1/100th of a cent)"),
-          ],
+          head: [chalk.gray("Type"), chalk.gray("Amount"), chalk.gray("Cents")],
           colWidths: [15, 15, 35],
         });
 
@@ -55,12 +51,12 @@ export function registerBalance(program: Command) {
           [
             "Available",
             chalk.green(formattedAvailable),
-            chalk.green(availableCenticents.toLocaleString()),
+            chalk.green(availableCents.toLocaleString()),
           ],
           [
             "Reserved",
             chalk.gray(formattedReserved),
-            chalk.gray(reservedCenticents.toLocaleString()),
+            chalk.gray(reservedCents.toLocaleString()),
           ],
         );
 
@@ -71,18 +67,18 @@ export function registerBalance(program: Command) {
     });
 }
 
-export type BalanceUsdCenticents = {
-  available: { centicents: Centicents; whole: number };
-  reserved: { centicents: Centicents; whole: number };
+export type BalanceUsdCents = {
+  available: { cents: Cents; whole: number };
+  reserved: { cents: Cents; whole: number };
 };
-export async function getBalance(): Promise<BalanceUsdCenticents> {
+export async function getBalance(): Promise<BalanceUsdCents> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
 
     return {
-      available: { centicents: 0, whole: 0 },
-      reserved: { centicents: 0, whole: 0 },
+      available: { cents: 0, whole: 0 },
+      reserved: { cents: 0, whole: 0 },
     };
   }
   const client = await apiClient();
@@ -126,12 +122,12 @@ export async function getBalance(): Promise<BalanceUsdCenticents> {
 
   return {
     available: {
-      centicents: available,
-      whole: available / 10_000,
+      cents: available,
+      whole: available / 100,
     },
     reserved: {
-      centicents: reserved,
-      whole: reserved / 10_000,
+      cents: reserved,
+      whole: reserved / 100,
     },
   };
 }

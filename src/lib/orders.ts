@@ -138,12 +138,12 @@ function printAsTable(orders: Array<HydratedOrder>) {
         order.id,
         order.side,
         order.instance_type,
-        usdFormatter.format(order.price / 10000),
+        usdFormatter.format(order.price / 100),
         order.quantity.toString(),
         duration,
         startDate.toLocaleString(),
         status,
-        executionPrice ? usdFormatter.format(executionPrice / 10000) : "-",
+        executionPrice ? usdFormatter.format(executionPrice / 100) : "-",
       ]);
     }
   }
@@ -161,8 +161,8 @@ export function registerOrders(program: Command) {
     .option("--side <side>", "Filter by order side (buy or sell)")
     .option("-t, --type <type>", "Filter by instance type")
     .option("--public", "Include public orders")
-    .option("--min-price <price>", "Filter by minimum price (in Centicents)")
-    .option("--max-price <price>", "Filter by maximum price (in Centicents)")
+    .option("--min-price <price>", "Filter by minimum price (in cents)")
+    .option("--max-price <price>", "Filter by maximum price (in cents)")
     .option(
       "--min-start <date>",
       "Filter by minimum start date (ISO 8601 datestring)",
@@ -198,11 +198,11 @@ export function registerOrders(program: Command) {
     )
     .option(
       "--min-fill-price <price>",
-      "Filter by minimum fill price (in Centicents)",
+      "Filter by minimum fill price (in cents)",
     )
     .option(
       "--max-fill-price <price>",
-      "Filter by maximum fill price (in Centicents)",
+      "Filter by maximum fill price (in cents)",
     )
     .option("--exclude-cancelled", "Exclude cancelled orders")
     .option("--only-cancelled", "Show only cancelled orders")
