@@ -14,15 +14,15 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import {
-  pricePerGPUHourToTotalPrice,
+  pricePerGPUHourToTotalPriceCents,
   totalPriceToPricePerGPUHour,
 } from "../helpers/price";
 import {
-  type Centicents,
-  centicentsToDollarsFormatted,
-  priceWholeToCenticents,
   roundEndDate,
   roundStartDate,
+  type Cents,
+  priceWholeToCents,
+  centsToDollarsFormatted,
 } from "../helpers/units";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 import type { Nullable } from "../types/empty";
@@ -84,21 +84,21 @@ async function buyOrderAction(options: SfBuyOptions) {
   const quantity = Math.ceil(accelerators / GPUS_PER_NODE);
 
   // parse price
-  let priceCenticents: Nullable<Centicents> = null;
+  let priceCents: Nullable<Cents> = null;
   if (options.price) {
-    const { centicents: priceParsed, invalid: priceInputInvalid } =
-      priceWholeToCenticents(options.price);
+    const { cents: priceCentsParsed, invalid: priceInputInvalid } =
+      priceWholeToCents(options.price);
     if (priceInputInvalid) {
       return logAndQuit(`Invalid price: ${options.price}`);
     }
-    priceCenticents = priceParsed;
+    priceCents = priceCentsParsed;
   }
 
   // Convert the price to the total price of the contract
   // (price per gpu hour * gpus per node * quantity * duration in hours)
-  if (priceCenticents) {
-    priceCenticents = pricePerGPUHourToTotalPrice(
-      priceCenticents,
+  if (priceCents) {
+    priceCents = pricePerGPUHourToTotalPriceCents(
+      priceCents,
       durationSeconds,
       quantity,
       GPUS_PER_NODE,
@@ -126,9 +126,9 @@ async function buyOrderAction(options: SfBuyOptions) {
       return logAndQuit("Not enough data exists to quote this order.");
     }
 
-    const priceLabelUsd = c.green(centicentsToDollarsFormatted(quote.price));
+    const priceLabelUsd = c.green(centsToDollarsFormatted(quote.price));
     const priceLabelPerGPUHour = c.green(
-      centicentsToDollarsFormatted(
+      centsToDollarsFormatted(
         totalPriceToPricePerGPUHour(
           quote.price,
           durationSeconds,
@@ -143,7 +143,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     );
   } else {
     // quote if no price was provided
-    if (!priceCenticents) {
+    if (!priceCents) {
       const quote = await getQuote({
         instanceType: options.type,
         quantity: quantity,
@@ -162,7 +162,7 @@ async function buyOrderAction(options: SfBuyOptions) {
         return process.exit(1);
       }
 
-      priceCenticents = quote.price;
+      priceCents = quote.price;
       durationSeconds = quote.duration;
       startDate = new Date(quote.start_at);
     }
@@ -170,8 +170,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     if (!durationSeconds) {
       throw new Error("unexpectly no duration provided");
     }
-
-    if (!priceCenticents) {
+    if (!priceCents) {
       throw new Error("unexpectly no price provided");
     }
 
@@ -184,7 +183,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     if (confirmWithUser) {
       const confirmationMessage = confirmPlaceOrderMessage({
         instanceType: options.type,
-        priceCenticents,
+        priceCents,
         quantity,
         startsAt: startDate,
         endsAt: endDate,
@@ -203,7 +202,7 @@ async function buyOrderAction(options: SfBuyOptions) {
 
     const res = await placeBuyOrder({
       instanceType: options.type,
-      priceCenticents,
+      priceCents,
       quantity,
       // round start date again because the user might have taken a long time to confirm
       // most of the time this will do nothing, but when it does it will move the start date forwrd one minute
@@ -264,7 +263,7 @@ async function buyOrderAction(options: SfBuyOptions) {
 }
 
 function confirmPlaceOrderMessage(options: BuyOptions) {
-  if (!options.priceCenticents) {
+  if (!options.priceCents) {
     return "";
   }
 
@@ -297,18 +296,16 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     (options.endsAt.getTime() - options.startsAt.getTime()) / 1000,
   );
   const pricePerGPUHour = totalPriceToPricePerGPUHour(
-    options.priceCenticents,
+    options.priceCents,
     durationInSeconds,
     options.quantity,
     GPUS_PER_NODE,
   );
-  const pricePerHourLabel = c.green(
-    centicentsToDollarsFormatted(pricePerGPUHour),
-  );
+  const pricePerHourLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
 
   const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
-  const dollarsLabel = c.green(centicentsToDollarsFormatted(pricePerGPUHour));
+  const dollarsLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
 
   const gpusLabel = c.green(options.quantity * GPUS_PER_NODE);
 
@@ -319,7 +316,7 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
 
 type BuyOptions = {
   instanceType: string;
-  priceCenticents: number;
+  priceCents: number;
   quantity: number;
   startsAt: Date;
   endsAt: Date;
@@ -336,7 +333,7 @@ export async function placeBuyOrder(options: BuyOptions) {
       // round start date again because the user might take a long time to confirm
       start_at: roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
-      price: options.priceCenticents,
+      price: options.priceCents,
     },
   });
 

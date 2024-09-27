@@ -39,45 +39,44 @@ function roundEpochUpToHour(epoch: number): number {
 // -- currency
 
 export type Cents = number;
-export type Centicents = number;
 
-interface PriceWholeToCenticentsReturn {
-  centicents: Nullable<Centicents>;
+interface PriceWholeToCentsReturn {
+  cents: Nullable<Cents>;
   invalid: boolean;
 }
-export function priceWholeToCenticents(
+export function priceWholeToCents(
   price: string | number,
-): PriceWholeToCenticentsReturn {
+): PriceWholeToCentsReturn {
   if (
     price === null ||
     price === undefined ||
     (typeof price !== "number" && typeof price !== "string")
   ) {
-    return { centicents: null, invalid: true };
+    return { cents: null, invalid: true };
   }
 
   if (typeof price === "number") {
     if (price < 0) {
-      return { centicents: null, invalid: true };
+      return { cents: null, invalid: true };
     }
 
-    return { centicents: price * 10_000, invalid: false };
+    return { cents: price * 100, invalid: false };
   } else if (typeof price === "string") {
     // remove any whitespace, dollar signs, negative signs, single and double quotes
     const priceCleaned = price.replace(/[\s\$\-\'\"]/g, "");
     if (priceCleaned === "") {
-      return { centicents: null, invalid: true };
+      return { cents: null, invalid: true };
     }
 
     const parsedPrice = Number.parseFloat(priceCleaned);
 
-    return { centicents: parsedPrice * 10_000, invalid: false };
+    return { cents: parsedPrice * 100, invalid: false };
   }
 
   // default invalid
-  return { centicents: null, invalid: true };
+  return { cents: null, invalid: true };
 }
 
-export function centicentsToDollarsFormatted(centicents: Centicents): string {
-  return `$${(centicents / 10_000).toFixed(2)}`;
+export function centsToDollarsFormatted(cents: Cents): string {
+  return `$${(cents / 100).toFixed(2)}`;
 }
