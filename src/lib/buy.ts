@@ -199,7 +199,6 @@ async function buyOrderAction(options: SfBuyOptions) {
         logAndQuit("Order cancelled");
       }
     }
-    console.log(priceCents);
 
     const res = await placeBuyOrder({
       instanceType: options.type,
