@@ -254,6 +254,7 @@ export interface operations {
               /** @description Whether there was no price data for this period. */
               no_data: boolean;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -276,6 +277,7 @@ export interface operations {
               /** @description Whether there was no price data for this period. */
               no_data: boolean;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -298,6 +300,7 @@ export interface operations {
               /** @description Whether there was no price data for this period. */
               no_data: boolean;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -543,17 +546,34 @@ export interface operations {
   getV0Orders: {
     parameters: {
       query?: {
+        side?: "buy" | "sell";
+        /** @description The instance type. */
         instance_type?: string;
-        limit?: string;
-        offset?: string;
+        include_public?: string | boolean;
+        min_price?: string | number;
+        max_price?: string | number;
         min_start_date?: string;
         max_start_date?: string;
-        min_duration?: string;
-        max_duration?: string;
-        min_quantity?: string;
-        max_quantity?: string;
-        side?: string;
-        include_public?: boolean;
+        min_duration?: string | number;
+        max_duration?: string | number;
+        min_quantity?: string | number;
+        max_quantity?: string | number;
+        contract_id?: string;
+        only_open?: string | boolean;
+        exclude_filled?: string | boolean;
+        only_filled?: string | boolean;
+        min_filled_at?: string;
+        max_filled_at?: string;
+        min_fill_price?: string | number;
+        max_fill_price?: string | number;
+        exclude_cancelled?: string | boolean;
+        only_cancelled?: string | boolean;
+        min_cancelled_at?: string;
+        max_cancelled_at?: string;
+        min_placed_at?: string;
+        max_placed_at?: string;
+        limit?: string | number;
+        offset?: string | number;
       };
       header?: {
         /** @description Generate a bearer token with `$ sf tokens create`. */
@@ -628,6 +648,19 @@ export interface operations {
                 /** @description If true, this is an immediate-or-cancel order. */
                 ioc?: boolean;
               };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
+              };
             };
         "multipart/form-data":
           | {
@@ -673,6 +706,19 @@ export interface operations {
                 /** @description If true, this is an immediate-or-cancel order. */
                 ioc?: boolean;
               };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
+              };
             };
         "text/plain":
           | {
@@ -717,6 +763,19 @@ export interface operations {
                 post_only?: boolean;
                 /** @description If true, this is an immediate-or-cancel order. */
                 ioc?: boolean;
+              };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
               };
             };
       };
@@ -864,10 +923,11 @@ export interface operations {
               ioc?: boolean;
             };
             executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            execution_price?: number;
             cancelled: boolean;
-            executed_at: string | null;
-            execution_price: number | null;
-            cancelled_at: string | null;
+            cancelled_at?: string;
             colocate_with?: string[];
             created_at: string;
           };
@@ -902,10 +962,11 @@ export interface operations {
               ioc?: boolean;
             };
             executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            execution_price?: number;
             cancelled: boolean;
-            executed_at: string | null;
-            execution_price: number | null;
-            cancelled_at: string | null;
+            cancelled_at?: string;
             colocate_with?: string[];
             created_at: string;
           };
@@ -940,10 +1001,11 @@ export interface operations {
               ioc?: boolean;
             };
             executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            execution_price?: number;
             cancelled: boolean;
-            executed_at: string | null;
-            execution_price: number | null;
-            cancelled_at: string | null;
+            cancelled_at?: string;
             colocate_with?: string[];
             created_at: string;
           };
@@ -1135,8 +1197,14 @@ export interface operations {
               name: string;
               type: string;
               ip: string;
-              status: "healthy" | "starting" | "unreachable" | "unhealthy";
+              status:
+                | "healthy"
+                | "starting"
+                | "unreachable"
+                | "unhealthy"
+                | "waiting";
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1148,8 +1216,14 @@ export interface operations {
               name: string;
               type: string;
               ip: string;
-              status: "healthy" | "starting" | "unreachable" | "unhealthy";
+              status:
+                | "healthy"
+                | "starting"
+                | "unreachable"
+                | "unhealthy"
+                | "waiting";
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1161,8 +1235,14 @@ export interface operations {
               name: string;
               type: string;
               ip: string;
-              status: "healthy" | "starting" | "unreachable" | "unhealthy";
+              status:
+                | "healthy"
+                | "starting"
+                | "unreachable"
+                | "unhealthy"
+                | "waiting";
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1258,7 +1338,12 @@ export interface operations {
             name: string;
             type: string;
             ip: string;
-            status: "healthy" | "starting" | "unreachable" | "unhealthy";
+            status:
+              | "healthy"
+              | "starting"
+              | "unreachable"
+              | "unhealthy"
+              | "waiting";
           };
           "multipart/form-data": {
             /** @constant */
@@ -1267,7 +1352,12 @@ export interface operations {
             name: string;
             type: string;
             ip: string;
-            status: "healthy" | "starting" | "unreachable" | "unhealthy";
+            status:
+              | "healthy"
+              | "starting"
+              | "unreachable"
+              | "unhealthy"
+              | "waiting";
           };
           "text/plain": {
             /** @constant */
@@ -1276,7 +1366,12 @@ export interface operations {
             name: string;
             type: string;
             ip: string;
-            status: "healthy" | "starting" | "unreachable" | "unhealthy";
+            status:
+              | "healthy"
+              | "starting"
+              | "unreachable"
+              | "unhealthy"
+              | "waiting";
           };
         };
       };
@@ -1369,6 +1464,7 @@ export interface operations {
               pubkey: string;
               username: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1380,6 +1476,7 @@ export interface operations {
               pubkey: string;
               username: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1391,6 +1488,7 @@ export interface operations {
               pubkey: string;
               username: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1629,6 +1727,7 @@ export interface operations {
                   id: string;
                 }
             )[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1660,6 +1759,7 @@ export interface operations {
                   id: string;
                 }
             )[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -1691,6 +1791,7 @@ export interface operations {
                   id: string;
                 }
             )[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -2078,13 +2179,14 @@ export interface operations {
               instance_group: string;
               /** @description The quantity of the procurement */
               quantity: number;
-              /** @description The TOTAL price (in centicents) to buy the duration */
-              max_price: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
               /** @description The block duration of the procurement in hours */
               min_duration_in_hours: number;
               /** @description The instance type. */
               instance_type: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -2095,13 +2197,14 @@ export interface operations {
               instance_group: string;
               /** @description The quantity of the procurement */
               quantity: number;
-              /** @description The TOTAL price (in centicents) to buy the duration */
-              max_price: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
               /** @description The block duration of the procurement in hours */
               min_duration_in_hours: number;
               /** @description The instance type. */
               instance_type: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -2112,13 +2215,14 @@ export interface operations {
               instance_group: string;
               /** @description The quantity of the procurement */
               quantity: number;
-              /** @description The TOTAL price (in centicents) to buy the duration */
-              max_price: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
               /** @description The block duration of the procurement in hours */
               min_duration_in_hours: number;
               /** @description The instance type. */
               instance_type: string;
             }[];
+            has_more: boolean;
             /** @constant */
             object: "list";
           };
@@ -2174,21 +2278,21 @@ export interface operations {
           instance_type: string;
           quantity: number;
           max_price_per_node_hour: number;
-          block_duration_in_hours: number;
+          min_duration_in_hours: number;
         };
         "multipart/form-data": {
           /** @description The instance type. */
           instance_type: string;
           quantity: number;
           max_price_per_node_hour: number;
-          block_duration_in_hours: number;
+          min_duration_in_hours: number;
         };
         "text/plain": {
           /** @description The instance type. */
           instance_type: string;
           quantity: number;
           max_price_per_node_hour: number;
-          block_duration_in_hours: number;
+          min_duration_in_hours: number;
         };
       };
     };
@@ -2204,8 +2308,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2217,8 +2321,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2230,8 +2334,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2294,8 +2398,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2307,8 +2411,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2320,8 +2424,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2375,22 +2479,22 @@ export interface operations {
       content: {
         "application/json": {
           quantity?: number;
-          /** @description The TOTAL price (in centicents) to buy the duration */
-          max_price?: number;
+          /** @description The price (in centicents) per node per hour */
+          max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
         };
         "multipart/form-data": {
           quantity?: number;
-          /** @description The TOTAL price (in centicents) to buy the duration */
-          max_price?: number;
+          /** @description The price (in centicents) per node per hour */
+          max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
         };
         "text/plain": {
           quantity?: number;
-          /** @description The TOTAL price (in centicents) to buy the duration */
-          max_price?: number;
+          /** @description The price (in centicents) per node per hour */
+          max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
         };
@@ -2408,8 +2512,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2421,8 +2525,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
@@ -2434,8 +2538,8 @@ export interface operations {
             instance_group: string;
             /** @description The quantity of the procurement */
             quantity: number;
-            /** @description The TOTAL price (in centicents) to buy the duration */
-            max_price: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
             /** @description The block duration of the procurement in hours */
             min_duration_in_hours: number;
             /** @description The instance type. */
