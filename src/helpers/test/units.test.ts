@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
+  type Cents,
   centsToDollarsFormatted,
   priceWholeToCents,
-  type Cents,
 } from "../units";
 
 describe("units", () => {

@@ -10,6 +10,7 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
 import { getContract } from "../helpers/fetchers";
+import { pricePerGPUHourToTotalPriceCents } from "../helpers/price";
 import {
   priceWholeToCents,
   roundEndDate,
@@ -18,7 +19,6 @@ import {
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
 import { GPUS_PER_NODE } from "./constants";
 import type { PlaceSellOrderParameters } from "./orders";
-import { pricePerGPUHourToTotalPriceCents } from "../helpers/price";
 
 export function registerSell(program: Command) {
   program

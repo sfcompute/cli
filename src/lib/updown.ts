@@ -4,10 +4,10 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { logAndQuit } from "../helpers/errors";
+import { type Cents, centsToDollarsFormatted } from "../helpers/units";
 import { getBalance } from "./balance";
 import { getQuote } from "./buy";
 import { formatDuration } from "./orders";
-import { centsToDollarsFormatted, type Cents } from "../helpers/units";
 
 export function registerUp(program: Command) {
   const cmd = program
