@@ -4,7 +4,7 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { logAndQuit } from "../helpers/errors";
-import { type Cents, centsToDollarsFormatted } from "../helpers/units";
+import { type Cents, centsToDollarsFormatted, dollarsToCents } from "../helpers/units";
 import { getBalance } from "./balance";
 import { getQuote } from "./buy";
 import { formatDuration } from "./orders";
@@ -22,7 +22,7 @@ export function registerUp(program: Command) {
     .option("-d, --duration <duration>", "Specify the minimum duration")
     .option(
       "-p, --price <price>",
-      "Specify the maximum price per node per hour",
+      "Specify the maximum price per node-hour, in dollars",
     );
 
   cmd.action(async (options) => {
@@ -46,7 +46,7 @@ const DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTS = 2.65 * 8 * 100;
 async function getDefaultProcurementOptions(props: {
   duration?: string;
   n?: string;
-  pricePerNodeHour?: string;
+  pricePerNodeHourDollars?: string;
   type?: string;
 }) {
   // Minimum block duration is 2 hours
@@ -71,14 +71,16 @@ async function getDefaultProcurementOptions(props: {
   // Eventually we should replace this price with yesterday's index price
   let quotePrice = DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTS;
   if (quote) {
-    // per hour price
+    console.log("quote", quote);
+    // per hour price in cents
     quotePrice = quote.price / durationHours;
   }
 
-  const pricePerNodeHourInDollars = props.pricePerNodeHour
-    ? Number.parseInt(props.pricePerNodeHour)
-    : quotePrice;
-  const pricePerNodeHourInCents = Math.ceil(pricePerNodeHourInDollars * 100);
+  console.log("props.pricePerNodeHour", props.pricePerNodeHourDollars);
+
+  const pricePerNodeHourInCents = props.pricePerNodeHourDollars
+    ? dollarsToCents(Number.parseFloat(props.pricePerNodeHourDollars))
+    : quotePrice
 
   const totalPriceInCents =
     pricePerNodeHourInCents * Number.parseInt(props.n ?? "1") * durationHours;
