@@ -2,7 +2,7 @@ import { expect } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 import util from "node:util";
-import type { SpawnOptions, Subprocess } from "bun";
+import type { SpawnOptions, Subprocess, SyncSubprocess } from "bun";
 import type { Command } from "commander";
 import { apiClient } from "../apiClient";
 import { isLoggedIn } from "../helpers/config";
@@ -309,7 +309,7 @@ export function registerSSH(program: Command) {
     }
 
     if (name) {
-      let proc: Subprocess<"inherit", "inherit", "inherit">;
+      let procResult: SyncSubprocess<"inherit", "inherit">;
       const instances = await getInstances({ clusterId: undefined });
       const instance = instances.find((instance) => instance.id === name);
       if (!instance) {
@@ -317,7 +317,7 @@ export function registerSSH(program: Command) {
       }
       if (instance.ip.split(":").length === 2) {
         const [ip, port] = instance.ip.split(":");
-        proc = Bun.spawn(
+        procResult = Bun.spawnSync(
           ["ssh", "-p", port, util.format("%s@%s", options.user, ip)],
           {
             stdin: "inherit",
@@ -326,7 +326,7 @@ export function registerSSH(program: Command) {
           },
         );
       } else {
-        proc = Bun.spawn(
+        procResult = Bun.spawnSync(
           ["ssh", util.format("%s@%s", options.user, instance.ip)],
           {
             stdin: "inherit",
@@ -335,8 +335,7 @@ export function registerSSH(program: Command) {
           },
         );
       }
-      await proc;
-      if (proc.exitCode === 255) {
+      if (procResult.exitCode === 255) {
         console.log(
           "The ssh command appears to possibly have failed. To set up ssh keys please run `sf ssh --init`.",
         );
