@@ -78,5 +78,13 @@ export function priceWholeToCents(
 }
 
 export function centsToDollarsFormatted(cents: Cents): string {
-  return `$${(cents / 100).toFixed(2)}`;
+  return `$${centsToDollars(cents).toFixed(2)}`;
+}
+
+export function centsToDollars(cents: Cents): number {
+  return cents / 100;
+}
+
+export function dollarsToCents(dollars: number): Cents {
+  return Math.ceil(dollars * 100);
 }
