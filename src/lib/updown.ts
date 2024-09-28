@@ -75,7 +75,6 @@ async function getDefaultProcurementOptions(props: {
   // Eventually we should replace this price with yesterday's index price
   let quotePrice = DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTS;
   if (quote) {
-    console.log("quote", quote);
     // per hour price in cents
     quotePrice = quote.price / durationHours;
   }
