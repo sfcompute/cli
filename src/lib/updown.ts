@@ -4,7 +4,11 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { logAndQuit } from "../helpers/errors";
-import { type Cents, centsToDollarsFormatted, dollarsToCents } from "../helpers/units";
+import {
+  type Cents,
+  centsToDollarsFormatted,
+  dollarsToCents,
+} from "../helpers/units";
 import { getBalance } from "./balance";
 import { getQuote } from "./buy";
 import { formatDuration } from "./orders";
@@ -80,7 +84,7 @@ async function getDefaultProcurementOptions(props: {
 
   const pricePerNodeHourInCents = props.pricePerNodeHourDollars
     ? dollarsToCents(Number.parseFloat(props.pricePerNodeHourDollars))
-    : quotePrice
+    : quotePrice;
 
   const totalPriceInCents =
     pricePerNodeHourInCents * Number.parseInt(props.n ?? "1") * durationHours;
