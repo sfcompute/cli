@@ -79,8 +79,6 @@ async function getDefaultProcurementOptions(props: {
     quotePrice = quote.price / durationHours;
   }
 
-  console.log("props.pricePerNodeHour", props.pricePerNodeHourDollars);
-
   const pricePerNodeHourInCents = props.pricePerNodeHourDollars
     ? dollarsToCents(Number.parseFloat(props.pricePerNodeHourDollars))
     : quotePrice;
