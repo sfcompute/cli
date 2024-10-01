@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  extend?: Array<string>;
+  colocate_with?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -81,7 +81,9 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // parse colocation contract id and assign it if it exists
-  const colocateWithContractIds = options.extend ? options.extend : [];
+  const colocateWithContractIds = options.colocate_with
+    ? options.colocate_with
+    : [];
   if (colocateWithContractIds) {
     // check if contract actually exists
     for (const contractId of colocateWithContractIds) {
@@ -325,7 +327,10 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   );
   const pricePerHourLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
 
-  const colocated_with = options.colocate_with.length === 0 ? "" : ` colocated with ${options.colocate_with.join(", ")}`;
+  const colocated_with =
+    options.colocate_with.length === 0
+      ? ""
+      : ` colocated with ${options.colocate_with.join(", ")}`;
   const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs${colocated_with}) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
   const dollarsLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
