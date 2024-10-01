@@ -55,8 +55,8 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-e, --extend <contract_id_array>",
-      "Extend an existing contract",
+      "-e, --colocate <contracts_to_colocate_with>",
+      "Colocate with existing contracts",
       (value) => value.split(","),
       [],
     )
@@ -81,9 +81,7 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // parse colocation contract id and assign it if it exists
-  const colocateWithContractIds = options.extend
-    ? options.extend
-    : [];
+  const colocateWithContractIds = options.extend ? options.extend : [];
   if (colocateWithContractIds) {
     // check if contract actually exists
     for (const contractId of colocateWithContractIds) {
