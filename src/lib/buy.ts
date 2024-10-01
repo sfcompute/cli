@@ -13,7 +13,6 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors";
-import { getContract } from "../helpers/fetchers";
 import {
   pricePerGPUHourToTotalPriceCents,
   totalPriceToPricePerGPUHour,
