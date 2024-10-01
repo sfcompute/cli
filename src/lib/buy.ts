@@ -80,17 +80,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
   }
 
-  // parse colocation contract id and assign it if it exists
   const colocateWithContractIds = options.colo ? options.colo : [];
-  if (colocateWithContractIds) {
-    // check if contract actually exists
-    for (const contractId of colocateWithContractIds) {
-      const contract = await getContract(contractId);
-      if (!contract || contract.status !== "active") {
-        return logAndQuit(`Contract ${contractId} not found`);
-      }
-    }
-  }
 
   // default to 1 node if not specified
   const accelerators = options.accelerators ? Number(options.accelerators) : 1;
