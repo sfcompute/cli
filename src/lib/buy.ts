@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  colocate_with?: Array<string>;
+  extend?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -55,8 +55,8 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-c, --colocate_with <contract_id_array>",
-      "The IDs of the contracts to colocate with. Your order will be placed on the same cluster as the contracts.",
+      "-e, --extend <contract_id_array>",
+      "Extend an existing contract",
       (value) => value.split(","),
       [],
     )
@@ -81,8 +81,8 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // parse colocation contract id and assign it if it exists
-  const colocateWithContractIds = options.colocate_with
-    ? options.colocate_with
+  const colocateWithContractIds = options.extend
+    ? options.extend
     : [];
   if (colocateWithContractIds) {
     // check if contract actually exists
@@ -359,6 +359,7 @@ export async function placeBuyOrder(options: BuyOptions) {
       start_at: roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCents,
+      colocate_with: options.colocate_with,
     },
   });
 
