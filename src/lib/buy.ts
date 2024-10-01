@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  colo?: Array<string>;
+  colocate_with?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -55,7 +55,7 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-c, --colo <contracts_to_colocate_with>",
+      "-colo, --colocate_with <contracts_to_colocate_with>",
       "Colocate with existing contracts",
       (value) => value.split(","),
       [],
@@ -80,7 +80,9 @@ async function buyOrderAction(options: SfBuyOptions) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
   }
 
-  const colocateWithContractIds = options.colo ? options.colo : [];
+  const colocateWithContractIds = options.colocate_with
+    ? options.colocate_with
+    : [];
 
   // default to 1 node if not specified
   const accelerators = options.accelerators ? Number(options.accelerators) : 1;
