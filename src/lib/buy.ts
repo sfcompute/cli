@@ -325,7 +325,8 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   );
   const pricePerHourLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
 
-  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
+  const colocated_with = options.colocate_with.length === 0 ? "" : ` colocated with ${options.colocate_with.join(", ")}`;
+  const topLine = `${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} (${GPUS_PER_NODE * options.quantity} GPUs${colocated_with}) at ${pricePerHourLabel} per GPU hour for ${c.green(durationHumanReadable)} ${timeDescription}`;
 
   const dollarsLabel = c.green(centsToDollarsFormatted(pricePerGPUHour));
 
