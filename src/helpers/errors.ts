@@ -23,3 +23,7 @@ export function failedToConnect(): never {
     "Failed to connect to the server. Please check your internet connection and try again.",
   );
 }
+
+export function unreachable(): never {
+  throw new Error("unreachable code");
+}

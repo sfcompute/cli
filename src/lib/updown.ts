@@ -4,7 +4,11 @@ import type { Command } from "commander";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient";
 import { logAndQuit } from "../helpers/errors";
-import { centicentsToDollarsFormatted } from "../helpers/units";
+import {
+  type Cents,
+  centsToDollarsFormatted,
+  dollarsToCents,
+} from "../helpers/units";
 import { getBalance } from "./balance";
 import { getQuote } from "./buy";
 import { formatDuration } from "./orders";
@@ -22,7 +26,7 @@ export function registerUp(program: Command) {
     .option("-d, --duration <duration>", "Specify the minimum duration")
     .option(
       "-p, --price <price>",
-      "Specify the maximum price per node per hour",
+      "Specify the maximum price per node-hour, in dollars",
     );
 
   cmd.action(async (options) => {
@@ -41,12 +45,12 @@ export function registerDown(program: Command) {
   });
 }
 
-const DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTICENTS = 2.65 * 8 * 10_000;
+const DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTS = 2.65 * 8 * 100;
 
 async function getDefaultProcurementOptions(props: {
   duration?: string;
   n?: string;
-  pricePerNodeHour?: string;
+  pricePerNodeHourDollars?: string;
   type?: string;
 }) {
   // Minimum block duration is 2 hours
@@ -69,38 +73,35 @@ async function getDefaultProcurementOptions(props: {
   });
 
   // Eventually we should replace this price with yesterday's index price
-  let quotePrice = DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTICENTS;
+  let quotePrice = DEFAULT_PRICE_PER_NODE_HOUR_IN_CENTS;
   if (quote) {
-    // per hour price
+    // per hour price in cents
     quotePrice = quote.price / durationHours;
   }
 
-  const pricePerNodeHourInDollars = props.pricePerNodeHour
-    ? Number.parseInt(props.pricePerNodeHour)
+  const pricePerNodeHourInCents = props.pricePerNodeHourDollars
+    ? dollarsToCents(Number.parseFloat(props.pricePerNodeHourDollars))
     : quotePrice;
-  const pricePerNodeHourInCenticents = Math.ceil(pricePerNodeHourInDollars);
 
-  const totalPriceInCenticents =
-    pricePerNodeHourInCenticents *
-    Number.parseInt(props.n ?? "1") *
-    durationHours;
+  const totalPriceInCents =
+    pricePerNodeHourInCents * Number.parseInt(props.n ?? "1") * durationHours;
 
   return {
     durationHours,
-    pricePerNodeHourInCenticents,
+    pricePerNodeHourInCents,
     n,
     type,
-    totalPriceInCenticents,
+    totalPriceInCents,
   };
 }
 
 // Instruct the user to set a price that's lower
 function getSuggestedCommandWhenBalanceLow(props: {
   durationHours: number;
-  pricePerNodeHourInCenticents: number;
+  pricePerNodeHourInCents: Cents;
   n: number;
-  totalPriceInCenticents: number;
-  balance: number;
+  totalPriceInCents: Cents;
+  balance: Cents;
 }) {
   const affordablePrice = props.balance / 100 / (props.n * props.durationHours);
 
@@ -110,9 +111,9 @@ function getSuggestedCommandWhenBalanceLow(props: {
 
 function confirmPlaceOrderMessage(options: {
   durationHours: number;
-  pricePerNodeHourInCenticents: number;
+  pricePerNodeHourInCents: number;
   n: number;
-  totalPriceInCenticents: number;
+  totalPriceInCents: number;
   type: string;
 }) {
   const totalNodesLabel = c.green(options.n);
@@ -125,7 +126,7 @@ function confirmPlaceOrderMessage(options: {
   const topLine = `Turning on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${c.green(formatDuration(durationInMilliseconds))} ${timeDescription}`;
 
   const dollarsLabel = c.green(
-    centicentsToDollarsFormatted(options.pricePerNodeHourInCenticents),
+    centsToDollarsFormatted(options.pricePerNodeHourInCents),
   );
 
   const priceLine = `\n Pay ${dollarsLabel} per node hour?`;
@@ -142,13 +143,8 @@ async function up(props: {
 }) {
   const client = await apiClient();
 
-  const {
-    durationHours,
-    n,
-    type,
-    pricePerNodeHourInCenticents,
-    totalPriceInCenticents,
-  } = await getDefaultProcurementOptions(props);
+  const { durationHours, n, type, pricePerNodeHourInCents, totalPriceInCents } =
+    await getDefaultProcurementOptions(props);
 
   if (durationHours && durationHours < 1) {
     console.error("Minimum duration is 1 hour");
@@ -158,9 +154,9 @@ async function up(props: {
   if (!props.y) {
     const confirmationMessage = confirmPlaceOrderMessage({
       durationHours,
-      pricePerNodeHourInCenticents,
+      pricePerNodeHourInCents,
       n,
-      totalPriceInCenticents,
+      totalPriceInCents,
       type,
     });
     const confirmed = await confirm({
@@ -175,15 +171,15 @@ async function up(props: {
 
   const balance = await getBalance();
 
-  if (balance.available.centicents < totalPriceInCenticents) {
+  if (balance.available.cents < totalPriceInCents) {
     console.log(
-      `You can't afford this. Available balance: $${(balance.available.centicents / 1000000).toFixed(2)}, Minimum price: $${(totalPriceInCenticents / 1000000).toFixed(2)}\n`,
+      `You can't afford this. Available balance: $${(balance.available.cents / 100).toFixed(2)}, Minimum price: $${(totalPriceInCents / 100).toFixed(2)}\n`,
     );
     const cmd = getSuggestedCommandWhenBalanceLow({
       durationHours,
-      pricePerNodeHourInCenticents,
+      pricePerNodeHourInCents,
       n,
-      totalPriceInCenticents,
+      totalPriceInCents,
       balance: balance.available.whole,
     });
     console.log(cmd);
@@ -213,7 +209,7 @@ async function up(props: {
           // we only update the duration & price if it's set
           min_duration_in_hours: props.duration ? durationHours : undefined,
           max_price_per_node_hour: props.price
-            ? pricePerNodeHourInCenticents
+            ? pricePerNodeHourInCents
             : undefined,
         },
       });
@@ -225,7 +221,7 @@ async function up(props: {
     body: {
       instance_type: type,
       quantity: n,
-      max_price_per_node_hour: pricePerNodeHourInCenticents,
+      max_price_per_node_hour: pricePerNodeHourInCents,
       min_duration_in_hours: Math.max(durationHours, 1),
     },
   });
