@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  colocate_with?: Array<string>;
+  colo?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -55,7 +55,7 @@ export function registerBuy(program: Command) {
     .option("-s, --start <start>", "Specify the start date")
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-e, --colocate <contracts_to_colocate_with>",
+      "-c, --colo <contracts_to_colocate_with>",
       "Colocate with existing contracts",
       (value) => value.split(","),
       [],
@@ -81,9 +81,7 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   // parse colocation contract id and assign it if it exists
-  const colocateWithContractIds = options.colocate_with
-    ? options.colocate_with
-    : [];
+  const colocateWithContractIds = options.colo ? options.colo : [];
   if (colocateWithContractIds) {
     // check if contract actually exists
     for (const contractId of colocateWithContractIds) {
