@@ -68,6 +68,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/orders/cancel-all": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["postV0OrdersCancel-all"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v0/instances": {
     parameters: {
       query?: never;
@@ -210,9 +226,9 @@ export type $defs = Record<string, never>;
 export interface operations {
   getV0Prices: {
     parameters: {
-      query: {
+      query?: {
         /** @description The instance type. */
-        instance_type: string;
+        instance_type?: string;
         /** @description The minimum quantity of nodes filled blocks included in the price calculation contain. */
         min_quantity?: number;
         /** @description The maximum quantity of nodes filled blocks included in the price calculation contain. */
@@ -240,11 +256,11 @@ export interface operations {
               /** @constant */
               object: "price-history-item";
               gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
                 min: number;
-                /** @description The maximum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
                 max: number;
-                /** @description The average price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
                 avg: number;
               };
               /** @description ISO 8601 datetime marking the start of the period. */
@@ -263,11 +279,11 @@ export interface operations {
               /** @constant */
               object: "price-history-item";
               gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
                 min: number;
-                /** @description The maximum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
                 max: number;
-                /** @description The average price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
                 avg: number;
               };
               /** @description ISO 8601 datetime marking the start of the period. */
@@ -286,11 +302,11 @@ export interface operations {
               /** @constant */
               object: "price-history-item";
               gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
                 min: number;
-                /** @description The maximum price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
                 max: number;
-                /** @description The average price per GPU hour for the period (in centicents, 1/100th of a cent). */
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
                 avg: number;
               };
               /** @description ISO 8601 datetime marking the start of the period. */
@@ -343,11 +359,11 @@ export interface operations {
     parameters: {
       query: {
         side: "buy" | "sell";
-        /** @description Inclusive lower bound for the start time, as an ISO 8601 string. The query will consider all valid start times at or after this time. The difference between this and `max_start_time` can be at most 24 hours. */
-        min_start_date: string;
-        /** @description Inclusive upper bound for the start time, as an ISO 8601 string. The query will consider all valid start times on or before this time. The difference between this and `min_start_time` can be at most 24 hours. */
-        max_start_date: string;
-        /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
+        /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. The difference between this and `max_start_time` can be at most 24 hours. */
+        min_start_date: "NOW" | string;
+        /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. The difference between this and `min_start_time` can be at most 24 hours. */
+        max_start_date: "NOW" | string;
+        /** @description desired duration, in seconds. Since contracts must end on the hour, the actual duration returned by the quote may be longer than the requested duration by up to 59 minutes. */
         duration: number;
         /** @description The number of nodes. */
         quantity: number;
@@ -376,14 +392,14 @@ export interface operations {
                 /** @constant */
                 side: "buy";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   /** @description The instance type. */
                   instance_type: string;
                 } | null;
@@ -394,14 +410,14 @@ export interface operations {
                 /** @constant */
                 side: "sell";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   contract_id: string;
                 } | null;
               };
@@ -412,14 +428,14 @@ export interface operations {
                 /** @constant */
                 side: "buy";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   /** @description The instance type. */
                   instance_type: string;
                 } | null;
@@ -430,14 +446,14 @@ export interface operations {
                 /** @constant */
                 side: "sell";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   contract_id: string;
                 } | null;
               };
@@ -448,14 +464,14 @@ export interface operations {
                 /** @constant */
                 side: "buy";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   /** @description The instance type. */
                   instance_type: string;
                 } | null;
@@ -466,14 +482,14 @@ export interface operations {
                 /** @constant */
                 side: "sell";
                 quote: {
-                  /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+                  /** @description Price in cents (1 = $0.01) */
                   price: number;
                   /** @description The number of nodes. */
                   quantity: number;
                   /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
                   start_at: string;
-                  /** @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h. */
-                  duration: number;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
                   contract_id: string;
                 } | null;
               };
@@ -612,11 +628,10 @@ export interface operations {
               instance_type: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -634,11 +649,10 @@ export interface operations {
               contract_id: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -654,7 +668,7 @@ export interface operations {
                  * @constant
                  */
                 strategy: "linear";
-                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                 limit: number;
                 /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                 start_at?: string;
@@ -670,11 +684,10 @@ export interface operations {
               instance_type: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -692,11 +705,10 @@ export interface operations {
               contract_id: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -712,7 +724,7 @@ export interface operations {
                  * @constant
                  */
                 strategy: "linear";
-                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                 limit: number;
                 /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                 start_at?: string;
@@ -728,11 +740,10 @@ export interface operations {
               instance_type: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -750,11 +761,10 @@ export interface operations {
               contract_id: string;
               /** @description The number of nodes. */
               quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
+              start_at: string | "NOW";
               /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
               end_at: string;
-              /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+              /** @description Price in cents (1 = $0.01) */
               price: number;
               flags?: {
                 /** @description If true, this will be a market order. */
@@ -770,7 +780,7 @@ export interface operations {
                  * @constant
                  */
                 strategy: "linear";
-                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in centicents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                 limit: number;
                 /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                 start_at?: string;
@@ -912,7 +922,7 @@ export interface operations {
             start_at: string;
             /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
             end_at: string;
-            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Price in cents (1 = $0.01) */
             price: number;
             flags: {
               /** @description If true, this will be a market order. */
@@ -924,7 +934,7 @@ export interface operations {
             };
             executed: boolean;
             executed_at?: string;
-            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Execution price in cents (1 = $0.01) */
             execution_price?: number;
             cancelled: boolean;
             cancelled_at?: string;
@@ -951,7 +961,7 @@ export interface operations {
             start_at: string;
             /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
             end_at: string;
-            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Price in cents (1 = $0.01) */
             price: number;
             flags: {
               /** @description If true, this will be a market order. */
@@ -963,7 +973,7 @@ export interface operations {
             };
             executed: boolean;
             executed_at?: string;
-            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Execution price in cents (1 = $0.01) */
             execution_price?: number;
             cancelled: boolean;
             cancelled_at?: string;
@@ -990,7 +1000,7 @@ export interface operations {
             start_at: string;
             /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
             end_at: string;
-            /** @description Price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Price in cents (1 = $0.01) */
             price: number;
             flags: {
               /** @description If true, this will be a market order. */
@@ -1002,7 +1012,7 @@ export interface operations {
             };
             executed: boolean;
             executed_at?: string;
-            /** @description Execution price in Centicents (1/100th of a cent, One Centicent  = $0.0001) */
+            /** @description Execution price in cents (1 = $0.01) */
             execution_price?: number;
             cancelled: boolean;
             cancelled_at?: string;
@@ -1085,6 +1095,101 @@ export interface operations {
       path: {
         id: string;
       };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "pending";
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "pending";
+          };
+          "text/plain": {
+            /** @constant */
+            object: "pending";
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  "postV0OrdersCancel-all": {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -2479,21 +2584,21 @@ export interface operations {
       content: {
         "application/json": {
           quantity?: number;
-          /** @description The price (in centicents) per node per hour */
+          /** @description The price (in cents) per node per hour */
           max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
         };
         "multipart/form-data": {
           quantity?: number;
-          /** @description The price (in centicents) per node per hour */
+          /** @description The price (in cents) per node per hour */
           max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
         };
         "text/plain": {
           quantity?: number;
-          /** @description The price (in centicents) per node per hour */
+          /** @description The price (in cents) per node per hour */
           max_price_per_node_hour?: number;
           /** @description The block duration of the procurement in hours */
           min_duration_in_hours?: number;
