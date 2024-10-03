@@ -1,6 +1,5 @@
 import { confirm } from "@inquirer/prompts";
 import c from "chalk";
-import * as chrono from "chrono-node";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -21,6 +20,7 @@ import {
   type Cents,
   centsToDollarsFormatted,
   computeApproximateDurationSeconds,
+  parseStartDate,
   priceWholeToCents,
   roundEndDate,
   roundStartDate,
@@ -117,13 +117,12 @@ async function buyOrderAction(options: SfBuyOptions) {
   switch (options.start) {
     case null:
     case undefined:
-    case "NOW":
       startDate = "NOW";
       break;
     default: {
-      const parsed = chrono.parseDate(options.start);
+      const parsed = parseStartDate(options.start);
       if (!parsed) {
-        return logAndQuit("Invalid start date");
+        return logAndQuit(`Invalid start date: ${options.start}`);
       }
       startDate = parsed;
     }
