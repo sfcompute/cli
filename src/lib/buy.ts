@@ -50,7 +50,7 @@ export function registerBuy(program: Command) {
     .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
     .option("-p, --price <price>", "The price in dollars, per GPU hour")
-    .option("-s, --start <start>", "Specify the start date")
+    .option("-s, --start <start>", "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'")
     .option("-y, --yes", "Automatically confirm the order")
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
@@ -109,11 +109,23 @@ async function buyOrderAction(options: SfBuyOptions) {
   const confirmWithUser = yesFlagOmitted || !options.yes;
 
   // parse starts at
-  let startDate = options.start ? chrono.parseDate(options.start) : new Date();
-  if (!startDate) {
-    return logAndQuit("Invalid start date");
+  let startDate: Date | "NOW";
+  switch (options.start) {
+    case null:
+    case undefined:
+    case "NOW":
+      startDate = "NOW";
+      break; 
+    default: {
+      const parsed = chrono.parseDate(options.start);
+      if (!parsed) {
+        return logAndQuit("Invalid start date");
+      }
+      startDate = parsed;
+    }
   }
 
+  let endDate: Date = dayjs(startDate).add(durationSeconds, "s").toDate();
   if (options.quote) {
     const quote = await getQuote({
       instanceType: options.type,
@@ -125,6 +137,8 @@ async function buyOrderAction(options: SfBuyOptions) {
     if (!quote) {
       return logAndQuit("Not enough data exists to quote this order.");
     }
+
+    durationSeconds = dayjs(quote.end_at).diff(dayjs(quote.start_at), "s");
 
     const priceLabelUsd = c.green(centsToDollarsFormatted(quote.price));
     const priceLabelPerGPUHour = c.green(
@@ -138,8 +152,9 @@ async function buyOrderAction(options: SfBuyOptions) {
       ),
     );
 
+    endDate = new Date(quote.end_at);
     console.log(
-      `This order is projected to cost ${priceLabelUsd} total or ${priceLabelPerGPUHour} per GPU hour`,
+      `Found availability from ${c.green(quote.start_at)} to ${c.green(quote.end_at)} (${c.green(formatDuration(durationSeconds * 1000))}) at ${priceLabelUsd} total (${priceLabelPerGPUHour}/GPU-hour)`,
     );
   } else {
     // quote if no price was provided
@@ -163,8 +178,9 @@ async function buyOrderAction(options: SfBuyOptions) {
       }
 
       priceCents = quote.price;
-      durationSeconds = quote.duration;
+      durationSeconds = dayjs(quote.end_at).diff(dayjs(quote.start_at), "s");
       startDate = new Date(quote.start_at);
+      endDate = new Date(quote.end_at);
     }
 
     if (!durationSeconds) {
@@ -174,11 +190,21 @@ async function buyOrderAction(options: SfBuyOptions) {
       throw new Error("unexpectly no price provided");
     }
 
-    // round the start and end dates. If we came from a quote, they should already be rounded,
-    // however, there may have been a delay between the quote and now, so we may need to move the start time up to the next minute
-    startDate = roundStartDate(startDate);
-    let endDate = dayjs(startDate).add(durationSeconds, "s").toDate();
-    endDate = roundEndDate(endDate);
+    // round the start date if it's not "NOW". If it came from a quote, it's already rounded
+    const roundedStartDate = startDate !== "NOW" ? roundStartDate(startDate) : startDate;
+
+    // round the end date. If it came from a quote, it's already rounded
+    const roundedEndDate = roundEndDate(endDate);
+
+    // if we rounded the time, prorate the price
+    const roundedDurationSeconds = dayjs(roundedEndDate).diff(dayjs((roundedStartDate === "NOW" ? roundStartDate(new Date()) : roundedStartDate)), "s");
+    if (roundedDurationSeconds !== durationSeconds) {
+      const priceCentsPerSecond = priceCents / durationSeconds;
+      const roundedPriceCents = priceCentsPerSecond * roundedDurationSeconds;
+      console.log("Duration rounded to fit trading grid. Your price has been pro-rated to: ", c.green(centsToDollarsFormatted(roundedPriceCents)));
+      priceCents = roundedPriceCents;
+    }
+    
 
     if (confirmWithUser) {
       const confirmationMessage = confirmPlaceOrderMessage({
@@ -271,9 +297,8 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.quantity > 1 ? "nodes" : "node";
 
-  const durationHumanReadable = formatDuration(
-    options.endsAt.getTime() - options.startsAt.getTime(),
-  );
+  const durationSeconds = dayjs(options.endsAt).diff(dayjs(options.startsAt === "NOW" ? roundStartDate(new Date()) : options.startsAt), "s");
+  const durationHumanReadable = formatDuration(durationSeconds * 1000);
   const endsAtLabel = c.green(
     dayjs(options.endsAt).format("MM/DD/YYYY hh:mm A"),
   );
@@ -292,12 +317,9 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
 
-  const durationInSeconds = Math.ceil(
-    (options.endsAt.getTime() - options.startsAt.getTime()) / 1000,
-  );
   const pricePerGPUHour = totalPriceToPricePerGPUHour(
     options.priceCents,
-    durationInSeconds,
+    durationSeconds,
     options.quantity,
     GPUS_PER_NODE,
   );
@@ -318,7 +340,7 @@ type BuyOptions = {
   instanceType: string;
   priceCents: number;
   quantity: number;
-  startsAt: Date;
+  startsAt: Date | "NOW";
   endsAt: Date;
   confirmWithUser: boolean;
   quoteOnly: boolean;
@@ -331,7 +353,7 @@ export async function placeBuyOrder(options: BuyOptions) {
       instance_type: options.instanceType,
       quantity: options.quantity,
       // round start date again because the user might take a long time to confirm
-      start_at: roundStartDate(options.startsAt).toISOString(),
+      start_at: options.startsAt === "NOW" ? "NOW" : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCents,
     },
@@ -362,7 +384,7 @@ export async function placeBuyOrder(options: BuyOptions) {
 type QuoteOptions = {
   instanceType: string;
   quantity: number;
-  startsAt: Date;
+  startsAt: Date | "NOW";
   durationSeconds: number;
 };
 export async function getQuote(options: QuoteOptions) {
@@ -375,8 +397,8 @@ export async function getQuote(options: QuoteOptions) {
         instance_type: options.instanceType,
         quantity: options.quantity,
         duration: options.durationSeconds,
-        min_start_date: options.startsAt.toISOString(),
-        max_start_date: options.startsAt.toISOString(),
+        min_start_date: options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+        max_start_date: options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
       },
     },
   });
