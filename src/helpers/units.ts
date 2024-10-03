@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import type { Nullable } from "../types/empty";
 
 // -- time
@@ -23,6 +24,16 @@ export function roundStartDate(startDate: Date): Date {
   } else {
     return epochToDate(roundEpochUpToHour(startEpoch));
   }
+}
+
+export function computeApproximateDurationSeconds(
+  startDate: Date | "NOW",
+  endDate: Date,
+): number {
+  const startEpoch =
+    startDate === "NOW" ? currentEpoch() : dateToEpoch(startDate);
+  const endEpoch = dateToEpoch(endDate);
+  return dayjs(epochToDate(endEpoch)).diff(dayjs(epochToDate(startEpoch)), "s");
 }
 
 export function roundEndDate(endDate: Date): Date {
