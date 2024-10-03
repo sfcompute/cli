@@ -129,7 +129,9 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
   }
 
-  let endDate: Date = dayjs(startDate === "NOW" ? new Date() : startDate).add(durationSeconds, "s").toDate();
+  let endDate: Date = dayjs(startDate === "NOW" ? new Date() : startDate)
+    .add(durationSeconds, "s")
+    .toDate();
   let didQuote = false;
   if (options.quote) {
     const quote = await getQuote({
@@ -315,7 +317,9 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   const endsAtLabel = c.green(
     dayjs(options.endsAt).format("MM/DD/YYYY hh:mm A"),
   );
-  const fromNowTime = dayjs(options.startsAt === "NOW" ? new Date() : options.startsAt).fromNow();
+  const fromNowTime = dayjs(
+    options.startsAt === "NOW" ? new Date() : options.startsAt,
+  ).fromNow();
 
   let timeDescription: string;
   if (
@@ -325,7 +329,9 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
     timeDescription = `from ${c.green("now")} until ${endsAtLabel}`;
   } else {
     const startAtLabel = c.green(
-      options.startsAt === "NOW" ? "NOW" : dayjs(options.startsAt).format("MM/DD/YYYY hh:mm A"),
+      options.startsAt === "NOW"
+        ? "NOW"
+        : dayjs(options.startsAt).format("MM/DD/YYYY hh:mm A"),
     );
     timeDescription = `from ${startAtLabel} (${c.green(fromNowTime)}) until ${endsAtLabel}`;
   }
@@ -360,7 +366,9 @@ type BuyOptions = {
   confirmWithUser: boolean;
   quoteOnly: boolean;
 };
-export async function placeBuyOrder(options: Omit<BuyOptions, "durationSeconds">) {
+export async function placeBuyOrder(
+  options: Omit<BuyOptions, "durationSeconds">,
+) {
   const api = await apiClient();
   const { data, error, response } = await api.POST("/v0/orders", {
     body: {
