@@ -50,7 +50,10 @@ export function registerBuy(program: Command) {
     .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
     .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
     .option("-p, --price <price>", "The price in dollars, per GPU hour")
-    .option("-s, --start <start>", "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'")
+    .option(
+      "-s, --start <start>",
+      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
+    )
     .option("-y, --yes", "Automatically confirm the order")
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
@@ -115,7 +118,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     case undefined:
     case "NOW":
       startDate = "NOW";
-      break; 
+      break;
     default: {
       const parsed = chrono.parseDate(options.start);
       if (!parsed) {
@@ -191,20 +194,30 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
 
     // round the start date if it's not "NOW". If it came from a quote, it's already rounded
-    const roundedStartDate = startDate !== "NOW" ? roundStartDate(startDate) : startDate;
+    const roundedStartDate =
+      startDate !== "NOW" ? roundStartDate(startDate) : startDate;
 
     // round the end date. If it came from a quote, it's already rounded
     const roundedEndDate = roundEndDate(endDate);
 
     // if we rounded the time, prorate the price
-    const roundedDurationSeconds = dayjs(roundedEndDate).diff(dayjs((roundedStartDate === "NOW" ? roundStartDate(new Date()) : roundedStartDate)), "s");
+    const roundedDurationSeconds = dayjs(roundedEndDate).diff(
+      dayjs(
+        roundedStartDate === "NOW"
+          ? roundStartDate(new Date())
+          : roundedStartDate,
+      ),
+      "s",
+    );
     if (roundedDurationSeconds !== durationSeconds) {
       const priceCentsPerSecond = priceCents / durationSeconds;
       const roundedPriceCents = priceCentsPerSecond * roundedDurationSeconds;
-      console.log("Duration rounded to fit trading grid. Your price has been pro-rated to: ", c.green(centsToDollarsFormatted(roundedPriceCents)));
+      console.log(
+        "Duration rounded to fit trading grid. Your price has been pro-rated to: ",
+        c.green(centsToDollarsFormatted(roundedPriceCents)),
+      );
       priceCents = roundedPriceCents;
     }
-    
 
     if (confirmWithUser) {
       const confirmationMessage = confirmPlaceOrderMessage({
@@ -232,7 +245,7 @@ async function buyOrderAction(options: SfBuyOptions) {
       quantity,
       // round start date again because the user might have taken a long time to confirm
       // most of the time this will do nothing, but when it does it will move the start date forwrd one minute
-      startsAt: roundStartDate(startDate),
+      startsAt: startDate === "NOW" ? "NOW" : roundStartDate(startDate),
       endsAt: endDate,
       confirmWithUser,
       quoteOnly: isQuoteOnly,
@@ -297,7 +310,14 @@ function confirmPlaceOrderMessage(options: BuyOptions) {
   const instanceTypeLabel = c.green(options.instanceType);
   const nodesLabel = options.quantity > 1 ? "nodes" : "node";
 
-  const durationSeconds = dayjs(options.endsAt).diff(dayjs(options.startsAt === "NOW" ? roundStartDate(new Date()) : options.startsAt), "s");
+  const durationSeconds = dayjs(options.endsAt).diff(
+    dayjs(
+      options.startsAt === "NOW"
+        ? roundStartDate(new Date())
+        : options.startsAt,
+    ),
+    "s",
+  );
   const durationHumanReadable = formatDuration(durationSeconds * 1000);
   const endsAtLabel = c.green(
     dayjs(options.endsAt).format("MM/DD/YYYY hh:mm A"),
@@ -353,7 +373,10 @@ export async function placeBuyOrder(options: BuyOptions) {
       instance_type: options.instanceType,
       quantity: options.quantity,
       // round start date again because the user might take a long time to confirm
-      start_at: options.startsAt === "NOW" ? "NOW" : roundStartDate(options.startsAt).toISOString(),
+      start_at:
+        options.startsAt === "NOW"
+          ? "NOW"
+          : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCents,
     },
@@ -397,8 +420,10 @@ export async function getQuote(options: QuoteOptions) {
         instance_type: options.instanceType,
         quantity: options.quantity,
         duration: options.durationSeconds,
-        min_start_date: options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
-        max_start_date: options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+        min_start_date:
+          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+        max_start_date:
+          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
       },
     },
   });
