@@ -7,7 +7,9 @@ export async function waitForOrderToNotBePending(orderId: string) {
   const spinner = ora(
     `Order ${orderId} - pending (this can take a moment)`,
   ).start();
-  const maxTries = 25;
+
+  // 1 minute
+  const maxTries = 120;
   for (let i = 0; i < maxTries; i++) {
     const order = await getOrder(orderId);
 
