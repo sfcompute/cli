@@ -213,7 +213,9 @@ async function buyOrderAction(options: SfBuyOptions) {
     );
 
     const priceCentsPerSecond = priceCents / durationSeconds;
-    const roundedPriceCents = Math.ceil(priceCentsPerSecond * roundedDurationSeconds);
+    const roundedPriceCents = Math.ceil(
+      priceCentsPerSecond * roundedDurationSeconds,
+    );
 
     priceCents = roundedPriceCents;
     startDate = roundedStartDate;
