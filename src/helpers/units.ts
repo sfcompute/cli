@@ -1,3 +1,5 @@
+import * as chrono from "chrono-node";
+import dayjs from "dayjs";
 import type { Nullable } from "../types/empty";
 
 // -- time
@@ -23,6 +25,16 @@ export function roundStartDate(startDate: Date): Date {
   } else {
     return epochToDate(roundEpochUpToHour(startEpoch));
   }
+}
+
+export function computeApproximateDurationSeconds(
+  startDate: Date | "NOW",
+  endDate: Date,
+): number {
+  const startEpoch =
+    startDate === "NOW" ? currentEpoch() : dateToEpoch(startDate);
+  const endEpoch = dateToEpoch(endDate);
+  return dayjs(epochToDate(endEpoch)).diff(dayjs(epochToDate(startEpoch)), "s");
 }
 
 export function roundEndDate(endDate: Date): Date {
@@ -87,4 +99,18 @@ export function centsToDollars(cents: Cents): number {
 
 export function dollarsToCents(dollars: number): Cents {
   return Math.ceil(dollars * 100);
+}
+
+export function parseStartDate(startDate: string): Date | "NOW" | null {
+  const nowRe = /\b(?:"|')?[nN][oO][wW](?:"|')?\b/;
+  if (nowRe.test(startDate)) {
+    return "NOW";
+  }
+
+  const chronoDate = chrono.parseDate(startDate);
+  if (!chronoDate) {
+    return null;
+  }
+
+  return chronoDate;
 }
