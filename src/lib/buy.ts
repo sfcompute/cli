@@ -266,6 +266,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     endsAt: endDate,
     confirmWithUser,
     quoteOnly: isQuoteOnly,
+    colocate_with: colocateWithContractIds,
   });
 
   const order = await waitForOrderToNotBePending(res.id);
