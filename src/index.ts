@@ -14,8 +14,11 @@ import { registerSSH } from "./lib/ssh";
 import { registerTokens } from "./lib/tokens";
 import { registerDown, registerUp } from "./lib/updown";
 import { registerUpgrade } from "./lib/upgrade";
+import { checkVersion } from "./checkVersion";
 
 const program = new Command();
+
+await checkVersion();
 
 program
   .name("sf")

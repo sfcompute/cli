@@ -40,8 +40,10 @@ interface InstanceObject {
   object: "instance";
   id: string;
   type: InstanceType;
-  ip: string;
+  public_ip: string;
+  private_ip: string;
   status: string;
+  ssh_port: number | undefined;
 }
 
 async function listInstancesAction({
@@ -60,6 +62,7 @@ async function listInstancesAction({
       chalk.gray("Instance Id"),
       chalk.gray("Type"),
       chalk.gray("IP Address"),
+      chalk.gray("SSH Port"),
       chalk.gray("Status"),
     ];
 
@@ -83,7 +86,8 @@ async function listInstancesAction({
         ...instances.map((instance) => [
           instance.id,
           colorInstanceType(instance.type),
-          instance.ip,
+          instance.public_ip,
+          instance.ssh_port,
           instance.status,
         ]),
       );
@@ -110,7 +114,7 @@ const sortInstancesByTypeAndIp = () => {
     const priorityB =
       InstanceTypeSortPriority[b.type] || Number.MAX_SAFE_INTEGER;
     if (priorityA === priorityB) {
-      return compareIPs(a.ip, b.ip); // secondary sort on ips
+      return compareIPs(a.public_ip, b.public_ip); // secondary sort on public ips
     }
     return priorityA - priorityB;
   };
@@ -189,7 +193,9 @@ export async function getInstances({
     object: instance.object,
     id: instance.id,
     type: instance.type as InstanceType,
-    ip: instance.ip,
+    public_ip: instance.public_ip,
+    private_ip: instance.private_ip,
     status: instance.status,
+    ssh_port: instance.ssh_port,
   }));
 }

@@ -12,6 +12,7 @@ import {
   unreachable,
 } from "../helpers/errors";
 import { getInstances } from "./instances";
+import chalk from "chalk";
 
 // openssh-client doesn't check $HOME while homedir() does. This function is to
 // make it easy to fix if it causes issues.
@@ -315,10 +316,14 @@ export function registerSSH(program: Command) {
       if (!instance) {
         logAndQuit(`Instance ${name} not found`);
       }
-      if (instance.ip.split(":").length === 2) {
-        const [ip, port] = instance.ip.split(":");
+      if (instance.public_ip.split(":").length === 2 || instance.ssh_port) {
+        const [ip, port] = instance.public_ip.split(":");
+
+        const sshPort = instance.ssh_port?.toString() || port || "22";
+
+        console.log(chalk.dim(`ssh -p ${sshPort} ${options.user}@${ip}`));
         procResult = Bun.spawnSync(
-          ["ssh", "-p", port, util.format("%s@%s", options.user, ip)],
+          ["ssh", "-p", sshPort, util.format("%s@%s", options.user, ip)],
           {
             stdin: "inherit",
             stdout: "inherit",
@@ -326,8 +331,9 @@ export function registerSSH(program: Command) {
           },
         );
       } else {
+        console.log(chalk.dim(`ssh ${options.user}@${instance.public_ip}`));
         procResult = Bun.spawnSync(
-          ["ssh", util.format("%s@%s", options.user, instance.ip)],
+          ["ssh", util.format("%s@%s", options.user, instance.public_ip)],
           {
             stdin: "inherit",
             stdout: "inherit",
