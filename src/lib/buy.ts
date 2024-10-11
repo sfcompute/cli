@@ -163,7 +163,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     console.log(
       `Found availability from ${c.green(quote.start_at)} to ${c.green(quote.end_at)} (${c.green(formatDuration(durationSeconds * 1000))}) at ${priceLabelUsd} total (${priceLabelPerGPUHour}/GPU-hour)`,
     );
-    didQuote = true;
+    return;
   } else if (!priceCents) {
     const quote = await getQuote({
       instanceType: options.type,
@@ -185,7 +185,6 @@ async function buyOrderAction(options: SfBuyOptions) {
         return logAndQuit("Not enough data exists to quote this order.");
       }
       priceCents = aggressivePrice;
-      didQuote = false;
     }
   }
 
