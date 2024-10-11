@@ -16,7 +16,6 @@ export async function waitForOrderToNotBePending(orderId: string) {
     if (order && order?.status !== "pending") {
       spinner.text = `Order ${orderId} - ${order?.status}`;
       spinner.succeed();
-      console.log(chalk.green("Order placed successfully"));
       return order;
     }
     await new Promise((resolve) => setTimeout(resolve, 500));

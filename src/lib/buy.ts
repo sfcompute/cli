@@ -172,22 +172,21 @@ async function buyOrderAction(options: SfBuyOptions) {
       durationSeconds,
     });
 
-    if (!quote) {
-      const durationInHours = durationSeconds / 3600;
-
-      console.log(`No one is selling this right now. To ask someone to sell it to you, add a price you're willing to pay. For example:
-
-  sf buy -d "${durationInHours}h" -n ${quantity * GPUS_PER_NODE} -p "2.50" 
-        `);
-
-      return process.exit(1);
+    if (quote) {
+      startDate = quote.start_at === "NOW" ? "NOW" : new Date(quote.start_at);
+      endDate = new Date(quote.end_at);
+      durationSeconds = computeApproximateDurationSeconds(startDate, endDate);
+      priceCents = quote.price;
+      didQuote = true;
+    } else {
+      // Quote an aggressive price based on an index if the order won't fill immediately
+      const aggressivePrice = await getAggressivePrice(options.type);
+      if (!aggressivePrice) {
+        return logAndQuit("Not enough data exists to quote this order.");
+      }
+      priceCents = aggressivePrice;
+      didQuote = false;
     }
-
-    startDate = quote.start_at === "NOW" ? "NOW" : new Date(quote.start_at);
-    endDate = new Date(quote.end_at);
-    durationSeconds = computeApproximateDurationSeconds(startDate, endDate);
-    priceCents = quote.price;
-    didQuote = true;
   }
 
   if (!durationSeconds) {
@@ -261,6 +260,8 @@ async function buyOrderAction(options: SfBuyOptions) {
     return;
   }
 
+  console.log("\n");
+
   if (order.status === "filled") {
     const now = new Date();
     const startAt = new Date(order.start_at);
@@ -286,13 +287,13 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 
   if (order.status === "open") {
-    console.log(`Your order wasn't accepted yet. You can check it's status with:
+    console.log(`Your order hasn't filled yet. You can check it's status with:
 
-        sf orders ls
+  sf orders ls --only-open
   
-      If you want to cancel the order, you can do so with:
+If you want to cancel the order, you can do so with:
   
-        sf orders cancel ${order.id}
+  sf orders cancel ${order.id}
   
         `);
     return;
@@ -300,7 +301,7 @@ async function buyOrderAction(options: SfBuyOptions) {
 
   console.error(`Order likely did not execute. Check the status with:
 
-      sf orders ls
+  sf orders ls
 
     `);
 }
@@ -467,14 +468,33 @@ async function getOrder(orderId: string) {
   return order;
 }
 
-async function tryToGetOrder(orderId: string) {
-  for (let i = 0; i < 10; i++) {
-    const order = await getOrder(orderId);
-    if (order) {
-      return order;
-    }
-    await sleep(50);
+async function getMostRecentIndexAvgPrice(instanceType: string) {
+  const api = await apiClient();
+
+  const { data } = await api.GET("/v0/prices", {
+    params: {
+      query: {
+        instance_type: instanceType,
+      },
+    },
+  });
+
+  if (!data) {
+    return logAndQuit("Failed to get prices: Unexpected response from server");
   }
 
-  return undefined;
+  data.data.sort((a, b) => {
+    return dayjs(b.period_start).diff(dayjs(a.period_start));
+  });
+
+  return data.data[0].gpu_hour;
+}
+
+async function getAggressivePrice(instanceType: string) {
+  const mostRecentPrice = await getMostRecentIndexAvgPrice(instanceType);
+  if (!mostRecentPrice) {
+    return undefined;
+  }
+
+  return (mostRecentPrice.avg + mostRecentPrice.max) / 2;
 }
