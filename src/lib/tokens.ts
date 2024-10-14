@@ -6,7 +6,7 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import ora from "ora";
 import { getCommandBase } from "../helpers/command";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../config";
 import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,

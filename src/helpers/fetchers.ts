@@ -1,4 +1,4 @@
-import { apiClient } from "../apiClient";
+import { apiClient } from "../api/client";
 import { logAndQuit } from "./errors";
 
 export async function getContract(contractId: string) {

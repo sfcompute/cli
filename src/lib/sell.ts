@@ -2,8 +2,8 @@ import * as chrono from "chrono-node";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import parseDuration from "parse-duration";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../api/client";
+import { isLoggedIn } from "../config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,

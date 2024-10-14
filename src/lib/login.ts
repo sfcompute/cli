@@ -1,7 +1,7 @@
 import { exec } from "node:child_process";
 import type { Command } from "commander";
 import ora from "ora";
-import { saveConfig } from "../helpers/config";
+import { saveConfig } from "../config";
 import { clearScreen } from "../helpers/prompt";
 import { getWebAppUrl } from "../helpers/urls";
 

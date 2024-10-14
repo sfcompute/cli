@@ -3,7 +3,7 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,

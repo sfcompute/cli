@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import parseDuration from "parse-duration";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../api/client";
+import { isLoggedIn } from "../config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
@@ -26,7 +26,7 @@ import {
   roundStartDate,
 } from "../helpers/units";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "../helpers/empty";
 import { GPUS_PER_NODE } from "./constants";
 import { formatDuration } from "./orders";
 

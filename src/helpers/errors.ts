@@ -1,5 +1,5 @@
 import { getCommandBase } from "./command";
-import { clearAuthFromConfig } from "./config";
+import { clearAuthFromConfig } from "../config";
 
 export function logAndQuit(message: string): never {
   console.error(message);

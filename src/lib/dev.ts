@@ -3,12 +3,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import {
-  deleteConfig,
-  getConfigPath,
-  isLoggedIn,
-  loadConfig,
-} from "../helpers/config";
+import { deleteConfig, getConfigPath, isLoggedIn, loadConfig } from "../config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,

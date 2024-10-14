@@ -2,16 +2,21 @@ import { confirm } from "@inquirer/prompts";
 import c from "chalk";
 import type { Command } from "commander";
 import parseDuration from "parse-duration";
-import { apiClient } from "../apiClient";
-import { logAndQuit } from "../helpers/errors";
+import { apiClient } from "../api/client";
+import {
+  logAndQuit,
+  logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../helpers/errors";
 import {
   type Cents,
   centsToDollarsFormatted,
   dollarsToCents,
 } from "../helpers/units";
-import { getBalance } from "./balance";
+
 import { getQuote } from "./buy";
 import { formatDuration } from "./orders";
+import { isLoggedIn } from "../config";
 
 export function registerUp(program: Command) {
   const cmd = program
@@ -273,4 +278,71 @@ async function down(props: {
   }
 
   return res.data;
+}
+
+// --
+
+export type BalanceUsdCents = {
+  available: { cents: Cents; whole: number };
+  reserved: { cents: Cents; whole: number };
+};
+export async function getBalance(): Promise<BalanceUsdCents> {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
+    logLoginMessageAndQuit();
+
+    return {
+      available: { cents: 0, whole: 0 },
+      reserved: { cents: 0, whole: 0 },
+    };
+  }
+  const client = await apiClient();
+
+  const { data, error, response } = await client.GET("/v0/balance");
+
+  if (!response.ok) {
+    switch (response.status) {
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      case 500:
+        return logAndQuit(`Failed to get balance: ${error?.message}`);
+      default:
+        return logAndQuit(`Failed to get balance: ${response.statusText}`);
+    }
+  }
+
+  if (!data) {
+    return logAndQuit(
+      `Failed to get balance: Unexpected response from server: ${response}`,
+    );
+  }
+
+  let available: number;
+  switch (data.available.currency) {
+    case "usd":
+      available = data.available.amount;
+      break;
+    default:
+      logAndQuit(`Unsupported currency: ${data.available.currency}`);
+  }
+
+  let reserved: number;
+  switch (data.reserved.currency) {
+    case "usd":
+      reserved = data.reserved.amount;
+      break;
+    default:
+      logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
+  }
+
+  return {
+    available: {
+      cents: available,
+      whole: available / 100,
+    },
+    reserved: {
+      cents: reserved,
+      whole: reserved / 100,
+    },
+  };
 }
