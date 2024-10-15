@@ -58,7 +58,7 @@ export function registerBuy(program: Command) {
     )
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-colo, --colocate_with <contracts_to_colocate_with>",
+      "-colo, --colocate <contracts_to_colocate_with>",
       "Colocate with existing contracts",
       (value) => value.split(","),
       [],
