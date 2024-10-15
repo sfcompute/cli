@@ -41,6 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
+  colocate?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -56,6 +57,12 @@ export function registerBuy(program: Command) {
       "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
     )
     .option("-y, --yes", "Automatically confirm the order")
+    .option(
+      "-colo, --colocate <contracts_to_colocate_with>",
+      "Colocate with existing contracts",
+      (value) => value.split(","),
+      [],
+    )
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
 }
@@ -75,6 +82,8 @@ async function buyOrderAction(options: SfBuyOptions) {
   if (!durationSeconds) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
   }
+
+  const colocateWithContractIds = options.colocate ? options.colocate : [];
 
   // default to 1 node if not specified
   const accelerators = options.accelerators ? Number(options.accelerators) : 1;
@@ -231,6 +240,7 @@ async function buyOrderAction(options: SfBuyOptions) {
       endsAt: endDate,
       confirmWithUser,
       quoteOnly: isQuoteOnly,
+      colocate_with: colocateWithContractIds,
     });
     const confirmed = await confirm({
       message: confirmationMessage,
@@ -252,6 +262,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     endsAt: endDate,
     confirmWithUser,
     quoteOnly: isQuoteOnly,
+    colocate_with: colocateWithContractIds,
   });
 
   const order = await waitForOrderToNotBePending(res.id);
@@ -366,6 +377,7 @@ type BuyOptions = {
   durationSeconds: number;
   confirmWithUser: boolean;
   quoteOnly: boolean;
+  colocate_with: Array<string>;
 };
 export async function placeBuyOrder(
   options: Omit<BuyOptions, "durationSeconds">,
@@ -383,6 +395,7 @@ export async function placeBuyOrder(
           : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCents,
+      colocate_with: options.colocate_with,
     },
   });
 
