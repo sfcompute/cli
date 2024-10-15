@@ -41,7 +41,7 @@ interface SfBuyOptions {
   start?: string;
   yes?: boolean;
   quote?: boolean;
-  colocate_with?: Array<string>;
+  colocate?: Array<string>;
 }
 
 export function registerBuy(program: Command) {
@@ -83,9 +83,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
   }
 
-  const colocateWithContractIds = options.colocate_with
-    ? options.colocate_with
-    : [];
+  const colocateWithContractIds = options.colocate ? options.colocate : [];
 
   // default to 1 node if not specified
   const accelerators = options.accelerators ? Number(options.accelerators) : 1;
