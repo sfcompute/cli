@@ -63,7 +63,12 @@ elif [ "$OS" = "Darwin" ]; then
     ;;
   *)
     echo "Installing for Intel Mac"
-    target='bun-darwin-x64'
+    if [ "$(sysctl -n machdep.cpu.features | grep -c AVX2)" -eq 0 ]; then
+      echo "(older Intel Mac detected, using baseline build)"
+      target='bun-darwin-x64-baseline'
+    else
+      target='bun-darwin-x64'
+    fi
     ;;
   esac
 fi

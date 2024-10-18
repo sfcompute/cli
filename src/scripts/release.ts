@@ -46,8 +46,10 @@ async function saveVersion(version: string) {
 }
 
 const COMPILE_TARGETS: string[] = [
+  "bun-linux-x64-baseline",
   "bun-linux-x64",
   "bun-linux-arm64",
+  "bun-darwin-x64-baseline",
   "bun-darwin-x64",
   "bun-darwin-arm64",
 ];
