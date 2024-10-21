@@ -76,11 +76,17 @@ async function buyOrderAction(options: SfBuyOptions) {
   // normalize inputs
 
   const isQuoteOnly = options.quote ?? false;
-
   // parse duration
   let durationSeconds = parseDuration(options.duration, "s");
+
   if (!durationSeconds) {
     return logAndQuit(`Invalid duration: ${options.duration}`);
+  }
+
+  if (durationSeconds < 3600) {
+    return logAndQuit(
+      `Duration must be at least 1 hour, instead was ${durationSeconds} seconds. Try using -d '1h' instead.`,
+    );
   }
 
   const colocateWithContractIds = options.colocate ? options.colocate : [];
@@ -189,11 +195,27 @@ async function buyOrderAction(options: SfBuyOptions) {
       didQuote = true;
     } else {
       // Quote an aggressive price based on an index if the order won't fill immediately
-      const aggressivePrice = await getAggressivePrice(options.type);
-      if (!aggressivePrice) {
+      const aggressivePricePerHour = await getAggressivePricePerHour(
+        options.type,
+      );
+      if (!aggressivePricePerHour) {
         return logAndQuit("Not enough data exists to quote this order.");
       }
-      priceCents = aggressivePrice;
+      const roundedStartDate =
+        startDate !== "NOW" ? roundStartDate(startDate) : startDate;
+
+      // round the end date.
+      const roundedEndDate = roundEndDate(endDate);
+
+      const roundedDurationSeconds = computeApproximateDurationSeconds(
+        roundedStartDate,
+        roundedEndDate,
+      );
+      priceCents =
+        aggressivePricePerHour *
+        GPUS_PER_NODE *
+        quantity *
+        Math.ceil(roundedDurationSeconds / 3600);
     }
   }
 
@@ -448,6 +470,7 @@ export async function getQuote(options: QuoteOptions) {
   if (!response.ok) {
     switch (response.status) {
       case 400:
+        console.log("Error:", error);
         return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
@@ -502,11 +525,20 @@ async function getMostRecentIndexAvgPrice(instanceType: string) {
   return data.data[0].gpu_hour;
 }
 
-async function getAggressivePrice(instanceType: string) {
+async function getAggressivePricePerHour(instanceType: string) {
   const mostRecentPrice = await getMostRecentIndexAvgPrice(instanceType);
+  // We'll set a floor on the recommended price here, because the index price
+  // will report 0 if there was no data, which might happen due to an outage.
+  const minimumPrice = 75; // 75 cents
+
   if (!mostRecentPrice) {
-    return undefined;
+    return minimumPrice;
   }
 
-  return (mostRecentPrice.avg + mostRecentPrice.max) / 2;
+  const recommendedIndexPrice = (mostRecentPrice.avg + mostRecentPrice.max) / 2;
+  if (recommendedIndexPrice < minimumPrice) {
+    return minimumPrice;
+  }
+
+  return recommendedIndexPrice;
 }
