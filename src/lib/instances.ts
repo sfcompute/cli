@@ -44,8 +44,8 @@ interface InstanceObject {
   private_ip: string;
   status: string;
   ssh_port: number | undefined;
+  can_connect: boolean;
 }
-
 async function listInstancesAction({
   clusterId,
   returnJson,
@@ -64,6 +64,7 @@ async function listInstancesAction({
       chalk.gray("IP Address"),
       chalk.gray("SSH Port"),
       chalk.gray("Status"),
+      chalk.gray("Can SSH"),
     ];
 
     if (instances.length === 0) {
@@ -89,6 +90,7 @@ async function listInstancesAction({
           instance.public_ip,
           instance.ssh_port,
           instance.status,
+          instance.can_connect ? "Yes" : "No",
         ]),
       );
       console.log(
@@ -197,5 +199,6 @@ export async function getInstances({
     private_ip: instance.private_ip,
     status: instance.status,
     ssh_port: instance.ssh_port,
+    can_connect: instance.can_connect,
   }));
 }
