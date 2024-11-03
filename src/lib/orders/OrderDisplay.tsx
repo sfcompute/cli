@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { formatDuration } from ".";
 
 function Order(props: { order: HydratedOrder }) {
-    const headColor = "";
 
     const duration = dayjs(props.order.end_at).diff(props.order.start_at);
     const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
