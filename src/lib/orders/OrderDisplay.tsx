@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { formatDuration } from ".";
 
 function Order(props: { order: HydratedOrder }) {
-
     const duration = dayjs(props.order.end_at).diff(props.order.start_at);
     const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
     const pricePerGPUHour = props.order.price * props.order.quantity * GPUS_PER_NODE / durationInHours / 100;
@@ -25,6 +24,7 @@ function Order(props: { order: HydratedOrder }) {
                 <Text>{props.order.instance_type}</Text>
                 <Text>${pricePerGPUHour.toFixed(2)}/gpu/hr</Text>
                 <Text>{durationFormatted}</Text>
+                <Text>${props.order.price / 100}/total</Text>
             </Box>
             <Box gap={1}>
                 <Text>{dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()}</Text>
@@ -36,7 +36,6 @@ function Order(props: { order: HydratedOrder }) {
 }
 
 export function OrderDisplay(props: { orders: HydratedOrder[] }) {
-
     if (props.orders.length === 0) {
         return <Text>No orders found</Text>;
     }

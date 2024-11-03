@@ -101,7 +101,7 @@ export function registerOrders(program: Command) {
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
     )
-    .option("--exclude-cancelled", "Exclude cancelled orders")
+    .option("--include-cancelled", "Include cancelled orders")
     .option("--only-cancelled", "Show only cancelled orders")
     .option(
       "--min-cancelled-at <date>",
@@ -149,7 +149,7 @@ export function registerOrders(program: Command) {
         min_fill_price: options.minFillPrice,
         max_fill_price: options.maxFillPrice,
 
-        exclude_cancelled: options.excludeCancelled,
+        exclude_cancelled: !options.includeCancelled,
         only_cancelled: options.onlyCancelled,
         min_cancelled_at: options.minCancelledAt,
         max_cancelled_at: options.maxCancelledAt,
