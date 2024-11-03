@@ -1,16 +1,19 @@
-import Table from "cli-table3";
+
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { getAuthToken, isLoggedIn } from "../../helpers/config";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import { fetchAndHandleErrors } from "../helpers/fetch";
-import { getApiUrl } from "../helpers/urls";
+} from "../../helpers/errors";
+import { fetchAndHandleErrors } from "../../helpers/fetch";
+import { getApiUrl } from "../../helpers/urls";
+import { render, Text } from "ink";
+import { OrderDisplay } from "./OrderDisplay";
+import type { HydratedOrder, ListResponseBody } from "./types";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -44,115 +47,9 @@ export function formatDuration(ms: number) {
   return result || "0ms";
 }
 
-export type OrderType = "buy" | "sell";
-export enum OrderStatus {
-  Pending = "pending",
-  Rejected = "rejected",
-  Open = "open",
-  Cancelled = "cancelled",
-  Filled = "filled",
-  Expired = "expired",
-}
-export interface OrderFlags {
-  market: boolean;
-  post_only: boolean;
-  ioc: boolean;
-  prorate: boolean;
-}
-
-export interface HydratedOrder {
-  object: "order";
-  id: string;
-  side: OrderType;
-  instance_type: string;
-  price: number;
-  start_at: string;
-  end_at: string;
-  quantity: number;
-  flags: OrderFlags;
-  created_at: string;
-  executed: boolean;
-  execution_price?: number;
-  cancelled: boolean;
-  status: OrderStatus;
-}
-
-export type PlaceSellOrderParameters = {
-  side: "sell";
-  quantity: number;
-  price: number;
-  start_at: string;
-  end_at: string;
-  contract_id: string;
-};
-
-export type PlaceOrderParameters = {
-  side: "buy";
-  quantity: number;
-  price: number;
-  instance_type: string;
-  duration: number;
-  start_at: string;
-};
-
-interface ListResponseBody<T> {
-  data: T[];
-  object: "list";
-}
-
-function printAsTable(orders: Array<HydratedOrder>) {
-  orders.sort((a, b) => a.start_at.localeCompare(b.start_at));
-  const table = new Table({
-    head: [
-      "ID",
-      "Side",
-      "Type",
-      "Price",
-      "Quantity",
-      "Duration",
-      "Start",
-      "Status",
-      "Execution Price",
-    ],
-  });
-  for (const order of orders) {
-    if (order.status === "pending") {
-      table.push([order.id, "-", "-", "-", "-", "-", "-", order.status]);
-    } else {
-      let status: string;
-      let executionPrice: number | undefined;
-      if (order.cancelled) {
-        status = "cancelled";
-      } else if (order.executed) {
-        status = "filled";
-        executionPrice = order.execution_price;
-      } else {
-        status = order.status;
-      }
-
-      const startDate = new Date(order.start_at);
-      const duration = formatDuration(
-        dayjs(order.end_at).diff(dayjs(startDate), "ms"),
-      );
-      table.push([
-        order.id,
-        order.side,
-        order.instance_type,
-        usdFormatter.format(order.price / 100),
-        order.quantity.toString(),
-        duration,
-        startDate.toLocaleString(),
-        status,
-        executionPrice ? usdFormatter.format(executionPrice / 100) : "-",
-      ]);
-    }
-  }
-
-  console.log(table.toString() + "\n");
-}
 
 export function registerOrders(program: Command) {
-  const ordersCommand = program.command("orders").description("Manage orders");
+  const ordersCommand = program.command("orders").alias("o").alias("order").description("Manage orders");
 
   ordersCommand
     .command("ls")
@@ -267,7 +164,7 @@ export function registerOrders(program: Command) {
       if (options.json) {
         console.log(JSON.stringify(orders, null, 2));
       } else {
-        printAsTable(orders);
+        render(<OrderDisplay orders={orders} />);
       }
 
       process.exit(0);
@@ -348,7 +245,7 @@ export async function getOrders(props: {
 
 export async function submitOrderCancellationByIdAction(
   orderId: string,
-): Promise<never> {
+): Promise<any> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();

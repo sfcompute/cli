@@ -8,7 +8,7 @@ import { registerContracts } from "./lib/contracts";
 import { registerDev } from "./lib/dev";
 import { registerInstances } from "./lib/instances";
 import { registerLogin } from "./lib/login";
-import { registerOrders } from "./lib/orders";
+import { registerOrders } from "./lib/orders/index";
 import { registerSell } from "./lib/sell";
 import { registerSSH } from "./lib/ssh";
 import { registerTokens } from "./lib/tokens";
