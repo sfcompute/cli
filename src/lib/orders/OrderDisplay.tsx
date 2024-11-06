@@ -32,7 +32,19 @@ function Order(props: { order: HydratedOrder }) {
 
 export function OrderDisplay(props: { orders: HydratedOrder[] }) {
     if (props.orders.length === 0) {
-        return <Text>No orders found</Text>;
+        return <Box flexDirection="column" gap={1} paddingBottom={1}>
+            <Text>No orders found.</Text>
+
+            <Box paddingLeft={4} flexDirection="column" >
+                <Text dimColor># View all public standing orders</Text>
+                <Text color="yellow">sf orders list --public</Text>
+            </Box>
+
+            <Box paddingLeft={4} flexDirection="column" >
+                <Text dimColor># Place an order to buy compute</Text>
+                <Text color="yellow">sf buy</Text>
+            </Box>
+        </Box>
     }
 
     return props.orders.map((order) => {

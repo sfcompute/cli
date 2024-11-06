@@ -43,7 +43,7 @@ export function InstanceList(props: { instances: InstanceObject[] }) {
             <Text>No instances found, you either haven't bought any, or they haven't started yet.</Text>
 
             <Box paddingLeft={4} flexDirection="column" >
-                <Text dimColor># List contracts to see when instances will start</Text>
+                <Text dimColor># List contracts you've bought to see when instances will start</Text>
                 <Text color="yellow">sf contracts list</Text>
             </Box>
 
