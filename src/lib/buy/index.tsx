@@ -8,6 +8,11 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors";
 import { roundStartDate } from "../../helpers/units";
+import parseDurationFromLibrary from "parse-duration";
+import { render } from "ink";
+import Quote from "./Quote";
+import { parseDate } from 'chrono-node'
+import { GPUS_PER_NODE } from "../constants";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -46,7 +51,64 @@ export function registerBuy(program: Command) {
     .action(buyOrderAction);
 }
 
-function buyOrderAction(options: SfBuyOptions) { }
+function parseStart(start?: string) {
+  if (!start) {
+    return "NOW";
+  }
+
+  if (start === "NOW") {
+    return "NOW";
+  }
+
+  const parsed = parseDate(start);
+  if (!parsed) {
+    return logAndQuit(`Invalid start date: ${start}`);
+  }
+
+  return parsed;
+}
+
+function parseAccelerators(accelerators?: string) {
+  if (!accelerators) {
+    return 1;
+  }
+
+  return Number.parseInt(accelerators) / GPUS_PER_NODE;
+}
+
+function parseDuration(duration?: string) {
+  if (!duration) {
+    return 1 * 60 * 60; // 1 hour
+  }
+
+  const parsed = parseDurationFromLibrary(duration);
+  if (!parsed) {
+    return logAndQuit(`Invalid duration: ${duration}`);
+  }
+
+  return parsed / 1000;
+}
+
+async function quoteAction(options: SfBuyOptions) {
+  const quote = await getQuoteFromParsedSfBuyOptions(options);
+  render(<Quote quote={quote} />)
+}
+
+/*
+Flow is:
+1. If --quote, get quote and exit
+2. If -p is provided, use it as the price
+3. Otherwise, get a price by quoting the market
+4. If --yes isn't provided, ask for confirmation
+5. Place order
+ */
+async function buyOrderAction(options: SfBuyOptions) {
+  if (options.quote) {
+    return quoteAction(options);
+  }
+
+
+}
 
 type BuyOptions = {
   instanceType: string;
@@ -98,6 +160,15 @@ export async function placeBuyOrder(
   }
 
   return data;
+}
+
+async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
+  return await getQuote({
+    instanceType: options.type,
+    quantity: parseAccelerators(options.accelerators),
+    startsAt: parseStart(options.start),
+    durationSeconds: parseDuration(options.duration),
+  });
 }
 
 type QuoteOptions = {
