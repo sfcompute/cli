@@ -2,9 +2,12 @@ import type { Command } from "commander";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { apiClient } from "../apiClient";
-import { logAndQuit, logSessionTokenExpiredAndQuit } from "../helpers/errors";
-import { roundStartDate } from "../helpers/units";
+import { apiClient } from "../../apiClient";
+import {
+  logAndQuit,
+  logSessionTokenExpiredAndQuit,
+} from "../../helpers/errors";
+import { roundStartDate } from "../../helpers/units";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -43,7 +46,7 @@ export function registerBuy(program: Command) {
     .action(buyOrderAction);
 }
 
-function buyOrderAction(options: SfBuyOptions) {}
+function buyOrderAction(options: SfBuyOptions) { }
 
 type BuyOptions = {
   instanceType: string;
@@ -144,11 +147,7 @@ export async function getQuote(options: QuoteOptions) {
   return data.quote;
 }
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function getOrder(orderId: string) {
+export async function getOrder(orderId: string) {
   const api = await apiClient();
 
   const { data: order } = await api.GET("/v0/orders/{id}", {
@@ -157,7 +156,7 @@ async function getOrder(orderId: string) {
   return order;
 }
 
-async function getMostRecentIndexAvgPrice(instanceType: string) {
+export async function getMostRecentIndexAvgPrice(instanceType: string) {
   const api = await apiClient();
 
   const { data } = await api.GET("/v0/prices", {
@@ -179,7 +178,7 @@ async function getMostRecentIndexAvgPrice(instanceType: string) {
   return data.data[0].gpu_hour;
 }
 
-async function getAggressivePricePerHour(instanceType: string) {
+export async function getAggressivePricePerHour(instanceType: string) {
   const mostRecentPrice = await getMostRecentIndexAvgPrice(instanceType);
   // We'll set a floor on the recommended price here, because the index price
   // will report 0 if there was no data, which might happen due to an outage.
