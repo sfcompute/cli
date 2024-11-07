@@ -1,6 +1,6 @@
 import * as chrono from "chrono-node";
 import dayjs from "dayjs";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "../types/empty.ts";
 
 // -- time
 
@@ -31,9 +31,8 @@ export function computeApproximateDurationSeconds(
   startDate: Date | "NOW",
   endDate: Date,
 ): number {
-  const startEpoch = startDate === "NOW"
-    ? currentEpoch()
-    : dateToEpoch(startDate);
+  const startEpoch =
+    startDate === "NOW" ? currentEpoch() : dateToEpoch(startDate);
   const endEpoch = dateToEpoch(endDate);
   return dayjs(epochToDate(endEpoch)).diff(dayjs(epochToDate(startEpoch)), "s");
 }

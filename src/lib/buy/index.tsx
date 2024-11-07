@@ -7,7 +7,7 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { roundStartDate } from "../../helpers/units.ts";
+import { parseStartDate, roundStartDate } from "../../helpers/units.ts";
 import parseDurationFromLibrary from "parse-duration";
 import { Box, render, useApp, useInput } from "ink";
 import { parseDate } from "chrono-node";
@@ -21,6 +21,7 @@ import ConfirmInput from "../ConfirmInput.tsx";
 import React from 'react'
 import { Row } from "../Row.tsx";
 import ms from "npm:ms";
+import Spinner from "ink-spinner";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -66,7 +67,7 @@ function parseStart(start?: string) {
     return "NOW";
   }
 
-  if (start === "NOW") {
+  if (start === "NOW" || start === "now") {
     return "NOW";
   }
 
@@ -76,6 +77,15 @@ function parseStart(start?: string) {
   }
 
   return parsed;
+}
+
+function parseStartAsDate(start?: string) {
+  const date = parseStart(start);
+  if (date === "NOW") {
+    return new Date();
+  }
+
+  return date;
 }
 
 function parseAccelerators(accelerators?: string) {
@@ -106,7 +116,7 @@ function parsePricePerGpuHour(price?: string) {
 
   // Remove $ if present
   const priceWithoutDollar = price.replace("$", "");
-  return Number.parseFloat(priceWithoutDollar);
+  return Number.parseFloat(priceWithoutDollar) * 100;
 }
 
 async function quoteAction(options: SfBuyOptions) {
@@ -146,18 +156,7 @@ function roundEndDate(endDate: Date) {
   return dayjs(endDate).add(1, "hour").startOf("hour")
 }
 
-function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
-  const [answer, setAnswer] = useState("");
-  const [value, setValue] = useState("");
-  const handleSubmit = useCallback((submitValue: boolean) => {
-    if (submitValue === false) {
-      setAnswer("You are heartless…");
-      return;
-    }
-
-    setAnswer("You love unicorns!");
-  }, []);
-
+function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
@@ -174,50 +173,94 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", d
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-
   const totalPrice = (props.price * props.size * GPUS_PER_NODE * realDurationHours) / 100;
+
+  return (<Box flexDirection="column">
+    <Text color="yellow">Buy Order</Text>
+    <Row headWidth={7} head="type" value={props.type} />
+    <Box>
+      <Box width={7}>
+        <Text dimColor>start</Text>
+      </Box>
+      <Box gap={1}>
+        <Text>{start}</Text>
+        <Text dimColor>{props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}</Text>
+      </Box>
+    </Box>
+    <Box>
+      <Box width={7}>
+        <Text dimColor>end</Text>
+      </Box>
+      <Box gap={1}>
+        <Text>{end}</Text>
+        <Text dimColor>({endFromNow})</Text>
+      </Box>
+    </Box>
+    <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
+    <Row headWidth={7} head="size" value={`${props.size * GPUS_PER_NODE} gpus`} />
+    <Row headWidth={7} head="rate" value={`$${(props.price / 100).toFixed(2)}/gpu/hr`} />
+    <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
+  </Box>)
+}
+
+function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [value, setValue] = useState("");
+  const { exit } = useApp();
+  const handleSubmit = useCallback((submitValue: boolean) => {
+    if (submitValue === false) {
+      setIsLoading(false);
+      exit();
+      return;
+    }
+
+    setIsLoading(true);
+  }, [exit]);
+
+  const [order, setOrder] = useState<Awaited<ReturnType<typeof getOrder>> | null>(null);
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (isLoading) {
+      interval = setInterval(async () => {
+        if (!isLoading) {
+          exit();
+        }
+
+        const o = await getOrder(value);
+        setOrder(o);
+
+        if (o && o.status != "pending") {
+          setIsLoading(false);
+        }
+      }, 3000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isLoading, exit, value]);
 
   return (
     <Box gap={1} flexDirection="column">
-      <Box flexDirection="column">
-        <Text color="yellow">Buy Order</Text>
-        <Row headWidth={7} head="type" value={props.type} />
-        <Box>
-          <Box width={7}>
-            <Text dimColor>start</Text>
-          </Box>
-          <Box gap={1}>
-            <Text>{start}</Text>
-            <Text dimColor>{props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}</Text>
-          </Box>
-        </Box>
-        <Box>
-          <Box width={7}>
-            <Text dimColor>end</Text>
-          </Box>
-          <Box gap={1}>
-            <Text>{end}</Text>
-            <Text dimColor>({endFromNow})</Text>
-          </Box>
-        </Box>
-        <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
-        <Row headWidth={7} head="size" value={`${props.size * GPUS_PER_NODE} gpus`} />
-        <Row headWidth={7} head="rate" value={`$${(props.price / 100).toFixed(2)}/gpu/hr`} />
-        <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
-      </Box>
+      <BuyOrderPreview {...props} />
 
-      <Box gap={1}>
+      {!isLoading && <Box gap={1}>
         <Text>Place order? (y/n)</Text>
 
         <ConfirmInput
-          isChecked
+          isChecked={false}
           value={value}
           onChange={setValue}
           onSubmit={handleSubmit}
         />
-      </Box>
 
-      <Text>{answer}</Text>
+      </Box>}
+      {isLoading && <Box gap={1}>
+        <Spinner type="dots" />
+        <Text>Placing order...</Text>
+      </Box>}
     </Box>
   );
 }
@@ -275,12 +318,11 @@ export async function placeBuyOrder(
 
 function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
-    dayjs(quote.start_at),
-    "seconds",
+    parseStartAsDate(quote.start_at),
   );
-  const durationHours = durationSeconds / 3600;
+  const durationHours = durationSeconds / 3600 / 1000;
 
-  return quote.price / 100 / GPUS_PER_NODE / quote.quantity / durationHours;
+  return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
