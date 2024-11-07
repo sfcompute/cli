@@ -18,6 +18,7 @@ import TextInput from "ink-text-input";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
+import React from 'react'
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);

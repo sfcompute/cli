@@ -2,7 +2,7 @@ import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { Command } from "commander";
 import dayjs from "npm:dayjs@1.11.13";
-import utc from "npm:dayjs@1.11.13/plugin/utc";
+import utc from "npm:dayjs@1.11.13/plugin/utc.js";
 import {
   deleteConfig,
   getConfigPath,
@@ -120,9 +120,9 @@ function registerEpoch(program: Command) {
         timestamps.forEach((epochTimestamp, i) => {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
-            `${colorDiffedEpochs[i]} | ${
-              chalk.yellow(dayjs(date).format("hh:mm A MM-DD-YYYY"))
-            } Local`,
+            `${colorDiffedEpochs[i]} | ${chalk.yellow(
+              dayjs(date).format("hh:mm A MM-DD-YYYY"),
+            )} Local`,
           );
         });
       }

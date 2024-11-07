@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import { version } from "../package.json" with { type: "json" };
+import pkg from "../package.json" with { type: "json" };
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
 import { registerContracts } from "./lib/contracts/index.tsx";
@@ -23,7 +23,7 @@ await checkVersion();
 program
   .name("sf")
   .description("The San Francisco Compute command line tool.")
-  .version(version);
+  .version(pkg.version);
 
 // commands
 registerLogin(program);
@@ -42,4 +42,4 @@ registerDown(program);
 // (development commands)
 registerDev(program);
 
-program.parse(Bun.argv);
+program.parse(process.argv);
