@@ -1,4 +1,4 @@
-import { failedToConnect } from "./errors";
+import { failedToConnect } from "./errors.ts";
 
 export const fetchAndHandleErrors: typeof fetch = async (url, init) => {
   try {

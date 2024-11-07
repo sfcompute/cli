@@ -2,16 +2,16 @@ import { confirm } from "@inquirer/prompts";
 import c from "chalk";
 import type { Command } from "commander";
 import parseDuration from "parse-duration";
-import { apiClient } from "../apiClient";
-import { logAndQuit } from "../helpers/errors";
+import { apiClient } from "../apiClient.ts";
+import { logAndQuit } from "../helpers/errors.ts";
 import {
   type Cents,
   centsToDollarsFormatted,
   dollarsToCents,
-} from "../helpers/units";
-import { getBalance } from "./balance";
-import { getQuote } from "./buy";
-import { formatDuration } from "./orders";
+} from "../helpers/units.ts";
+import { getBalance } from "./balance.ts";
+import { getQuote } from "./buy/index.tsx";
+import { formatDuration } from "./orders/index.tsx";
 
 export function registerUp(program: Command) {
   const cmd = program
@@ -83,8 +83,8 @@ async function getDefaultProcurementOptions(props: {
     ? dollarsToCents(Number.parseFloat(props.pricePerNodeHourDollars))
     : quotePrice;
 
-  const totalPriceInCents =
-    pricePerNodeHourInCents * Number.parseInt(props.n ?? "1") * durationHours;
+  const totalPriceInCents = pricePerNodeHourInCents *
+    Number.parseInt(props.n ?? "1") * durationHours;
 
   return {
     durationHours,
@@ -105,7 +105,9 @@ function getSuggestedCommandWhenBalanceLow(props: {
 }) {
   const affordablePrice = props.balance / 100 / (props.n * props.durationHours);
 
-  const cmd = `sf up -n ${props.n} -d ${props.durationHours}h -p ${affordablePrice.toFixed(2)}`;
+  const cmd = `sf up -n ${props.n} -d ${props.durationHours}h -p ${
+    affordablePrice.toFixed(2)
+  }`;
   return `You could try setting a lower price and your nodes will turn on\nif the market price dips this low:\n\n\t${cmd}\n`;
 }
 
@@ -123,7 +125,10 @@ function confirmPlaceOrderMessage(options: {
 
   const timeDescription = `starting ${c.green("ASAP")} until you turn it off`;
 
-  const topLine = `Turning on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${c.green(formatDuration(durationInMilliseconds))} ${timeDescription}`;
+  const topLine =
+    `Turning on ${totalNodesLabel} ${instanceTypeLabel} ${nodesLabel} continuously for ${
+      c.green(formatDuration(durationInMilliseconds))
+    } ${timeDescription}`;
 
   const dollarsLabel = c.green(
     centsToDollarsFormatted(options.pricePerNodeHourInCents),
@@ -173,7 +178,9 @@ async function up(props: {
 
   if (balance.available.cents < totalPriceInCents) {
     console.log(
-      `You can't afford this. Available balance: $${(balance.available.cents / 100).toFixed(2)}, Minimum price: $${(totalPriceInCents / 100).toFixed(2)}\n`,
+      `You can't afford this. Available balance: $${
+        (balance.available.cents / 100).toFixed(2)
+      }, Minimum price: $${(totalPriceInCents / 100).toFixed(2)}\n`,
     );
     const cmd = getSuggestedCommandWhenBalanceLow({
       durationHours,

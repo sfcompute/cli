@@ -1,24 +1,23 @@
 import type { Command } from "commander";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { apiClient } from "../../apiClient";
+import dayjs from "npm:dayjs@1.11.13";
+import duration from "npm:dayjs@1.11.13/plugin/duration.js";
+import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import { apiClient } from "../../apiClient.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../../helpers/errors";
-import { roundStartDate } from "../../helpers/units";
+} from "../../helpers/errors.ts";
+import { roundStartDate } from "../../helpers/units.ts";
 import parseDurationFromLibrary from "parse-duration";
 import { Box, render, useApp, useInput } from "ink";
-import { parseDate } from 'chrono-node'
-import { GPUS_PER_NODE } from "../constants";
-import type { Quote } from "./types";
-import QuoteDisplay from "./Quote";
+import { parseDate } from "chrono-node";
+import { GPUS_PER_NODE } from "../constants.ts";
+import type { Quote } from "./types.ts";
+import QuoteDisplay from "./Quote.tsx";
 import TextInput from "ink-text-input";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
-import ConfirmInput from "../ConfirmInput";
-
+import ConfirmInput from "../ConfirmInput.tsx";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -39,7 +38,7 @@ const Counter = () => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCounter(previousCounter => previousCounter + 1);
+      setCounter((previousCounter) => previousCounter + 1);
     }, 100);
 
     return () => {
@@ -73,7 +72,7 @@ export function registerBuy(program: Command) {
     )
     .option("--quote", "Only provide a quote for the order")
     .action(() => {
-      render(<Robot />)
+      render(<Robot />);
     });
 }
 
@@ -121,13 +120,13 @@ function parsePricePerGpuHour(price?: string) {
   }
 
   // Remove $ if present
-  const priceWithoutDollar = price.replace('$', '');
+  const priceWithoutDollar = price.replace("$", "");
   return Number.parseFloat(priceWithoutDollar);
 }
 
 async function quoteAction(options: SfBuyOptions) {
   const quote = await getQuoteFromParsedSfBuyOptions(options);
-  render(<QuoteDisplay quote={quote} />)
+  render(<QuoteDisplay quote={quote} />);
 }
 
 function Robot() {
@@ -136,7 +135,7 @@ function Robot() {
   const [y, setY] = useState(1);
 
   useInput((input, key) => {
-    if (input === 'q') {
+    if (input === "q") {
       exit();
     }
 
@@ -176,14 +175,13 @@ Flow is:
 5. Place order
  */
 async function buyOrderAction(options: SfBuyOptions) {
-
   render(<Robot />);
 
   if (options.quote) {
     return quoteAction(options);
   }
 
-  // Grab the price per GPU hour, either 
+  // Grab the price per GPU hour, either
   let pricePerGpuHour: number | null = parsePricePerGpuHour(options.price);
   if (!pricePerGpuHour) {
     const quote = await getQuoteFromParsedSfBuyOptions(options);
@@ -202,17 +200,16 @@ async function buyOrderAction(options: SfBuyOptions) {
 }
 
 function BuyOrder() {
-
-  return <Robot />
-  const [answer, setAnswer] = useState('');
-  const [value, setValue] = useState('');
+  return <Robot />;
+  const [answer, setAnswer] = useState("");
+  const [value, setValue] = useState("");
   const handleSubmit = useCallback((submitValue: boolean) => {
     if (submitValue === false) {
-      setAnswer('You are heartless…');
+      setAnswer("You are heartless…");
       return;
     }
 
-    setAnswer('You love unicorns!');
+    setAnswer("You love unicorns!");
   }, []);
 
   return (
@@ -251,10 +248,9 @@ export async function placeBuyOrder(
       instance_type: options.instanceType,
       quantity: options.quantity,
       // round start date again because the user might take a long time to confirm
-      start_at:
-        options.startsAt === "NOW"
-          ? "NOW"
-          : roundStartDate(options.startsAt).toISOString(),
+      start_at: options.startsAt === "NOW"
+        ? "NOW"
+        : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.priceCents,
       colocate_with: options.colocate_with,
@@ -284,7 +280,10 @@ export async function placeBuyOrder(
 }
 
 function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
-  const durationSeconds = dayjs(quote.end_at).diff(dayjs(quote.start_at), 'seconds');
+  const durationSeconds = dayjs(quote.end_at).diff(
+    dayjs(quote.start_at),
+    "seconds",
+  );
   const durationHours = durationSeconds / 3600;
 
   return quote.price / 100 / GPUS_PER_NODE / quote.quantity / durationHours;
@@ -315,10 +314,12 @@ export async function getQuote(options: QuoteOptions) {
         instance_type: options.instanceType,
         quantity: options.quantity,
         duration: options.durationSeconds,
-        min_start_date:
-          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
-        max_start_date:
-          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+        min_start_date: options.startsAt === "NOW"
+          ? "NOW"
+          : options.startsAt.toISOString(),
+        max_start_date: options.startsAt === "NOW"
+          ? "NOW"
+          : options.startsAt.toISOString(),
       },
     },
   });

@@ -1,20 +1,20 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import { version } from "../package.json";
-import { registerBalance } from "./lib/balance";
-import { registerBuy } from "./lib/buy";
-import { registerContracts } from "./lib/contracts";
-import { registerDev } from "./lib/dev";
-import { registerInstances } from "./lib/instances";
-import { registerLogin } from "./lib/login";
-import { registerOrders } from "./lib/orders/index";
-import { registerSell } from "./lib/sell";
-import { registerSSH } from "./lib/ssh";
-import { registerTokens } from "./lib/tokens";
-import { registerDown, registerUp } from "./lib/updown";
-import { registerUpgrade } from "./lib/upgrade";
-import { checkVersion } from "./checkVersion";
+import { version } from "../package.json" with { type: "json" };
+import { registerBalance } from "./lib/balance.ts";
+import { registerBuy } from "./lib/buy/index.tsx";
+import { registerContracts } from "./lib/contracts/index.tsx";
+import { registerDev } from "./lib/dev.ts";
+import { registerInstances } from "./lib/instances/index.tsx";
+import { registerLogin } from "./lib/login.ts";
+import { registerOrders } from "./lib/orders/index.tsx";
+import { registerSell } from "./lib/sell.ts";
+import { registerSSH } from "./lib/ssh.ts";
+import { registerTokens } from "./lib/tokens.ts";
+import { registerDown, registerUp } from "./lib/updown.ts";
+import { registerUpgrade } from "./lib/upgrade.ts";
+import { checkVersion } from "./checkVersion.ts";
 
 const program = new Command();
 

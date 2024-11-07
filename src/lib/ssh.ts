@@ -1,17 +1,15 @@
-import { expect } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 import util from "node:util";
-import type { SpawnOptions, Subprocess, SyncSubprocess } from "bun";
 import type { Command } from "commander";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../apiClient.ts";
+import { isLoggedIn } from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   unreachable,
-} from "../helpers/errors";
-import { getInstances } from "./instances";
+} from "../helpers/errors.ts";
+import { getInstances } from "./instances/index.tsx";
 import chalk from "chalk";
 
 // openssh-client doesn't check $HOME while homedir() does. This function is to

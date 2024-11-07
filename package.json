@@ -4,9 +4,9 @@
     "lint": "biome lint --write ./src",
     "check-fix": "biome check ./src --apply",
     "check": "biome check ./src && tsc --noEmit --project .",
-    "dev": "IS_DEVELOPMENT_CLI_ENV=true bun run src/index.ts",
-    "release": "bun run src/scripts/release.ts",
-    "prod": "bun run src/index.ts",
+    "dev": "IS_DEVELOPMENT_CLI_ENV=true deno run src/index.ts",
+    "release": "deno run src/scripts/release.ts",
+    "prod": "deno run src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "chrono-node": "^2.7.6",
     "cli-table3": "^0.6.5",
     "commander": "^12.1.0",
-    "dayjs": "^1.11.12",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "ink": "^5.0.1",
     "ink-confirm-input": "^2.0.0",
@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
-    "@types/bun": "latest",
     "@types/semver": "^7.5.8"
   },
   "peerDependencies": {

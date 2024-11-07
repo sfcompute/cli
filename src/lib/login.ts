@@ -1,9 +1,9 @@
 import { exec } from "node:child_process";
 import type { Command } from "commander";
 import ora from "ora";
-import { saveConfig } from "../helpers/config";
-import { clearScreen } from "../helpers/prompt";
-import { getWebAppUrl } from "../helpers/urls";
+import { saveConfig } from "../helpers/config.ts";
+import { clearScreen } from "../helpers/prompt.ts";
+import { getWebAppUrl } from "../helpers/urls.ts";
 
 // We're using Axios here because there's a bug
 // where the fetch API in Bun isn't passing the body

@@ -16,7 +16,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    ),
+    )
   );
   switch (type) {
     case "major":
@@ -56,8 +56,8 @@ const COMPILE_TARGETS: string[] = [
 
 async function compileDistribution() {
   for (const target of COMPILE_TARGETS) {
-    const result =
-      await Bun.$`bun build ./src/index.ts --compile --target=${target} --outfile dist/sf-${target}`;
+    const result = await Bun
+      .$`bun build ./src/index.ts --compile --target=${target} --outfile dist/sf-${target}`;
     if (result.exitCode !== 0) {
       logAndError(`Failed to compile for ${target}`);
     }
@@ -150,7 +150,9 @@ program
       const validTypes = ["major", "minor", "patch", "prerelease"];
       if (!validTypes.includes(type)) {
         console.error(
-          `Invalid release type: ${type}. Valid types are: ${validTypes.join(", ")}`,
+          `Invalid release type: ${type}. Valid types are: ${
+            validTypes.join(", ")
+          }`,
         );
         process.exit(1);
       }

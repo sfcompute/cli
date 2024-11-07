@@ -1,21 +1,21 @@
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { Command } from "commander";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+import dayjs from "npm:dayjs@1.11.13";
+import utc from "npm:dayjs@1.11.13/plugin/utc";
 import {
   deleteConfig,
   getConfigPath,
   isLoggedIn,
   loadConfig,
-} from "../helpers/config";
+} from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import { currentEpoch, epochToDate } from "../helpers/units";
-import { getApiUrl } from "../helpers/urls";
+} from "../helpers/errors.ts";
+import { currentEpoch, epochToDate } from "../helpers/units.ts";
+import { getApiUrl } from "../helpers/urls.ts";
 
 dayjs.extend(utc);
 
@@ -120,7 +120,9 @@ function registerEpoch(program: Command) {
         timestamps.forEach((epochTimestamp, i) => {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
-            `${colorDiffedEpochs[i]} | ${chalk.yellow(dayjs(date).format("hh:mm A MM-DD-YYYY"))} Local`,
+            `${colorDiffedEpochs[i]} | ${
+              chalk.yellow(dayjs(date).format("hh:mm A MM-DD-YYYY"))
+            } Local`,
           );
         });
       }

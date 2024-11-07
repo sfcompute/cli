@@ -2,23 +2,23 @@ import * as chrono from "chrono-node";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import parseDuration from "parse-duration";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../apiClient.ts";
+import { isLoggedIn } from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import { getContract } from "../helpers/fetchers";
-import { pricePerGPUHourToTotalPriceCents } from "../helpers/price";
+} from "../helpers/errors.ts";
+import { getContract } from "../helpers/fetchers.ts";
+import { pricePerGPUHourToTotalPriceCents } from "../helpers/price.ts";
 import {
   priceWholeToCents,
   roundEndDate,
   roundStartDate,
-} from "../helpers/units";
-import { waitForOrderToNotBePending } from "../helpers/waitingForOrder";
-import { GPUS_PER_NODE } from "./constants";
-import type { PlaceSellOrderParameters } from "./orders";
+} from "../helpers/units.ts";
+import { waitForOrderToNotBePending } from "../helpers/waitingForOrder.ts";
+import { GPUS_PER_NODE } from "./constants.ts";
+import type { PlaceSellOrderParameters } from "./orders/types.ts";
 
 export function registerSell(program: Command) {
   program
@@ -89,7 +89,8 @@ async function placeSellOrder(options: {
   }
 
   if (options.accelerators % GPUS_PER_NODE !== 0) {
-    const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
+    const exampleCommand =
+      `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
     return logAndQuit(
       `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
     );
@@ -154,7 +155,9 @@ async function placeSellOrder(options: {
     switch (response.status) {
       case 400:
         return logAndQuit(
-          `Bad Request: ${error?.message}: ${JSON.stringify(error?.details, null, 2)}`,
+          `Bad Request: ${error?.message}: ${
+            JSON.stringify(error?.details, null, 2)
+          }`,
         );
       // return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:

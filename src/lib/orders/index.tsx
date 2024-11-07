@@ -1,19 +1,18 @@
-
 import type { Command } from "commander";
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { getAuthToken, isLoggedIn } from "../../helpers/config";
+import duration from "npm:dayjs@1.11.13/plugin/duration.js";
+import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import { getAuthToken, isLoggedIn } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../../helpers/errors";
-import { fetchAndHandleErrors } from "../../helpers/fetch";
-import { getApiUrl } from "../../helpers/urls";
+} from "../../helpers/errors.ts";
+import { fetchAndHandleErrors } from "../../helpers/fetch.ts";
+import { getApiUrl } from "../../helpers/urls.ts";
 import { render, Text } from "ink";
-import { OrderDisplay } from "./OrderDisplay";
-import type { HydratedOrder, ListResponseBody } from "./types";
+import { OrderDisplay } from "./OrderDisplay.tsx";
+import type { HydratedOrder, ListResponseBody } from "./types.ts";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -47,9 +46,9 @@ export function formatDuration(ms: number) {
   return result || "0ms";
 }
 
-
 export function registerOrders(program: Command) {
-  const ordersCommand = program.command("orders").alias("o").alias("order").description("Manage orders");
+  const ordersCommand = program.command("orders").alias("o").alias("order")
+    .description("Manage orders");
 
   ordersCommand
     .command("ls")
