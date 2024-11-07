@@ -9,10 +9,16 @@ import {
 } from "../../helpers/errors";
 import { roundStartDate } from "../../helpers/units";
 import parseDurationFromLibrary from "parse-duration";
-import { render } from "ink";
-import Quote from "./Quote";
+import { Box, render, useApp, useInput } from "ink";
 import { parseDate } from 'chrono-node'
 import { GPUS_PER_NODE } from "../constants";
+import type { Quote } from "./types";
+import QuoteDisplay from "./Quote";
+import TextInput from "ink-text-input";
+import { useCallback, useEffect, useState } from "react";
+import { Text } from "ink";
+import ConfirmInput from "../ConfirmInput";
+
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -27,6 +33,24 @@ interface SfBuyOptions {
   quote?: boolean;
   colocate?: Array<string>;
 }
+
+const Counter = () => {
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCounter(previousCounter => previousCounter + 1);
+    }, 100);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  return <Text color="green">{counter} tests passed</Text>;
+};
+
+render(<Robot />);
 
 export function registerBuy(program: Command) {
   program
@@ -48,7 +72,9 @@ export function registerBuy(program: Command) {
       [],
     )
     .option("--quote", "Only provide a quote for the order")
-    .action(buyOrderAction);
+    .action(() => {
+      render(<Robot />)
+    });
 }
 
 function parseStart(start?: string) {
@@ -89,9 +115,56 @@ function parseDuration(duration?: string) {
   return parsed / 1000;
 }
 
+function parsePricePerGpuHour(price?: string) {
+  if (!price) {
+    return null;
+  }
+
+  // Remove $ if present
+  const priceWithoutDollar = price.replace('$', '');
+  return Number.parseFloat(priceWithoutDollar);
+}
+
 async function quoteAction(options: SfBuyOptions) {
   const quote = await getQuoteFromParsedSfBuyOptions(options);
-  render(<Quote quote={quote} />)
+  render(<QuoteDisplay quote={quote} />)
+}
+
+function Robot() {
+  const { exit } = useApp();
+  const [x, setX] = useState(1);
+  const [y, setY] = useState(1);
+
+  useInput((input, key) => {
+    if (input === 'q') {
+      exit();
+    }
+
+    if (key.leftArrow) {
+      setX(Math.max(1, x - 1));
+    }
+
+    if (key.rightArrow) {
+      setX(Math.min(20, x + 1));
+    }
+
+    if (key.upArrow) {
+      setY(Math.max(1, y - 1));
+    }
+
+    if (key.downArrow) {
+      setY(Math.min(10, y + 1));
+    }
+  });
+
+  return (
+    <Box flexDirection="column">
+      <Text>Use arrow keys to move the face. Press “q” to exit.</Text>
+      <Box height={12} paddingLeft={x} paddingTop={y}>
+        <Text>^_^</Text>
+      </Box>
+    </Box>
+  );
 }
 
 /*
@@ -103,11 +176,59 @@ Flow is:
 5. Place order
  */
 async function buyOrderAction(options: SfBuyOptions) {
+
+  render(<Robot />);
+
   if (options.quote) {
     return quoteAction(options);
   }
 
+  // Grab the price per GPU hour, either 
+  let pricePerGpuHour: number | null = parsePricePerGpuHour(options.price);
+  if (!pricePerGpuHour) {
+    const quote = await getQuoteFromParsedSfBuyOptions(options);
+    if (!quote) {
+      pricePerGpuHour = await getAggressivePricePerHour(options.type);
+    } else {
+      pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+    }
+  }
 
+  const inst = render(<BuyOrder />, {
+    exitOnCtrlC: true,
+    patchConsole: true,
+  });
+  inst.rerender(<BuyOrder />);
+}
+
+function BuyOrder() {
+
+  return <Robot />
+  const [answer, setAnswer] = useState('');
+  const [value, setValue] = useState('');
+  const handleSubmit = useCallback((submitValue: boolean) => {
+    if (submitValue === false) {
+      setAnswer('You are heartless…');
+      return;
+    }
+
+    setAnswer('You love unicorns!');
+  }, []);
+
+  return (
+    <Box>
+      <Text>Do you like unicorns? (Y/n)</Text>
+
+      <ConfirmInput
+        isChecked
+        value={value}
+        onChange={setValue}
+        onSubmit={handleSubmit}
+      />
+
+      <Text>{answer}</Text>
+    </Box>
+  );
 }
 
 type BuyOptions = {
@@ -160,6 +281,13 @@ export async function placeBuyOrder(
   }
 
   return data;
+}
+
+function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
+  const durationSeconds = dayjs(quote.end_at).diff(dayjs(quote.start_at), 'seconds');
+  const durationHours = durationSeconds / 3600;
+
+  return quote.price / 100 / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {

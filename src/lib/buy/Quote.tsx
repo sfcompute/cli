@@ -2,22 +2,10 @@ import { Box, Text } from "ink";
 import { Row } from "../Row";
 import dayjs from "dayjs";
 import { GPUS_PER_NODE } from "../constants";
+import type { Quote } from "./types";
 
-type Quote = {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    instance_type: string;
-} | {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    contract_id: string;
-} | null
 
-export default function Quote(props: { quote: Quote }) {
+export default function QuoteDisplay(props: { quote: Quote }) {
     if (!props.quote) {
         return <Box flexDirection="column" gap={1} paddingBottom={1}>
             <Text>No quote available for this configuration. That doesn't mean it's not available, but you'll need to give a price you're willing to pay for it.</Text>
@@ -32,6 +20,7 @@ export default function Quote(props: { quote: Quote }) {
     const durationHours = durationSeconds / 3600;
     const pricePerHour = props.quote.price / durationHours / GPUS_PER_NODE / props.quote.quantity / 100;
     const priceTotal = props.quote.price / 100;
+
 
     return <Box flexDirection="column" paddingBottom={1}>
         <Row headWidth={10} head="Per Hour" value={`$${pricePerHour.toFixed(2)}/gpu/hr`} />
