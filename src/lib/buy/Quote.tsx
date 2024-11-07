@@ -35,10 +35,10 @@ export default function QuoteDisplay(props: { quote: Quote }) {
     <Box flexDirection="column" paddingBottom={1}>
       <Row
         headWidth={10}
-        head="Per Hour"
+        head="rate"
         value={`$${pricePerHour.toFixed(2)}/gpu/hr`}
       />
-      <Row headWidth={10} head="Total" value={`$${priceTotal.toFixed(2)}`} />
+      <Row headWidth={10} head="total" value={`$${priceTotal.toFixed(2)}`} />
     </Box>
   );
 }

@@ -19,6 +19,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
 import React from 'react'
+import { Row } from "../Row.tsx";
+import ms from "npm:ms";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -34,21 +36,6 @@ interface SfBuyOptions {
   colocate?: Array<string>;
 }
 
-const Counter = () => {
-  const [counter, setCounter] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCounter((previousCounter) => previousCounter + 1);
-    }, 100);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  return <Text color="green">{counter} tests passed</Text>;
-};
 
 
 export function registerBuy(program: Command) {
@@ -152,11 +139,14 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
   }
 
-  render(<BuyOrder />);
-
+  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={parseStart(options.start)} duration={options.duration} type={options.type} />);
 }
 
-function BuyOrder() {
+function roundEndDate(endDate: Date) {
+  return dayjs(endDate).add(1, "hour").startOf("hour")
+}
+
+function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
   const [answer, setAnswer] = useState("");
   const [value, setValue] = useState("");
   const handleSubmit = useCallback((submitValue: boolean) => {
@@ -168,16 +158,62 @@ function BuyOrder() {
     setAnswer("You love unicorns!");
   }, []);
 
-  return (
-    <Box>
-      <Text>Do you like unicorns? (Y/n)</Text>
+  const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
+  const start = startDate.format("MMM D h:mm a").toLowerCase();
 
-      <ConfirmInput
-        isChecked
-        value={value}
-        onChange={setValue}
-        onSubmit={handleSubmit}
-      />
+  // @ts-ignore fromNow not typed
+  const startFromNow = startDate.fromNow();
+
+  const endDate = roundEndDate(startDate.add(parseDuration(props.duration), "seconds").toDate());
+  const end = endDate.format("MMM D h:mm a").toLowerCase();
+
+  // @ts-ignore fromNow not typed
+  const endFromNow = endDate.fromNow();
+
+  const realDuration = endDate.diff(startDate);
+  const realDurationString = ms(realDuration);
+
+  const totalPrice = (props.price * props.size * GPUS_PER_NODE) / 100;
+
+  return (
+    <Box gap={1} flexDirection="column">
+      <Box flexDirection="column">
+        <Text color="yellow">Buy Order</Text>
+        <Row headWidth={7} head="type" value={props.type} />
+        <Box>
+          <Box width={7}>
+            <Text dimColor>start</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{start}</Text>
+            <Text dimColor>{props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}</Text>
+          </Box>
+        </Box>
+        <Box>
+          <Box width={7}>
+            <Text dimColor>end</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{end}</Text>
+            <Text dimColor>({endFromNow})</Text>
+          </Box>
+        </Box>
+        <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
+        <Row headWidth={7} head="size" value={`${props.size * GPUS_PER_NODE} gpus`} />
+        <Row headWidth={7} head="rate" value={`$${props.price / 100}/gpu/hr`} />
+        <Row headWidth={7} head="total" value={`$${totalPrice}`} />
+      </Box>
+
+      <Box gap={1}>
+        <Text>Place order? (y/n)</Text>
+
+        <ConfirmInput
+          isChecked
+          value={value}
+          onChange={setValue}
+          onSubmit={handleSubmit}
+        />
+      </Box>
 
       <Text>{answer}</Text>
     </Box>
