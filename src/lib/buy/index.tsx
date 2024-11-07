@@ -171,9 +171,11 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", d
   const endFromNow = endDate.fromNow();
 
   const realDuration = endDate.diff(startDate);
+  const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = (props.price * props.size * GPUS_PER_NODE) / 100;
+
+  const totalPrice = (props.price * props.size * GPUS_PER_NODE * realDurationHours) / 100;
 
   return (
     <Box gap={1} flexDirection="column">
@@ -200,8 +202,8 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", d
         </Box>
         <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
         <Row headWidth={7} head="size" value={`${props.size * GPUS_PER_NODE} gpus`} />
-        <Row headWidth={7} head="rate" value={`$${props.price / 100}/gpu/hr`} />
-        <Row headWidth={7} head="total" value={`$${totalPrice}`} />
+        <Row headWidth={7} head="rate" value={`$${(props.price / 100).toFixed(2)}/gpu/hr`} />
+        <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
       </Box>
 
       <Box gap={1}>
