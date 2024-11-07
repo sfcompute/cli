@@ -1,9 +1,9 @@
-import type React from "react";
 import { useCallback } from "react";
 import TextInput from "ink-text-input";
-import yn from "yn";
+import yn from "npm:yn";
+import React from "react";
 
-const noop = () => {};
+const noop = () => { };
 
 interface ConfirmInputProps {
   isChecked?: boolean;
