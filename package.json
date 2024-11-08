@@ -6,7 +6,7 @@
     "check": "biome check ./src && tsc --noEmit --project .",
     "dev": "IS_DEVELOPMENT_CLI_ENV=true deno run src/index.ts",
     "release": "deno run src/scripts/release.ts",
-    "prod": "deno run src/index.ts",
+    "prod": "deno run --allow-all src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts"
   },
   "dependencies": {
@@ -31,10 +31,10 @@
     "ora": "^8.1.0",
     "parse-duration": "^1.1.0",
     "react": "^18.3.1",
-    "semver": "^7.6.3"
+    "semver": "^7.6.3",
+    "tiny-invariant": "^1.3.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.2",
     "@types/semver": "^7.5.8"
   },
   "peerDependencies": {

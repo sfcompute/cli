@@ -22,6 +22,7 @@ import React from 'react'
 import { Row } from "../Row.tsx";
 import ms from "npm:ms";
 import Spinner from "ink-spinner";
+import invariant from "tiny-invariant";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -124,6 +125,7 @@ async function quoteAction(options: SfBuyOptions) {
   render(<QuoteDisplay quote={quote} />);
 }
 
+
 /*
 Flow is:
 1. If --quote, get quote and exit
@@ -149,21 +151,25 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
   }
 
-  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={parseStart(options.start)} duration={options.duration} type={options.type} />);
+  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={parseStart(options.start)} type={options.type} />);
 }
 
 function roundEndDate(endDate: Date) {
   return dayjs(endDate).add(1, "hour").startOf("hour")
 }
 
-function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
+function getTotalPrice(pricePerGpuHour: number, size: number, durationInHours: number) {
+  return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours)
+}
+
+function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string }) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
   // @ts-ignore fromNow not typed
   const startFromNow = startDate.fromNow();
 
-  const endDate = roundEndDate(startDate.add(parseDuration(props.duration), "seconds").toDate());
+  const endDate = roundEndDate(props.endsAt);
   const end = endDate.format("MMM D h:mm a").toLowerCase();
 
   // @ts-ignore fromNow not typed
@@ -173,7 +179,7 @@ function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = (props.price * props.size * GPUS_PER_NODE * realDurationHours) / 100;
+  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) / 100;
 
   return (<Box flexDirection="column">
     <Text color="yellow">Buy Order</Text>
@@ -203,10 +209,28 @@ function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "
   </Box>)
 }
 
-function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", duration: string, type: string }) {
+function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string, colocate: Array<string> }) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const { exit } = useApp();
+
+  async function submitOrder() {
+    const endsAt = roundEndDate(props.endsAt);
+    const realDurationInHours = dayjs(endsAt).diff(dayjs(parseStartAsDate(props.startAt))) / 1000 / 3600;
+
+    console.log(getTotalPrice(props.price, props.size, realDurationInHours))
+
+    await placeBuyOrder({
+      instanceType: props.type,
+      totalPriceInCents: getTotalPrice(props.price, props.size, realDurationInHours),
+      startsAt: props.startAt,
+      endsAt: endsAt.toDate(),
+      colocateWith: props.colocate,
+      numberNodes: props.size,
+    })
+    setOrder(order);
+  }
+
   const handleSubmit = useCallback((submitValue: boolean) => {
     if (submitValue === false) {
       setIsLoading(false);
@@ -215,6 +239,7 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", d
     }
 
     setIsLoading(true);
+    submitOrder();
   }, [exit]);
 
   const [order, setOrder] = useState<Awaited<ReturnType<typeof getOrder>> | null>(null);
@@ -265,32 +290,33 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", d
   );
 }
 
-type BuyOptions = {
-  instanceType: string;
-  priceCents: number;
-  quantity: number;
-  startsAt: Date | "NOW";
-  endsAt: Date;
-  durationSeconds: number;
-  quoteOnly: boolean;
-  colocate_with: Array<string>;
-};
+
 export async function placeBuyOrder(
-  options: Omit<BuyOptions, "durationSeconds">,
+  options: {
+    instanceType: string;
+    totalPriceInCents: number;
+    startsAt: Date | "NOW";
+    endsAt: Date;
+    colocateWith: Array<string>;
+    numberNodes: number;
+  }
 ) {
+  invariant(options.totalPriceInCents == Math.ceil(options.totalPriceInCents), "totalPriceInCents must be a whole number");
+  invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
+
   const api = await apiClient();
   const { data, error, response } = await api.POST("/v0/orders", {
     body: {
       side: "buy",
       instance_type: options.instanceType,
-      quantity: options.quantity,
+      quantity: options.numberNodes,
       // round start date again because the user might take a long time to confirm
       start_at: options.startsAt === "NOW"
         ? "NOW"
         : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
-      price: options.priceCents,
-      colocate_with: options.colocate_with,
+      price: options.totalPriceInCents,
+      colocate_with: options.colocateWith,
     },
   });
 
