@@ -12,7 +12,7 @@ import { registerOrders } from "./lib/orders/index.tsx";
 import { registerSell } from "./lib/sell.ts";
 import { registerSSH } from "./lib/ssh.ts";
 import { registerTokens } from "./lib/tokens.ts";
-import { registerDown, registerUp } from "./lib/updown.ts";
+import { registerDown, registerUp } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { checkVersion } from "./checkVersion.ts";
 
