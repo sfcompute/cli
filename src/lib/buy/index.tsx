@@ -60,7 +60,7 @@ export function registerBuy(program: Command) {
     .action(buyOrderAction);
 }
 
-function parseStart(start?: string) {
+export function parseStart(start?: string) {
   if (!start) {
     return "NOW";
   }
@@ -77,7 +77,7 @@ function parseStart(start?: string) {
   return parsed;
 }
 
-function parseStartAsDate(start?: string) {
+export function parseStartAsDate(start?: string) {
   const date = parseStart(start);
   if (date === "NOW") {
     return new Date();

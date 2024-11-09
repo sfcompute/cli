@@ -14,9 +14,12 @@ import { render, Text } from "ink";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
 import React from "react";
+import { parseStartAsDate } from "../buy/index.tsx";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
+
+
 
 export function formatDuration(ms: number) {
   const d = dayjs.duration(ms);
@@ -156,10 +159,17 @@ export function registerOrders(program: Command) {
         offset: options.offset,
       });
 
+      // Sort orders by start time ascending (present to future)
+      const sortedOrders = [...orders].sort((a, b) => {
+        const aStart = parseStartAsDate(a.start_at);
+        const bStart = parseStartAsDate(b.start_at);
+        return aStart.getTime() - bStart.getTime();
+      });
+
       if (options.json) {
-        console.log(JSON.stringify(orders, null, 2));
+        console.log(JSON.stringify(sortedOrders, null, 2));
       } else {
-        render(<OrderDisplay orders={orders} />);
+        render(<OrderDisplay orders={sortedOrders} />);
       }
 
       process.exit(0);
