@@ -16,7 +16,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    ),
+    )
   );
   switch (type) {
     case "major":
@@ -33,39 +33,42 @@ function bumpVersion(
 }
 
 async function getLocalVersion() {
-  const packagejsonFile = Bun.file("package.json");
-  const packagejson = await packagejsonFile.json();
-  return packagejson.version;
+  const packageJson = await Deno.readTextFile("package.json");
+  return JSON.parse(packageJson).version;
 }
 
 async function saveVersion(version: string) {
-  const packagejsonFile = Bun.file("package.json");
-  const packagejson = await packagejsonFile.json();
-  packagejson.version = version;
-  await Bun.write("package.json", JSON.stringify(packagejson, null, 2));
+  const packageJson = await Deno.readTextFile("package.json");
+  const packageObj = JSON.parse(packageJson);
+  packageObj.version = version;
+  await Deno.writeTextFile("package.json", JSON.stringify(packageObj, null, 2));
 }
 
 const COMPILE_TARGETS: string[] = [
-  "bun-linux-x64-baseline",
-  "bun-linux-x64",
-  "bun-linux-arm64",
-  "bun-darwin-x64-baseline",
-  "bun-darwin-x64",
-  "bun-darwin-arm64",
+  "x86_64-unknown-linux-gnu",
+  "aarch64-unknown-linux-gnu", 
+  "x86_64-apple-darwin",
+  "aarch64-apple-darwin",
 ];
 
 async function compileDistribution() {
   for (const target of COMPILE_TARGETS) {
-    const result =
-      await Bun.$`bun build ./src/index.ts --compile --target=${target} --outfile dist/sf-${target}`;
-    if (result.exitCode !== 0) {
+    const result = await new Deno.Command("deno", {
+      args: ["compile",  "-A", "--target", target, "--output", `dist/sf-${target}`, "./src/index.ts"],
+    }).output();
+
+    if (!result.success) {
       logAndError(`Failed to compile for ${target}`);
     }
     console.log(`✅ Compiled for ${target}`);
 
     const zipFileName = `dist/sf-${target}.zip`;
-    const zipResult = await Bun.$`zip -j ${zipFileName} dist/sf-${target}`;
-    if (zipResult.exitCode !== 0) {
+    const zipResult = await new Deno.Command("zip", {
+      args: ["-j", zipFileName, `dist/sf-${target}`],
+    }).output();
+
+    if (!zipResult.success) {
+      console.error(zipResult.stderr);
       logAndError(`Failed to zip the binary for ${target}`);
     }
     console.log(`✅ Zipped binary for ${target}`);
@@ -73,21 +76,21 @@ async function compileDistribution() {
 }
 
 async function asyncSpawn(cmds: string[]) {
-  const result = Bun.spawn(cmds);
-
-  await result.exited;
+  const result = await new Deno.Command(cmds[0], {
+    args: cmds.slice(1),
+  }).output();
 
   return {
-    exitCode: result.exitCode,
+    exitCode: result.success ? 0 : 1,
   };
 }
 
 async function createRelease(version: string) {
-  const distFiles = fs.readdirSync("./dist");
+  const distFiles = Array.from(Deno.readDirSync("./dist"));
   const zipFiles = distFiles
-    .filter((entry) => fs.statSync(`./dist/${entry}`).isFile())
-    .filter((entry) => entry.endsWith(".zip"))
-    .map((entry) => `./dist/${entry}`);
+    .filter((entry) => entry.isFile)
+    .filter((entry) => entry.name.endsWith(".zip"))
+    .map((entry) => `./dist/${entry.name}`);
 
   console.log(zipFiles);
 
@@ -131,7 +134,13 @@ async function createRelease(version: string) {
 }
 
 async function cleanDist() {
-  fs.rmSync("./dist", { recursive: true, force: true });
+  try {
+    await Deno.remove("./dist", { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw error;
+    }
+  }
 }
 
 program
@@ -150,13 +159,18 @@ program
       const validTypes = ["major", "minor", "patch", "prerelease"];
       if (!validTypes.includes(type)) {
         console.error(
-          `Invalid release type: ${type}. Valid types are: ${validTypes.join(", ")}`,
+          `Invalid release type: ${type}. Valid types are: ${
+            validTypes.join(", ")
+          }`,
         );
         process.exit(1);
       }
 
-      const ghCheckResult = await Bun.$`which gh`;
-      if (ghCheckResult.exitCode !== 0) {
+      const ghCheckResult = await new Deno.Command("which", {
+        args: ["gh"],
+      }).output();
+
+      if (!ghCheckResult.success) {
         console.error(
           `The 'gh' command is not installed. Please install it.
 

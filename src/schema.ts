@@ -46,7 +46,7 @@ export interface paths {
         get: operations["getV0Orders"];
         put?: never;
         post: operations["postV0Orders"];
-        delete?: never;
+        delete: operations["deleteV0Orders"];
         options?: never;
         head?: never;
         patch?: never;
@@ -63,22 +63,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["deleteV0OrdersById"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/orders/cancel-all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["postV0OrdersCancel-all"];
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -598,7 +582,153 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            object: "order";
+                            id: string;
+                            side: "buy" | "sell";
+                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                            end_at: string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number;
+                            flags: {
+                                /** @description If true, this will be a market order. */
+                                market?: boolean;
+                                /** @description If true, this is a post-only order. */
+                                post_only?: boolean;
+                                /** @description If true, this is an immediate-or-cancel order. */
+                                ioc?: boolean;
+                            };
+                            executed: boolean;
+                            executed_at?: string;
+                            /** @description Execution price in cents (1 = $0.01) */
+                            execution_price?: number;
+                            cancelled: boolean;
+                            cancelled_at?: string;
+                            colocate_with?: string[];
+                            created_at: string;
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                    "multipart/form-data": {
+                        data: {
+                            /** @constant */
+                            object: "order";
+                            id: string;
+                            side: "buy" | "sell";
+                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                            end_at: string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number;
+                            flags: {
+                                /** @description If true, this will be a market order. */
+                                market?: boolean;
+                                /** @description If true, this is a post-only order. */
+                                post_only?: boolean;
+                                /** @description If true, this is an immediate-or-cancel order. */
+                                ioc?: boolean;
+                            };
+                            executed: boolean;
+                            executed_at?: string;
+                            /** @description Execution price in cents (1 = $0.01) */
+                            execution_price?: number;
+                            cancelled: boolean;
+                            cancelled_at?: string;
+                            colocate_with?: string[];
+                            created_at: string;
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                    "text/plain": {
+                        data: {
+                            /** @constant */
+                            object: "order";
+                            id: string;
+                            side: "buy" | "sell";
+                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description The number of nodes. */
+                            quantity: number;
+                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                            start_at: string;
+                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                            end_at: string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number;
+                            flags: {
+                                /** @description If true, this will be a market order. */
+                                market?: boolean;
+                                /** @description If true, this is a post-only order. */
+                                post_only?: boolean;
+                                /** @description If true, this is an immediate-or-cancel order. */
+                                ioc?: boolean;
+                            };
+                            executed: boolean;
+                            executed_at?: string;
+                            /** @description Execution price in cents (1 = $0.01) */
+                            execution_price?: number;
+                            cancelled: boolean;
+                            cancelled_at?: string;
+                            colocate_with?: string[];
+                            created_at: string;
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                };
             };
         };
     };
@@ -804,6 +934,101 @@ export interface operations {
                         id: string;
                         /** @constant */
                         status: "pending";
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                };
+            };
+        };
+    };
+    deleteV0Orders: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Generate a bearer token with `$ sf tokens create`. */
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "pending";
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "pending";
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "pending";
                     };
                 };
             };
@@ -1152,101 +1377,6 @@ export interface operations {
             };
         };
     };
-    "postV0OrdersCancel-all": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
-    };
     getV0Instances: {
         parameters: {
             query?: never;
@@ -1279,6 +1409,8 @@ export interface operations {
                             public_ip: string;
                             private_ip: string;
                             ssh_port?: number;
+                            /** @description Whether or not you can connect to the instance via SSH */
+                            can_connect: boolean;
                             /** @description What state the instance is currently in. */
                             status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                         }[];
@@ -1301,6 +1433,8 @@ export interface operations {
                             public_ip: string;
                             private_ip: string;
                             ssh_port?: number;
+                            /** @description Whether or not you can connect to the instance via SSH */
+                            can_connect: boolean;
                             /** @description What state the instance is currently in. */
                             status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                         }[];
@@ -1323,6 +1457,8 @@ export interface operations {
                             public_ip: string;
                             private_ip: string;
                             ssh_port?: number;
+                            /** @description Whether or not you can connect to the instance via SSH */
+                            can_connect: boolean;
                             /** @description What state the instance is currently in. */
                             status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                         }[];
@@ -1429,6 +1565,8 @@ export interface operations {
                         public_ip: string;
                         private_ip: string;
                         ssh_port?: number;
+                        /** @description Whether or not you can connect to the instance via SSH */
+                        can_connect: boolean;
                         /** @description What state the instance is currently in. */
                         status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                     };
@@ -1446,6 +1584,8 @@ export interface operations {
                         public_ip: string;
                         private_ip: string;
                         ssh_port?: number;
+                        /** @description Whether or not you can connect to the instance via SSH */
+                        can_connect: boolean;
                         /** @description What state the instance is currently in. */
                         status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                     };
@@ -1463,6 +1603,8 @@ export interface operations {
                         public_ip: string;
                         private_ip: string;
                         ssh_port?: number;
+                        /** @description Whether or not you can connect to the instance via SSH */
+                        can_connect: boolean;
                         /** @description What state the instance is currently in. */
                         status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
                     };
@@ -1803,7 +1945,7 @@ export interface operations {
                             created_at: string;
                             /** @description The instance type. */
                             instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                             shape: {
                                 intervals: string[];
                                 quantities: number[];
@@ -1832,7 +1974,7 @@ export interface operations {
                             created_at: string;
                             /** @description The instance type. */
                             instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                             shape: {
                                 intervals: string[];
                                 quantities: number[];
@@ -1861,7 +2003,7 @@ export interface operations {
                             created_at: string;
                             /** @description The instance type. */
                             instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                             shape: {
                                 intervals: string[];
                                 quantities: number[];
@@ -1974,7 +2116,7 @@ export interface operations {
                         created_at: string;
                         /** @description The instance type. */
                         instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                         shape: {
                             intervals: string[];
                             quantities: number[];
@@ -1998,7 +2140,7 @@ export interface operations {
                         created_at: string;
                         /** @description The instance type. */
                         instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                         shape: {
                             intervals: string[];
                             quantities: number[];
@@ -2022,7 +2164,7 @@ export interface operations {
                         created_at: string;
                         /** @description The instance type. */
                         instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0. */
+                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
                         shape: {
                             intervals: string[];
                             quantities: number[];

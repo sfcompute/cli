@@ -1,7 +1,7 @@
 import { unlinkSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { EmptyObject } from "../types/empty";
+import type { EmptyObject } from "../types/empty.ts";
 
 export interface Config {
   api_url: string;
@@ -32,7 +32,7 @@ export async function saveConfig(
   const configData = JSON.stringify(config, null, 2);
 
   try {
-    await Bun.write(configPath, configData);
+    await Deno.writeTextFile(configPath, configData);
 
     return { success: true };
   } catch (error) {
@@ -81,9 +81,14 @@ export function getConfigPath(): string {
   return configPath;
 }
 
-function configFileExists(): Promise<boolean> {
+async function configFileExists(): Promise<boolean> {
   const configPath = getConfigPath();
-  return Bun.file(configPath).exists();
+  try {
+    await Deno.stat(configPath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function readConfigFile(): Promise<Config | EmptyObject> {
@@ -94,7 +99,7 @@ async function readConfigFile(): Promise<Config | EmptyObject> {
 
   const configPath = getConfigPath();
   try {
-    const configData = await Bun.file(configPath).text();
+    const configData = await Deno.readTextFile(configPath);
     const config = JSON.parse(configData);
     if (typeof config === "object" && config !== null) {
       return config;

@@ -1,6 +1,6 @@
 import boxen from "boxen";
 import chalk from "chalk";
-import { version } from "../package.json";
+import pkg from "../package.json" with { type: "json" };
 import semver from "semver";
 
 async function checkProductionCLIVersion() {
@@ -21,6 +21,7 @@ async function checkProductionCLIVersion() {
 }
 
 export async function checkVersion() {
+  const version = pkg.version;
   const latestVersion = await checkProductionCLIVersion();
   if (latestVersion && version !== latestVersion) {
     const isOutdated = semver.lt(version, latestVersion);

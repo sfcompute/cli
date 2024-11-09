@@ -5,13 +5,13 @@ import Table from "cli-table3";
 import type { Command } from "commander";
 import dayjs from "dayjs";
 import ora from "ora";
-import { getCommandBase } from "../helpers/command";
-import { getAuthToken, isLoggedIn } from "../helpers/config";
+import { getCommandBase } from "../helpers/command.ts";
+import { getAuthToken, isLoggedIn } from "../helpers/config.ts";
 import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import { getApiUrl } from "../helpers/urls";
+} from "../helpers/errors.ts";
+import { getApiUrl } from "../helpers/urls.ts";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -98,7 +98,9 @@ async function createTokenAction() {
     default: "",
   });
   const description = await input({
-    message: `Description for your token ${chalk.gray("(optional, ↵ to skip)")}:`,
+    message: `Description for your token ${
+      chalk.gray("(optional, ↵ to skip)")
+    }:`,
     default: "",
   });
 
@@ -276,15 +278,17 @@ async function deleteTokenAction({
   }
 
   const deleteTokenConfirmed = await confirm({
-    message: `Are you sure you want to delete this token? ${chalk.gray("(it will stop working immediately.)")}`,
+    message: `Are you sure you want to delete this token? ${
+      chalk.gray("(it will stop working immediately.)")
+    }`,
     default: false,
   });
   if (!deleteTokenConfirmed) {
     process.exit(0);
   } else {
     const verySureConfirmed = await confirm({
-      message:
-        chalk.red("Very sure?") + " " + chalk.gray("(just double-checking)"),
+      message: chalk.red("Very sure?") + " " +
+        chalk.gray("(just double-checking)"),
       default: false,
     });
 

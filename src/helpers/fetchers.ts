@@ -1,5 +1,5 @@
-import { apiClient } from "../apiClient";
-import { logAndQuit } from "./errors";
+import { apiClient } from "../apiClient.ts";
+import { logAndQuit } from "./errors.ts";
 
 export async function getContract(contractId: string) {
   const api = await apiClient();

@@ -1,14 +1,14 @@
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../apiClient.ts";
+import { isLoggedIn } from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
-import type { Cents } from "../helpers/units";
+} from "../helpers/errors.ts";
+import type { Cents } from "../helpers/units.ts";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

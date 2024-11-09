@@ -1,4 +1,4 @@
-import { loadConfig } from "./config";
+import { loadConfig } from "./config.ts";
 
 const webPaths = {
   cli_session_create: "/cli/session",

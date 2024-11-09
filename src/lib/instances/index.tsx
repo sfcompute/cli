@@ -1,17 +1,21 @@
-import chalk, { type ChalkInstance } from "chalk";
-import Table from "cli-table3";
 import type { Command } from "commander";
-import { apiClient } from "../apiClient";
-import { isLoggedIn } from "../helpers/config";
+import { apiClient } from "../../apiClient.ts";
+import { isLoggedIn } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors";
+} from "../../helpers/errors.ts";
+import type { InstanceObject, InstanceType } from "./types.ts";
+import { render } from "ink";
+import { InstanceDisplay, InstanceList } from "./InstanceDisplay.tsx";
+import React from "react";
 
 export function registerInstances(program: Command) {
   const instances = program
     .command("instances")
+    .alias("i")
+    .alias("instance")
     .description("Manage instances you own");
 
   // sf instances ls|list <cluster_id>
@@ -31,21 +35,6 @@ export function registerInstances(program: Command) {
 
 // --
 
-interface ListResponseBody<T> {
-  data: T[];
-  object: "list";
-}
-type InstanceType = "h100i" | "h100" | "a100";
-interface InstanceObject {
-  object: "instance";
-  id: string;
-  type: InstanceType;
-  public_ip: string;
-  private_ip: string;
-  status: string;
-  ssh_port: number | undefined;
-  can_connect: boolean;
-}
 async function listInstancesAction({
   clusterId,
   returnJson,
@@ -58,47 +47,7 @@ async function listInstancesAction({
   if (returnJson) {
     console.log(JSON.stringify(instances, null, 2));
   } else {
-    const tableHeaders = [
-      chalk.gray("Instance Id"),
-      chalk.gray("Type"),
-      chalk.gray("IP Address"),
-      chalk.gray("SSH Port"),
-      chalk.gray("Status"),
-      chalk.gray("Can SSH"),
-    ];
-
-    if (instances.length === 0) {
-      // empty table
-      const table = new Table({
-        head: tableHeaders,
-        colWidths: [20, 20, 20],
-      });
-      table.push([
-        { colSpan: 3, content: "No instances found", hAlign: "center" },
-      ]);
-      console.log(table.toString() + "\n");
-    } else {
-      const table = new Table({
-        head: tableHeaders,
-        // colWidths: [32, 10, 20],
-      });
-
-      table.push(
-        ...instances.map((instance) => [
-          instance.id,
-          colorInstanceType(instance.type),
-          instance.public_ip,
-          instance.ssh_port,
-          instance.status,
-          instance.can_connect ? "Yes" : "No",
-        ]),
-      );
-      console.log(
-        table.toString() +
-          "\n" +
-          "To ssh into an instance, run `sf ssh <instance-id>`.\n",
-      );
-    }
+    render(<InstanceList instances={instances} />);
   }
 
   process.exit(0);
@@ -111,10 +60,10 @@ const InstanceTypeSortPriority: { [key in InstanceType]: number } = {
 };
 const sortInstancesByTypeAndIp = () => {
   return (a: InstanceObject, b: InstanceObject) => {
-    const priorityA =
-      InstanceTypeSortPriority[a.type] || Number.MAX_SAFE_INTEGER;
-    const priorityB =
-      InstanceTypeSortPriority[b.type] || Number.MAX_SAFE_INTEGER;
+    const priorityA = InstanceTypeSortPriority[a.type] ||
+      Number.MAX_SAFE_INTEGER;
+    const priorityB = InstanceTypeSortPriority[b.type] ||
+      Number.MAX_SAFE_INTEGER;
     if (priorityA === priorityB) {
       return compareIPs(a.public_ip, b.public_ip); // secondary sort on public ips
     }
@@ -151,14 +100,6 @@ const compareIPs = (ip1: string, ip2: string) => {
 
   return 0; // should never happen
 };
-
-const instanceTypeColoring: { [key in InstanceType]: ChalkInstance } = {
-  h100i: chalk.green,
-  h100: chalk.cyan,
-  a100: chalk.magenta,
-};
-const colorInstanceType = (instanceType: InstanceType) =>
-  (instanceTypeColoring[instanceType] || chalk.white)(instanceType);
 
 // --
 

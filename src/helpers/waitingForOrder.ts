@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import ora from "ora";
-import { logAndQuit } from "./errors";
-import { getOrder } from "./fetchers";
+import { logAndQuit } from "./errors.ts";
+import { getOrder } from "./fetchers.ts";
 
 export async function waitForOrderToNotBePending(orderId: string) {
   const spinner = ora(

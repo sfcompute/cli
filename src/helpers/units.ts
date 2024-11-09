@@ -1,6 +1,6 @@
 import * as chrono from "chrono-node";
 import dayjs from "dayjs";
-import type { Nullable } from "../types/empty";
+import type { Nullable } from "../types/empty.ts";
 
 // -- time
 
