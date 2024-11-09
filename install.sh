@@ -101,6 +101,13 @@ echo "Downloading '${BINARY_NAME}' CLI binary..."
 echo "curl -L -o \"${TMPDIR}/${BINARY_NAME}.zip\" \"${SF_BINARY_URL}\""
 curl -L -o "${TMPDIR}/${BINARY_NAME}.zip" "${SF_BINARY_URL}" || { echo "Failed to download binary"; exit 1; }
 
+# Verify the downloaded file is a valid zip archive
+if ! unzip -t "${TMPDIR}/${BINARY_NAME}.zip" >/dev/null 2>&1; then
+    echo "Downloaded file is not a valid zip archive. Installation failed."
+    rm -rf "${TMPDIR}"
+    exit 1
+fi
+
 # Extract the zip file in the temporary directory.
 echo "unzip -o \"${TMPDIR}/${BINARY_NAME}.zip\" -d \"${TMPDIR}/dist\""
 unzip -o "${TMPDIR}/${BINARY_NAME}.zip" -d "${TMPDIR}/dist" || { echo "Failed to extract sf"; exit 1; }

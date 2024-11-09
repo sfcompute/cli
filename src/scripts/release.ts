@@ -85,8 +85,8 @@ async function asyncSpawn(cmds: string[]) {
     exitCode: result.success ? 0 : 1,
   };
 }
-
 async function createRelease(version: string) {
+  // Verify zip files are valid before creating release
   const distFiles = Array.from(Deno.readDirSync("./dist"));
   const zipFiles = distFiles
     .filter((entry) => entry.isFile)
@@ -94,6 +94,18 @@ async function createRelease(version: string) {
     .map((entry) => `./dist/${entry.name}`);
 
   console.log(zipFiles);
+
+  // Verify each zip file is valid
+  for (const zipFile of zipFiles) {
+    const verifyResult = await new Deno.Command("unzip", {
+      args: ["-t", zipFile],
+    }).output();
+
+    if (!verifyResult.success) {
+      logAndError(`Invalid zip file: ${zipFile}`);
+    }
+    console.log(`✅ Verified zip file: ${zipFile}`);
+  }
 
   const releaseFlag = version.includes("pre") ? "--prerelease" : "--latest";
   const result = await asyncSpawn([
