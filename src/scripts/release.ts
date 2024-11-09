@@ -76,6 +76,7 @@ async function compileDistribution() {
 }
 
 async function asyncSpawn(cmds: string[]) {
+  console.log("cmds", cmds);
   const result = await new Deno.Command(cmds[0], {
     args: cmds.slice(1),
   }).output();
