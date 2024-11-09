@@ -4,6 +4,7 @@ import { GPUS_PER_NODE } from "../constants.ts";
 import dayjs from "npm:dayjs@1.11.13";
 import { formatDuration } from "./index.tsx";
 import { Row } from "../Row.tsx";
+import React from "react";
 
 function Order(props: { order: HydratedOrder }) {
   const duration = dayjs(props.order.end_at).diff(props.order.start_at);
@@ -25,9 +26,8 @@ function Order(props: { order: HydratedOrder }) {
       <Row
         headWidth={7}
         head="nodes"
-        value={`${props.order.quantity} x ${props.order.instance_type} (${
-          props.order.quantity * GPUS_PER_NODE
-        } gpus)`}
+        value={`${props.order.quantity} x ${props.order.instance_type} (${props.order.quantity * GPUS_PER_NODE
+          } gpus)`}
       />
       <Row
         headWidth={7}

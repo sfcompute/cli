@@ -209,18 +209,20 @@ function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "
   </Box>)
 }
 
+type Order = Awaited<ReturnType<typeof getOrder>> | Awaited<ReturnType<typeof placeBuyOrder>>;
+
 function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string, colocate: Array<string> }) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const { exit } = useApp();
+  const [order, setOrder] = useState<Order | null>(null);
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
     const realDurationInHours = dayjs(endsAt).diff(dayjs(parseStartAsDate(props.startAt))) / 1000 / 3600;
 
-    console.log(getTotalPrice(props.price, props.size, realDurationInHours))
-
-    await placeBuyOrder({
+    setIsLoading(true);
+    const order = await placeBuyOrder({
       instanceType: props.type,
       totalPriceInCents: getTotalPrice(props.price, props.size, realDurationInHours),
       startsAt: props.startAt,
@@ -238,11 +240,10 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
       return;
     }
 
-    setIsLoading(true);
     submitOrder();
   }, [exit]);
 
-  const [order, setOrder] = useState<Awaited<ReturnType<typeof getOrder>> | null>(null);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isLoading) {
@@ -251,13 +252,18 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
           exit();
         }
 
-        const o = await getOrder(value);
+        if (!order) {
+          return;
+        }
+
+        const o = await getOrder(order!.id);
         setOrder(o);
 
         if (o && o.status != "pending") {
-          setIsLoading(false);
+          exit()
+          return
         }
-      }, 3000);
+      }, 200);
     }
 
     return () => {
@@ -265,7 +271,7 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
         clearInterval(interval);
       }
     };
-  }, [isLoading, exit, value]);
+  }, [isLoading, exit, value, order]);
 
   return (
     <Box gap={1} flexDirection="column">
@@ -282,9 +288,24 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
         />
 
       </Box>}
+
       {isLoading && <Box gap={1}>
-        <Spinner type="dots" />
-        <Text>Placing order...</Text>
+        {(!order || order.status === "pending") && <Spinner type="dots" />}
+        {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
+        {!order && <Text>Placing order...</Text>}
+        {order && <Box gap={1}><Text>Order placed: {order.id}</Text><Text>- ({order.status})</Text></Box>}
+      </Box>}
+
+      {order && order.status === "open" && <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
+        <Text>Your order is open, but not filled. You can check it's status with... </Text>
+        <Box paddingLeft={2}>
+          <Text color="green">sf orders ls</Text>
+        </Box>
+
+        <Text>Or you can cancel it with... </Text>
+        <Box paddingLeft={2}>
+          <Text color="green">sf orders cancel {order.id}</Text>
+        </Box>
       </Box>}
     </Box>
   );
