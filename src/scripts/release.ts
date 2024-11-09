@@ -47,7 +47,6 @@ async function saveVersion(version: string) {
 const COMPILE_TARGETS: string[] = [
   "x86_64-unknown-linux-gnu",
   "aarch64-unknown-linux-gnu", 
-  "x86_64-pc-windows-msvc",
   "x86_64-apple-darwin",
   "aarch64-apple-darwin",
 ];
@@ -69,6 +68,7 @@ async function compileDistribution() {
     }).output();
 
     if (!zipResult.success) {
+      console.error(zipResult.stderr);
       logAndError(`Failed to zip the binary for ${target}`);
     }
     console.log(`✅ Zipped binary for ${target}`);
