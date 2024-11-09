@@ -1,8 +1,7 @@
 import { Box, Text } from "ink";
-import { Row } from "../Row.tsx";
+import { Row } from "./Row.tsx";
 import dayjs from "dayjs";
-import { GPUS_PER_NODE } from "../constants.ts";
-import type { Quote } from "./types.ts";
+import { GPUS_PER_NODE } from "./constants.ts";
 import React from "react";
 
 export default function QuoteDisplay(props: { quote: Quote }) {
@@ -42,3 +41,20 @@ export default function QuoteDisplay(props: { quote: Quote }) {
     </Box>
   );
 }
+
+export type Quote =
+  | {
+    price: number;
+    quantity: number;
+    start_at: string;
+    end_at: string;
+    instance_type: string;
+  }
+  | {
+    price: number;
+    quantity: number;
+    start_at: string;
+    end_at: string;
+    contract_id: string;
+  }
+  | null;

@@ -84,14 +84,14 @@ function OrderMinimal(props: { order: HydratedOrder }) {
         </Text>
       </Box>
 
-      <Box width={14}>
+      <Box width={24}>
         <Text strikethrough={!!executedPricePerGPUHour} dimColor={!!executedPricePerGPUHour}>${pricePerGPUHour.toFixed(2)}/gpu/hr</Text>
-        {executedPricePerGPUHour && <Text>(${executedPricePerGPUHour.toFixed(2)}/gpu/hr)</Text>}
+        {executedPricePerGPUHour && <Text> ${executedPricePerGPUHour.toFixed(2)}</Text>}
       </Box>
       <Box width={33}>
         <Text>{dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} → {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}</Text>
       </Box>
-      <Box width={4}>
+      <Box width={7}>
         <Text>{durationFormatted}</Text>
       </Box>
       <Box width={10}>
