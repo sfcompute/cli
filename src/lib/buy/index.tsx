@@ -17,7 +17,7 @@ import QuoteDisplay from "../Quote.tsx";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
-import React from 'react'
+import React from "react";
 import { Row } from "../Row.tsx";
 import ms from "ms";
 import Spinner from "ink-spinner";
@@ -36,8 +36,6 @@ interface SfBuyOptions {
   quote?: boolean;
   colocate?: Array<string>;
 }
-
-
 
 export function registerBuy(program: Command) {
   program
@@ -124,7 +122,6 @@ async function quoteAction(options: SfBuyOptions) {
   render(<QuoteDisplay quote={quote} />);
 }
 
-
 /*
 Flow is:
 1. If --quote, get quote and exit
@@ -134,7 +131,6 @@ Flow is:
 5. Place order
  */
 async function buyOrderAction(options: SfBuyOptions) {
-
   if (options.quote) {
     return quoteAction(options);
   }
@@ -152,20 +148,43 @@ async function buyOrderAction(options: SfBuyOptions) {
 
   const duration = parseDuration(options.duration);
   const startDate = parseStartAsDate(options.start);
-  const endsAt = roundEndDate(dayjs(startDate).add(duration, "seconds").toDate()).toDate();
+  const endsAt = roundEndDate(
+    dayjs(startDate).add(duration, "seconds").toDate(),
+  ).toDate();
 
-  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={startDate} type={options.type} endsAt={endsAt} colocate={options.colocate} />);
+  render(
+    <BuyOrder
+      price={pricePerGpuHour}
+      size={parseAccelerators(options.accelerators)}
+      startAt={startDate}
+      type={options.type}
+      endsAt={endsAt}
+      colocate={options.colocate}
+    />,
+  );
 }
 
 function roundEndDate(endDate: Date) {
-  return dayjs(endDate).add(1, "hour").startOf("hour")
+  return dayjs(endDate).add(1, "hour").startOf("hour");
 }
 
-function getTotalPrice(pricePerGpuHour: number, size: number, durationInHours: number) {
-  return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours)
+function getTotalPrice(
+  pricePerGpuHour: number,
+  size: number,
+  durationInHours: number,
+) {
+  return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
 
-function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string }) {
+function BuyOrderPreview(
+  props: {
+    price: number;
+    size: number;
+    startAt: Date | "NOW";
+    endsAt: Date;
+    type: string;
+  },
+) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
@@ -182,39 +201,63 @@ function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) / 100;
+  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
+    100;
 
-  return (<Box flexDirection="column">
-    <Text color="yellow">Buy Order</Text>
-    <Row headWidth={7} head="type" value={props.type} />
-    <Box>
-      <Box width={7}>
-        <Text dimColor>start</Text>
+  return (
+    <Box flexDirection="column">
+      <Text color="yellow">Buy Order</Text>
+      <Row headWidth={7} head="type" value={props.type} />
+      <Box>
+        <Box width={7}>
+          <Text dimColor>start</Text>
+        </Box>
+        <Box gap={1}>
+          <Text>{start}</Text>
+          <Text dimColor>
+            {props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}
+          </Text>
+        </Box>
       </Box>
-      <Box gap={1}>
-        <Text>{start}</Text>
-        <Text dimColor>{props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}</Text>
+      <Box>
+        <Box width={7}>
+          <Text dimColor>end</Text>
+        </Box>
+        <Box gap={1}>
+          <Text>{end}</Text>
+          <Text dimColor>({endFromNow})</Text>
+        </Box>
       </Box>
+      <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
+      <Row
+        headWidth={7}
+        head="size"
+        value={`${props.size * GPUS_PER_NODE} gpus`}
+      />
+      <Row
+        headWidth={7}
+        head="rate"
+        value={`$${(props.price / 100).toFixed(2)}/gpu/hr`}
+      />
+      <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
     </Box>
-    <Box>
-      <Box width={7}>
-        <Text dimColor>end</Text>
-      </Box>
-      <Box gap={1}>
-        <Text>{end}</Text>
-        <Text dimColor>({endFromNow})</Text>
-      </Box>
-    </Box>
-    <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
-    <Row headWidth={7} head="size" value={`${props.size * GPUS_PER_NODE} gpus`} />
-    <Row headWidth={7} head="rate" value={`$${(props.price / 100).toFixed(2)}/gpu/hr`} />
-    <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
-  </Box>)
+  );
 }
 
-type Order = Awaited<ReturnType<typeof getOrder>> | Awaited<ReturnType<typeof placeBuyOrder>>;
+type Order =
+  | Awaited<ReturnType<typeof getOrder>>
+  | Awaited<ReturnType<typeof placeBuyOrder>>;
 
-function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string, colocate?: Array<string> }) {
+function BuyOrder(
+  props: {
+    price: number;
+    size: number;
+    startAt: Date | "NOW";
+    endsAt: Date;
+    type: string;
+    colocate?: Array<string>;
+  },
+) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const { exit } = useApp();
@@ -222,18 +265,25 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
-    const startAt = props.startAt === "NOW" ? parseStartAsDate(props.startAt) : props.startAt;
-    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+    const startAt = props.startAt === "NOW"
+      ? parseStartAsDate(props.startAt)
+      : props.startAt;
+    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
+      3600;
 
     setIsLoading(true);
     const order = await placeBuyOrder({
       instanceType: props.type,
-      totalPriceInCents: getTotalPrice(props.price, props.size, realDurationInHours),
+      totalPriceInCents: getTotalPrice(
+        props.price,
+        props.size,
+        realDurationInHours,
+      ),
       startsAt: props.startAt,
       endsAt: endsAt.toDate(),
       colocateWith: props.colocate || [],
       numberNodes: props.size,
-    })
+    });
     setOrder(order);
   }
 
@@ -246,7 +296,6 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
 
     submitOrder();
   }, [exit]);
-
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -264,8 +313,8 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
         setOrder(o);
 
         if (o && o.status != "pending") {
-          exit()
-          return
+          exit();
+          return;
         }
       }, 200);
     }
@@ -281,40 +330,52 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
     <Box gap={1} flexDirection="column">
       <BuyOrderPreview {...props} />
 
-      {!isLoading && <Box gap={1}>
-        <Text>Place order? (y/n)</Text>
+      {!isLoading && (
+        <Box gap={1}>
+          <Text>Place order? (y/n)</Text>
 
-        <ConfirmInput
-          isChecked={false}
-          value={value}
-          onChange={setValue}
-          onSubmit={handleSubmit}
-        />
-
-      </Box>}
-
-      {isLoading && <Box gap={1}>
-        {(!order || order.status === "pending") && <Spinner type="dots" />}
-        {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
-        {!order && <Text>Placing order...</Text>}
-        {order && <Box gap={1}><Text>Order placed: {order.id}</Text><Text>- ({order.status})</Text></Box>}
-      </Box>}
-
-      {order && order.status === "open" && <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
-        <Text>Your order is open, but not filled. You can check it's status with... </Text>
-        <Box paddingLeft={2}>
-          <Text color="green">sf orders ls</Text>
+          <ConfirmInput
+            isChecked={false}
+            value={value}
+            onChange={setValue}
+            onSubmit={handleSubmit}
+          />
         </Box>
+      )}
 
-        <Text>Or you can cancel it with... </Text>
-        <Box paddingLeft={2}>
-          <Text color="green">sf orders cancel {order.id}</Text>
+      {isLoading && (
+        <Box gap={1}>
+          {(!order || order.status === "pending") && <Spinner type="dots" />}
+          {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
+          {!order && <Text>Placing order...</Text>}
+          {order && (
+            <Box gap={1}>
+              <Text>Order placed: {order.id}</Text>
+              <Text>- ({order.status})</Text>
+            </Box>
+          )}
         </Box>
-      </Box>}
+      )}
+
+      {order && order.status === "open" && (
+        <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
+          <Text>
+            Your order is open, but not filled. You can check it's status
+            with...
+          </Text>
+          <Box paddingLeft={2}>
+            <Text color="green">sf orders ls</Text>
+          </Box>
+
+          <Text>Or you can cancel it with...</Text>
+          <Box paddingLeft={2}>
+            <Text color="green">sf orders cancel {order.id}</Text>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }
-
 
 export async function placeBuyOrder(
   options: {
@@ -324,9 +385,12 @@ export async function placeBuyOrder(
     endsAt: Date;
     colocateWith: Array<string>;
     numberNodes: number;
-  }
+  },
 ) {
-  invariant(options.totalPriceInCents == Math.ceil(options.totalPriceInCents), "totalPriceInCents must be a whole number");
+  invariant(
+    options.totalPriceInCents == Math.ceil(options.totalPriceInCents),
+    "totalPriceInCents must be a whole number",
+  );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
 
   const api = await apiClient();

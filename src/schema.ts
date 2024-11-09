@@ -4,2800 +4,2902 @@
  */
 
 export interface paths {
-    "/v0/prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Prices"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/v0/prices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Quote"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Prices"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Orders"];
-        put?: never;
-        post: operations["postV0Orders"];
-        delete: operations["deleteV0Orders"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Quote"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/orders/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0OrdersById"];
-        put?: never;
-        post?: never;
-        delete: operations["deleteV0OrdersById"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Orders"];
+    put?: never;
+    post: operations["postV0Orders"];
+    delete: operations["deleteV0Orders"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/orders/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/instances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Instances"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0OrdersById"];
+    put?: never;
+    post?: never;
+    delete: operations["deleteV0OrdersById"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/instances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/instances/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0InstancesById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Instances"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/instances/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/credentials": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Credentials"];
-        put?: never;
-        post: operations["postV0Credentials"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0InstancesById"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/credentials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/contracts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Contracts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Credentials"];
+    put?: never;
+    post: operations["postV0Credentials"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/contracts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/contracts/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0ContractsById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Contracts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/contracts/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Balance"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0ContractsById"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/procurements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0Procurements"];
-        put?: never;
-        post: operations["postV0Procurements"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Balance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/procurements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/procurements/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0ProcurementsById"];
-        put: operations["putV0ProcurementsById"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["getV0Procurements"];
+    put?: never;
+    post: operations["postV0Procurements"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/procurements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get: operations["getV0ProcurementsById"];
+    put: operations["putV0ProcurementsById"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: never;
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getV0Prices: {
-        parameters: {
-            query?: {
-                /** @description The instance type. */
-                instance_type?: string;
-                /** @description The minimum quantity of nodes filled blocks included in the price calculation contain. */
-                min_quantity?: number;
-                /** @description The maximum quantity of nodes filled blocks included in the price calculation contain. */
-                max_quantity?: number;
-                /** @description The minimum duration, in seconds, of filled blocks. */
-                min_duration?: number;
-                /** @description The maximum duration, in seconds, of filled blocks. */
-                max_duration?: number;
-                /** @description The number of days to go back, starting from today. If you provide 0, you will only see prices for today. If you provide 1, you will see prices over all of yesterday, and today. */
-                since_n_days_ago?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            /** @constant */
-                            object: "price-history-item";
-                            gpu_hour?: {
-                                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                min: number;
-                                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                max: number;
-                                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                                avg: number;
-                            };
-                            /** @description ISO 8601 datetime marking the start of the period. */
-                            period_start: string;
-                            /** @description ISO 8601 datetime marking the end of the period. */
-                            period_end: string;
-                            /** @description Whether there was no price data for this period. */
-                            no_data: boolean;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            /** @constant */
-                            object: "price-history-item";
-                            gpu_hour?: {
-                                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                min: number;
-                                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                max: number;
-                                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                                avg: number;
-                            };
-                            /** @description ISO 8601 datetime marking the start of the period. */
-                            period_start: string;
-                            /** @description ISO 8601 datetime marking the end of the period. */
-                            period_end: string;
-                            /** @description Whether there was no price data for this period. */
-                            no_data: boolean;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            /** @constant */
-                            object: "price-history-item";
-                            gpu_hour?: {
-                                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                min: number;
-                                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                                max: number;
-                                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                                avg: number;
-                            };
-                            /** @description ISO 8601 datetime marking the start of the period. */
-                            period_start: string;
-                            /** @description ISO 8601 datetime marking the end of the period. */
-                            period_end: string;
-                            /** @description Whether there was no price data for this period. */
-                            no_data: boolean;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  getV0Prices: {
+    parameters: {
+      query?: {
+        /** @description The instance type. */
+        instance_type?: string;
+        /** @description The minimum quantity of nodes filled blocks included in the price calculation contain. */
+        min_quantity?: number;
+        /** @description The maximum quantity of nodes filled blocks included in the price calculation contain. */
+        max_quantity?: number;
+        /** @description The minimum duration, in seconds, of filled blocks. */
+        min_duration?: number;
+        /** @description The maximum duration, in seconds, of filled blocks. */
+        max_duration?: number;
+        /** @description The number of days to go back, starting from today. If you provide 0, you will only see prices for today. If you provide 1, you will see prices over all of yesterday, and today. */
+        since_n_days_ago?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getV0Quote: {
-        parameters: {
-            query: {
-                side: "buy" | "sell";
-                /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. The difference between this and `max_start_time` can be at most 24 hours. */
-                min_start_date: "NOW" | string;
-                /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. The difference between this and `min_start_time` can be at most 24 hours. */
-                max_start_date: "NOW" | string;
-                /** @description desired duration, in seconds. Since contracts must end on the hour, the actual duration returned by the quote may be longer than the requested duration by up to 59 minutes. */
-                duration: number;
-                /** @description The number of nodes. */
-                quantity: number;
-                /** @description The instance type. */
-                instance_type?: string;
-                contract_id?: string;
-            };
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "buy";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        } | null;
-                    } | {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "sell";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            contract_id: string;
-                        } | null;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "buy";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        } | null;
-                    } | {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "sell";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            contract_id: string;
-                        } | null;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "buy";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        } | null;
-                    } | {
-                        /** @constant */
-                        object: "quote";
-                        /** @constant */
-                        side: "sell";
-                        quote: {
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            contract_id: string;
-                        } | null;
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            data: {
+              /** @constant */
+              object: "price-history-item";
+              gpu_hour?: {
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+                min: number;
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+                max: number;
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+                avg: number;
+              };
+              /** @description ISO 8601 datetime marking the start of the period. */
+              period_start: string;
+              /** @description ISO 8601 datetime marking the end of the period. */
+              period_end: string;
+              /** @description Whether there was no price data for this period. */
+              no_data: boolean;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              /** @constant */
+              object: "price-history-item";
+              gpu_hour?: {
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+                min: number;
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+                max: number;
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+                avg: number;
+              };
+              /** @description ISO 8601 datetime marking the start of the period. */
+              period_start: string;
+              /** @description ISO 8601 datetime marking the end of the period. */
+              period_end: string;
+              /** @description Whether there was no price data for this period. */
+              no_data: boolean;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              /** @constant */
+              object: "price-history-item";
+              gpu_hour?: {
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+                min: number;
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+                max: number;
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+                avg: number;
+              };
+              /** @description ISO 8601 datetime marking the start of the period. */
+              period_start: string;
+              /** @description ISO 8601 datetime marking the end of the period. */
+              period_end: string;
+              /** @description Whether there was no price data for this period. */
+              no_data: boolean;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
         };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    getV0Orders: {
-        parameters: {
-            query?: {
-                side?: "buy" | "sell";
-                /** @description The instance type. */
-                instance_type?: string;
-                include_public?: string | boolean;
-                min_price?: string | number;
-                max_price?: string | number;
-                min_start_date?: string;
-                max_start_date?: string;
-                min_duration?: string | number;
-                max_duration?: string | number;
-                min_quantity?: string | number;
-                max_quantity?: string | number;
-                contract_id?: string;
-                only_open?: string | boolean;
-                exclude_filled?: string | boolean;
-                only_filled?: string | boolean;
-                min_filled_at?: string;
-                max_filled_at?: string;
-                min_fill_price?: string | number;
-                max_fill_price?: string | number;
-                exclude_cancelled?: string | boolean;
-                only_cancelled?: string | boolean;
-                min_cancelled_at?: string;
-                max_cancelled_at?: string;
-                min_placed_at?: string;
-                max_placed_at?: string;
-                limit?: string | number;
-                offset?: string | number;
-            };
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  getV0Quote: {
+    parameters: {
+      query: {
+        side: "buy" | "sell";
+        /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. The difference between this and `max_start_time` can be at most 24 hours. */
+        min_start_date: "NOW" | string;
+        /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. The difference between this and `min_start_time` can be at most 24 hours. */
+        max_start_date: "NOW" | string;
+        /** @description desired duration, in seconds. Since contracts must end on the hour, the actual duration returned by the quote may be longer than the requested duration by up to 59 minutes. */
+        duration: number;
+        /** @description The number of nodes. */
+        quantity: number;
+        /** @description The instance type. */
+        instance_type?: string;
+        contract_id?: string;
+      };
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
     };
-    postV0Orders: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @constant */
-                    side: "buy";
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    colocate_with?: string[];
-                } | {
-                    /** @constant */
-                    side: "sell";
-                    contract_id: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    reprice?: {
-                        /**
-                         * @description Adjust this order's price linearly from adjustment start to end.
-                         * @constant
-                         */
-                        strategy: "linear";
-                        /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                        limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                        start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-                        end_at?: string;
-                    };
-                };
-                "multipart/form-data": {
-                    /** @constant */
-                    side: "buy";
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    colocate_with?: string[];
-                } | {
-                    /** @constant */
-                    side: "sell";
-                    contract_id: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    reprice?: {
-                        /**
-                         * @description Adjust this order's price linearly from adjustment start to end.
-                         * @constant
-                         */
-                        strategy: "linear";
-                        /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                        limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                        start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-                        end_at?: string;
-                    };
-                };
-                "text/plain": {
-                    /** @constant */
-                    side: "buy";
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    colocate_with?: string[];
-                } | {
-                    /** @constant */
-                    side: "sell";
-                    contract_id: string;
-                    /** @description The number of nodes. */
-                    quantity: number;
-                    start_at: string | "NOW";
-                    /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                    end_at: string;
-                    /** @description Price in cents (1 = $0.01) */
-                    price: number;
-                    flags?: {
-                        /** @description If true, this will be a market order. */
-                        market?: boolean;
-                        /** @description If true, this is a post-only order. */
-                        post_only?: boolean;
-                        /** @description If true, this is an immediate-or-cancel order. */
-                        ioc?: boolean;
-                    };
-                    reprice?: {
-                        /**
-                         * @description Adjust this order's price linearly from adjustment start to end.
-                         * @constant
-                         */
-                        strategy: "linear";
-                        /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                        limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                        start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-                        end_at?: string;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "buy";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+            } | null;
+          } | {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "sell";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              contract_id: string;
+            } | null;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "buy";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+            } | null;
+          } | {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "sell";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              contract_id: string;
+            } | null;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "buy";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+            } | null;
+          } | {
+            /** @constant */
+            object: "quote";
+            /** @constant */
+            side: "sell";
+            quote: {
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              contract_id: string;
+            } | null;
+          };
         };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        /** @constant */
-                        status: "pending";
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        /** @constant */
-                        status: "pending";
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        /** @constant */
-                        status: "pending";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    deleteV0Orders: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  getV0Orders: {
+    parameters: {
+      query?: {
+        side?: "buy" | "sell";
+        /** @description The instance type. */
+        instance_type?: string;
+        include_public?: string | boolean;
+        min_price?: string | number;
+        max_price?: string | number;
+        min_start_date?: string;
+        max_start_date?: string;
+        min_duration?: string | number;
+        max_duration?: string | number;
+        min_quantity?: string | number;
+        max_quantity?: string | number;
+        contract_id?: string;
+        only_open?: string | boolean;
+        exclude_filled?: string | boolean;
+        only_filled?: string | boolean;
+        min_filled_at?: string;
+        max_filled_at?: string;
+        min_fill_price?: string | number;
+        max_fill_price?: string | number;
+        exclude_cancelled?: string | boolean;
+        only_cancelled?: string | boolean;
+        min_cancelled_at?: string;
+        max_cancelled_at?: string;
+        min_placed_at?: string;
+        max_placed_at?: string;
+        limit?: string | number;
+        offset?: string | number;
+      };
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
     };
-    getV0OrdersById: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        side: "buy" | "sell";
-                        status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                        end_at: string;
-                        /** @description Price in cents (1 = $0.01) */
-                        price: number;
-                        flags: {
-                            /** @description If true, this will be a market order. */
-                            market?: boolean;
-                            /** @description If true, this is a post-only order. */
-                            post_only?: boolean;
-                            /** @description If true, this is an immediate-or-cancel order. */
-                            ioc?: boolean;
-                        };
-                        executed: boolean;
-                        executed_at?: string;
-                        /** @description Execution price in cents (1 = $0.01) */
-                        execution_price?: number;
-                        cancelled: boolean;
-                        cancelled_at?: string;
-                        colocate_with?: string[];
-                        created_at: string;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        side: "buy" | "sell";
-                        status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                        end_at: string;
-                        /** @description Price in cents (1 = $0.01) */
-                        price: number;
-                        flags: {
-                            /** @description If true, this will be a market order. */
-                            market?: boolean;
-                            /** @description If true, this is a post-only order. */
-                            post_only?: boolean;
-                            /** @description If true, this is an immediate-or-cancel order. */
-                            ioc?: boolean;
-                        };
-                        executed: boolean;
-                        executed_at?: string;
-                        /** @description Execution price in cents (1 = $0.01) */
-                        execution_price?: number;
-                        cancelled: boolean;
-                        cancelled_at?: string;
-                        colocate_with?: string[];
-                        created_at: string;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "order";
-                        id: string;
-                        side: "buy" | "sell";
-                        status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description The number of nodes. */
-                        quantity: number;
-                        /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                        start_at: string;
-                        /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                        end_at: string;
-                        /** @description Price in cents (1 = $0.01) */
-                        price: number;
-                        flags: {
-                            /** @description If true, this will be a market order. */
-                            market?: boolean;
-                            /** @description If true, this is a post-only order. */
-                            post_only?: boolean;
-                            /** @description If true, this is an immediate-or-cancel order. */
-                            ioc?: boolean;
-                        };
-                        executed: boolean;
-                        executed_at?: string;
-                        /** @description Execution price in cents (1 = $0.01) */
-                        execution_price?: number;
-                        cancelled: boolean;
-                        cancelled_at?: string;
-                        colocate_with?: string[];
-                        created_at: string;
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            data: {
+              /** @constant */
+              object: "order";
+              id: string;
+              side: "buy" | "sell";
+              status:
+                | "pending"
+                | "rejected"
+                | "open"
+                | "cancelled"
+                | "filled"
+                | "expired";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              executed: boolean;
+              executed_at?: string;
+              /** @description Execution price in cents (1 = $0.01) */
+              execution_price?: number;
+              cancelled: boolean;
+              cancelled_at?: string;
+              colocate_with?: string[];
+              created_at: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              /** @constant */
+              object: "order";
+              id: string;
+              side: "buy" | "sell";
+              status:
+                | "pending"
+                | "rejected"
+                | "open"
+                | "cancelled"
+                | "filled"
+                | "expired";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              executed: boolean;
+              executed_at?: string;
+              /** @description Execution price in cents (1 = $0.01) */
+              execution_price?: number;
+              cancelled: boolean;
+              cancelled_at?: string;
+              colocate_with?: string[];
+              created_at: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              /** @constant */
+              object: "order";
+              id: string;
+              side: "buy" | "sell";
+              status:
+                | "pending"
+                | "rejected"
+                | "open"
+                | "cancelled"
+                | "filled"
+                | "expired";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+              start_at: string;
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              executed: boolean;
+              executed_at?: string;
+              /** @description Execution price in cents (1 = $0.01) */
+              execution_price?: number;
+              cancelled: boolean;
+              cancelled_at?: string;
+              colocate_with?: string[];
+              created_at: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
         };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    deleteV0OrdersById: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "pending";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  postV0Orders: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
     };
-    getV0Instances: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @constant */
+          side: "buy";
+          /** @description The instance type. */
+          instance_type: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          colocate_with?: string[];
+        } | {
+          /** @constant */
+          side: "sell";
+          contract_id: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          reprice?: {
+            /**
+             * @description Adjust this order's price linearly from adjustment start to end.
+             * @constant
+             */
+            strategy: "linear";
+            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+            limit: number;
+            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+            start_at?: string;
+            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+            end_at?: string;
+          };
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            /** @constant */
-                            object: "instance";
-                            id: string;
-                            name: string;
-                            type: string;
-                            /**
-                             * @deprecated
-                             * @description Deprecated and will be removed soon, please use public_ip
-                             */
-                            ip: string;
-                            public_ip: string;
-                            private_ip: string;
-                            ssh_port?: number;
-                            /** @description Whether or not you can connect to the instance via SSH */
-                            can_connect: boolean;
-                            /** @description What state the instance is currently in. */
-                            status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            /** @constant */
-                            object: "instance";
-                            id: string;
-                            name: string;
-                            type: string;
-                            /**
-                             * @deprecated
-                             * @description Deprecated and will be removed soon, please use public_ip
-                             */
-                            ip: string;
-                            public_ip: string;
-                            private_ip: string;
-                            ssh_port?: number;
-                            /** @description Whether or not you can connect to the instance via SSH */
-                            can_connect: boolean;
-                            /** @description What state the instance is currently in. */
-                            status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            /** @constant */
-                            object: "instance";
-                            id: string;
-                            name: string;
-                            type: string;
-                            /**
-                             * @deprecated
-                             * @description Deprecated and will be removed soon, please use public_ip
-                             */
-                            ip: string;
-                            public_ip: string;
-                            private_ip: string;
-                            ssh_port?: number;
-                            /** @description Whether or not you can connect to the instance via SSH */
-                            can_connect: boolean;
-                            /** @description What state the instance is currently in. */
-                            status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        "multipart/form-data": {
+          /** @constant */
+          side: "buy";
+          /** @description The instance type. */
+          instance_type: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          colocate_with?: string[];
+        } | {
+          /** @constant */
+          side: "sell";
+          contract_id: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          reprice?: {
+            /**
+             * @description Adjust this order's price linearly from adjustment start to end.
+             * @constant
+             */
+            strategy: "linear";
+            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+            limit: number;
+            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+            start_at?: string;
+            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+            end_at?: string;
+          };
         };
+        "text/plain": {
+          /** @constant */
+          side: "buy";
+          /** @description The instance type. */
+          instance_type: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          colocate_with?: string[];
+        } | {
+          /** @constant */
+          side: "sell";
+          contract_id: string;
+          /** @description The number of nodes. */
+          quantity: number;
+          start_at: string | "NOW";
+          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          reprice?: {
+            /**
+             * @description Adjust this order's price linearly from adjustment start to end.
+             * @constant
+             */
+            strategy: "linear";
+            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+            limit: number;
+            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+            start_at?: string;
+            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+            end_at?: string;
+          };
+        };
+      };
     };
-    getV0InstancesById: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "instance";
-                        id: string;
-                        name: string;
-                        type: string;
-                        /**
-                         * @deprecated
-                         * @description Deprecated and will be removed soon, please use public_ip
-                         */
-                        ip: string;
-                        public_ip: string;
-                        private_ip: string;
-                        ssh_port?: number;
-                        /** @description Whether or not you can connect to the instance via SSH */
-                        can_connect: boolean;
-                        /** @description What state the instance is currently in. */
-                        status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "instance";
-                        id: string;
-                        name: string;
-                        type: string;
-                        /**
-                         * @deprecated
-                         * @description Deprecated and will be removed soon, please use public_ip
-                         */
-                        ip: string;
-                        public_ip: string;
-                        private_ip: string;
-                        ssh_port?: number;
-                        /** @description Whether or not you can connect to the instance via SSH */
-                        can_connect: boolean;
-                        /** @description What state the instance is currently in. */
-                        status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "instance";
-                        id: string;
-                        name: string;
-                        type: string;
-                        /**
-                         * @deprecated
-                         * @description Deprecated and will be removed soon, please use public_ip
-                         */
-                        ip: string;
-                        public_ip: string;
-                        private_ip: string;
-                        ssh_port?: number;
-                        /** @description Whether or not you can connect to the instance via SSH */
-                        can_connect: boolean;
-                        /** @description What state the instance is currently in. */
-                        status: "Pending" | "Downloading" | "Customizing" | "Starting" | "Running" | "PostRestart" | "PostForceRestart" | "Stopping" | "Stopped" | "ForceStopped" | "Terminating";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "order";
+            id: string;
+            /** @constant */
+            status: "pending";
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "order";
+            id: string;
+            /** @constant */
+            status: "pending";
+          };
+          "text/plain": {
+            /** @constant */
+            object: "order";
+            id: string;
+            /** @constant */
+            status: "pending";
+          };
         };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    getV0Credentials: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            /** @constant */
-                            object: "ssh_credential";
-                            id: string;
-                            pubkey: string;
-                            username: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            /** @constant */
-                            object: "ssh_credential";
-                            id: string;
-                            pubkey: string;
-                            username: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            /** @constant */
-                            object: "ssh_credential";
-                            id: string;
-                            pubkey: string;
-                            username: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  deleteV0Orders: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
     };
-    postV0Credentials: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    pubkey: string;
-                    username: string;
-                };
-                "multipart/form-data": {
-                    pubkey: string;
-                    username: string;
-                };
-                "text/plain": {
-                    pubkey: string;
-                    username: string;
-                };
-            };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "pending";
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "pending";
+          };
+          "text/plain": {
+            /** @constant */
+            object: "pending";
+          };
         };
-        responses: {
-            /** @description SSH credentials and associated Linux user to be set up on the VM when it spins up. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "ssh_credential";
-                        id: string;
-                        pubkey: string;
-                        username: string;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "ssh_credential";
-                        id: string;
-                        pubkey: string;
-                        username: string;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "ssh_credential";
-                        id: string;
-                        pubkey: string;
-                        username: string;
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    getV0Contracts: {
-        parameters: {
-            query?: {
-                active_within_interval_start?: string;
-                active_within_interval_end?: string;
-                instance_type?: string;
-            };
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: ({
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                                intervals: string[];
-                                quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                        } | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                        })[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: ({
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                                intervals: string[];
-                                quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                        } | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                        })[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: ({
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                                intervals: string[];
-                                quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                        } | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                        })[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  getV0OrdersById: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
     };
-    getV0ContractsById: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                            intervals: string[];
-                            quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                    } | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                            intervals: string[];
-                            quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                    } | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                            intervals: string[];
-                            quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                    } | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                    };
-                };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "order";
+            id: string;
+            side: "buy" | "sell";
+            status:
+              | "pending"
+              | "rejected"
+              | "open"
+              | "cancelled"
+              | "filled"
+              | "expired";
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description The number of nodes. */
+            quantity: number;
+            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+            start_at: string;
+            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number;
+            flags: {
+              /** @description If true, this will be a market order. */
+              market?: boolean;
+              /** @description If true, this is a post-only order. */
+              post_only?: boolean;
+              /** @description If true, this is an immediate-or-cancel order. */
+              ioc?: boolean;
             };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
+            executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in cents (1 = $0.01) */
+            execution_price?: number;
+            cancelled: boolean;
+            cancelled_at?: string;
+            colocate_with?: string[];
+            created_at: string;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "order";
+            id: string;
+            side: "buy" | "sell";
+            status:
+              | "pending"
+              | "rejected"
+              | "open"
+              | "cancelled"
+              | "filled"
+              | "expired";
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description The number of nodes. */
+            quantity: number;
+            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+            start_at: string;
+            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number;
+            flags: {
+              /** @description If true, this will be a market order. */
+              market?: boolean;
+              /** @description If true, this is a post-only order. */
+              post_only?: boolean;
+              /** @description If true, this is an immediate-or-cancel order. */
+              ioc?: boolean;
             };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
+            executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in cents (1 = $0.01) */
+            execution_price?: number;
+            cancelled: boolean;
+            cancelled_at?: string;
+            colocate_with?: string[];
+            created_at: string;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "order";
+            id: string;
+            side: "buy" | "sell";
+            status:
+              | "pending"
+              | "rejected"
+              | "open"
+              | "cancelled"
+              | "filled"
+              | "expired";
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description The number of nodes. */
+            quantity: number;
+            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+            start_at: string;
+            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number;
+            flags: {
+              /** @description If true, this will be a market order. */
+              market?: boolean;
+              /** @description If true, this is a post-only order. */
+              post_only?: boolean;
+              /** @description If true, this is an immediate-or-cancel order. */
+              ioc?: boolean;
             };
+            executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in cents (1 = $0.01) */
+            execution_price?: number;
+            cancelled: boolean;
+            cancelled_at?: string;
+            colocate_with?: string[];
+            created_at: string;
+          };
         };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    getV0Balance: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "balance";
-                        available: {
-                            /** @description Funds available to spend or withdraw. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                        reserved: {
-                            /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "balance";
-                        available: {
-                            /** @description Funds available to spend or withdraw. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                        reserved: {
-                            /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "balance";
-                        available: {
-                            /** @description Funds available to spend or withdraw. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                        reserved: {
-                            /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-                            amount: number;
-                            /** @constant */
-                            currency: "usd";
-                        };
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "not_authenticated";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  deleteV0OrdersById: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
     };
-    getV0Procurements: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            id: string;
-                            /** @description The instance group of the procurement */
-                            instance_group: string;
-                            /** @description The quantity of the procurement */
-                            quantity: number;
-                            /** @description The price per hour per node */
-                            max_price_per_node_hour: number;
-                            /** @description The block duration of the procurement in hours */
-                            min_duration_in_hours: number;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            id: string;
-                            /** @description The instance group of the procurement */
-                            instance_group: string;
-                            /** @description The quantity of the procurement */
-                            quantity: number;
-                            /** @description The price per hour per node */
-                            max_price_per_node_hour: number;
-                            /** @description The block duration of the procurement in hours */
-                            min_duration_in_hours: number;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            id: string;
-                            /** @description The instance group of the procurement */
-                            instance_group: string;
-                            /** @description The quantity of the procurement */
-                            quantity: number;
-                            /** @description The price per hour per node */
-                            max_price_per_node_hour: number;
-                            /** @description The block duration of the procurement in hours */
-                            min_duration_in_hours: number;
-                            /** @description The instance type. */
-                            instance_type: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "pending";
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "pending";
+          };
+          "text/plain": {
+            /** @constant */
+            object: "pending";
+          };
         };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    postV0Procurements: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Generate a bearer token with `$ sf tokens create`. */
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description The instance type. */
-                    instance_type: string;
-                    quantity: number;
-                    max_price_per_node_hour: number;
-                    min_duration_in_hours: number;
-                };
-                "multipart/form-data": {
-                    /** @description The instance type. */
-                    instance_type: string;
-                    quantity: number;
-                    max_price_per_node_hour: number;
-                    min_duration_in_hours: number;
-                };
-                "text/plain": {
-                    /** @description The instance type. */
-                    instance_type: string;
-                    quantity: number;
-                    max_price_per_node_hour: number;
-                    min_duration_in_hours: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "multipart/form-data": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "text/plain": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  getV0Instances: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
     };
-    getV0ProcurementsById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "multipart/form-data": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "text/plain": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            data: {
+              /** @constant */
+              object: "instance";
+              id: string;
+              name: string;
+              type: string;
+              /**
+               * @deprecated
+               * @description Deprecated and will be removed soon, please use public_ip
+               */
+              ip: string;
+              public_ip: string;
+              private_ip: string;
+              ssh_port?: number;
+              /** @description Whether or not you can connect to the instance via SSH */
+              can_connect: boolean;
+              /** @description What state the instance is currently in. */
+              status:
+                | "Pending"
+                | "Downloading"
+                | "Customizing"
+                | "Starting"
+                | "Running"
+                | "PostRestart"
+                | "PostForceRestart"
+                | "Stopping"
+                | "Stopped"
+                | "ForceStopped"
+                | "Terminating";
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              /** @constant */
+              object: "instance";
+              id: string;
+              name: string;
+              type: string;
+              /**
+               * @deprecated
+               * @description Deprecated and will be removed soon, please use public_ip
+               */
+              ip: string;
+              public_ip: string;
+              private_ip: string;
+              ssh_port?: number;
+              /** @description Whether or not you can connect to the instance via SSH */
+              can_connect: boolean;
+              /** @description What state the instance is currently in. */
+              status:
+                | "Pending"
+                | "Downloading"
+                | "Customizing"
+                | "Starting"
+                | "Running"
+                | "PostRestart"
+                | "PostForceRestart"
+                | "Stopping"
+                | "Stopped"
+                | "ForceStopped"
+                | "Terminating";
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              /** @constant */
+              object: "instance";
+              id: string;
+              name: string;
+              type: string;
+              /**
+               * @deprecated
+               * @description Deprecated and will be removed soon, please use public_ip
+               */
+              ip: string;
+              public_ip: string;
+              private_ip: string;
+              ssh_port?: number;
+              /** @description Whether or not you can connect to the instance via SSH */
+              can_connect: boolean;
+              /** @description What state the instance is currently in. */
+              status:
+                | "Pending"
+                | "Downloading"
+                | "Customizing"
+                | "Starting"
+                | "Running"
+                | "PostRestart"
+                | "PostForceRestart"
+                | "Stopping"
+                | "Stopped"
+                | "ForceStopped"
+                | "Terminating";
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
         };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
     };
-    putV0ProcurementsById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    quantity?: number;
-                    /** @description The price (in cents) per node per hour */
-                    max_price_per_node_hour?: number;
-                    /** @description The block duration of the procurement in hours */
-                    min_duration_in_hours?: number;
-                };
-                "multipart/form-data": {
-                    quantity?: number;
-                    /** @description The price (in cents) per node per hour */
-                    max_price_per_node_hour?: number;
-                    /** @description The block duration of the procurement in hours */
-                    min_duration_in_hours?: number;
-                };
-                "text/plain": {
-                    quantity?: number;
-                    /** @description The price (in cents) per node per hour */
-                    max_price_per_node_hour?: number;
-                    /** @description The block duration of the procurement in hours */
-                    min_duration_in_hours?: number;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "multipart/form-data": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                    "text/plain": {
-                        id: string;
-                        /** @description The instance group of the procurement */
-                        instance_group: string;
-                        /** @description The quantity of the procurement */
-                        quantity: number;
-                        /** @description The price per hour per node */
-                        max_price_per_node_hour: number;
-                        /** @description The block duration of the procurement in hours */
-                        min_duration_in_hours: number;
-                        /** @description The instance type. */
-                        instance_type: string;
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
-            };
-        };
+  };
+  getV0InstancesById: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "instance";
+            id: string;
+            name: string;
+            type: string;
+            /**
+             * @deprecated
+             * @description Deprecated and will be removed soon, please use public_ip
+             */
+            ip: string;
+            public_ip: string;
+            private_ip: string;
+            ssh_port?: number;
+            /** @description Whether or not you can connect to the instance via SSH */
+            can_connect: boolean;
+            /** @description What state the instance is currently in. */
+            status:
+              | "Pending"
+              | "Downloading"
+              | "Customizing"
+              | "Starting"
+              | "Running"
+              | "PostRestart"
+              | "PostForceRestart"
+              | "Stopping"
+              | "Stopped"
+              | "ForceStopped"
+              | "Terminating";
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "instance";
+            id: string;
+            name: string;
+            type: string;
+            /**
+             * @deprecated
+             * @description Deprecated and will be removed soon, please use public_ip
+             */
+            ip: string;
+            public_ip: string;
+            private_ip: string;
+            ssh_port?: number;
+            /** @description Whether or not you can connect to the instance via SSH */
+            can_connect: boolean;
+            /** @description What state the instance is currently in. */
+            status:
+              | "Pending"
+              | "Downloading"
+              | "Customizing"
+              | "Starting"
+              | "Running"
+              | "PostRestart"
+              | "PostForceRestart"
+              | "Stopping"
+              | "Stopped"
+              | "ForceStopped"
+              | "Terminating";
+          };
+          "text/plain": {
+            /** @constant */
+            object: "instance";
+            id: string;
+            name: string;
+            type: string;
+            /**
+             * @deprecated
+             * @description Deprecated and will be removed soon, please use public_ip
+             */
+            ip: string;
+            public_ip: string;
+            private_ip: string;
+            ssh_port?: number;
+            /** @description Whether or not you can connect to the instance via SSH */
+            can_connect: boolean;
+            /** @description What state the instance is currently in. */
+            status:
+              | "Pending"
+              | "Downloading"
+              | "Customizing"
+              | "Starting"
+              | "Running"
+              | "PostRestart"
+              | "PostForceRestart"
+              | "Stopping"
+              | "Stopped"
+              | "ForceStopped"
+              | "Terminating";
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0Credentials: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /** @constant */
+              object: "ssh_credential";
+              id: string;
+              pubkey: string;
+              username: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              /** @constant */
+              object: "ssh_credential";
+              id: string;
+              pubkey: string;
+              username: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              /** @constant */
+              object: "ssh_credential";
+              id: string;
+              pubkey: string;
+              username: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  postV0Credentials: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          pubkey: string;
+          username: string;
+        };
+        "multipart/form-data": {
+          pubkey: string;
+          username: string;
+        };
+        "text/plain": {
+          pubkey: string;
+          username: string;
+        };
+      };
+    };
+    responses: {
+      /** @description SSH credentials and associated Linux user to be set up on the VM when it spins up. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "ssh_credential";
+            id: string;
+            pubkey: string;
+            username: string;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "ssh_credential";
+            id: string;
+            pubkey: string;
+            username: string;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "ssh_credential";
+            id: string;
+            pubkey: string;
+            username: string;
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0Contracts: {
+    parameters: {
+      query?: {
+        active_within_interval_start?: string;
+        active_within_interval_end?: string;
+        instance_type?: string;
+      };
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: ({
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "active";
+              id: string;
+              /** Format: date-time */
+              created_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+              shape: {
+                intervals: string[];
+                quantities: number[];
+              };
+              colocate_with?: string[];
+              cluster_id?: string;
+            } | {
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "pending";
+              id: string;
+            })[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: ({
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "active";
+              id: string;
+              /** Format: date-time */
+              created_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+              shape: {
+                intervals: string[];
+                quantities: number[];
+              };
+              colocate_with?: string[];
+              cluster_id?: string;
+            } | {
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "pending";
+              id: string;
+            })[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: ({
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "active";
+              id: string;
+              /** Format: date-time */
+              created_at: string;
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+              shape: {
+                intervals: string[];
+                quantities: number[];
+              };
+              colocate_with?: string[];
+              cluster_id?: string;
+            } | {
+              /** @constant */
+              object: "contract";
+              /** @constant */
+              status: "pending";
+              id: string;
+            })[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0ContractsById: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "active";
+            id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+            shape: {
+              intervals: string[];
+              quantities: number[];
+            };
+            colocate_with?: string[];
+            cluster_id?: string;
+          } | {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "pending";
+            id: string;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "active";
+            id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+            shape: {
+              intervals: string[];
+              quantities: number[];
+            };
+            colocate_with?: string[];
+            cluster_id?: string;
+          } | {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "pending";
+            id: string;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "active";
+            id: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description The instance type. */
+            instance_type: string;
+            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+            shape: {
+              intervals: string[];
+              quantities: number[];
+            };
+            colocate_with?: string[];
+            cluster_id?: string;
+          } | {
+            /** @constant */
+            object: "contract";
+            /** @constant */
+            status: "pending";
+            id: string;
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0Balance: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "balance";
+            available: {
+              /** @description Funds available to spend or withdraw. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+            reserved: {
+              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "balance";
+            available: {
+              /** @description Funds available to spend or withdraw. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+            reserved: {
+              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+          };
+          "text/plain": {
+            /** @constant */
+            object: "balance";
+            available: {
+              /** @description Funds available to spend or withdraw. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+            reserved: {
+              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
+              amount: number;
+              /** @constant */
+              currency: "usd";
+            };
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0Procurements: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              id: string;
+              /** @description The instance group of the procurement */
+              instance_group: string;
+              /** @description The quantity of the procurement */
+              quantity: number;
+              /** @description The price per hour per node */
+              max_price_per_node_hour: number;
+              /** @description The block duration of the procurement in hours */
+              min_duration_in_hours: number;
+              /** @description The instance type. */
+              instance_type: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  postV0Procurements: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Generate a bearer token with `$ sf tokens create`. */
+        authorization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          min_duration_in_hours: number;
+        };
+        "multipart/form-data": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          min_duration_in_hours: number;
+        };
+        "text/plain": {
+          /** @description The instance type. */
+          instance_type: string;
+          quantity: number;
+          max_price_per_node_hour: number;
+          min_duration_in_hours: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  getV0ProcurementsById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  putV0ProcurementsById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          quantity?: number;
+          /** @description The price (in cents) per node per hour */
+          max_price_per_node_hour?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+        "multipart/form-data": {
+          quantity?: number;
+          /** @description The price (in cents) per node per hour */
+          max_price_per_node_hour?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+        "text/plain": {
+          quantity?: number;
+          /** @description The price (in cents) per node per hour */
+          max_price_per_node_hour?: number;
+          /** @description The block duration of the procurement in hours */
+          min_duration_in_hours?: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "multipart/form-data": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+          "text/plain": {
+            id: string;
+            /** @description The instance group of the procurement */
+            instance_group: string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+            /** @description The instance type. */
+            instance_type: string;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
 }

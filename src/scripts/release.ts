@@ -46,7 +46,7 @@ async function saveVersion(version: string) {
 
 const COMPILE_TARGETS: string[] = [
   "x86_64-unknown-linux-gnu",
-  "aarch64-unknown-linux-gnu", 
+  "aarch64-unknown-linux-gnu",
   "x86_64-apple-darwin",
   "aarch64-apple-darwin",
 ];
@@ -54,7 +54,15 @@ const COMPILE_TARGETS: string[] = [
 async function compileDistribution() {
   for (const target of COMPILE_TARGETS) {
     const result = await new Deno.Command("deno", {
-      args: ["compile",  "-A", "--target", target, "--output", `dist/sf-${target}`, "./src/index.ts"],
+      args: [
+        "compile",
+        "-A",
+        "--target",
+        target,
+        "--output",
+        `dist/sf-${target}`,
+        "./src/index.ts",
+      ],
     }).output();
 
     if (!result.success) {

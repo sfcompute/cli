@@ -21,16 +21,6 @@ dayjs.extend(utc);
 
 // development only commands
 export function registerDev(program: Command) {
-
-  // self
-  program.command("me").action(async () => {
-    const accountId = await getLoggedInAccountId();
-    console.log(accountId);
-
-    process.exit(0);
-  });
-
-      
   if (process.env.IS_DEVELOPMENT_CLI_ENV) {
     // config
     registerConfig(program);
@@ -43,6 +33,14 @@ export function registerDev(program: Command) {
       console.log(
         chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A")),
       );
+
+      process.exit(0);
+    });
+
+    // self
+    program.command("me").action(async () => {
+      const accountId = await getLoggedInAccountId();
+      console.log(accountId);
 
       process.exit(0);
     });
@@ -122,9 +120,11 @@ function registerEpoch(program: Command) {
         timestamps.forEach((epochTimestamp, i) => {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
-            `${colorDiffedEpochs[i]} | ${chalk.yellow(
-              dayjs(date).format("hh:mm A MM-DD-YYYY"),
-            )} Local`,
+            `${colorDiffedEpochs[i]} | ${
+              chalk.yellow(
+                dayjs(date).format("hh:mm A MM-DD-YYYY"),
+              )
+            } Local`,
           );
         });
       }

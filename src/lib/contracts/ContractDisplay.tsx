@@ -3,7 +3,7 @@ import type { Contract } from "./types.ts";
 import { Row } from "../Row.tsx";
 import dayjs from "npm:dayjs@1.11.13";
 import ms from "ms";
-import React from 'react';
+import React from "react";
 
 const STARTED = "▶";
 const UPCOMING = "⏸";

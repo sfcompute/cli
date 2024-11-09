@@ -165,10 +165,10 @@ async function findDefaultKey(): Promise<string> {
     stdout: "piped",
     stderr: "null",
   });
-  
+
   const output = await proc.output();
   const status = await proc.status;
-  
+
   if (status.success) {
     const decoder = new TextDecoder("utf-8");
     let stdoutStr: string;

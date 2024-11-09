@@ -19,12 +19,15 @@ export function registerUpgrade(program: Command) {
 
       if (version) {
         const command = new Deno.Command("bash", {
-          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`]
+          args: [
+            "-c",
+            `"$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`,
+          ],
         });
         await command.output();
       } else {
         const command = new Deno.Command("bash", {
-          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)"`]
+          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)"`],
         });
         await command.output();
       }

@@ -3,8 +3,8 @@
 // import c from "chalk";
 
 // Import necessary modules from Ink
-import { Box, Text, render, useApp } from "ink";
-import React, { useState, useCallback, useEffect } from "react";
+import { Box, render, Text, useApp } from "ink";
+import React, { useCallback, useEffect, useState } from "react";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient.ts";
 import { logAndQuit } from "../helpers/errors.ts";
@@ -47,10 +47,17 @@ export function registerUp(program: Command) {
   const cmd = program
     .command("up")
     .description("Automatically buy GPUs until you have the desired quantity")
-    .option("-n, --accelerators <accelerators>", "The number of GPUs to purchase continuously", "1")
+    .option(
+      "-n, --accelerators <accelerators>",
+      "The number of GPUs to purchase continuously",
+      "1",
+    )
     .option("-t, --type <type>", "Specify the type of node", "h100i")
     .option("-d, --duration <duration>", "Specify the minimum duration")
-    .option("-p, --price <price>", "Specify the maximum price per GPU hour, in dollars")
+    .option(
+      "-p, --price <price>",
+      "Specify the maximum price per GPU hour, in dollars",
+    )
     .option("-y, --yes", "Automatically confirm the order");
 
   cmd.action((options) => {
@@ -69,8 +76,12 @@ function UpCommand(props: {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState<React.ReactNode>(null);
-  const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<
+    React.ReactNode
+  >(null);
+  const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(
+    null,
+  );
   const [procurementResult, setProcurementResult] = useState<any>(null);
 
   useEffect(() => {
@@ -97,7 +108,7 @@ function UpCommand(props: {
               You can't afford this. Available balance: $
               {(balance.available.cents / 100).toFixed(2)}, Minimum price: $
               {(totalPriceInCents / 100).toFixed(2)}
-            </Text>
+            </Text>,
           );
           return;
         }
@@ -109,7 +120,7 @@ function UpCommand(props: {
             accelerators={accelerators}
             totalPriceInCents={totalPriceInCents}
             type={type}
-          />
+          />,
         );
 
         if (props.yes) {
@@ -150,11 +161,13 @@ function UpCommand(props: {
         // Check existing procurements
         const procurements = await client.GET("/v0/procurements");
         if (!procurements.response.ok) {
-          throw new Error(procurements.error?.message || "Failed to list procurements");
+          throw new Error(
+            procurements.error?.message || "Failed to list procurements",
+          );
         }
 
         const existingProcurement = procurements.data?.data.find(
-          (p: any) => p.instance_group === type
+          (p: any) => p.instance_group === type,
         );
 
         const nodesRequired = Math.ceil(accelerators / GPUS_PER_NODE);
@@ -168,7 +181,9 @@ function UpCommand(props: {
             body: {
               quantity: nodesRequired,
               min_duration_in_hours: props.duration ? durationHours : undefined,
-              max_price_per_node_hour: props.price ? pricePerNodeHourInCents : undefined,
+              max_price_per_node_hour: props.price
+                ? pricePerNodeHourInCents
+                : undefined,
             },
           });
           setProcurementResult(res.data);
@@ -194,7 +209,7 @@ function UpCommand(props: {
         exit();
       }
     },
-    [props.duration, props.price, exit]
+    [props.duration, props.price, exit],
   );
 
   const handleSubmit = useCallback(
@@ -210,11 +225,18 @@ function UpCommand(props: {
       }
       const accelerators = parseAccelerators(props.accelerators);
       const type = props.type ?? "h100i";
-      const pricePerGpuHourInCents = dollarsToCents(Number.parseFloat(props.price ?? "0"));
+      const pricePerGpuHourInCents = dollarsToCents(
+        Number.parseFloat(props.price ?? "0"),
+      );
 
-      submitProcurement({ durationHours, accelerators, type, pricePerGpuHourInCents });
+      submitProcurement({
+        durationHours,
+        accelerators,
+        type,
+        pricePerGpuHourInCents,
+      });
     },
-    [submitProcurement, exit]
+    [submitProcurement, exit],
   );
 
   return (
@@ -242,7 +264,7 @@ function UpCommand(props: {
       {isLoading && (
         <Box>
           <Spinner type="dots" />
-          <Text> Placing procurement...</Text>
+          <Text>Placing procurement...</Text>
         </Box>
       )}
       {procurementResult && (
@@ -320,14 +342,16 @@ async function getDefaultProcurementOptions(props: {
   let quotePricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
   if (quote) {
     // Total price divided by duration in hours, GPUs, and nodes
-    quotePricePerGpuHourInCents = quote.price / durationHours / GPUS_PER_NODE / nodesRequired;
+    quotePricePerGpuHourInCents = quote.price / durationHours / GPUS_PER_NODE /
+      nodesRequired;
   }
 
   const pricePerGpuHourInCents = props.price
     ? dollarsToCents(Number.parseFloat(props.price))
     : quotePricePerGpuHourInCents;
 
-  const totalPriceInCents = pricePerGpuHourInCents * accelerators * durationHours;
+  const totalPriceInCents = pricePerGpuHourInCents * accelerators *
+    durationHours;
 
   return {
     durationHours,
@@ -355,7 +379,9 @@ function DownCommand(props: {
 
         const procurements = await client.GET("/v0/procurements");
         if (!procurements.response.ok) {
-          throw new Error(procurements.error?.message || "Failed to list procurements");
+          throw new Error(
+            procurements.error?.message || "Failed to list procurements",
+          );
         }
 
         const procurement = procurements.data?.data.find(
@@ -399,7 +425,7 @@ function DownCommand(props: {
       {isLoading && (
         <Box>
           <Spinner type="dots" />
-          <Text> Turning off nodes...</Text>
+          <Text>Turning off nodes...</Text>
         </Box>
       )}
       {error && (
@@ -407,9 +433,7 @@ function DownCommand(props: {
           Error: {error}
         </Text>
       )}
-      {result && (
-        <Text color="green">Nodes turned off successfully!</Text>
-      )}
+      {result && <Text color="green">Nodes turned off successfully!</Text>}
     </Box>
   );
 }

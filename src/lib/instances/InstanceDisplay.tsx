@@ -2,7 +2,7 @@ import { Box, Text } from "ink";
 import type { InstanceObject } from "./types.ts";
 import Spinner from "ink-spinner";
 import { Row } from "../Row.tsx";
-import React from 'react';
+import React from "react";
 
 export function InstanceDisplay(props: { instance: InstanceObject }) {
   let status = "loading";

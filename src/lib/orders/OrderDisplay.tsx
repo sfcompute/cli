@@ -22,8 +22,8 @@ function orderDetails(order: HydratedOrder) {
   return {
     pricePerGPUHour,
     durationFormatted,
-    executedPricePerGPUHour
-  }
+    executedPricePerGPUHour,
+  };
 }
 
 function Order(props: { order: HydratedOrder }) {
@@ -42,8 +42,9 @@ function Order(props: { order: HydratedOrder }) {
       <Row
         headWidth={7}
         head="nodes"
-        value={`${props.order.quantity} x ${props.order.instance_type} (${props.order.quantity * GPUS_PER_NODE
-          } gpus)`}
+        value={`${props.order.quantity} x ${props.order.instance_type} (${
+          props.order.quantity * GPUS_PER_NODE
+        } gpus)`}
       />
       <Row
         headWidth={7}
@@ -71,7 +72,8 @@ function Order(props: { order: HydratedOrder }) {
 }
 
 function OrderMinimal(props: { order: HydratedOrder }) {
-  const { pricePerGPUHour, durationFormatted, executedPricePerGPUHour } = orderDetails(props.order);
+  const { pricePerGPUHour, durationFormatted, executedPricePerGPUHour } =
+    orderDetails(props.order);
 
   return (
     <Box gap={1}>
@@ -85,11 +87,22 @@ function OrderMinimal(props: { order: HydratedOrder }) {
       </Box>
 
       <Box width={24}>
-        <Text strikethrough={!!executedPricePerGPUHour} dimColor={!!executedPricePerGPUHour}>${pricePerGPUHour.toFixed(2)}/gpu/hr</Text>
-        {executedPricePerGPUHour && <Text> ${executedPricePerGPUHour.toFixed(2)}</Text>}
+        <Text
+          strikethrough={!!executedPricePerGPUHour}
+          dimColor={!!executedPricePerGPUHour}
+        >
+          ${pricePerGPUHour.toFixed(2)}/gpu/hr
+        </Text>
+        {executedPricePerGPUHour && (
+          <Text>${executedPricePerGPUHour.toFixed(2)}</Text>
+        )}
       </Box>
       <Box width={33}>
-        <Text>{dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} → {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}</Text>
+        <Text>
+          {dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} →
+          {" "}
+          {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}
+        </Text>
       </Box>
       <Box width={7}>
         <Text>{durationFormatted}</Text>
@@ -100,11 +113,13 @@ function OrderMinimal(props: { order: HydratedOrder }) {
       <Box>
         <Text>{props.order.id}</Text>
       </Box>
-    </Box >
-  )
+    </Box>
+  );
 }
 
-export function OrderDisplay(props: { orders: HydratedOrder[], expanded?: boolean }) {
+export function OrderDisplay(
+  props: { orders: HydratedOrder[]; expanded?: boolean },
+) {
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
@@ -124,10 +139,8 @@ export function OrderDisplay(props: { orders: HydratedOrder[], expanded?: boolea
   }
 
   return props.orders.map((order) => {
-    return props.expanded ? (
-      <Order order={order} key={order.id} />
-    ) : (
-      <OrderMinimal order={order} key={order.id} />
-    );
+    return props.expanded
+      ? <Order order={order} key={order.id} />
+      : <OrderMinimal order={order} key={order.id} />;
   });
 }
