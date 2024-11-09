@@ -6,12 +6,28 @@ import { formatDuration } from "./index.tsx";
 import { Row } from "../Row.tsx";
 import React from "react";
 
-function Order(props: { order: HydratedOrder }) {
-  const duration = dayjs(props.order.end_at).diff(props.order.start_at);
+function orderDetails(order: HydratedOrder) {
+  const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour = props.order.price * props.order.quantity /
+  const pricePerGPUHour = order.price * order.quantity /
     GPUS_PER_NODE / durationInHours / 100;
   const durationFormatted = formatDuration(duration);
+
+  let executedPricePerGPUHour;
+  if (order.execution_price) {
+    executedPricePerGPUHour = order.execution_price * order.quantity /
+      GPUS_PER_NODE / durationInHours / 100;
+  }
+
+  return {
+    pricePerGPUHour,
+    durationFormatted,
+    executedPricePerGPUHour
+  }
+}
+
+function Order(props: { order: HydratedOrder }) {
+  const { pricePerGPUHour, durationFormatted } = orderDetails(props.order);
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -54,7 +70,41 @@ function Order(props: { order: HydratedOrder }) {
   );
 }
 
-export function OrderDisplay(props: { orders: HydratedOrder[] }) {
+function OrderMinimal(props: { order: HydratedOrder }) {
+  const { pricePerGPUHour, durationFormatted, executedPricePerGPUHour } = orderDetails(props.order);
+
+  return (
+    <Box gap={1}>
+      <Box width={6} gap={1}>
+        <Text color={props.order.side === "buy" ? "green" : "red"}>
+          {props.order.side === "buy" ? "↑" : "↓"}
+        </Text>
+        <Text color={props.order.side === "buy" ? "green" : "red"}>
+          {props.order.side}
+        </Text>
+      </Box>
+
+      <Box width={14}>
+        <Text strikethrough={!!executedPricePerGPUHour} dimColor={!!executedPricePerGPUHour}>${pricePerGPUHour.toFixed(2)}/gpu/hr</Text>
+        {executedPricePerGPUHour && <Text>(${executedPricePerGPUHour.toFixed(2)}/gpu/hr)</Text>}
+      </Box>
+      <Box width={33}>
+        <Text>{dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} → {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}</Text>
+      </Box>
+      <Box width={4}>
+        <Text>{durationFormatted}</Text>
+      </Box>
+      <Box width={10}>
+        <Text dimColor>({props.order.status})</Text>
+      </Box>
+      <Box>
+        <Text>{props.order.id}</Text>
+      </Box>
+    </Box >
+  )
+}
+
+export function OrderDisplay(props: { orders: HydratedOrder[], expanded?: boolean }) {
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
@@ -74,6 +124,10 @@ export function OrderDisplay(props: { orders: HydratedOrder[] }) {
   }
 
   return props.orders.map((order) => {
-    return <Order order={order} key={order.id} />;
+    return props.expanded ? (
+      <Order order={order} key={order.id} />
+    ) : (
+      <OrderMinimal order={order} key={order.id} />
+    );
   });
 }

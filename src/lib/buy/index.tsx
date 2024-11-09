@@ -151,7 +151,11 @@ async function buyOrderAction(options: SfBuyOptions) {
     }
   }
 
-  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={parseStart(options.start)} type={options.type} />);
+  const duration = parseDuration(options.duration);
+  const startDate = parseStartAsDate(options.start);
+  const endsAt = roundEndDate(dayjs(startDate).add(duration, "seconds").toDate()).toDate();
+
+  render(<BuyOrder price={pricePerGpuHour} size={parseAccelerators(options.accelerators)} startAt={startDate} type={options.type} endsAt={endsAt} colocate={options.colocate} />);
 }
 
 function roundEndDate(endDate: Date) {
@@ -211,7 +215,7 @@ function BuyOrderPreview(props: { price: number, size: number, startAt: Date | "
 
 type Order = Awaited<ReturnType<typeof getOrder>> | Awaited<ReturnType<typeof placeBuyOrder>>;
 
-function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string, colocate: Array<string> }) {
+function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", endsAt: Date, type: string, colocate?: Array<string> }) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const { exit } = useApp();
@@ -219,7 +223,8 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
-    const realDurationInHours = dayjs(endsAt).diff(dayjs(parseStartAsDate(props.startAt))) / 1000 / 3600;
+    const startAt = props.startAt === "NOW" ? parseStartAsDate(props.startAt) : props.startAt;
+    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
 
     setIsLoading(true);
     const order = await placeBuyOrder({
@@ -227,7 +232,7 @@ function BuyOrder(props: { price: number, size: number, startAt: Date | "NOW", e
       totalPriceInCents: getTotalPrice(props.price, props.size, realDurationInHours),
       startsAt: props.startAt,
       endsAt: endsAt.toDate(),
-      colocateWith: props.colocate,
+      colocateWith: props.colocate || [],
       numberNodes: props.size,
     })
     setOrder(order);

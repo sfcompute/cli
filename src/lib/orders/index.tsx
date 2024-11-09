@@ -13,11 +13,7 @@ import { getApiUrl } from "../../helpers/urls.ts";
 import { render, Text } from "ink";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
-
-const usdFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+import React from "react";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
