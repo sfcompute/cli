@@ -181,6 +181,7 @@ function UpCommand(props: {
               min_duration_in_hours: Math.max(durationHours, 1),
             },
           });
+
           if (!res.response.ok) {
             throw new Error(res.error?.message || "Failed to purchase nodes");
           }

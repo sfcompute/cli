@@ -15,6 +15,8 @@ import React from "react";
 export function registerContracts(program: Command) {
   program
     .command("contracts")
+    .alias("c")
+    .alias("contract")
     .description("Manage contracts")
     .addCommand(
       new Command("list")
