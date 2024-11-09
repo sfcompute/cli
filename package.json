@@ -1,11 +1,7 @@
 {
   "scripts": {
-    "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src",
-    "check-fix": "biome check ./src --apply",
-    "check": "biome check ./src && tsc --noEmit --project .",
     "dev": "IS_DEVELOPMENT_CLI_ENV=true deno run src/index.ts",
-    "release": "deno run src/scripts/release.ts",
+    "release": "deno run --allow-all src/scripts/release.ts",
     "prod": "deno run --allow-all src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts"
   },
@@ -40,5 +36,5 @@
   "peerDependencies": {
     "typescript": "^5.6.2"
   },
-  "version": "0.0.61"
+  "version": "0.0.61-pre.1731128379107"
 }

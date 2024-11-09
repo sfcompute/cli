@@ -1,4 +1,4 @@
-import type { Cents } from "./units";
+import type { Cents } from "./units.ts";
 
 export function pricePerGPUHourToTotalPriceCents(
   pricePerGPUHourCents: Cents,

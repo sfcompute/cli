@@ -18,11 +18,15 @@ export function registerUpgrade(program: Command) {
       }
 
       if (version) {
-        await Bun
-          .$`bash -c "$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`;
+        const command = new Deno.Command("bash", {
+          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`]
+        });
+        await command.output();
       } else {
-        await Bun
-          .$`bash -c "$(curl -fsSL https://www.sfcompute.com/cli/install)"`;
+        const command = new Deno.Command("bash", {
+          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)"`]
+        });
+        await command.output();
       }
 
       process.exit(0);

@@ -9,6 +9,7 @@ import {
 import type { InstanceObject, InstanceType } from "./types.ts";
 import { render } from "ink";
 import { InstanceDisplay, InstanceList } from "./InstanceDisplay.tsx";
+import React from "react";
 
 export function registerInstances(program: Command) {
   const instances = program

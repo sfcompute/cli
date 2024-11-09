@@ -14,13 +14,12 @@ import { parseDate } from "chrono-node";
 import { GPUS_PER_NODE } from "../constants.ts";
 import type { Quote } from "./types.ts";
 import QuoteDisplay from "./Quote.tsx";
-import TextInput from "ink-text-input";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
 import React from 'react'
 import { Row } from "../Row.tsx";
-import ms from "npm:ms";
+import ms from "ms";
 import Spinner from "ink-spinner";
 import invariant from "tiny-invariant";
 

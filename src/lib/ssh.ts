@@ -11,6 +11,7 @@ import {
 } from "../helpers/errors.ts";
 import { getInstances } from "./instances/index.tsx";
 import chalk from "chalk";
+import invariant from "tiny-invariant";
 
 // openssh-client doesn't check $HOME while homedir() does. This function is to
 // make it easy to fix if it causes issues.
@@ -18,14 +19,11 @@ function sshHomedir(): string {
   return os.homedir();
 }
 
-// Bun 1.1.29 does not handle empty arguments properly, for now use an `sh -c`
-// wrapper. Due to using `sh` as a wrapper it won't throw an error for unfound
-// executables, but will instead have an exitCode of 127 (as per usual shell
-// handling).
-function spawnWrapper<Opts extends SpawnOptions.OptionsObject>(
+// Helper to spawn processes with proper error handling
+function spawnWrapper<Opts extends Deno.CommandOptions>(
   cmds: string[],
   options?: Opts,
-): SpawnOptions.OptionsToSubprocess<Opts> {
+): Deno.ChildProcess {
   let shCmd = "";
   for (const cmd of cmds) {
     if (shCmd.length > 0) {
@@ -54,7 +52,10 @@ function spawnWrapper<Opts extends SpawnOptions.OptionsObject>(
     }
     shCmd += '"';
   }
-  return Bun.spawn(["sh", "-c", shCmd], options);
+  return new Deno.Command("sh", {
+    args: ["-c", shCmd],
+    ...options,
+  }).spawn();
 }
 
 // Returns an absolute path (symbolic links, ".", and ".." are left
@@ -86,16 +87,12 @@ function isPubkey(key: string): boolean {
 async function readFileOrKey(keyOrFile: string): Promise<string> {
   try {
     // Check if the input is a file path
-    const fileContent = Bun.file(keyOrFile);
-    if (!fileContent) {
-      throw new Error("File not found");
-    }
-    const file = await fileContent.text();
-    if (!isPubkey(file)) {
+    const fileContent = await Deno.readTextFile(keyOrFile);
+    if (!isPubkey(fileContent)) {
       throw new Error("The file content does not look like a valid public key");
     }
 
-    return file;
+    return fileContent;
   } catch (error) {
     const key = keyOrFile.trim();
     if (!isPubkey(key)) {
@@ -132,13 +129,13 @@ async function findDefaultKey(): Promise<string> {
   ];
 
   {
-    let proc: Subprocess<null, null, null>;
+    let proc: Deno.ChildProcess;
     try {
-      proc = Bun.spawn(["ssh", "-V"], {
-        stdin: null,
-        stdout: null,
-        stderr: null,
-      });
+      proc = new Deno.Command("ssh", {
+        args: ["-V"],
+        stdout: "null",
+        stderr: "null",
+      }).spawn();
     } catch (e) {
       if (e instanceof TypeError) {
         logAndQuit(
@@ -148,8 +145,8 @@ async function findDefaultKey(): Promise<string> {
         throw e;
       }
     }
-    await proc.exited;
-    if (proc.exitCode !== 0) {
+    const status = await proc.status;
+    if (!status.success) {
       logAndQuit("The ssh command is not functioning as expected.");
     }
   }
@@ -164,17 +161,19 @@ async function findDefaultKey(): Promise<string> {
   let keySupportedRsa = false;
 
   const proc = spawnWrapper(["ssh", "-G", ""], {
-    stdin: null,
-    stdout: "pipe",
-    stderr: null,
+    stdin: "null",
+    stdout: "piped",
+    stderr: "null",
   });
-  const stdout = await Bun.readableStreamToArrayBuffer(proc.stdout);
-  await proc.exited;
-  if (proc.exitCode === 0) {
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    let stdoutStr: string | null;
+  
+  const output = await proc.output();
+  const status = await proc.status;
+  
+  if (status.success) {
+    const decoder = new TextDecoder("utf-8");
+    let stdoutStr: string;
     try {
-      stdoutStr = decoder.decode(stdout);
+      stdoutStr = decoder.decode(output.stdout);
     } catch (e) {
       logAndQuit("The ssh command returned invalid utf-8");
     }
@@ -199,16 +198,19 @@ async function findDefaultKey(): Promise<string> {
           lineSuffix + ".pub",
         );
         sshGParsedSuccess = true;
-        if (await Bun.file(potentialIdentityFile).exists()) {
+        try {
+          await Deno.stat(potentialIdentityFile);
           identityFile = potentialIdentityFile;
           break;
+        } catch {
+          // File doesn't exist, continue checking
         }
       }
     }
   }
 
   if (!sshGParsedSuccess) {
-    expect(identityFile === null);
+    invariant(identityFile === null);
 
     console.log(
       "Warning: failed finding default ssh keys (checking hardcoded list)",
@@ -219,9 +221,12 @@ async function findDefaultKey(): Promise<string> {
       const potentialIdentityFile = normalizeSshConfigPath(
         hardcodedPrivKey + ".pub",
       );
-      if (await Bun.file(potentialIdentityFile).exists()) {
+      try {
+        await Deno.stat(potentialIdentityFile);
         identityFile = potentialIdentityFile;
         break;
+      } catch {
+        // File doesn't exist, continue checking
       }
     }
   }
@@ -249,15 +254,15 @@ async function findDefaultKey(): Promise<string> {
         extraSshOptions,
       ),
       {
-        stdin: null,
-        stdout: null,
-        stderr: null,
+        stdin: "null",
+        stdout: "null",
+        stderr: "null",
       },
     );
-    await proc.exited;
-    if (proc.exitCode === 0) {
+    const status = await proc.status;
+    if (status.success) {
       // Success
-    } else if (proc.exitCode === 127) {
+    } else if (status.code === 127) {
       // Gross as technically ssh-keyen could also exit with 127. Remove once no
       // longer using spawnWrapper.
       logAndQuit(
@@ -271,8 +276,7 @@ async function findDefaultKey(): Promise<string> {
   }
 
   console.log(util.format("Using ssh key %s", identityFile));
-  const file = Bun.file(identityFile);
-  return (await file.text()).trim();
+  return (await Deno.readTextFile(identityFile)).trim();
 }
 
 export function registerSSH(program: Command) {
@@ -308,7 +312,7 @@ export function registerSSH(program: Command) {
     }
 
     if (name) {
-      let procResult: SyncSubprocess<"inherit", "inherit">;
+      let procResult: Deno.CommandOutput;
       const instances = await getInstances({ clusterId: undefined });
       const instance = instances.find((instance) => instance.id === name);
       if (!instance) {
@@ -320,31 +324,27 @@ export function registerSSH(program: Command) {
         const sshPort = instance.ssh_port?.toString() || port || "22";
 
         console.log(chalk.dim(`ssh -p ${sshPort} ${options.user}@${ip}`));
-        procResult = Bun.spawnSync(
-          ["ssh", "-p", sshPort, util.format("%s@%s", options.user, ip)],
-          {
-            stdin: "inherit",
-            stdout: "inherit",
-            stderr: "inherit",
-          },
-        );
+        procResult = new Deno.Command("ssh", {
+          args: ["-p", sshPort, util.format("%s@%s", options.user, ip)],
+          stdin: "inherit",
+          stdout: "inherit",
+          stderr: "inherit",
+        }).outputSync();
       } else {
         console.log(chalk.dim(`ssh ${options.user}@${instance.public_ip}`));
-        procResult = Bun.spawnSync(
-          ["ssh", util.format("%s@%s", options.user, instance.public_ip)],
-          {
-            stdin: "inherit",
-            stdout: "inherit",
-            stderr: "inherit",
-          },
-        );
+        procResult = new Deno.Command("ssh", {
+          args: [util.format("%s@%s", options.user, instance.public_ip)],
+          stdin: "inherit",
+          stdout: "inherit",
+          stderr: "inherit",
+        }).outputSync();
       }
-      if (procResult.exitCode === 255) {
+      if (procResult.code === 255) {
         console.log(
           "The ssh command appears to possibly have failed. To set up ssh keys please run `sf ssh --init`.",
         );
       }
-      process.exit(0);
+      Deno.exit(0);
     }
 
     if (options.init || options.add) {
@@ -367,7 +367,7 @@ export function registerSSH(program: Command) {
 
       console.log("Added ssh key");
 
-      process.exit(0);
+      Deno.exit(0);
     }
 
     cmd.help();
