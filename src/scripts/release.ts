@@ -196,7 +196,7 @@ program
       const bumpedVersion = bumpVersion(version, type);
       await saveVersion(bumpedVersion);
       await compileDistribution();
-      // await createRelease(bumpedVersion);
+      await createRelease(bumpedVersion);
     } catch (err) {
       console.error(err);
     }

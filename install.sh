@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e # Exit on any error
+
 # Define the GitHub repository and the name of the binary.
 GITHUB_REPO="sfcompute/cli"
 BINARY_NAME="sf"
@@ -20,9 +22,9 @@ command_exists() {
 if ! command_exists unzip; then
   echo "unzip is not installed. Attempting to install..."
   if command_exists apt-get; then
-    sudo apt-get update && sudo apt-get install -y unzip
+    sudo apt-get update && sudo apt-get install -y unzip || { echo "Failed to install unzip via apt-get"; exit 1; }
   elif command_exists yum; then
-    sudo yum install -y unzip
+    sudo yum install -y unzip || { echo "Failed to install unzip via yum"; exit 1; }
   else
     echo "Unable to install unzip. Please install it manually and run this script again."
     exit 1
@@ -36,7 +38,7 @@ if ! command_exists unzip; then
 fi
 
 # Make sure the target dir exists
-mkdir -p "${TARGET_DIR}"
+mkdir -p "${TARGET_DIR}" || { echo "Failed to create target directory"; exit 1; }
 
 # Define the target file path for the 'sf' CLI binary.
 TARGET_FILE="${TARGET_DIR}/${BINARY_NAME}"
@@ -44,10 +46,10 @@ TARGET_FILE="${TARGET_DIR}/${BINARY_NAME}"
 if [ "$OS" = "Linux" ]; then
   case "${ARCH}" in
     x86_64)
-      target='bun-linux-x64'
+      target='x86_64-unknown-linux-gnu'
       ;;
     aarch64)
-      target='bun-linux-arm64'
+      target='aarch64-unknown-linux-gnu'
       ;;
     *)
       echo "Unsupported Linux architecture: ${ARCH}" >&2
@@ -55,26 +57,25 @@ if [ "$OS" = "Linux" ]; then
       ;;
   esac
 elif [ "$OS" = "Darwin" ]; then
-  sys="$(sysctl -n machdep.cpu.brand_string)"
-  case "$sys" in
-  *M1*|*M2*|*M3*)
-    echo "Installing for Apple Silicon"
-    target='bun-darwin-arm64'
-    ;;
-  *)
-    echo "Installing for Intel Mac"
-    if [ "$(sysctl -n machdep.cpu.features | grep -c AVX2)" -eq 0 ]; then
-      echo "(older Intel Mac detected, using baseline build)"
-      target='bun-darwin-x64-baseline'
-    else
-      target='bun-darwin-x64'
-    fi
-    ;;
+  case "${ARCH}" in
+    x86_64)
+      target='x86_64-apple-darwin'
+      ;;
+    arm64)
+      target='aarch64-apple-darwin'
+      ;;
+    *)
+      echo "Unsupported macOS architecture: ${ARCH}" >&2
+      exit 1
+      ;;
   esac
+else
+  echo "Unsupported operating system: ${OS}" >&2
+  exit 1
 fi
 
 # Set up temporary directory for download and extraction
-TMPDIR=$(mktemp -d)
+TMPDIR=$(mktemp -d) || { echo "Failed to create temporary directory"; exit 1; }
 
 GITHUB=${GITHUB-"https://github.com"}
 
@@ -98,21 +99,20 @@ fi
 # Download the 'sf' CLI binary from the specified URL.
 echo "Downloading '${BINARY_NAME}' CLI binary..."
 echo "curl -L -o \"${TMPDIR}/${BINARY_NAME}.zip\" \"${SF_BINARY_URL}\""
-curl -L -o "${TMPDIR}/${BINARY_NAME}.zip" "${SF_BINARY_URL}"
+curl -L -o "${TMPDIR}/${BINARY_NAME}.zip" "${SF_BINARY_URL}" || { echo "Failed to download binary"; exit 1; }
 
 # Extract the zip file in the temporary directory.
 echo "unzip -o \"${TMPDIR}/${BINARY_NAME}.zip\" -d \"${TMPDIR}/dist\""
-unzip -o "${TMPDIR}/${BINARY_NAME}.zip" -d "${TMPDIR}/dist" ||
-    { echo "Failed to extract sf"; exit 1; }
+unzip -o "${TMPDIR}/${BINARY_NAME}.zip" -d "${TMPDIR}/dist" || { echo "Failed to extract sf"; exit 1; }
 
 # Move the binary to the target directory.
-mv "${TMPDIR}/dist/sf-$target" "${TARGET_FILE}"
+mv "${TMPDIR}/dist/sf-$target" "${TARGET_FILE}" || { echo "Failed to move binary to target location"; exit 1; }
 
 # Make the downloaded binary executable.
-chmod +x "${TARGET_FILE}"
+chmod +x "${TARGET_FILE}" || { echo "Failed to make binary executable"; exit 1; }
 
 # Clean up the temporary directory.
-rm -rf "${TMPDIR}"
+rm -rf "${TMPDIR}" || { echo "Failed to clean up temporary directory"; exit 1; }
 
 # Verify that the 'sf' CLI binary is successfully installed.
 if [ -f "${TARGET_FILE}" ]; then
@@ -151,4 +151,5 @@ if [ -f "${TARGET_FILE}" ]; then
 
 else
     echo "Installation failed. '${BINARY_NAME}' CLI could not be installed."
+    exit 1
 fi
