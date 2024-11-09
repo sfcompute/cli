@@ -20,24 +20,7 @@ import ConfirmInput from "./ConfirmInput.tsx";
 import Spinner from "ink-spinner";
 import { GPUS_PER_NODE } from "./constants.ts";
 import { Row } from "./Row.tsx";
-
-// Adjusted constants
-const DEFAULT_PRICE_PER_HOUR_IN_CENTS = 2.65 * 8 * 100; // Adjust as needed
-
-export function registerUp(program: Command) {
-  const cmd = program
-    .command("up")
-    .description("Automatically buy nodes until you have the desired quantity")
-    .option("-n, --quantity <quantity>", "The number of nodes to purchase continuously", "1")
-    .option("-t, --type <type>", "Specify the type of node", "h100i")
-    .option("-d, --duration <duration>", "Specify the minimum duration")
-    .option("-p, --price <price>", "Specify the maximum price per hour, in dollars")
-    .option("-y, --yes", "Automatically confirm the order");
-
-  cmd.action(async (options) => {
-    render(<UpCommand {...options} />);
-  });
-}
+import { Command } from "commander";
 
 export function registerDown(program: Command) {
   const cmd = program
@@ -45,13 +28,38 @@ export function registerDown(program: Command) {
     .description("Turn off nodes")
     .option("-t, --type <type>", "Specify the type of node", "h100i");
 
-  cmd.action(async (options) => {
+  cmd.action((options) => {
     render(<DownCommand {...options} />);
   });
 }
 
+function parseAccelerators(accelerators?: string) {
+  if (!accelerators) {
+    return 1;
+  }
+
+  return Number.parseInt(accelerators) / GPUS_PER_NODE;
+}
+
+const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Adjust as needed (e.g., $2.65 per GPU per hour)
+
+export function registerUp(program: Command) {
+  const cmd = program
+    .command("up")
+    .description("Automatically buy GPUs until you have the desired quantity")
+    .option("-n, --accelerators <accelerators>", "The number of GPUs to purchase continuously", "1")
+    .option("-t, --type <type>", "Specify the type of node", "h100i")
+    .option("-d, --duration <duration>", "Specify the minimum duration")
+    .option("-p, --price <price>", "Specify the maximum price per GPU hour, in dollars")
+    .option("-y, --yes", "Automatically confirm the order");
+
+  cmd.action((options) => {
+    render(<UpCommand {...options} />);
+  });
+}
+
 function UpCommand(props: {
-  quantity: string;
+  accelerators: string;
   type: string;
   duration?: string;
   price?: string;
@@ -71,9 +79,9 @@ function UpCommand(props: {
       try {
         const {
           durationHours,
-          quantity,
+          accelerators,
           type,
-          pricePerHourInCents,
+          pricePerGpuHourInCents,
           totalPriceInCents,
         } = await getDefaultProcurementOptions(props);
 
@@ -97,8 +105,8 @@ function UpCommand(props: {
         setConfirmationMessage(
           <ConfirmationMessage
             durationHours={durationHours}
-            pricePerHourInCents={pricePerHourInCents}
-            quantity={quantity}
+            pricePerGpuHourInCents={pricePerGpuHourInCents}
+            accelerators={accelerators}
             totalPriceInCents={totalPriceInCents}
             type={type}
           />
@@ -107,9 +115,9 @@ function UpCommand(props: {
         if (props.yes) {
           await submitProcurement({
             durationHours,
-            quantity,
+            accelerators,
             type,
-            pricePerHourInCents,
+            pricePerGpuHourInCents,
           });
         }
       } catch (err: any) {
@@ -123,21 +131,21 @@ function UpCommand(props: {
   const submitProcurement = useCallback(
     async ({
       durationHours,
-      quantity,
+      accelerators,
       type,
-      pricePerHourInCents,
+      pricePerGpuHourInCents,
     }: {
       durationHours: number;
-      quantity: number;
+      accelerators: number;
       type: string;
-      pricePerHourInCents: number;
+      pricePerGpuHourInCents: number;
     }) => {
       try {
         setIsLoading(true);
         const client = await apiClient();
 
         // Calculate price per node-hour
-        const pricePerNodeHourInCents = pricePerHourInCents / quantity;
+        const pricePerNodeHourInCents = pricePerGpuHourInCents * GPUS_PER_NODE;
 
         // Check existing procurements
         const procurements = await client.GET("/v0/procurements");
@@ -149,6 +157,7 @@ function UpCommand(props: {
           (p: any) => p.instance_group === type
         );
 
+        const nodesRequired = Math.ceil(accelerators / GPUS_PER_NODE);
         if (existingProcurement) {
           const res = await client.PUT("/v0/procurements/{id}", {
             params: {
@@ -157,7 +166,7 @@ function UpCommand(props: {
               },
             },
             body: {
-              quantity: quantity,
+              quantity: nodesRequired,
               min_duration_in_hours: props.duration ? durationHours : undefined,
               max_price_per_node_hour: props.price ? pricePerNodeHourInCents : undefined,
             },
@@ -167,7 +176,7 @@ function UpCommand(props: {
           const res = await client.POST("/v0/procurements", {
             body: {
               instance_type: type,
-              quantity: quantity,
+              quantity: nodesRequired,
               max_price_per_node_hour: pricePerNodeHourInCents,
               min_duration_in_hours: Math.max(durationHours, 1),
             },
@@ -194,17 +203,15 @@ function UpCommand(props: {
         return;
       }
 
-      // RIGHT HERE: There's no such thing as procurement options. 
-      // we need to parse these from the command line options.
       const durationHours = parseDuration(props.duration ?? "2h", "h");
       if (!durationHours) {
         logAndQuit(`Failed to parse duration: ${props.duration}`);
       }
-      const quantity = Number.parseInt(props.quantity ?? "1");
+      const accelerators = parseAccelerators(props.accelerators);
       const type = props.type ?? "h100i";
-      const pricePerHourInCents = dollarsToCents(Number.parseFloat(props.price ?? "0"));
-      console.log("submitProcurement", { durationHours, quantity, type, pricePerHourInCents });
-      submitProcurement({ durationHours, quantity, type, pricePerHourInCents });
+      const pricePerGpuHourInCents = dollarsToCents(Number.parseFloat(props.price ?? "0"));
+
+      submitProcurement({ durationHours, accelerators, type, pricePerGpuHourInCents });
     },
     [submitProcurement, exit]
   );
@@ -221,7 +228,7 @@ function UpCommand(props: {
         <Box flexDirection="column">
           {confirmationMessage}
           <Box>
-            <Text>Start nodes? (y/n)</Text>
+            <Text>Start GPUs? (y/n)</Text>
             <ConfirmInput
               isChecked={false}
               value={value}
@@ -245,32 +252,31 @@ function UpCommand(props: {
     </Box>
   );
 }
+
 function ConfirmationMessage(props: {
   durationHours: number;
-  pricePerHourInCents: number;
-  quantity: number;
+  pricePerGpuHourInCents: number;
+  accelerators: number;
   totalPriceInCents: number;
   type: string;
 }) {
   const durationInMilliseconds = props.durationHours * 60 * 60 * 1000;
-  const gpusPerNode = GPUS_PER_NODE; // TODO: Get from constants
-  const totalGpus = props.quantity * gpusPerNode;
 
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box gap={1}>
         <Text color="green">↑</Text>
-        <Text color="yellow">start nodes</Text>
+        <Text color="yellow">start GPUs</Text>
       </Box>
       <Row
         headWidth={10}
-        head="nodes"
-        value={`${props.quantity} x ${props.type} (${totalGpus} gpus)`}
+        head="GPUs"
+        value={`${props.accelerators} x ${props.type}`}
       />
       <Row
         headWidth={10}
         head="price"
-        value={`$${(props.pricePerHourInCents / 100 / gpusPerNode).toFixed(2)}/gpu/hr`}
+        value={`$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
       />
       <Row
         headWidth={10}
@@ -280,7 +286,7 @@ function ConfirmationMessage(props: {
       <Row
         headWidth={10}
         head="total"
-        value={`$${props.totalPriceInCents / 100}/hr`}
+        value={`$${(props.totalPriceInCents / 100).toFixed(2)}/hr`}
       />
     </Box>
   );
@@ -288,7 +294,7 @@ function ConfirmationMessage(props: {
 
 async function getDefaultProcurementOptions(props: {
   duration?: string;
-  quantity?: string;
+  accelerators?: string;
   price?: string;
   type?: string;
 }) {
@@ -298,32 +304,35 @@ async function getDefaultProcurementOptions(props: {
     logAndQuit(`Failed to parse duration: ${duration}`);
   }
   durationHours = Math.ceil(durationHours);
-  const quantity = Number.parseInt(props.quantity ?? "1");
+
+  const accelerators = Number.parseInt(props.accelerators ?? "1");
+  const nodesRequired = Math.ceil(accelerators / GPUS_PER_NODE);
   const type = props.type ?? "h100i";
 
   const quote = await getQuote({
     instanceType: type,
-    quantity,
+    quantity: nodesRequired,
     startsAt: new Date(),
     durationSeconds: durationHours * 60 * 60,
   });
 
-  let quotePricePerHourInCents = DEFAULT_PRICE_PER_HOUR_IN_CENTS;
+  let quotePricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
   if (quote) {
-    // Total price divided by duration in hours
-    quotePricePerHourInCents = quote.price / durationHours;
+    // Total price divided by duration in hours, GPUs, and nodes
+    quotePricePerGpuHourInCents = quote.price / durationHours / GPUS_PER_NODE / nodesRequired;
   }
 
-  const pricePerHourInCents = props.price
+  const pricePerGpuHourInCents = props.price
     ? dollarsToCents(Number.parseFloat(props.price))
-    : quotePricePerHourInCents;
+    : quotePricePerGpuHourInCents;
 
-  const totalPriceInCents = pricePerHourInCents * durationHours;
+  const totalPriceInCents = pricePerGpuHourInCents * accelerators * durationHours;
 
   return {
     durationHours,
-    pricePerHourInCents,
-    quantity,
+    pricePerGpuHourInCents,
+    accelerators,
+    nodesRequired,
     type,
     totalPriceInCents,
   };

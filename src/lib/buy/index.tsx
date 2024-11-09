@@ -7,9 +7,9 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { parseStartDate, roundStartDate } from "../../helpers/units.ts";
+import { roundStartDate } from "../../helpers/units.ts";
 import parseDurationFromLibrary from "parse-duration";
-import { Box, render, useApp, useInput } from "ink";
+import { Box, render, useApp } from "ink";
 import { parseDate } from "chrono-node";
 import { GPUS_PER_NODE } from "../constants.ts";
 import type { Quote } from "../Quote.tsx";
