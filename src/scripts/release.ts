@@ -54,7 +54,7 @@ const COMPILE_TARGETS: string[] = [
 async function compileDistribution() {
   for (const target of COMPILE_TARGETS) {
     const result = await new Deno.Command("deno", {
-      args: ["compile", "--target", target, "--output", `dist/sf-${target}`, "./src/index.ts"],
+      args: ["compile",  "-A", "--target", target, "--output", `dist/sf-${target}`, "./src/index.ts"],
     }).output();
 
     if (!result.success) {
