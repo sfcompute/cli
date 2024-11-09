@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import ora from "ora";
 
 export function registerUpgrade(program: Command) {
   return program
@@ -6,32 +7,57 @@ export function registerUpgrade(program: Command) {
     .argument("[version]", "The version to upgrade to")
     .description("Upgrade to the latest version or a specific version")
     .action(async (version) => {
+      const spinner = ora();
+
       if (version) {
-        const url =
-          `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
+        spinner.start(`Checking if version ${version} exists`);
+        const url = `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
         const response = await fetch(url, { method: "HEAD" });
 
         if (response.status === 404) {
-          console.error(`Version ${version} does not exist.`);
+          spinner.fail(`Version ${version} does not exist.`);
           process.exit(1);
         }
+        spinner.succeed();
       }
 
-      if (version) {
-        const command = new Deno.Command("bash", {
-          args: [
-            "-c",
-            `"$(curl -fsSL https://www.sfcompute.com/cli/install)" -- ${version}`,
-          ],
-        });
-        await command.output();
-      } else {
-        const command = new Deno.Command("bash", {
-          args: ["-c", `"$(curl -fsSL https://www.sfcompute.com/cli/install)"`],
-        });
-        await command.output();
+      // Fetch the install script
+      spinner.start("Downloading install script");
+      const scriptResponse = await fetch(
+        "https://www.sfcompute.com/cli/install"
+      );
+
+      if (!scriptResponse.ok) {
+        spinner.fail("Failed to download install script.");
+        process.exit(1);
       }
 
+      const script = await scriptResponse.text();
+      spinner.succeed();
+
+      // Execute the script with bash
+      spinner.start("Installing upgrade");
+      const command = new Deno.Command("bash", {
+        stdin: "piped",
+        stdout: "piped",
+        stderr: "piped",
+      });
+
+      const bashProcess = command.spawn();
+      const stdinWriter = bashProcess.stdin.getWriter();
+      await stdinWriter.write(new TextEncoder().encode(script));
+      stdinWriter.close();
+
+      const { code, stdout, stderr } = await bashProcess.output();
+
+      if (code !== 0) {
+        spinner.fail("Upgrade failed");
+        console.error(new TextDecoder().decode(stderr));
+        console.log(new TextDecoder().decode(stdout));
+        process.exit(1);
+      }
+
+      spinner.succeed("Upgrade completed successfully");
       process.exit(0);
     });
 }
