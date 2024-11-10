@@ -165,6 +165,16 @@ async function buyOrderAction(options: SfBuyOptions) {
 }
 
 function roundEndDate(endDate: Date) {
+  const minutes = endDate.getMinutes();
+  const seconds = endDate.getSeconds();
+  const ms = endDate.getMilliseconds();
+
+  // If already at an hour boundary (no minutes/seconds/ms), return as-is
+  if (minutes === 0 && seconds === 0 && ms === 0) {
+    return dayjs(endDate);
+  }
+
+  // Otherwise round up to next hour
   return dayjs(endDate).add(1, "hour").startOf("hour");
 }
 
