@@ -135,6 +135,11 @@ async function buyOrderAction(options: SfBuyOptions) {
     return quoteAction(options);
   }
 
+  const nodes = parseAccelerators(options.accelerators)
+  if (!Number.isInteger(nodes)) {
+    return logAndQuit(`You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`);
+  }
+
   // Grab the price per GPU hour, either
   let pricePerGpuHour: number | null = parsePricePerGpuHour(options.price);
   if (!pricePerGpuHour) {
@@ -402,6 +407,10 @@ export async function placeBuyOrder(
     "totalPriceInCents must be a whole number",
   );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
+  invariant(
+    options.numberNodes === Math.ceil(options.numberNodes),
+    "numberNodes must be a whole number",
+  );
 
   const api = await apiClient();
   const { data, error, response } = await api.POST("/v0/orders", {
@@ -422,7 +431,7 @@ export async function placeBuyOrder(
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error?.message}`);
+        return logAndQuit(`Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
@@ -488,7 +497,6 @@ export async function getQuote(options: QuoteOptions) {
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        console.log("Error:", error);
         return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
