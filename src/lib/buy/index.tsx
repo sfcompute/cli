@@ -14,7 +14,7 @@ import { parseDate } from "chrono-node";
 import { GPUS_PER_NODE } from "../constants.ts";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
 import React from "react";
@@ -277,6 +277,7 @@ function BuyOrder(
   const [value, setValue] = useState("");
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
@@ -313,33 +314,32 @@ function BuyOrder(
   }, [exit]);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    if (isLoading) {
-      interval = setInterval(async () => {
-        if (!isLoading) {
-          exit();
-        }
-
+    if (isLoading && intervalRef.current == null) {
+      intervalRef.current = setInterval(async () => {
         if (!order) {
           return;
         }
 
-        const o = await getOrder(order!.id);
+        const o = await getOrder(order.id);
         setOrder(o);
 
-        if (o && o.status != "pending") {
+        if (o && o.status !== "pending") {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           exit();
-          return;
         }
       }, 200);
     }
 
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isLoading, exit, value, order]);
+  }, [isLoading, order]);
 
   return (
     <Box gap={1} flexDirection="column">
