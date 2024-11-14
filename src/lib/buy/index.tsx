@@ -278,6 +278,7 @@ function BuyOrder(
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [loadingMsg, setLoadingMsg] = useState<string | null>("Placing order...");
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
@@ -302,7 +303,6 @@ function BuyOrder(
     });
     setOrder(order);
   }
-
   const handleSubmit = useCallback((submitValue: boolean) => {
     if (submitValue === false) {
       setIsLoading(false);
@@ -311,7 +311,7 @@ function BuyOrder(
     }
 
     submitOrder();
-  }, [exit]);
+  }, [exit, setIsLoading]);
 
   useEffect(() => {
     if (isLoading && intervalRef.current == null) {
@@ -321,15 +321,23 @@ function BuyOrder(
         }
 
         const o = await getOrder(order.id);
+        if (!o) {
+          setLoadingMsg("Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.");
+          return
+        }
+        if (o.status === "pending") {
+          setLoadingMsg("Pending...");
+          return
+        }
         setOrder(o);
 
-        if (o && o.status !== "pending") {
-          if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-          }
-          exit();
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
+        exit();
+        return
+
       }, 200);
     }
 
@@ -339,7 +347,7 @@ function BuyOrder(
         intervalRef.current = null;
       }
     };
-  }, [isLoading, order]);
+  }, [isLoading, order, exit, setOrder]);
 
   return (
     <Box gap={1} flexDirection="column">
@@ -362,7 +370,7 @@ function BuyOrder(
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="dots" />}
           {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
-          {!order && <Text>Placing order...</Text>}
+          {!order && <Text>{loadingMsg}</Text>}
           {order && (
             <Box gap={1}>
               <Text>Order placed: {order.id}</Text>
