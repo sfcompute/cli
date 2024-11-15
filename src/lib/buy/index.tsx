@@ -303,10 +303,15 @@ function BuyOrder(
     });
     setOrder(order);
   }
+
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback((submitValue: boolean) => {
     if (submitValue === false) {
       setIsLoading(false);
-      exit();
+      setResultMessage("Order not placed, use 'y' to confirm");
+      setTimeout(() => {
+        exit()
+      }, 0)
       return;
     }
 
@@ -379,6 +384,8 @@ function BuyOrder(
           )}
         </Box>
       )}
+
+      {resultMessage && <Text dimColor>{resultMessage}</Text>}
 
       {order && order.status === "open" && (
         <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
