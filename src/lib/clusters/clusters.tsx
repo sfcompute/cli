@@ -1,8 +1,7 @@
 import type { Command } from "commander";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { generateCSR, generateKeyPair } from "./csr.ts";
-
+import { getKeys } from "./keys.tsx";
 export function registerClusters(program: Command) {
   const clusters = program
     .command("clusters")
@@ -22,9 +21,12 @@ export function registerClusters(program: Command) {
       });
     });
 
-  // sf clusters users add --cluster <cluster_id> [--user <username>]
-  clusters
-    .command("users add")
+  const users = clusters
+    .command("users")
+    .description("Manage cluster users");
+
+  users
+    .command("add")
     .description("Add a user to a cluster")
     .requiredOption("--cluster <cluster_id>", "ID of the cluster")
     .requiredOption("--user <username>", "Username to add")
@@ -36,9 +38,8 @@ export function registerClusters(program: Command) {
       });
     });
 
-  // sf clusters users rm <id>
-  clusters
-    .command("users rm <id>")
+  users
+    .command("rm <id>")
     .description("Remove a user from a cluster")
     .option("--json", "Output in JSON format")
     .action(async (id, options) => {
@@ -47,9 +48,9 @@ export function registerClusters(program: Command) {
       });
     });
 
-  // sf clusters users ls|list
-  clusters
-    .command("users list")
+  users
+    .command("list")
+    .alias("ls")
     .description("List users in a cluster")
     .option("--json", "Output in JSON format")
     .action(async (options) => {
@@ -80,41 +81,6 @@ async function listClustersAction({ returnJson }: { returnJson?: boolean }) {
   }
 }
 
-async function saveKeyAndCrtToFile({
-  privateKey,
-  crt,
-  username,
-}: {
-  privateKey: string;
-  crt: string;
-  username: string;
-}) {
-  // Save keys to ~/.sfcompute/keys directory
-  const homeDir = Deno.env.get("HOME");
-  if (!homeDir) {
-    return logAndQuit("Could not determine home directory, please set HOME environment variable");
-  }
-
-  const keyDir = `${homeDir}/.sfcompute/keys`;
-  const keyPrefix = username;
-
-  try {
-    // Create keys directory if it doesn't exist
-    await Deno.mkdir(keyDir, { recursive: true });
-
-    // Save private key with restricted permissions
-    const keyPath = `${keyDir}/${keyPrefix}.key`;
-    await Deno.writeTextFile(keyPath, privateKey);
-    await Deno.chmod(keyPath, 0o600);
-
-    // Save public key
-    const certPath = `${keyDir}/${keyPrefix}.crt`;
-    await Deno.writeTextFile(certPath, crt);
-  } catch (err) {
-    return logAndQuit(`Failed to save keys: ${err}`);
-  }
-}
-
 async function addClusterUserAction({
   clusterId,
   username,
@@ -130,19 +96,12 @@ async function addClusterUserAction({
     );
   }
 
-  const { privateKey, publicKey } = await generateKeyPair();
-  const csr = generateCSR(privateKey, username, username);
-
-  await saveKeyAndCrtToFile({
-    privateKey,
-    crt: publicKey,
-    username,
-  });
+  const { publicKey } = await getKeys();
 
   const { data, error, response } = await api.POST("/v0/credentials", {
     body: {
       object: "k8s_credential",
-      csr,
+      pubkey: publicKey,
       username,
       cluster_id: clusterId,
     }
@@ -203,5 +162,7 @@ async function listClusterUsersAction({ returnJson }: { returnJson?: boolean }) 
     );
   }
 
-  console.log(data);
+  for (const item of data.data) {
+    console.log(item);
+  }
 }

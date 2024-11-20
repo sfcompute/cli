@@ -14,6 +14,7 @@ import { registerSSH } from "./lib/ssh.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerDown, registerUp } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
+import { registerClusters } from "./lib/clusters/clusters.tsx";
 import { checkVersion } from "./checkVersion.ts";
 
 const program = new Command();
@@ -30,14 +31,15 @@ registerLogin(program);
 registerBuy(program);
 registerOrders(program);
 registerContracts(program);
-registerInstances(program);
-registerSSH(program);
+// registerInstances(program);
+// registerSSH(program);
 registerSell(program);
 registerBalance(program);
 registerTokens(program);
 registerUpgrade(program);
 registerUp(program);
 registerDown(program);
+registerClusters(program);
 
 // (development commands)
 registerDev(program);
