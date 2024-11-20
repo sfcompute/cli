@@ -1,6 +1,7 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
 import * as os from "node:os";
+import { Buffer } from "node:buffer";
 
 export async function getKeys(): Promise<{ publicKey: string; privateKey: string }> {
     const keys = await loadKeys();
@@ -40,8 +41,8 @@ export function decryptSecret(secret: string, privateKey: string) {
     const decrypted = crypto.privateDecrypt({
         key: privateKey,
         padding: crypto.constants.RSA_PKCS1_PADDING,
-    }, secret);
-    return decrypted;
+    }, Buffer.from(secret, 'base64'));
+    return decrypted.toString('utf8');
 }
 
 async function saveKeys(keys: { publicKey: string; privateKey: string }) {
