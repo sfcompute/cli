@@ -46,6 +46,15 @@ export function registerClusters(program: Command) {
         id,
       });
     });
+
+  // sf clusters users ls|list
+  clusters
+    .command("users list")
+    .description("List users in a cluster")
+    .option("--json", "Output in JSON format")
+    .action(async (options) => {
+      await listClusterUsersAction({ returnJson: options.json });
+    });
 }
 
 async function listClustersAction({ returnJson }: { returnJson?: boolean }) {
@@ -172,6 +181,25 @@ async function removeClusterUserAction({ id }: { id: string }) {
     console.error(error);
     return logAndQuit(
       `Failed to remove user from cluster: Unexpected response from server: ${response}`
+    );
+  }
+
+  console.log(data);
+}
+
+async function listClusterUsersAction({ returnJson }: { returnJson?: boolean }) {
+  const api = await apiClient();
+
+  const { data, error, response } = await api.GET("/v0/credentials");
+
+  if (!response.ok) {
+    return logAndQuit(`Failed to list users in cluster: ${response.statusText}`);
+  }
+
+  if (!data) {
+    console.error(error);
+    return logAndQuit(
+      `Failed to list users in cluster: Unexpected response from server: ${response}`
     );
   }
 

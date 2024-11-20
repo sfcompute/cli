@@ -1736,7 +1736,16 @@ export interface operations {
                             id: string;
                             username?: string;
                             label?: string;
-                            csr: string;
+                            pubkey: string;
+                            cluster: {
+                                /** @constant */
+                                object: "kubernetes_cluster";
+                                id: string;
+                                kubernetes_api_url?: string;
+                                name: string;
+                                kubernetes_namespace: string;
+                                kubernetes_ca_cert?: string;
+                            };
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1755,7 +1764,16 @@ export interface operations {
                             id: string;
                             username?: string;
                             label?: string;
-                            csr: string;
+                            pubkey: string;
+                            cluster: {
+                                /** @constant */
+                                object: "kubernetes_cluster";
+                                id: string;
+                                kubernetes_api_url?: string;
+                                name: string;
+                                kubernetes_namespace: string;
+                                kubernetes_ca_cert?: string;
+                            };
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1774,7 +1792,16 @@ export interface operations {
                             id: string;
                             username?: string;
                             label?: string;
-                            csr: string;
+                            pubkey: string;
+                            cluster: {
+                                /** @constant */
+                                object: "kubernetes_cluster";
+                                id: string;
+                                kubernetes_api_url?: string;
+                                name: string;
+                                kubernetes_namespace: string;
+                                kubernetes_ca_cert?: string;
+                            };
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1864,12 +1891,12 @@ export interface operations {
                     /** @constant */
                     object?: "ssh_credential";
                 } | {
-                    csr: string;
-                    username?: string;
+                    username: string;
                     label?: string;
                     cluster_id: string;
                     /** @constant */
                     object: "k8s_credential";
+                    pubkey: string;
                 };
                 "multipart/form-data": {
                     pubkey: string;
@@ -1877,12 +1904,12 @@ export interface operations {
                     /** @constant */
                     object?: "ssh_credential";
                 } | {
-                    csr: string;
-                    username?: string;
+                    username: string;
                     label?: string;
                     cluster_id: string;
                     /** @constant */
                     object: "k8s_credential";
+                    pubkey: string;
                 };
                 "text/plain": {
                     pubkey: string;
@@ -1890,12 +1917,12 @@ export interface operations {
                     /** @constant */
                     object?: "ssh_credential";
                 } | {
-                    csr: string;
-                    username?: string;
+                    username: string;
                     label?: string;
                     cluster_id: string;
                     /** @constant */
                     object: "k8s_credential";
+                    pubkey: string;
                 };
             };
         };
@@ -1917,7 +1944,16 @@ export interface operations {
                         id: string;
                         username?: string;
                         label?: string;
-                        csr: string;
+                        pubkey: string;
+                        cluster: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            id: string;
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                        };
                     };
                     "multipart/form-data": {
                         /** @constant */
@@ -1931,7 +1967,16 @@ export interface operations {
                         id: string;
                         username?: string;
                         label?: string;
-                        csr: string;
+                        pubkey: string;
+                        cluster: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            id: string;
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                        };
                     };
                     "text/plain": {
                         /** @constant */
@@ -1945,7 +1990,16 @@ export interface operations {
                         id: string;
                         username?: string;
                         label?: string;
-                        csr: string;
+                        pubkey: string;
+                        cluster: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            id: string;
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                        };
                     };
                 };
             };
@@ -2052,6 +2106,9 @@ export interface operations {
                             object: "kubernetes_cluster";
                             id: string;
                             kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
                         }[];
                         has_more: boolean;
                         /** @constant */
@@ -2063,6 +2120,9 @@ export interface operations {
                             object: "kubernetes_cluster";
                             id: string;
                             kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
                         }[];
                         has_more: boolean;
                         /** @constant */
@@ -2074,6 +2134,9 @@ export interface operations {
                             object: "kubernetes_cluster";
                             id: string;
                             kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
                         }[];
                         has_more: boolean;
                         /** @constant */
