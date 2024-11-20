@@ -1,7 +1,8 @@
 import type { Command } from "commander";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { getKeys } from "./keys.tsx";
+import { decryptSecret, getKeys } from "./keys.tsx";
+
 export function registerClusters(program: Command) {
   const clusters = program
     .command("clusters")
@@ -15,9 +16,11 @@ export function registerClusters(program: Command) {
     .alias("ls")
     .description("List clusters")
     .option("--json", "Output in JSON format")
+    .option("--token <token>", "API token")
     .action(async (options) => {
       await listClustersAction({
         returnJson: options.json,
+        token: options.token,
       });
     });
 
@@ -31,10 +34,12 @@ export function registerClusters(program: Command) {
     .requiredOption("--cluster <cluster>", "name of the cluster")
     .requiredOption("--user <username>", "Username to add")
     .option("--json", "Output in JSON format")
+    .option("--token <token>", "API token")
     .action(async (options) => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
+        token: options.token,
       });
     });
 
@@ -42,9 +47,11 @@ export function registerClusters(program: Command) {
     .command("rm <id>")
     .description("Remove a user from a cluster")
     .option("--json", "Output in JSON format")
+    .option("--token <token>", "API token")
     .action(async (id, options) => {
       await removeClusterUserAction({
         id,
+        token: options.token,
       });
     });
 
@@ -53,13 +60,17 @@ export function registerClusters(program: Command) {
     .alias("ls")
     .description("List users in a cluster")
     .option("--json", "Output in JSON format")
+    .option("--token <token>", "API token")
     .action(async (options) => {
-      await listClusterUsersAction({ returnJson: options.json });
+      await listClusterUsersAction({
+        returnJson: options.json,
+        token: options.token,
+      });
     });
 }
 
-async function listClustersAction({ returnJson }: { returnJson?: boolean }) {
-  const api = await apiClient();
+async function listClustersAction({ returnJson, token }: { returnJson?: boolean, token?: string }) {
+  const api = await apiClient(token);
 
   const { data, error, response } = await api.GET("/v0/clusters");
 
@@ -84,11 +95,13 @@ async function listClustersAction({ returnJson }: { returnJson?: boolean }) {
 async function addClusterUserAction({
   clusterName,
   username,
+  token,
 }: {
   clusterName: string;
   username: string;
+  token?: string;
 }) {
-  const api = await apiClient();
+  const api = await apiClient(token);
   const { publicKey } = await getKeys();
 
   const { data, error, response } = await api.POST("/v0/credentials", {
@@ -115,8 +128,8 @@ async function addClusterUserAction({
   console.log(data);
 }
 
-async function removeClusterUserAction({ id }: { id: string }) {
-  const api = await apiClient();
+async function removeClusterUserAction({ id, token }: { id: string, token?: string }) {
+  const api = await apiClient(token);
 
   const { data, error, response } = await api.DELETE("/v0/credentials/{id}", {
     params: {
@@ -140,8 +153,8 @@ async function removeClusterUserAction({ id }: { id: string }) {
   console.log(data);
 }
 
-async function listClusterUsersAction({ returnJson }: { returnJson?: boolean }) {
-  const api = await apiClient();
+async function listClusterUsersAction({ returnJson, token }: { returnJson?: boolean, token?: string }) {
+  const api = await apiClient(token);
 
   const { data, error, response } = await api.GET("/v0/credentials");
 
@@ -156,7 +169,20 @@ async function listClusterUsersAction({ returnJson }: { returnJson?: boolean }) 
     );
   }
 
+  if (data.data.length === 0) {
+    console.log("No users found");
+    return;
+  }
+
+  const { privateKey } = await getKeys();
   for (const item of data.data) {
-    console.log(item);
+    if (item.object !== "k8s_credential") {
+      continue;
+    }
+    if (!item.encrypted_token) {
+      continue;
+    }
+    const res = decryptSecret(item.encrypted_token, privateKey);
+    console.log(res);
   }
 }

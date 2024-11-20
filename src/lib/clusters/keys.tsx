@@ -37,13 +37,23 @@ function generateKeyPair() {
     };
 }
 
-export function decryptSecret(secret: string, privateKey: string) {
-    const decrypted = crypto.privateDecrypt({
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-    }, Buffer.from(secret, 'base64'));
-    return decrypted.toString('utf8');
+export function decryptSecret(encrypted_secret: string, privateKey: string) {
+    try {
+        const decoded = Buffer.from(encrypted_secret, 'base64');
+        const decrypted = crypto.privateDecrypt({
+            key: privateKey,
+            padding: crypto.constants.RSA_PKCS1_PADDING,
+        }, decoded);
+
+        // Convert decrypted array to Buffer
+        const decryptedBuffer = Buffer.isBuffer(decrypted) ? decrypted : Buffer.from(decrypted);
+
+        return decryptedBuffer.toString('utf8');
+    } catch (err) {
+        throw new Error(`Failed to decrypt secret: ${err}`);
+    }
 }
+
 
 async function saveKeys(keys: { publicKey: string; privateKey: string }) {
     const { publicKey, privateKey } = keys;

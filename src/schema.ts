@@ -1737,7 +1737,7 @@ export interface operations {
                             username?: string;
                             label?: string;
                             pubkey: string;
-                            cluster: {
+                            cluster?: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
                                 kubernetes_api_url?: string;
@@ -1745,6 +1745,7 @@ export interface operations {
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
                             };
+                            encrypted_token?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1764,7 +1765,7 @@ export interface operations {
                             username?: string;
                             label?: string;
                             pubkey: string;
-                            cluster: {
+                            cluster?: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
                                 kubernetes_api_url?: string;
@@ -1772,6 +1773,7 @@ export interface operations {
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
                             };
+                            encrypted_token?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1791,7 +1793,7 @@ export interface operations {
                             username?: string;
                             label?: string;
                             pubkey: string;
-                            cluster: {
+                            cluster?: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
                                 kubernetes_api_url?: string;
@@ -1799,6 +1801,7 @@ export interface operations {
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
                             };
+                            encrypted_token?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1942,7 +1945,7 @@ export interface operations {
                         username?: string;
                         label?: string;
                         pubkey: string;
-                        cluster: {
+                        cluster?: {
                             /** @constant */
                             object: "kubernetes_cluster";
                             kubernetes_api_url?: string;
@@ -1950,6 +1953,7 @@ export interface operations {
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
                         };
+                        encrypted_token?: string;
                     };
                     "multipart/form-data": {
                         /** @constant */
@@ -1964,7 +1968,7 @@ export interface operations {
                         username?: string;
                         label?: string;
                         pubkey: string;
-                        cluster: {
+                        cluster?: {
                             /** @constant */
                             object: "kubernetes_cluster";
                             kubernetes_api_url?: string;
@@ -1972,6 +1976,7 @@ export interface operations {
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
                         };
+                        encrypted_token?: string;
                     };
                     "text/plain": {
                         /** @constant */
@@ -1986,7 +1991,7 @@ export interface operations {
                         username?: string;
                         label?: string;
                         pubkey: string;
-                        cluster: {
+                        cluster?: {
                             /** @constant */
                             object: "kubernetes_cluster";
                             kubernetes_api_url?: string;
@@ -1994,6 +1999,7 @@ export interface operations {
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
                         };
+                        encrypted_token?: string;
                     };
                 };
             };
