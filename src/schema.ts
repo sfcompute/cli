@@ -1740,7 +1740,6 @@ export interface operations {
                             cluster: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
-                                id: string;
                                 kubernetes_api_url?: string;
                                 name: string;
                                 kubernetes_namespace: string;
@@ -1768,7 +1767,6 @@ export interface operations {
                             cluster: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
-                                id: string;
                                 kubernetes_api_url?: string;
                                 name: string;
                                 kubernetes_namespace: string;
@@ -1796,7 +1794,6 @@ export interface operations {
                             cluster: {
                                 /** @constant */
                                 object: "kubernetes_cluster";
-                                id: string;
                                 kubernetes_api_url?: string;
                                 name: string;
                                 kubernetes_namespace: string;
@@ -1893,7 +1890,7 @@ export interface operations {
                 } | {
                     username: string;
                     label?: string;
-                    cluster_id: string;
+                    cluster: string;
                     /** @constant */
                     object: "k8s_credential";
                     pubkey: string;
@@ -1906,7 +1903,7 @@ export interface operations {
                 } | {
                     username: string;
                     label?: string;
-                    cluster_id: string;
+                    cluster: string;
                     /** @constant */
                     object: "k8s_credential";
                     pubkey: string;
@@ -1919,7 +1916,7 @@ export interface operations {
                 } | {
                     username: string;
                     label?: string;
-                    cluster_id: string;
+                    cluster: string;
                     /** @constant */
                     object: "k8s_credential";
                     pubkey: string;
@@ -1948,7 +1945,6 @@ export interface operations {
                         cluster: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;
@@ -1971,7 +1967,6 @@ export interface operations {
                         cluster: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;
@@ -1994,7 +1989,6 @@ export interface operations {
                         cluster: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;
@@ -2104,7 +2098,6 @@ export interface operations {
                         data: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;
@@ -2118,7 +2111,6 @@ export interface operations {
                         data: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;
@@ -2132,7 +2124,6 @@ export interface operations {
                         data: {
                             /** @constant */
                             object: "kubernetes_cluster";
-                            id: string;
                             kubernetes_api_url?: string;
                             name: string;
                             kubernetes_namespace: string;

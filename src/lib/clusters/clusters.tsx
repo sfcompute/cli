@@ -28,12 +28,12 @@ export function registerClusters(program: Command) {
   users
     .command("add")
     .description("Add a user to a cluster")
-    .requiredOption("--cluster <cluster_id>", "ID of the cluster")
+    .requiredOption("--cluster <cluster>", "name of the cluster")
     .requiredOption("--user <username>", "Username to add")
     .option("--json", "Output in JSON format")
     .action(async (options) => {
       await addClusterUserAction({
-        clusterId: options.cluster,
+        clusterName: options.cluster,
         username: options.user,
       });
     });
@@ -82,28 +82,22 @@ async function listClustersAction({ returnJson }: { returnJson?: boolean }) {
 }
 
 async function addClusterUserAction({
-  clusterId,
+  clusterName,
   username,
 }: {
-  clusterId: string;
+  clusterName: string;
   username: string;
 }) {
   const api = await apiClient();
-
-  if (!clusterId.startsWith("clus_")) {
-    return logAndQuit(
-      `Invalid cluster ID ${clusterId}, it should start with 'clus_'`,
-    );
-  }
-
   const { publicKey } = await getKeys();
 
   const { data, error, response } = await api.POST("/v0/credentials", {
     body: {
+      username,
+      label: "foo",
+      cluster: clusterName,
       object: "k8s_credential",
       pubkey: publicKey,
-      username,
-      cluster_id: clusterId,
     }
   });
 
