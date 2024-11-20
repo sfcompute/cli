@@ -2,6 +2,9 @@ import type { Command } from "commander";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { decryptSecret, getKeys } from "./keys.tsx";
+import { createKubeConfigString } from "./kubeconfig.ts";
+import { Box, render, Text } from "ink";
+import React from "react";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -183,6 +186,20 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
       continue;
     }
     const res = decryptSecret(item.encrypted_token, privateKey);
-    console.log(res);
+
+    const kubeconfig = createKubeConfigString({
+      cluster: {
+        name: item.cluster.name,
+        kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
+        certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
+        namespace: item.cluster.kubernetes_namespace || "",
+      },
+      user: {
+        name: item.username || "",
+        token: res,
+      },
+    });
+
+    console.log(kubeconfig, "\n#--\n\n");
   }
 }
