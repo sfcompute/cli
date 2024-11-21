@@ -1,4 +1,5 @@
-import * as crypto from "node:crypto";
+import { box, BoxKeyPair, randomBytes, } from "tweetnacl";
+import { encodeBase64, decodeBase64 } from "tweetnacl-util";
 import * as path from "node:path";
 import * as os from "node:os";
 import { Buffer } from "node:buffer";
@@ -18,18 +19,10 @@ export async function getKeys(): Promise<{ publicKey: string; privateKey: string
 }
 
 function generateKeyPair() {
-    // Generate RSA key pair
-    const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-            type: 'spki',
-            format: 'pem'
-        },
-        privateKeyEncoding: {
-            type: 'pkcs8',
-            format: 'pem'
-        }
-    });
+    // generate a key pair
+    const pair = box.keyPair();
+    const publicKey = encodeBase64(pair.publicKey);
+    const privateKey = encodeBase64(pair.secretKey);
 
     return {
         publicKey,
@@ -37,28 +30,26 @@ function generateKeyPair() {
     };
 }
 
-export function decryptSecret(encrypted_secret: string, privateKey: string) {
-    try {
-        const decoded = Buffer.from(encrypted_secret, 'base64');
-        const decrypted = crypto.privateDecrypt({
-            key: privateKey,
-            padding: crypto.constants.RSA_PKCS1_PADDING,
-        }, decoded);
+export function decryptSecret(props: { encrypted: string, secretKey: string, nonce: string, ephemeralKey: string }) {
+    // Generate nonce and message from encrypted secret
+    const decrypted = box.open(
+        decodeBase64(props.encrypted),
+        decodeBase64(props.nonce),
+        decodeBase64(props.secretKey),
+        decodeBase64(props.ephemeralKey)
+    );
 
-        // Convert decrypted array to Buffer
-        const decryptedBuffer = Buffer.isBuffer(decrypted) ? decrypted : Buffer.from(decrypted);
-
-        return decryptedBuffer.toString('utf8');
-    } catch (err) {
-        throw new Error(`Failed to decrypt secret: ${err}`);
+    if (!decrypted) {
+        throw new Error("Failed to decrypt secret");
     }
+    return Buffer.from(decrypted).toString('utf8');
 }
 
 
 async function saveKeys(keys: { publicKey: string; privateKey: string }) {
     const { publicKey, privateKey } = keys;
-    const publicKeyPath = path.join(os.homedir(), ".sf", "public.pem");
-    const privateKeyPath = path.join(os.homedir(), ".sf", "private.pem");
+    const publicKeyPath = path.join(os.homedir(), ".sf", "public_key");
+    const privateKeyPath = path.join(os.homedir(), ".sf", "private_key");
 
     try {
         // Create .sf directory if it doesn't exist
@@ -76,8 +67,8 @@ async function saveKeys(keys: { publicKey: string; privateKey: string }) {
 }
 
 async function loadKeys() {
-    const publicKeyPath = path.join(os.homedir(), ".sf", "public.pem");
-    const privateKeyPath = path.join(os.homedir(), ".sf", "private.pem");
+    const publicKeyPath = path.join(os.homedir(), ".sf", "public_key");
+    const privateKeyPath = path.join(os.homedir(), ".sf", "private_key");
 
     let publicKey = null;
     let privateKey = null;
