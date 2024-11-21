@@ -185,6 +185,11 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
     }
     const res = decryptSecret(item.encrypted_token, privateKey);
 
+    if (!item.cluster) {
+      console.error("Cluster is undefined");
+      continue;
+    }
+
     const kubeconfig = createKubeConfigString({
       cluster: {
         name: item.cluster.name,
