@@ -109,7 +109,7 @@ async function addClusterUserAction({
     body: {
       username,
       label: "foo",
-      cluster_id: clusterName,
+      cluster: clusterName,
       object: "k8s_credential",
       pubkey: publicKey,
     }
