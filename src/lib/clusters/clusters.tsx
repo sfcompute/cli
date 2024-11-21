@@ -3,8 +3,6 @@ import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { decryptSecret, getKeys } from "./keys.tsx";
 import { createKubeConfigString } from "./kubeconfig.ts";
-import { Box, render, Text } from "ink";
-import React from "react";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -111,7 +109,7 @@ async function addClusterUserAction({
     body: {
       username,
       label: "foo",
-      cluster: clusterName,
+      cluster_id: clusterName,
       object: "k8s_credential",
       pubkey: publicKey,
     }
