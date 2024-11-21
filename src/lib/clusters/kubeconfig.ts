@@ -1,3 +1,5 @@
+import path from "node:path";
+import os from "node:os";
 import yaml from "yaml";
 
 export interface Kubeconfig {
@@ -29,7 +31,7 @@ export interface Kubeconfig {
   kind: string;
   preferences: Record<string, unknown>;
 }
-export function createKubeConfigString(props: {
+export function createKubeconfig(props: {
   clusters: Array<{
     name: string;
     certificateAuthorityData: string;
@@ -98,7 +100,7 @@ export function createKubeConfigString(props: {
     kubeconfig["current-context"] = kubeconfig.contexts[0].name;
   }
 
-  return yaml.stringify(kubeconfig);
+  return kubeconfig;
 }
 
 export function mergeNamedItems<T extends { name: string }>(
@@ -139,4 +141,28 @@ export function mergeKubeconfigs(
     kind: newConfig.kind || oldConfig.kind,
     preferences: { ...oldConfig.preferences, ...newConfig.preferences },
   };
+}
+
+export const KUBECONFIG_PATH = path.join(os.homedir(), ".kube", "config");
+
+export async function loadKubeconfig(): Promise<Kubeconfig | null> {
+  try {
+    const kubeconfig = await Deno.readTextFile(KUBECONFIG_PATH);
+    return yaml.parse(kubeconfig);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function syncKubeconfig(kubeconfig: Kubeconfig) {
+  const currentConfig = await loadKubeconfig();
+  if (!currentConfig) {
+    await Deno.writeTextFile(KUBECONFIG_PATH, yaml.stringify(kubeconfig));
+  } else {
+    const merged = mergeKubeconfigs(currentConfig, kubeconfig);
+    await Deno.writeTextFile(KUBECONFIG_PATH, yaml.stringify(merged));
+  }
 }

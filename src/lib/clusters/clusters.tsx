@@ -2,7 +2,8 @@ import type { Command } from "commander";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
-import { createKubeConfigString } from "./kubeconfig.ts";
+import { createKubeconfig, KUBECONFIG_PATH, syncKubeconfig } from "./kubeconfig.ts";
+import yaml from "yaml";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -58,16 +59,15 @@ export function registerClusters(program: Command) {
       });
     });
 
-  users
-    .command("list")
-    .alias("ls")
-    .description("List users in a cluster")
-    .option("--json", "Output in JSON format")
+  clusters
+    .command("kubeconfig")
+    .description("Generate kubeconfig")
     .option("--token <token>", "API token")
+    .option("--print", "Print the kubeconfig instead of writing it to disk")
     .action(async (options) => {
-      await listClusterUsersAction({
-        returnJson: options.json,
+      await kubeconfigAction({
         token: options.token,
+        print: options.print,
       });
     });
 }
@@ -162,7 +162,7 @@ async function removeClusterUserAction({ id, token }: { id: string, token?: stri
   console.log(data);
 }
 
-async function listClusterUsersAction({ returnJson, token }: { returnJson?: boolean, token?: string }) {
+async function kubeconfigAction({ token, print }: { token?: string, print?: boolean }) {
   const api = await apiClient(token);
 
   const { data, error, response } = await api.GET("/v0/credentials");
@@ -218,5 +218,12 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
     });
   }
 
-  console.log(createKubeConfigString({ clusters, users }), "\n#--\n\n");
+  const kubeconfig = createKubeconfig({ clusters, users });
+
+  if (print) {
+    console.log(yaml.stringify(kubeconfig));
+  } else {
+    await syncKubeconfig(kubeconfig);
+    console.log(`Config written to ${KUBECONFIG_PATH}`);
+  }
 }
