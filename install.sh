@@ -86,6 +86,7 @@ if [ $# -eq 0 ]; then
     SF_BINARY_URL=$github_repo/releases/latest/download/sf-$target.zip
 else
     VERSION=$1
+    echo "Downloading version $VERSION"
     SF_BINARY_URL=$github_repo/releases/download/$VERSION/sf-$target.zip
 fi
 
