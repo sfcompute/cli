@@ -18,6 +18,12 @@ export async function getKeys(): Promise<{ publicKey: string; privateKey: string
     return newKeys;
 }
 
+export async function regenerateKeys() {
+    const newKeys = generateKeyPair();
+    console.error("generating new keys")
+    await saveKeys(newKeys);
+}
+
 function generateKeyPair() {
     // generate a key pair
     const pair = nacl.default.box.keyPair();

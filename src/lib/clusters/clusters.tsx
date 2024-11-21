@@ -1,7 +1,7 @@
 import type { Command } from "commander";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { decryptSecret, getKeys } from "./keys.tsx";
+import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import { createKubeConfigString } from "./kubeconfig.ts";
 
 export function registerClusters(program: Command) {
@@ -36,11 +36,13 @@ export function registerClusters(program: Command) {
     .requiredOption("--user <username>", "Username to add")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
+    .option("--regenerate-keys", "Regenerate encryption keys for the user")
     .action(async (options) => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
         token: options.token,
+        shouldRegenerateKeys: options.regenerateKeys,
       });
     });
 
@@ -97,12 +99,18 @@ async function addClusterUserAction({
   clusterName,
   username,
   token,
+  shouldRegenerateKeys,
 }: {
   clusterName: string;
   username: string;
   token?: string;
+  shouldRegenerateKeys?: boolean;
 }) {
   const api = await apiClient(token);
+  if (shouldRegenerateKeys) {
+    await regenerateKeys();
+  }
+
   const { publicKey } = await getKeys();
 
   const { data, error, response } = await api.POST("/v0/credentials", {
@@ -176,6 +184,8 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
   }
 
   const { privateKey } = await getKeys();
+  const clusters: Array<{ name: string, certificateAuthorityData: string, kubernetesApiUrl: string, namespace?: string }> = [];
+  const users: Array<{ name: string, token: string }> = [];
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
@@ -195,19 +205,18 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
       continue;
     }
 
-    const kubeconfig = createKubeConfigString({
-      cluster: {
-        name: item.cluster.name,
-        kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
-        certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
-        namespace: item.cluster.kubernetes_namespace || "",
-      },
-      user: {
-        name: item.username || "",
-        token: res,
-      },
+    clusters.push({
+      name: item.cluster.name,
+      kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
+      certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
+      namespace: item.cluster.kubernetes_namespace || "",
     });
 
-    console.log(kubeconfig, "\n#--\n\n");
+    users.push({
+      name: item.username || "",
+      token: res,
+    });
   }
+
+  console.log(createKubeConfigString({ clusters, users }), "\n#--\n\n");
 }

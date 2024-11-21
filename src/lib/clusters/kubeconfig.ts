@@ -29,52 +29,74 @@ export interface Kubeconfig {
   kind: string;
   preferences: Record<string, unknown>;
 }
-
 export function createKubeConfigString(props: {
-  cluster: {
+  clusters: Array<{
+    name: string;
     certificateAuthorityData: string;
     kubernetesApiUrl: string;
-    name: string;
     namespace?: string;
-  };
-  user: {
-    token: string;
+  }>;
+  users: Array<{
     name: string;
+    token: string;
+  }>;
+  currentContext?: {
+    clusterName: string;
+    userName: string;
   };
 }) {
+  const { clusters, users, currentContext } = props;
+
   const kubeconfig: Kubeconfig = {
     apiVersion: "v1",
-    clusters: [
-      {
-        name: props.cluster.name,
-        cluster: {
-          "certificate-authority-data": props.cluster.certificateAuthorityData,
-          server: props.cluster.kubernetesApiUrl,
-        },
-      },
-    ],
-    contexts: [
-      {
-        name: props.cluster.name,
-        context: {
-          cluster: props.cluster.name,
-          user: props.user.name,
-          namespace: props.cluster.namespace,
-        },
-      },
-    ],
-    users: [
-      {
-        name: props.user.name,
-        user: {
-          token: props.user.token,
-        },
-      },
-    ],
-    "current-context": props.cluster.name,
     kind: "Config",
     preferences: {},
+    clusters: clusters.map((cluster) => ({
+      name: cluster.name,
+      cluster: {
+        "certificate-authority-data": cluster.certificateAuthorityData,
+        server: cluster.kubernetesApiUrl,
+      },
+    })),
+    users: users.map((user) => ({
+      name: user.name,
+      user: {
+        token: user.token,
+      },
+    })),
+    contexts: [],
+    "current-context": "",
   };
+
+  // Generate contexts automatically by matching clusters and users by name
+  kubeconfig.contexts = clusters.map((cluster) => {
+    // Try to find a user with the same name as the cluster
+    let user = users.find((u) => u.name === cluster.name);
+
+    // If no matching user, default to the first user
+    if (!user) {
+      user = users[0];
+    }
+
+    const contextName = `${cluster.name}@${user.name}`;
+
+    return {
+      name: contextName,
+      context: {
+        cluster: cluster.name,
+        user: user.name,
+        namespace: cluster.namespace,
+      },
+    };
+  });
+
+  // Set current context based on provided cluster and user names
+  if (currentContext) {
+    const contextName = `${currentContext.clusterName}@${currentContext.userName}`;
+    kubeconfig["current-context"] = contextName;
+  } else if (kubeconfig.contexts.length > 0) {
+    kubeconfig["current-context"] = kubeconfig.contexts[0].name;
+  }
 
   return yaml.stringify(kubeconfig);
 }
@@ -95,13 +117,23 @@ export function mergeNamedItems<T extends { name: string }>(
 
 export function mergeKubeconfigs(
   oldConfig: Kubeconfig,
-  newConfig: Kubeconfig
+  newConfig?: Kubeconfig
 ): Kubeconfig {
+  if (!newConfig) {
+    return oldConfig;
+  }
+
   return {
     apiVersion: newConfig.apiVersion || oldConfig.apiVersion,
-    clusters: mergeNamedItems(oldConfig.clusters, newConfig.clusters),
-    contexts: mergeNamedItems(oldConfig.contexts, newConfig.contexts),
-    users: mergeNamedItems(oldConfig.users, newConfig.users),
+    clusters: mergeNamedItems(
+      oldConfig.clusters || [],
+      newConfig.clusters || []
+    ),
+    contexts: mergeNamedItems(
+      oldConfig.contexts || [],
+      newConfig.contexts || []
+    ),
+    users: mergeNamedItems(oldConfig.users || [], newConfig.users || []),
     "current-context":
       newConfig["current-context"] || oldConfig["current-context"],
     kind: newConfig.kind || oldConfig.kind,
