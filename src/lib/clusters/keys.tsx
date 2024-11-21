@@ -20,7 +20,7 @@ export async function getKeys(): Promise<{ publicKey: string; privateKey: string
 function generateKeyPair() {
     // Generate RSA key pair
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 2048,
+        modulusLength: 4096,
         publicKeyEncoding: {
             type: 'spki',
             format: 'pem'
