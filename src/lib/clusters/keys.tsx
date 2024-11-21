@@ -33,10 +33,10 @@ function generateKeyPair() {
 export function decryptSecret(props: { encrypted: string, secretKey: string, nonce: string, ephemeralPublicKey: string }) {
     // Generate nonce and message from encrypted secret
     const decrypted = nacl.default.box.open(
-        util.def.decodeBase64(props.encrypted),
+        util.decodeBase64(props.encrypted),
         util.decodeBase64(props.nonce),
+        util.decodeBase64(props.ephemeralPublicKey),
         util.decodeBase64(props.secretKey),
-        util.decodeBase64(props.ephemeralPublicKey)
     );
 
     if (!decrypted) {
