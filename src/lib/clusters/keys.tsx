@@ -30,13 +30,13 @@ function generateKeyPair() {
     };
 }
 
-export function decryptSecret(props: { encrypted: string, secretKey: string, nonce: string, ephemeralKey: string }) {
+export function decryptSecret(props: { encrypted: string, secretKey: string, nonce: string, ephemeralPublicKey: string }) {
     // Generate nonce and message from encrypted secret
     const decrypted = box.open(
         decodeBase64(props.encrypted),
         decodeBase64(props.nonce),
         decodeBase64(props.secretKey),
-        decodeBase64(props.ephemeralKey)
+        decodeBase64(props.ephemeralPublicKey)
     );
 
     if (!decrypted) {

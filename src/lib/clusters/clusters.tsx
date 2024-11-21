@@ -180,10 +180,15 @@ async function listClusterUsersAction({ returnJson, token }: { returnJson?: bool
     if (item.object !== "k8s_credential") {
       continue;
     }
-    if (!item.encrypted_token) {
+    if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
-    const res = decryptSecret(item.encrypted_token, privateKey);
+    const res = decryptSecret({
+      encrypted: item.encrypted_token,
+      secretKey: privateKey,
+      nonce: item.nonce,
+      ephemeralPublicKey: item.ephemeral_pubkey,
+    });
 
     if (!item.cluster) {
       console.error("Cluster is undefined");

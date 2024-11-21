@@ -1746,6 +1746,8 @@ export interface operations {
                                 kubernetes_ca_cert?: string;
                             };
                             encrypted_token?: string;
+                            nonce?: string;
+                            ephemeral_pubkey?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1774,6 +1776,8 @@ export interface operations {
                                 kubernetes_ca_cert?: string;
                             };
                             encrypted_token?: string;
+                            nonce?: string;
+                            ephemeral_pubkey?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1802,6 +1806,8 @@ export interface operations {
                                 kubernetes_ca_cert?: string;
                             };
                             encrypted_token?: string;
+                            nonce?: string;
+                            ephemeral_pubkey?: string;
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -1954,6 +1960,8 @@ export interface operations {
                             kubernetes_ca_cert?: string;
                         };
                         encrypted_token?: string;
+                        nonce?: string;
+                        ephemeral_pubkey?: string;
                     };
                     "multipart/form-data": {
                         /** @constant */
@@ -1977,6 +1985,8 @@ export interface operations {
                             kubernetes_ca_cert?: string;
                         };
                         encrypted_token?: string;
+                        nonce?: string;
+                        ephemeral_pubkey?: string;
                     };
                     "text/plain": {
                         /** @constant */
@@ -2000,6 +2010,8 @@ export interface operations {
                             kubernetes_ca_cert?: string;
                         };
                         encrypted_token?: string;
+                        nonce?: string;
+                        ephemeral_pubkey?: string;
                     };
                 };
             };
