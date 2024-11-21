@@ -1,5 +1,5 @@
-import { box, BoxKeyPair, randomBytes, } from "tweetnacl";
-import { encodeBase64, decodeBase64 } from "tweetnacl-util";
+import * as nacl from "npm:tweetnacl";
+import util from "npm:tweetnacl-util";
 import * as path from "node:path";
 import * as os from "node:os";
 import { Buffer } from "node:buffer";
@@ -20,9 +20,9 @@ export async function getKeys(): Promise<{ publicKey: string; privateKey: string
 
 function generateKeyPair() {
     // generate a key pair
-    const pair = box.keyPair();
-    const publicKey = encodeBase64(pair.publicKey);
-    const privateKey = encodeBase64(pair.secretKey);
+    const pair = nacl.default.box.keyPair();
+    const publicKey = util.encodeBase64(pair.publicKey);
+    const privateKey = util.encodeBase64(pair.secretKey);
 
     return {
         publicKey,
@@ -32,11 +32,11 @@ function generateKeyPair() {
 
 export function decryptSecret(props: { encrypted: string, secretKey: string, nonce: string, ephemeralPublicKey: string }) {
     // Generate nonce and message from encrypted secret
-    const decrypted = box.open(
-        decodeBase64(props.encrypted),
-        decodeBase64(props.nonce),
-        decodeBase64(props.secretKey),
-        decodeBase64(props.ephemeralPublicKey)
+    const decrypted = nacl.default.box.open(
+        util.def.decodeBase64(props.encrypted),
+        util.decodeBase64(props.nonce),
+        util.decodeBase64(props.secretKey),
+        util.decodeBase64(props.ephemeralPublicKey)
     );
 
     if (!decrypted) {

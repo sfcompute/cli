@@ -1,6 +1,6 @@
 import yaml from "yaml";
 
-interface Kubeconfig {
+export interface Kubeconfig {
   apiVersion: string;
   clusters: {
     name: string;
@@ -77,4 +77,34 @@ export function createKubeConfigString(props: {
   };
 
   return yaml.stringify(kubeconfig);
+}
+
+export function mergeNamedItems<T extends { name: string }>(
+  items1: T[],
+  items2: T[]
+): T[] {
+  const map = new Map<string, T>();
+  for (const item of items1) {
+    map.set(item.name, item);
+  }
+  for (const item of items2) {
+    map.set(item.name, item); // This will overwrite items with the same name
+  }
+  return Array.from(map.values());
+}
+
+export function mergeKubeconfigs(
+  oldConfig: Kubeconfig,
+  newConfig: Kubeconfig
+): Kubeconfig {
+  return {
+    apiVersion: newConfig.apiVersion || oldConfig.apiVersion,
+    clusters: mergeNamedItems(oldConfig.clusters, newConfig.clusters),
+    contexts: mergeNamedItems(oldConfig.contexts, newConfig.contexts),
+    users: mergeNamedItems(oldConfig.users, newConfig.users),
+    "current-context":
+      newConfig["current-context"] || oldConfig["current-context"],
+    kind: newConfig.kind || oldConfig.kind,
+    preferences: { ...oldConfig.preferences, ...newConfig.preferences },
+  };
 }
