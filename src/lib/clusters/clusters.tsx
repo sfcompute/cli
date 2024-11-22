@@ -4,6 +4,8 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import { createKubeconfig, KUBECONFIG_PATH, syncKubeconfig } from "./kubeconfig.ts";
 import yaml from "yaml";
+import { Box, render, Text } from "ink";
+import React from "react";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -72,6 +74,20 @@ export function registerClusters(program: Command) {
     });
 }
 
+function ClusterDisplay({ clusters }: { clusters: Array<{ name: string, kubernetes_api_url: string, kubernetes_namespace: string }> }) {
+  return (
+    <Box flexDirection="column">
+      {clusters.map(cluster => (
+        <Box key={cluster.name} gap={1}>
+          <Text>{cluster.name}</Text>
+          <Text>{cluster.kubernetes_api_url}</Text>
+          <Text>namespace={cluster.kubernetes_namespace}</Text>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
 async function listClustersAction({ returnJson, token }: { returnJson?: boolean, token?: string }) {
   const api = await apiClient(token);
 
@@ -91,7 +107,11 @@ async function listClustersAction({ returnJson, token }: { returnJson?: boolean,
   if (returnJson) {
     console.log(JSON.stringify(data.data, null, 2));
   } else {
-    console.log(data.data);
+    render(<ClusterDisplay clusters={data.data.map(cluster => ({
+      name: cluster.name,
+      kubernetes_api_url: cluster.kubernetes_api_url || "",
+      kubernetes_namespace: cluster.kubernetes_namespace || "",
+    }))} />);
   }
 }
 
