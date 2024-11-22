@@ -151,7 +151,16 @@ export async function loadKubeconfig(): Promise<Kubeconfig | null> {
     return yaml.parse(kubeconfig);
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
-      // Create empty kubeconfig if it doesn't exist
+      // Create .kube directory and empty kubeconfig if they don't exist
+      const kubeDir = path.join(os.homedir(), ".kube");
+      try {
+        await Deno.mkdir(kubeDir, { recursive: true });
+      } catch (mkdirError) {
+        if (!(mkdirError instanceof Deno.errors.AlreadyExists)) {
+          throw mkdirError;
+        }
+      }
+
       const emptyConfig: Kubeconfig = {
         apiVersion: "v1",
         kind: "Config",
