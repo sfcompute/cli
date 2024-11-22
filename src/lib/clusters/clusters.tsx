@@ -6,6 +6,7 @@ import { createKubeconfig, KUBECONFIG_PATH, syncKubeconfig } from "./kubeconfig.
 import yaml from "yaml";
 import { Box, render, Text } from "ink";
 import React from "react";
+import { Row } from "../Row.tsx";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -61,6 +62,14 @@ export function registerClusters(program: Command) {
       });
     });
 
+  users
+    .command("list")
+    .description("List users in a cluster")
+    .option("--token <token>", "API token")
+    .action(async (options) => {
+      await listClusterUsers({ token: options.token });
+    });
+
   clusters
     .command("kubeconfig")
     .description("Generate kubeconfig")
@@ -78,10 +87,12 @@ function ClusterDisplay({ clusters }: { clusters: Array<{ name: string, kubernet
   return (
     <Box flexDirection="column">
       {clusters.map(cluster => (
-        <Box key={cluster.name} gap={1}>
-          <Text>{cluster.name}</Text>
-          <Text>{cluster.kubernetes_api_url}</Text>
-          <Text>namespace={cluster.kubernetes_namespace}</Text>
+        <Box key={cluster.name} flexDirection="column">
+          <Box gap={1}>
+            <Text color="green">{cluster.name}</Text>
+          </Box>
+          <Row headWidth={11} head="k8s api" value={cluster.kubernetes_api_url} />
+          <Row headWidth={11} head="namespace" value={cluster.kubernetes_namespace} />
         </Box>
       ))}
     </Box>
@@ -113,6 +124,53 @@ async function listClustersAction({ returnJson, token }: { returnJson?: boolean,
       kubernetes_namespace: cluster.kubernetes_namespace || "",
     }))} />);
   }
+}
+
+function ClusterUserDisplay({ users }: { users: Array<{ name: string, is_usable: boolean, cluster: string }> }) {
+  return (
+    <Box flexDirection="column">
+      {users.map(user => (
+        <Box key={user.name} flexDirection="column">
+          <Box gap={1}>
+            <Text color="green">{user.name}</Text>
+          </Box>
+          <Row headWidth={11} head="status" value={user.is_usable ? "ready" : "not ready"} />
+          <Row headWidth={11} head="cluster" value={user.cluster} />
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
+async function listClusterUsers({ token }: { token?: string }) {
+  const api = await apiClient(token);
+
+  const { data, error, response } = await api.GET("/v0/credentials");
+
+  if (!response.ok) {
+    return logAndQuit(`Failed to get users in cluster: ${response.statusText}`);
+  }
+
+  if (!data) {
+    console.error(error);
+    return logAndQuit(
+      `Failed to get users in cluster: Unexpected response from server: ${response}`
+    );
+  }
+
+  const k8s = data.data.filter(credential => credential.object === "k8s_credential");
+
+  const users: Array<{ name: string, is_usable: boolean, cluster: string }> = [];
+  for (const k of k8s) {
+    const is_usable: boolean = Boolean(k.encrypted_token && k.nonce && k.ephemeral_pubkey);
+    users.push({
+      name: k.username || "",
+      is_usable,
+      cluster: k.cluster.name,
+    });
+  }
+
+  render(<ClusterUserDisplay users={users} />);
 }
 
 async function addClusterUserAction({
