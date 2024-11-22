@@ -42,6 +42,7 @@ export function registerUpgrade(program: Command) {
         stdin: "piped",
         stdout: "piped",
         stderr: "piped",
+        env: version ? { SF_CLI_VERSION: version } : undefined,
       });
 
       const bashProcess = command.spawn();

@@ -81,8 +81,11 @@ GITHUB=${GITHUB-"https://github.com"}
 
 github_repo="$GITHUB/$GITHUB_REPO"
 
-# Check if a version is provided as an argument
-if [ $# -eq 0 ]; then
+# Check if a version is provided as an argument or environment variable
+if [ -n "${SF_CLI_VERSION}" ]; then
+    VERSION="${SF_CLI_VERSION}"
+    SF_BINARY_URL=$github_repo/releases/download/$VERSION/sf-$target.zip
+elif [ $# -eq 0 ]; then
     SF_BINARY_URL=$github_repo/releases/latest/download/sf-$target.zip
 else
     VERSION=$1
