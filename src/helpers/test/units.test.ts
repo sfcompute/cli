@@ -1,6 +1,6 @@
 import {
-  assertEquals,
   assert,
+  assertEquals,
 } from "https://deno.land/std@0.112.0/testing/asserts.ts";
 import {
   type Cents,

@@ -135,9 +135,11 @@ async function buyOrderAction(options: SfBuyOptions) {
     return quoteAction(options);
   }
 
-  const nodes = parseAccelerators(options.accelerators)
+  const nodes = parseAccelerators(options.accelerators);
   if (!Number.isInteger(nodes)) {
-    return logAndQuit(`You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`);
+    return logAndQuit(
+      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
+    );
   }
 
   // Grab the price per GPU hour, either
@@ -278,7 +280,9 @@ function BuyOrder(
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [loadingMsg, setLoadingMsg] = useState<string | null>("Placing order...");
+  const [loadingMsg, setLoadingMsg] = useState<string | null>(
+    "Placing order...",
+  );
 
   async function submitOrder() {
     const endsAt = roundEndDate(props.endsAt);
@@ -310,8 +314,8 @@ function BuyOrder(
       setIsLoading(false);
       setResultMessage("Order not placed, use 'y' to confirm");
       setTimeout(() => {
-        exit()
-      }, 0)
+        exit();
+      }, 0);
       return;
     }
 
@@ -327,12 +331,14 @@ function BuyOrder(
 
         const o = await getOrder(order.id);
         if (!o) {
-          setLoadingMsg("Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.");
-          return
+          setLoadingMsg(
+            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
+          );
+          return;
         }
         if (o.status === "pending") {
           setLoadingMsg("Pending...");
-          return
+          return;
         }
         setOrder(o);
 
@@ -341,8 +347,7 @@ function BuyOrder(
           intervalRef.current = null;
         }
         exit();
-        return
-
+        return;
       }, 200);
     }
 
@@ -446,7 +451,9 @@ export async function placeBuyOrder(
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`);
+        return logAndQuit(
+          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`,
+        );
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:

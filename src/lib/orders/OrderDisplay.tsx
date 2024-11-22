@@ -42,8 +42,9 @@ function Order(props: { order: HydratedOrder }) {
       <Row
         headWidth={7}
         head="nodes"
-        value={`${props.order.quantity} x ${props.order.instance_type} (${props.order.quantity * GPUS_PER_NODE
-          } gpus)`}
+        value={`${props.order.quantity} x ${props.order.instance_type} (${
+          props.order.quantity * GPUS_PER_NODE
+        } gpus)`}
       />
       <Row
         headWidth={7}

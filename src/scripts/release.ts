@@ -66,6 +66,7 @@ async function compileDistribution() {
     }).output();
 
     if (!result.success) {
+      console.error(new TextDecoder().decode(result.stderr));
       logAndError(`Failed to compile for ${target}`);
     }
     console.log(`✅ Compiled for ${target}`);
@@ -181,7 +182,9 @@ program
       if (!validTypes.includes(type)) {
         console.error(
           `Invalid release type: ${type}. Valid types are: ${
-            validTypes.join(", ")
+            validTypes.join(
+              ", ",
+            )
           }`,
         );
         process.exit(1);

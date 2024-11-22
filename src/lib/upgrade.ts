@@ -11,7 +11,8 @@ export function registerUpgrade(program: Command) {
 
       if (version) {
         spinner.start(`Checking if version ${version} exists`);
-        const url = `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
+        const url =
+          `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
         const response = await fetch(url, { method: "HEAD" });
 
         if (response.status === 404) {
@@ -24,7 +25,7 @@ export function registerUpgrade(program: Command) {
       // Fetch the install script
       spinner.start("Downloading install script");
       const scriptResponse = await fetch(
-        "https://www.sfcompute.com/cli/install"
+        "https://www.sfcompute.com/cli/install",
       );
 
       if (!scriptResponse.ok) {
