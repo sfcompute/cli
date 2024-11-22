@@ -7,6 +7,8 @@ import yaml from "yaml";
 import { Box, render, Text } from "ink";
 import React from "react";
 import { Row } from "../Row.tsx";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Spinner from "ink-spinner";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -142,6 +144,19 @@ function ClusterUserDisplay({ users }: { users: Array<{ name: string, is_usable:
   );
 }
 
+async function isCredentialReady(id: string) {
+  const api = await apiClient();
+  const { data, error, response } = await api.GET("/v0/credentials");
+
+  const cred = data?.data.find(credential => credential.id === id && credential.object === "k8s_credential");
+
+  if (!cred) {
+    return false;
+  }
+
+  return Boolean(cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey);
+}
+
 async function listClusterUsers({ token }: { token?: string }) {
   const api = await apiClient(token);
 
@@ -171,6 +186,52 @@ async function listClusterUsers({ token }: { token?: string }) {
   }
 
   render(<ClusterUserDisplay users={users} />);
+}
+
+function UserAddedDisplay(props: {
+  id: string;
+  username: string;
+}) {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      isCredentialReady(props.id).then(setIsReady);
+    }, 200);
+    return () => clearInterval(interval);
+  }, [props.id]);
+
+  if (!isReady) {
+    return <Box paddingBottom={1} flexDirection="column">
+      <Box gap={1}>
+        <Text>✓</Text>
+        <Text>User <Text color="green">{props.username}</Text> is provisioning...</Text>
+      </Box>
+
+      <Box gap={1} paddingBottom={1}>
+        <Spinner type="arc" />
+        <Text>Waiting for user to be ready...</Text>
+      </Box>
+
+      <Box paddingLeft={2} flexDirection="column" gap={1}>
+        <Box flexDirection="column">
+          <Text dimColor># When the user is ready, you can sync your kubeconfig by running</Text>
+          <Text color="yellow">sf clusters kubeconfig</Text>
+        </Box>
+
+        <Box flexDirection="column">
+          <Text dimColor># You can also check the status of the user by running</Text>
+          <Text color="yellow">sf clusters users list</Text>
+        </Box>
+      </Box>
+    </Box>;
+  }
+
+  return (
+    <Box flexDirection="column" gap={1} paddingBottom={1}>
+      <Text>User added to cluster</Text>
+    </Box>
+  );
 }
 
 async function addClusterUserAction({
@@ -212,15 +273,7 @@ async function addClusterUserAction({
     );
   }
 
-  render(
-    <Box flexDirection="column" gap={1} paddingBottom={1}>
-      <Text>User added to cluster</Text>
-      <Box paddingLeft={2} flexDirection="column">
-        <Text dimColor># In a moment you can sync your kubeconfig by running</Text>
-        <Text color="yellow">sf clusters kubeconfig</Text>
-      </Box>
-    </Box>
-  );
+  render(<UserAddedDisplay id={data.id} username={username} />);
 }
 
 async function removeClusterUserAction({ id, token }: { id: string, token?: string }) {

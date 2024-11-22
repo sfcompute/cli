@@ -15,7 +15,7 @@ export function InstanceDisplay(props: { instance: InstanceObject }) {
       <Box gap={1}>
         {status === "loading" && (
           <Text color={"yellow"}>
-            <Spinner type="dots" />
+            <Spinner type="arc" />
           </Text>
         )}
         {status === "ready" && <Text color={"green"}>✓</Text>}
