@@ -73,14 +73,14 @@ export function registerClusters(program: Command) {
     });
 
   clusters
-    .command("kubeconfig")
-    .description("Generate kubeconfig")
+    .command("config")
+    .description("Generate config")
     .option("--token <token>", "API token")
-    .option("--print", "Print the kubeconfig instead of writing it to disk")
+    .option("--sync", "Sync the config instead of printing it")
     .action(async (options) => {
       await kubeconfigAction({
         token: options.token,
-        print: options.print,
+        print: !options.sync,
       });
     });
 }
@@ -215,8 +215,8 @@ function UserAddedDisplay(props: {
 
       <Box paddingLeft={2} flexDirection="column" gap={1}>
         <Box flexDirection="column">
-          <Text dimColor># When the user is ready, you can sync your kubeconfig by running</Text>
-          <Text color="yellow">sf clusters kubeconfig</Text>
+          <Text dimColor># When the user is ready, you can sync your ~/.kube/config by running</Text>
+          <Text color="yellow">sf clusters config --sync</Text>
         </Box>
 
         <Box flexDirection="column">
