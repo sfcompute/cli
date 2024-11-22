@@ -281,7 +281,14 @@ function UserAddedDisplay(props: {
 
   return (
     <Box flexDirection="column" gap={1} paddingBottom={1}>
-      <Text>User added to cluster</Text>
+      <Box gap={1}>
+        <Text>✓</Text>
+        <Text>User added to cluster</Text>
+      </Box>
+      <Box paddingLeft={2} flexDirection="column">
+        <Text dimColor># Run this command to update your kubeconfig:</Text>
+        <Text color="yellow">sf clusters config --sync</Text>
+      </Box>
     </Box>
   );
 }
