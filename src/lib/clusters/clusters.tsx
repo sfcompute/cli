@@ -166,7 +166,7 @@ async function listClusterUsers({ token }: { token?: string }) {
     users.push({
       name: k.username || "",
       is_usable,
-      cluster: k.cluster.name,
+      cluster: k.cluster?.name || "",
     });
   }
 
@@ -212,7 +212,15 @@ async function addClusterUserAction({
     );
   }
 
-  console.log(data);
+  render(
+    <Box flexDirection="column" gap={1} paddingBottom={1}>
+      <Text>User added to cluster</Text>
+      <Box paddingLeft={2} flexDirection="column">
+        <Text dimColor># In a moment you can sync your kubeconfig by running</Text>
+        <Text color="yellow">sf clusters kubeconfig</Text>
+      </Box>
+    </Box>
+  );
 }
 
 async function removeClusterUserAction({ id, token }: { id: string, token?: string }) {
