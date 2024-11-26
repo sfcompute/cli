@@ -37,6 +37,7 @@ export function registerClusters(program: Command) {
 
   const users = clusters
     .command("users")
+    .alias("user")
     .description("Manage cluster users");
 
   users
@@ -58,6 +59,7 @@ export function registerClusters(program: Command) {
 
   users
     .command("rm <id>")
+    .alias("remove")
     .description("Remove a user from a cluster")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
@@ -70,6 +72,7 @@ export function registerClusters(program: Command) {
 
   users
     .command("list")
+    .alias("ls")
     .description("List users in a cluster")
     .option("--token <token>", "API token")
     .action(async (options) => {
