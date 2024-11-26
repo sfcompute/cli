@@ -423,7 +423,7 @@ export async function placeBuyOrder(
   },
 ) {
   invariant(
-    options.totalPriceInCents == Math.ceil(options.totalPriceInCents),
+    options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
     "totalPriceInCents must be a whole number",
   );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");

@@ -4,6 +4,7 @@ import { Row } from "../Row.tsx";
 import dayjs from "npm:dayjs@1.11.13";
 import ms from "ms";
 import React from "react";
+import { GPUS_PER_NODE } from "../constants.ts";
 
 const STARTED = "▶";
 const UPCOMING = "⏸";
@@ -49,8 +50,8 @@ export function ContractDisplay(props: { contract: Contract }) {
 
           return (
             <Box key={interval} gap={1}>
-              <Box width={10}>
-                <Text>{quantity} x {props.contract.instance_type}</Text>
+              <Box width={17} alignItems="flex-end">
+                <Text>{quantity * GPUS_PER_NODE} x {props.contract.instance_type} (gpus)</Text>
               </Box>
               <Text dimColor>│</Text>
               <Box gap={1}>
