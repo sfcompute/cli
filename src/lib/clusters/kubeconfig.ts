@@ -9,7 +9,6 @@ export interface Kubeconfig {
     cluster: {
       "certificate-authority-data"?: string;
       server: string;
-      "insecure-skip-tls-verify"?: boolean;
     };
   }[];
   contexts: {
@@ -57,11 +56,8 @@ export function createKubeconfig(props: {
     clusters: clusters.map((cluster) => ({
       name: cluster.name,
       cluster: {
-        // "certificate-authority-data": cluster.certificateAuthorityData,
         server: cluster.kubernetesApiUrl,
-
-        // TODO: Remove this once we have a proper TLS cert
-        "insecure-skip-tls-verify": true,
+        "certificate-authority-data": cluster.certificateAuthorityData,
       },
     })),
     users: users.map((user) => ({
