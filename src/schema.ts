@@ -116,6 +116,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/credentials/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["deleteV0CredentialsById"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/clusters": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["getV0Clusters"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v0/contracts": {
     parameters: {
       query?: never;
@@ -543,31 +575,31 @@ export interface operations {
         side?: "buy" | "sell";
         /** @description The instance type. */
         instance_type?: string;
-        include_public?: string | boolean;
-        min_price?: string | number;
-        max_price?: string | number;
+        include_public?: boolean;
+        min_price?: number;
+        max_price?: number;
         min_start_date?: string;
         max_start_date?: string;
-        min_duration?: string | number;
-        max_duration?: string | number;
-        min_quantity?: string | number;
-        max_quantity?: string | number;
+        min_duration?: number;
+        max_duration?: number;
+        min_quantity?: number;
+        max_quantity?: number;
         contract_id?: string;
-        only_open?: string | boolean;
-        exclude_filled?: string | boolean;
-        only_filled?: string | boolean;
+        only_open?: boolean;
+        exclude_filled?: boolean;
+        only_filled?: boolean;
         min_filled_at?: string;
         max_filled_at?: string;
-        min_fill_price?: string | number;
-        max_fill_price?: string | number;
-        exclude_cancelled?: string | boolean;
-        only_cancelled?: string | boolean;
+        min_fill_price?: number;
+        max_fill_price?: number;
+        exclude_cancelled?: boolean;
+        only_cancelled?: boolean;
         min_cancelled_at?: string;
         max_cancelled_at?: string;
         min_placed_at?: string;
         max_placed_at?: string;
-        limit?: string | number;
-        offset?: string | number;
+        limit?: number;
+        offset?: number;
       };
       header?: {
         /** @description Generate a bearer token with `$ sf tokens create`. */
@@ -1794,37 +1826,91 @@ export interface operations {
         };
         content: {
           "application/json": {
-            data: {
+            data: ({
               /** @constant */
               object: "ssh_credential";
               id: string;
               pubkey: string;
               username: string;
-            }[];
+            } | {
+              /** @constant */
+              object: "k8s_credential";
+              id: string;
+              username?: string;
+              label?: string;
+              pubkey: string;
+              cluster?: {
+                /** @constant */
+                object: "kubernetes_cluster";
+                kubernetes_api_url?: string;
+                name: string;
+                kubernetes_namespace: string;
+                kubernetes_ca_cert?: string;
+              };
+              encrypted_token?: string;
+              nonce?: string;
+              ephemeral_pubkey?: string;
+            })[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "multipart/form-data": {
-            data: {
+            data: ({
               /** @constant */
               object: "ssh_credential";
               id: string;
               pubkey: string;
               username: string;
-            }[];
+            } | {
+              /** @constant */
+              object: "k8s_credential";
+              id: string;
+              username?: string;
+              label?: string;
+              pubkey: string;
+              cluster?: {
+                /** @constant */
+                object: "kubernetes_cluster";
+                kubernetes_api_url?: string;
+                name: string;
+                kubernetes_namespace: string;
+                kubernetes_ca_cert?: string;
+              };
+              encrypted_token?: string;
+              nonce?: string;
+              ephemeral_pubkey?: string;
+            })[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "text/plain": {
-            data: {
+            data: ({
               /** @constant */
               object: "ssh_credential";
               id: string;
               pubkey: string;
               username: string;
-            }[];
+            } | {
+              /** @constant */
+              object: "k8s_credential";
+              id: string;
+              username?: string;
+              label?: string;
+              pubkey: string;
+              cluster?: {
+                /** @constant */
+                object: "kubernetes_cluster";
+                kubernetes_api_url?: string;
+                name: string;
+                kubernetes_namespace: string;
+                kubernetes_ca_cert?: string;
+              };
+              encrypted_token?: string;
+              nonce?: string;
+              ephemeral_pubkey?: string;
+            })[];
             has_more: boolean;
             /** @constant */
             object: "list";
@@ -1910,19 +1996,45 @@ export interface operations {
         "application/json": {
           pubkey: string;
           username: string;
+          /** @constant */
+          object?: "ssh_credential";
+        } | {
+          username: string;
+          label?: string;
+          cluster: string;
+          /** @constant */
+          object: "k8s_credential";
+          pubkey: string;
         };
         "multipart/form-data": {
           pubkey: string;
           username: string;
+          /** @constant */
+          object?: "ssh_credential";
+        } | {
+          username: string;
+          label?: string;
+          cluster: string;
+          /** @constant */
+          object: "k8s_credential";
+          pubkey: string;
         };
         "text/plain": {
           pubkey: string;
           username: string;
+          /** @constant */
+          object?: "ssh_credential";
+        } | {
+          username: string;
+          label?: string;
+          cluster: string;
+          /** @constant */
+          object: "k8s_credential";
+          pubkey: string;
         };
       };
     };
     responses: {
-      /** @description SSH credentials and associated Linux user to be set up on the VM when it spins up. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -1934,6 +2046,24 @@ export interface operations {
             id: string;
             pubkey: string;
             username: string;
+          } | {
+            /** @constant */
+            object: "k8s_credential";
+            id: string;
+            username?: string;
+            label?: string;
+            pubkey: string;
+            cluster?: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            };
+            encrypted_token?: string;
+            nonce?: string;
+            ephemeral_pubkey?: string;
           };
           "multipart/form-data": {
             /** @constant */
@@ -1941,6 +2071,24 @@ export interface operations {
             id: string;
             pubkey: string;
             username: string;
+          } | {
+            /** @constant */
+            object: "k8s_credential";
+            id: string;
+            username?: string;
+            label?: string;
+            pubkey: string;
+            cluster?: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            };
+            encrypted_token?: string;
+            nonce?: string;
+            ephemeral_pubkey?: string;
           };
           "text/plain": {
             /** @constant */
@@ -1948,6 +2096,162 @@ export interface operations {
             id: string;
             pubkey: string;
             username: string;
+          } | {
+            /** @constant */
+            object: "k8s_credential";
+            id: string;
+            username?: string;
+            label?: string;
+            pubkey: string;
+            cluster?: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            };
+            encrypted_token?: string;
+            nonce?: string;
+            ephemeral_pubkey?: string;
+          };
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "not_authenticated";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "multipart/form-data": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+          "text/plain": {
+            /** @constant */
+            object: "error";
+            /** @constant */
+            code: "internal_server";
+            message: string;
+            details?: Record<string, never>;
+          };
+        };
+      };
+    };
+  };
+  deleteV0CredentialsById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getV0Clusters: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            data: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "multipart/form-data": {
+            data: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
+          };
+          "text/plain": {
+            data: {
+              /** @constant */
+              object: "kubernetes_cluster";
+              kubernetes_api_url?: string;
+              name: string;
+              kubernetes_namespace: string;
+              kubernetes_ca_cert?: string;
+            }[];
+            has_more: boolean;
+            /** @constant */
+            object: "list";
           };
         };
       };

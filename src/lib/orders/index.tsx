@@ -19,8 +19,6 @@ import { parseStartAsDate } from "../buy/index.tsx";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-
-
 export function formatDuration(ms: number) {
   const d = dayjs.duration(ms);
 

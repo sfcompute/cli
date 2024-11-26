@@ -263,7 +263,7 @@ function UpCommand(props: {
       )}
       {isLoading && (
         <Box>
-          <Spinner type="dots" />
+          <Spinner type="arc" />
           <Text>Placing procurement...</Text>
         </Box>
       )}
@@ -424,7 +424,7 @@ function DownCommand(props: {
     <Box flexDirection="column">
       {isLoading && (
         <Box>
-          <Spinner type="dots" />
+          <Spinner type="arc" />
           <Text>Turning off nodes...</Text>
         </Box>
       )}
