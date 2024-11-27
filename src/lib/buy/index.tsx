@@ -129,10 +129,12 @@ function QuoteComponent(
 ) {
   const [quote, setQuote] = useState<Quote | null>(null);
 
-  useEffect(async () => {
-    const quote = await getQuoteFromParsedSfBuyOptions(props.options);
-    setQuote(quote);
-  }, []);
+  useEffect(() => {
+    (async () => {
+      const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+      setQuote(quote);
+    })();
+  }, [props.options]);
 
   return quote === null
     ? (
@@ -177,36 +179,38 @@ function QuoteAndBuy(
   const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
 
   // submit a quote request, handle loading state
-  useEffect(async () => {
-    const quote = await getQuoteFromParsedSfBuyOptions(props.options);
-
-    // Grab the price per GPU hour, either
-    let pricePerGpuHour: number | null = parsePricePerGpuHour(
-      props.options.price,
-    );
-    if (!pricePerGpuHour) {
+  useEffect(() => {
+    (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
-      if (!quote) {
-        pricePerGpuHour = await getAggressivePricePerHour(props.options.type);
-      } else {
-        pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+
+      // Grab the price per GPU hour, either
+      let pricePerGpuHour: number | null = parsePricePerGpuHour(
+        props.options.price,
+      );
+      if (!pricePerGpuHour) {
+        const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+        if (!quote) {
+          pricePerGpuHour = await getAggressivePricePerHour(props.options.type);
+        } else {
+          pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+        }
       }
-    }
 
-    const duration = parseDuration(props.options.duration);
-    const startDate = parseStartAsDate(props.options.start);
-    const endsAt = roundEndDate(
-      dayjs(startDate).add(duration, "seconds").toDate(),
-    ).toDate();
+      const duration = parseDuration(props.options.duration);
+      const startDate = parseStartAsDate(props.options.start);
+      const endsAt = roundEndDate(
+        dayjs(startDate).add(duration, "seconds").toDate(),
+      ).toDate();
 
-    setOrderProps({
-      type: props.options.type,
-      price: pricePerGpuHour,
-      size: parseAccelerators(props.options.accelerators),
-      startAt: startDate,
-      endsAt,
-      colocate: props.options.colocate,
-    });
+      setOrderProps({
+        type: props.options.type,
+        price: pricePerGpuHour,
+        size: parseAccelerators(props.options.accelerators),
+        startAt: startDate,
+        endsAt,
+        colocate: props.options.colocate,
+      });
+    })();
   }, []);
 
   return orderProps === null
