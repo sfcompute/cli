@@ -117,11 +117,6 @@ function parsePricePerGpuHour(price?: string) {
   return Number.parseFloat(priceWithoutDollar) * 100;
 }
 
-async function quoteAction(options: SfBuyOptions) {
-  const quote = await getQuoteFromParsedSfBuyOptions(options);
-  render(<QuoteDisplay quote={quote} />);
-}
-
 function QuoteComponent(
   props: {
     options: SfBuyOptions;
@@ -158,17 +153,17 @@ Flow is:
  */
 async function buyOrderAction(options: SfBuyOptions) {
   if (options.quote) {
-    return quoteAction(options);
-  }
+    render(<QuoteComponent options={options} />);
+  } else {
+    const nodes = parseAccelerators(options.accelerators);
+    if (!Number.isInteger(nodes)) {
+      return logAndQuit(
+        `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
+      );
+    }
 
-  const nodes = parseAccelerators(options.accelerators);
-  if (!Number.isInteger(nodes)) {
-    return logAndQuit(
-      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
-    );
+    render(<QuoteAndBuy options={options} />);
   }
-
-  render(<QuoteAndBuy options={options} />);
 }
 
 function QuoteAndBuy(
