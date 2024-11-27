@@ -122,6 +122,29 @@ async function quoteAction(options: SfBuyOptions) {
   render(<QuoteDisplay quote={quote} />);
 }
 
+function QuoteComponent(
+  props: {
+    options: SfBuyOptions;
+  },
+) {
+  const [quote, setQuote] = useState<Quote | null>(null);
+
+  useEffect(async () => {
+    const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+    setQuote(quote);
+  }, []);
+
+  return quote === null ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
+      <Box gap={1}>
+        <Text>Getting quote...</Text>
+      </Box>
+    </Box>
+  ) : <QuoteDisplay quote={quote} />;
+}
+
+
 /*
 Flow is:
 1. If --quote, get quote and exit
@@ -142,32 +165,56 @@ async function buyOrderAction(options: SfBuyOptions) {
     );
   }
 
-  // Grab the price per GPU hour, either
-  let pricePerGpuHour: number | null = parsePricePerGpuHour(options.price);
-  if (!pricePerGpuHour) {
-    const quote = await getQuoteFromParsedSfBuyOptions(options);
-    if (!quote) {
-      pricePerGpuHour = await getAggressivePricePerHour(options.type);
-    } else {
-      pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+  render(<QuoteAndBuy options={options} />);
+}
+
+function QuoteAndBuy(
+  props: {
+    options: SfBuyOptions;
+  },
+) {
+  const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
+
+  // submit a quote request, handle loading state
+  useEffect(async () => {
+    const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+
+    // Grab the price per GPU hour, either
+    let pricePerGpuHour: number | null = parsePricePerGpuHour(props.options.price);
+    if (!pricePerGpuHour) {
+      const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+      if (!quote) {
+        pricePerGpuHour = await getAggressivePricePerHour(props.options.type);
+      } else {
+        pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+      }
     }
-  }
 
-  const duration = parseDuration(options.duration);
-  const startDate = parseStartAsDate(options.start);
-  const endsAt = roundEndDate(
-    dayjs(startDate).add(duration, "seconds").toDate(),
-  ).toDate();
+    const duration = parseDuration(props.options.duration);
+    const startDate = parseStartAsDate(props.options.start);
+    const endsAt = roundEndDate(
+      dayjs(startDate).add(duration, "seconds").toDate(),
+    ).toDate();
 
-  render(
-    <BuyOrder
-      price={pricePerGpuHour}
-      size={parseAccelerators(options.accelerators)}
-      startAt={startDate}
-      type={options.type}
-      endsAt={endsAt}
-      colocate={options.colocate}
-    />,
+    setOrderProps({
+      type: props.options.type,
+      price: pricePerGpuHour,
+      size: parseAccelerators(props.options.accelerators),
+      startAt: startDate,
+      endsAt,
+      colocate: props.options.colocate,
+    });
+  }, []);
+
+  return orderProps === null ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
+      <Box gap={1}>
+        <Text>Getting quote...</Text>
+      </Box>
+    </Box>
+  ) : (
+    <BuyOrder {...orderProps} />
   );
 }
 
@@ -264,16 +311,16 @@ function BuyOrderPreview(
 type Order =
   | Awaited<ReturnType<typeof getOrder>>
   | Awaited<ReturnType<typeof placeBuyOrder>>;
-
+type BuyOrderProps = {
+  price: number;
+  size: number;
+  startAt: Date | "NOW";
+  endsAt: Date;
+  type: string;
+  colocate?: Array<string>;
+}
 function BuyOrder(
-  props: {
-    price: number;
-    size: number;
-    startAt: Date | "NOW";
-    endsAt: Date;
-    type: string;
-    colocate?: Array<string>;
-  },
+  props: BuyOrderProps,
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -499,6 +546,7 @@ type QuoteOptions = {
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
+
   const { data, error, response } = await api.GET("/v0/quote", {
     params: {
       query: {
@@ -514,6 +562,8 @@ export async function getQuote(options: QuoteOptions) {
           : options.startsAt.toISOString(),
       },
     },
+    // timeout after 600 seconds
+    signal: AbortSignal.timeout(600 * 1000),
   });
 
   if (!response.ok) {
