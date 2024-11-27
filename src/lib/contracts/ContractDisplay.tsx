@@ -51,7 +51,11 @@ export function ContractDisplay(props: { contract: Contract }) {
           return (
             <Box key={interval} gap={1}>
               <Box width={17} alignItems="flex-end">
-                <Text>{quantity * GPUS_PER_NODE} x {props.contract.instance_type} (gpus)</Text>
+                <Text>
+                  {quantity * GPUS_PER_NODE} x {props.contract.instance_type}
+                  {" "}
+                  (gpus)
+                </Text>
               </Box>
               <Text dimColor>│</Text>
               <Box gap={1}>

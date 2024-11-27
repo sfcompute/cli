@@ -32,7 +32,7 @@ export function registerSell(program: Command) {
     .option(
       "-f, --flags <flags>",
       "Specify additional flags as JSON",
-      JSON.parse
+      JSON.parse,
     )
     .action(async (options) => {
       await placeSellOrder(options);
@@ -54,7 +54,7 @@ function contractStartAndEnd(contract: {
 }) {
   const startDate = dayjs(contract.shape.intervals[0]).toDate();
   const endDate = dayjs(
-    contract.shape.intervals[contract.shape.intervals.length - 1]
+    contract.shape.intervals[contract.shape.intervals.length - 1],
   ).toDate();
 
   return { startDate, endDate };
@@ -84,14 +84,15 @@ async function placeSellOrder(options: {
 
   if (contract?.status === "pending") {
     return logAndQuit(
-      `Contract ${options.contractId} is currently pending. Please try again in a few seconds.`
+      `Contract ${options.contractId} is currently pending. Please try again in a few seconds.`,
     );
   }
 
   if (options.accelerators % GPUS_PER_NODE !== 0) {
-    const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
+    const exampleCommand =
+      `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
     return logAndQuit(
-      `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`
+      `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
     );
   }
 
@@ -133,7 +134,7 @@ async function placeSellOrder(options: {
     priceCents,
     totalDurationSecs,
     nodes,
-    GPUS_PER_NODE
+    GPUS_PER_NODE,
   );
 
   const params: PlaceSellOrderParameters = {
@@ -154,11 +155,13 @@ async function placeSellOrder(options: {
     switch (response.status) {
       case 400:
         return logAndQuit(
-          `Bad Request: ${error?.message}: ${JSON.stringify(
-            error?.details,
-            null,
-            2
-          )}`
+          `Bad Request: ${error?.message}: ${
+            JSON.stringify(
+              error?.details,
+              null,
+              2,
+            )
+          }`,
         );
       // return logAndQuit(`Bad Request: ${error?.message}`);
       case 401:

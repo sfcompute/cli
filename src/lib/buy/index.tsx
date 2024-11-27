@@ -134,16 +134,17 @@ function QuoteComponent(
     setQuote(quote);
   }, []);
 
-  return quote === null ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return quote === null
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : <QuoteDisplay quote={quote} />;
+    )
+    : <QuoteDisplay quote={quote} />;
 }
-
 
 /*
 Flow is:
@@ -180,7 +181,9 @@ function QuoteAndBuy(
     const quote = await getQuoteFromParsedSfBuyOptions(props.options);
 
     // Grab the price per GPU hour, either
-    let pricePerGpuHour: number | null = parsePricePerGpuHour(props.options.price);
+    let pricePerGpuHour: number | null = parsePricePerGpuHour(
+      props.options.price,
+    );
     if (!pricePerGpuHour) {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
       if (!quote) {
@@ -206,16 +209,16 @@ function QuoteAndBuy(
     });
   }, []);
 
-  return orderProps === null ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return orderProps === null
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : (
-    <BuyOrder {...orderProps} />
-  );
+    )
+    : <BuyOrder {...orderProps} />;
 }
 
 function roundEndDate(endDate: Date) {
@@ -318,7 +321,7 @@ type BuyOrderProps = {
   endsAt: Date;
   type: string;
   colocate?: Array<string>;
-}
+};
 function BuyOrder(
   props: BuyOrderProps,
 ) {
@@ -545,7 +548,6 @@ type QuoteOptions = {
 };
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
-
 
   const { data, error, response } = await api.GET("/v0/quote", {
     params: {
