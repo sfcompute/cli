@@ -123,15 +123,20 @@ function QuoteComponent(
   },
 ) {
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+      setIsLoading(false);
+      if (!quote) {
+        return;
+      }
       setQuote(quote);
     })();
   }, [props.options]);
 
-  return quote === null
+  return isLoading
     ? (
       <Box gap={1}>
         <Spinner type="dots" />
