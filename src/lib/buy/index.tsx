@@ -117,9 +117,35 @@ function parsePricePerGpuHour(price?: string) {
   return Number.parseFloat(priceWithoutDollar) * 100;
 }
 
-async function quoteAction(options: SfBuyOptions) {
-  const quote = await getQuoteFromParsedSfBuyOptions(options);
-  render(<QuoteDisplay quote={quote} />);
+function QuoteComponent(
+  props: {
+    options: SfBuyOptions;
+  },
+) {
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+      setIsLoading(false);
+      if (!quote) {
+        return;
+      }
+      setQuote(quote);
+    })();
+  }, [props.options]);
+
+  return isLoading
+    ? (
+      <Box gap={1}>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
+      </Box>
+    )
+    : <QuoteDisplay quote={quote} />;
 }
 
 /*
@@ -132,43 +158,71 @@ Flow is:
  */
 async function buyOrderAction(options: SfBuyOptions) {
   if (options.quote) {
-    return quoteAction(options);
-  }
-
-  const nodes = parseAccelerators(options.accelerators);
-  if (!Number.isInteger(nodes)) {
-    return logAndQuit(
-      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
-    );
-  }
-
-  // Grab the price per GPU hour, either
-  let pricePerGpuHour: number | null = parsePricePerGpuHour(options.price);
-  if (!pricePerGpuHour) {
-    const quote = await getQuoteFromParsedSfBuyOptions(options);
-    if (!quote) {
-      pricePerGpuHour = await getAggressivePricePerHour(options.type);
-    } else {
-      pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+    render(<QuoteComponent options={options} />);
+  } else {
+    const nodes = parseAccelerators(options.accelerators);
+    if (!Number.isInteger(nodes)) {
+      return logAndQuit(
+        `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
+      );
     }
+
+    render(<QuoteAndBuy options={options} />);
   }
+}
 
-  const duration = parseDuration(options.duration);
-  const startDate = parseStartAsDate(options.start);
-  const endsAt = roundEndDate(
-    dayjs(startDate).add(duration, "seconds").toDate(),
-  ).toDate();
+function QuoteAndBuy(
+  props: {
+    options: SfBuyOptions;
+  },
+) {
+  const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
 
-  render(
-    <BuyOrder
-      price={pricePerGpuHour}
-      size={parseAccelerators(options.accelerators)}
-      startAt={startDate}
-      type={options.type}
-      endsAt={endsAt}
-      colocate={options.colocate}
-    />,
-  );
+  // submit a quote request, handle loading state
+  useEffect(() => {
+    (async () => {
+      const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+
+      // Grab the price per GPU hour, either
+      let pricePerGpuHour: number | null = parsePricePerGpuHour(
+        props.options.price,
+      );
+      if (!pricePerGpuHour) {
+        const quote = await getQuoteFromParsedSfBuyOptions(props.options);
+        if (!quote) {
+          pricePerGpuHour = await getAggressivePricePerHour(props.options.type);
+        } else {
+          pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+        }
+      }
+
+      const duration = parseDuration(props.options.duration);
+      const startDate = parseStartAsDate(props.options.start);
+      const endsAt = roundEndDate(
+        dayjs(startDate).add(duration, "seconds").toDate(),
+      ).toDate();
+
+      setOrderProps({
+        type: props.options.type,
+        price: pricePerGpuHour,
+        size: parseAccelerators(props.options.accelerators),
+        startAt: startDate,
+        endsAt,
+        colocate: props.options.colocate,
+      });
+    })();
+  }, []);
+
+  return orderProps === null
+    ? (
+      <Box gap={1}>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
+      </Box>
+    )
+    : <BuyOrder {...orderProps} />;
 }
 
 function roundEndDate(endDate: Date) {
@@ -264,16 +318,16 @@ function BuyOrderPreview(
 type Order =
   | Awaited<ReturnType<typeof getOrder>>
   | Awaited<ReturnType<typeof placeBuyOrder>>;
-
+type BuyOrderProps = {
+  price: number;
+  size: number;
+  startAt: Date | "NOW";
+  endsAt: Date;
+  type: string;
+  colocate?: Array<string>;
+};
 function BuyOrder(
-  props: {
-    price: number;
-    size: number;
-    startAt: Date | "NOW";
-    endsAt: Date;
-    type: string;
-    colocate?: Array<string>;
-  },
+  props: BuyOrderProps,
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -514,6 +568,8 @@ export async function getQuote(options: QuoteOptions) {
           : options.startsAt.toISOString(),
       },
     },
+    // timeout after 600 seconds
+    signal: AbortSignal.timeout(600 * 1000),
   });
 
   if (!response.ok) {
