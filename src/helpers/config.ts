@@ -26,7 +26,7 @@ const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
 // --
 
 export async function saveConfig(
-  config: Partial<Config>,
+  config: Partial<Config>
 ): Promise<{ success: boolean }> {
   const configPath = getConfigPath();
   const configData = JSON.stringify(config, null, 2);
@@ -36,6 +36,7 @@ export async function saveConfig(
 
     return { success: true };
   } catch (error) {
+    console.error("Error saving config:", error);
     return { success: false };
   }
 }
