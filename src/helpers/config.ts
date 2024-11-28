@@ -26,16 +26,20 @@ const ConfigDefaults = process.env.IS_DEVELOPMENT_CLI_ENV
 // --
 
 export async function saveConfig(
-  config: Partial<Config>,
+  config: Partial<Config>
 ): Promise<{ success: boolean }> {
   const configPath = getConfigPath();
+  const configDir = join(homedir(), ".sfcompute");
   const configData = JSON.stringify(config, null, 2);
 
   try {
+    // Ensure config directory exists
+    await Deno.mkdir(configDir, { recursive: true });
     await Deno.writeTextFile(configPath, configData);
 
     return { success: true };
   } catch (error) {
+    console.error("Error saving config:", error);
     return { success: false };
   }
 }
