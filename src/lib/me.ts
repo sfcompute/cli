@@ -1,9 +1,7 @@
-
-
 import type { Command } from "commander";
 import {
-  logSessionTokenExpiredAndQuit,
   logLoginMessageAndQuit,
+  logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
 import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import { logAndQuit } from "../helpers/errors.ts";
