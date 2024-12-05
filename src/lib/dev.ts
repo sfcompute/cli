@@ -37,14 +37,6 @@ export function registerDev(program: Command) {
       process.exit(0);
     });
 
-    // self
-    program.command("me").action(async () => {
-      const accountId = await getLoggedInAccountId();
-      console.log(accountId);
-
-      process.exit(0);
-    });
-
     // connection
     program.command("ping").action(async () => {
       const data = await pingServer();
@@ -173,34 +165,6 @@ function colorDiffEpochs(epochStrings: string[]): string[] {
 }
 
 // --
-
-async function getLoggedInAccountId() {
-  const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
-    logLoginMessageAndQuit();
-  }
-  const config = await loadConfig();
-
-  const response = await fetch(await getApiUrl("me"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
-    },
-  });
-  if (!response.ok) {
-    if (response.status === 401) {
-      logSessionTokenExpiredAndQuit();
-    }
-    console.log(response);
-
-    logAndQuit("Failed to fetch account info");
-  }
-
-  const data = await response.json();
-
-  return data.id;
-}
 
 async function pingServer() {
   const loggedIn = await isLoggedIn();

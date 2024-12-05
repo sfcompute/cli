@@ -14,6 +14,7 @@ import { registerDown, registerUp } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerClusters } from "./lib/clusters/clusters.tsx";
 import { checkVersion } from "./checkVersion.ts";
+import { registerMe } from "./lib/me.ts";
 
 const program = new Command();
 
@@ -36,6 +37,7 @@ registerUpgrade(program);
 registerUp(program);
 registerDown(program);
 registerClusters(program);
+registerMe(program);
 
 // (development commands)
 registerDev(program);
