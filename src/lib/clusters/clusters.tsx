@@ -8,7 +8,7 @@ import {
   syncKubeconfig,
 } from "./kubeconfig.ts";
 import yaml from "yaml";
-import { Box, render, Text } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import React from "react";
 import { Row } from "../Row.tsx";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -239,10 +239,16 @@ function UserAddedDisplay(props: {
   username: string;
 }) {
   const [isReady, setIsReady] = useState(false);
+  const { exit } = useApp();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      isCredentialReady(props.id).then(setIsReady);
+      isCredentialReady(props.id).then((ready) => {
+        setIsReady(ready);
+        setTimeout(() => {
+          exit();
+        }, 0);
+      });
     }, 200);
     return () => clearInterval(interval);
   }, [props.id]);
