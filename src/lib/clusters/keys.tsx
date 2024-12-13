@@ -18,14 +18,12 @@ export async function getKeys(): Promise<
     };
   }
   const newKeys = generateKeyPair();
-  console.error("generating new keys");
   await saveKeys(newKeys);
   return newKeys;
 }
 
 export async function regenerateKeys() {
   const newKeys = generateKeyPair();
-  console.error("generating new keys");
   await saveKeys(newKeys);
 }
 

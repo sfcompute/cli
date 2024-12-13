@@ -42,18 +42,18 @@ export function registerClusters(program: Command) {
 
   users
     .command("add")
-    .description("Add a user to a cluster")
+    .description("Add a user to a cluster (always regenerates keys)")
     .requiredOption("--cluster <cluster>", "name of the cluster")
     .requiredOption("--user <username>", "Username to add")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
-    .option("--regenerate-keys", "Regenerate encryption keys for the user")
+    .option("--print", "Print the kubeconfig instead of syncing to file")
     .action(async (options) => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
         token: options.token,
-        shouldRegenerateKeys: options.regenerateKeys,
+        print: options.print,
       });
     });
 
@@ -81,13 +81,13 @@ export function registerClusters(program: Command) {
 
   clusters
     .command("config")
-    .description("Generate config")
+    .description("Generate or sync kubeconfig")
     .option("--token <token>", "API token")
-    .option("--sync", "Sync the config instead of printing it")
+    .option("--print", "Print the config instead of syncing to file")
     .action(async (options) => {
       await kubeconfigAction({
         token: options.token,
-        print: !options.sync,
+        print: options.print,
       });
     });
 }
@@ -181,7 +181,7 @@ function ClusterUserDisplay(
 
 async function isCredentialReady(id: string) {
   const api = await apiClient();
-  const { data, error, response } = await api.GET("/v0/credentials");
+  const { data } = await api.GET("/v0/credentials");
 
   const cred = data?.data.find((credential) =>
     credential.id === id && credential.object === "k8s_credential"
@@ -237,21 +237,27 @@ async function listClusterUsers({ token }: { token?: string }) {
 function UserAddedDisplay(props: {
   id: string;
   username: string;
+  print?: boolean;
 }) {
   const [isReady, setIsReady] = useState(false);
   const { exit } = useApp();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      isCredentialReady(props.id).then((ready) => {
-        setIsReady(ready);
+    const interval = setInterval(async () => {
+      const ready = await isCredentialReady(props.id);
+      if (ready) {
+        clearInterval(interval);
+        setIsReady(true);
+
+        // Once ready, sync or print config before exiting
+        await kubeconfigAction({ print: props.print });
         setTimeout(() => {
           exit();
         }, 0);
-      });
-    }, 200);
+      }
+    }, 500);
     return () => clearInterval(interval);
-  }, [props.id]);
+  }, [props.id, props.print]);
 
   if (!isReady) {
     return (
@@ -271,10 +277,12 @@ function UserAddedDisplay(props: {
         <Box paddingLeft={2} flexDirection="column" gap={1}>
           <Box flexDirection="column">
             <Text dimColor>
-              # When the user is ready, you can sync your ~/.kube/config by
-              running
+              # Once ready, your kubeconfig will be updated automatically.
             </Text>
-            <Text color="yellow">sf clusters config --sync</Text>
+            <Text dimColor>
+              # If you prefer to manage kubeconfig manually, you could have run:
+            </Text>
+            <Text color="yellow">sf clusters config --print</Text>
           </Box>
 
           <Box flexDirection="column">
@@ -292,11 +300,7 @@ function UserAddedDisplay(props: {
     <Box flexDirection="column" gap={1} paddingBottom={1}>
       <Box gap={1}>
         <Text>✓</Text>
-        <Text>User added to cluster</Text>
-      </Box>
-      <Box paddingLeft={2} flexDirection="column">
-        <Text dimColor># Run this command to update your kubeconfig:</Text>
-        <Text color="yellow">sf clusters config --sync</Text>
+        <Text>User added to cluster and config updated</Text>
       </Box>
     </Box>
   );
@@ -306,17 +310,17 @@ async function addClusterUserAction({
   clusterName,
   username,
   token,
-  shouldRegenerateKeys,
+  print,
 }: {
   clusterName: string;
   username: string;
   token?: string;
-  shouldRegenerateKeys?: boolean;
+  print?: boolean;
 }) {
   const api = await apiClient(token);
-  if (shouldRegenerateKeys) {
-    await regenerateKeys();
-  }
+
+  // Always regenerate keys before creating a new user
+  await regenerateKeys();
 
   const { publicKey } = await getKeys();
 
@@ -341,7 +345,8 @@ async function addClusterUserAction({
     );
   }
 
-  render(<UserAddedDisplay id={data.id} username={username} />);
+  // Render UI that waits for the user to become ready, then sync/print config
+  render(<UserAddedDisplay id={data.id} username={username} print={print} />);
 }
 
 async function removeClusterUserAction(
@@ -415,15 +420,22 @@ async function kubeconfigAction(
     if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
-    const res = decryptSecret({
-      encrypted: item.encrypted_token,
-      secretKey: privateKey,
-      nonce: item.nonce,
-      ephemeralPublicKey: item.ephemeral_pubkey,
-    });
+
+    let token: string | undefined;
+
+    try {
+      token = decryptSecret({
+        encrypted: item.encrypted_token,
+        secretKey: privateKey,
+        nonce: item.nonce,
+        ephemeralPublicKey: item.ephemeral_pubkey,
+      });
+    } catch (e) {
+      continue;
+    }
+
 
     if (!item.cluster) {
-      console.error("Cluster is undefined");
       continue;
     }
 
@@ -436,7 +448,7 @@ async function kubeconfigAction(
 
     users.push({
       name: item.username || "",
-      token: res,
+      token,
     });
   }
 
