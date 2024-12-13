@@ -1,8 +1,3 @@
-// Remove Inquirer and Chalk imports
-// import { confirm } from "@inquirer/prompts";
-// import c from "chalk";
-
-// Import necessary modules from Ink
 import { Box, render, Text, useApp } from "ink";
 import React, { useCallback, useEffect, useState } from "react";
 import parseDuration from "parse-duration";
@@ -18,42 +13,40 @@ import { GPUS_PER_NODE } from "./constants.ts";
 import { Row } from "./Row.tsx";
 import { Command } from "commander";
 
-export function registerDown(program: Command) {
-  const cmd = program
-    .command("down")
-    .description("Turn off nodes")
-    .option("-t, --type <type>", "Specify the type of node", "h100i");
+const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Example default price
 
-  cmd.action((options) => {
-    render(<DownCommand {...options} />);
-  });
-}
-
-const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Adjust as needed (e.g., $2.65 per GPU per hour)
-
-export function registerUp(program: Command) {
-  const cmd = program
-    .command("up")
-    .description("Automatically buy GPUs until you have the desired quantity")
-    .option(
-      "-n, --accelerators <accelerators>",
-      "The number of GPUs to purchase continuously",
-      "8",
-    )
-    .option("-t, --type <type>", "Specify the type of node", "h100i")
-    .option("-d, --duration <duration>", "Specify the minimum duration", "2h")
-    .option(
-      "-p, --price <price>",
-      "Specify the maximum price per GPU hour, in dollars",
-    )
+export function registerScale(program: Command) {
+  const scale = program
+    .command("scale")
+    .description("Scale GPUs or show current procurement details")
+    .option("-n, --accelerators <accelerators>", "Set number of GPUs (0 to turn off)")
+    .option("-t, --type <type>", "Specify node type", "h100i")
+    .option("-d, --duration <duration>", "Minimum duration", "2h")
+    .option("-p, --price <price>", "Max price per GPU hour, in dollars")
     .option("-y, --yes", "Automatically confirm the order");
 
-  cmd.action((options) => {
-    render(<UpCommand {...options} />);
+  // "show" subcommand
+  scale
+    .command("show")
+    .description("Show current procurement details")
+    .option("-t, --type <type>", "Specify node type", "h100i")
+    .action((options) => {
+      render(<ShowCommand {...options} />);
+    });
+
+  // Default action when running "fly scale" without "show"
+  scale.action((options) => {
+    // If -n is provided, attempt to scale
+    if (options.accelerators !== undefined) {
+      render(<ScaleCommand {...options} />);
+    } else {
+      // No -n and no "show" - just print help
+      scale.outputHelp();
+    }
   });
 }
 
-function UpCommand(props: {
+function ScaleCommand(props: {
   accelerators: string;
   type: string;
   duration: string;
@@ -64,22 +57,28 @@ function UpCommand(props: {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState<
-    React.ReactNode
-  >(null);
-  const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(
-    null,
-  );
+  const [confirmationMessage, setConfirmationMessage] = useState<React.ReactNode>(null);
+  const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(null);
   const [procurementResult, setProcurementResult] = useState<any>(null);
   const [
     displayedPricePerNodeHourInCents,
     setDisplayedPricePerNodeHourInCents,
   ] = useState<number | undefined>(undefined);
 
+  const isDown = Number(props.accelerators) === 0;
+
   useEffect(() => {
-    // Initial setup
     async function init() {
       try {
+        if (isDown) {
+          // Scale down (0 GPUs)
+          await scaleDown(props.type);
+          setProcurementResult(true);
+          exit();
+          return;
+        }
+
+        // Scale up logic
         const {
           durationHours,
           nodesRequired,
@@ -88,9 +87,9 @@ function UpCommand(props: {
           pricePerNodeHourInCents,
           totalPriceInCents,
         } = await getDefaultProcurementOptions(props);
+
         setDisplayedPricePerNodeHourInCents(pricePerNodeHourInCents);
-        const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents) /
-          GPUS_PER_NODE;
+        const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents) / GPUS_PER_NODE;
 
         if (durationHours < 1) {
           setError("Minimum duration is 1 hour");
@@ -101,10 +100,8 @@ function UpCommand(props: {
         if (balance.available.cents < totalPriceInCents) {
           setBalanceLowMessage(
             <Text>
-              You can't afford this. Available balance: $
-              {(balance.available.cents / 100).toFixed(2)}, Minimum price: $
-              {(totalPriceInCents / 100).toFixed(2)}
-            </Text>,
+              You can't afford this. Available: ${(balance.available.cents / 100).toFixed(2)}, Needed: ${(totalPriceInCents / 100).toFixed(2)}
+            </Text>
           );
           return;
         }
@@ -116,7 +113,7 @@ function UpCommand(props: {
             accelerators={accelerators}
             totalPriceInCents={totalPriceInCents}
             type={type}
-          />,
+          />
         );
 
         if (props.yes) {
@@ -149,49 +146,13 @@ function UpCommand(props: {
     }) => {
       try {
         setIsLoading(true);
-        const client = await apiClient();
-
-        // Check existing procurements
-        const procurements = await client.GET("/v0/procurements");
-        if (!procurements.response.ok) {
-          throw new Error(
-            procurements.error?.message || "Failed to list procurements",
-          );
-        }
-
-        const existingProcurement = procurements.data?.data.find(
-          (p: any) => p.instance_group === type,
-        );
-
-        if (existingProcurement) {
-          const res = await client.PUT("/v0/procurements/{id}", {
-            params: {
-              path: {
-                id: existingProcurement.id,
-              },
-            },
-            body: {
-              quantity: nodesRequired,
-              min_duration_in_hours: durationHours,
-              max_price_per_node_hour: pricePerNodeHourInCents,
-            },
-          });
-          setProcurementResult(res.data);
-        } else {
-          const res = await client.POST("/v0/procurements", {
-            body: {
-              instance_type: type,
-              quantity: nodesRequired,
-              max_price_per_node_hour: pricePerNodeHourInCents,
-              min_duration_in_hours: Math.max(durationHours, 1),
-            },
-          });
-
-          if (!res.response.ok) {
-            throw new Error(res.error?.message || "Failed to purchase nodes");
-          }
-          setProcurementResult(res.data);
-        }
+        const result = await scaleToCount({
+          durationHours,
+          nodesRequired,
+          type,
+          pricePerNodeHourInCents,
+        });
+        setProcurementResult(result);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -199,7 +160,7 @@ function UpCommand(props: {
         exit();
       }
     },
-    [props.duration, props.price, exit],
+    [props.duration, props.price, exit]
   );
 
   const handleSubmit = useCallback(
@@ -215,30 +176,23 @@ function UpCommand(props: {
         type,
       } = getProcurementOptions(props);
 
-      let pricePerNodeHourInCents: number;
-      if (displayedPricePerNodeHourInCents) {
-        pricePerNodeHourInCents = displayedPricePerNodeHourInCents;
-      } else {
-        throw new Error("unreachable code (displayed price should be set)");
+      if (!displayedPricePerNodeHourInCents) {
+        throw new Error("Price per node hour not set.");
       }
 
       submitProcurement({
         durationHours,
         nodesRequired,
         type,
-        pricePerNodeHourInCents,
+        pricePerNodeHourInCents: displayedPricePerNodeHourInCents,
       });
     },
-    [submitProcurement, displayedPricePerNodeHourInCents, exit],
+    [submitProcurement, displayedPricePerNodeHourInCents, exit]
   );
 
   return (
     <Box flexDirection="column">
-      {error && (
-        <Text color="red">
-          Error: {error}
-        </Text>
-      )}
+      {error && <Text color="red">Error: {error}</Text>}
       {balanceLowMessage && <Box>{balanceLowMessage}</Box>}
       {!error && confirmationMessage && !props.yes && !isLoading && (
         <Box flexDirection="column">
@@ -260,11 +214,100 @@ function UpCommand(props: {
           <Text>Placing procurement...</Text>
         </Box>
       )}
-      {procurementResult && (
+      {procurementResult && !isDown && (
         <Box>
           <Text color="green">Procurement successful!</Text>
         </Box>
       )}
+      {procurementResult && isDown && (
+        <Box>
+          <Text color="green">Nodes turned off successfully!</Text>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+function ShowCommand(props: { type: string }) {
+  const { exit } = useApp();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [info, setInfo] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchInfo() {
+      try {
+        const client = await apiClient();
+        const procurements = await client.GET("/v0/procurements");
+        if (!procurements.response.ok) {
+          throw new Error(
+            procurements.error?.message || "Failed to list procurements"
+          );
+        }
+
+        const current = procurements.data?.data.find(
+          (p: any) => p.instance_group === props.type
+        );
+        if (!current) {
+          setInfo(null);
+        } else {
+          setInfo(current);
+        }
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchInfo();
+  }, [props.type]);
+
+  if (isLoading) {
+    return (
+      <Box>
+        <Spinner type="arc" />
+        <Text>Fetching procurement details...</Text>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box>
+        <Text color="red">Error: {error}</Text>
+      </Box>
+    );
+  }
+
+  if (!info) {
+    return (
+      <Box>
+        <Text>No procurement found for {props.type}</Text>
+      </Box>
+    );
+  }
+
+  const duration = info.min_duration_in_hours;
+  const quantity = info.quantity * GPUS_PER_NODE;
+  const pricePerNodeHourInCents = info.max_price_per_node_hour;
+  const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents / GPUS_PER_NODE);
+
+  return (
+    <Box flexDirection="column">
+      <Row headWidth={15} head="Type" value={props.type} />
+      <Row headWidth={15} head="GPUs" value={String(quantity)} />
+      <Row
+        headWidth={15}
+        head="Price"
+        value={`$${(pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
+      />
+      <Row
+        headWidth={15}
+        head="Min Duration"
+        value={formatDuration(duration * 3600 * 1000)}
+      />
+      <Text color="green">Current procurement details fetched successfully.</Text>
     </Box>
   );
 }
@@ -277,18 +320,13 @@ function ConfirmationMessage(props: {
   type: string;
 }) {
   const durationInMilliseconds = props.durationHours * 60 * 60 * 1000;
-
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box gap={1}>
         <Text color="green">↑</Text>
         <Text color="yellow">start GPUs</Text>
       </Box>
-      <Row
-        headWidth={15}
-        head="GPUs"
-        value={`${props.accelerators} x ${props.type}`}
-      />
+      <Row headWidth={15} head="GPUs" value={`${props.accelerators} x ${props.type}`} />
       <Row
         headWidth={15}
         head="price"
@@ -302,9 +340,7 @@ function ConfirmationMessage(props: {
       <Row
         headWidth={15}
         head="initial total"
-        value={`$${(props.totalPriceInCents / 100).toFixed(2)} for ${
-          formatDuration(durationInMilliseconds)
-        }`}
+        value={`$${(props.totalPriceInCents / 100).toFixed(2)} for ${formatDuration(durationInMilliseconds)}`}
       />
     </Box>
   );
@@ -323,10 +359,8 @@ function getProcurementOptions(props: {
   durationHours = Math.ceil(durationHours);
 
   const accelerators = Number.parseInt(props.accelerators);
-  if (accelerators % GPUS_PER_NODE != 0) {
-    logAndQuit(
-      "At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs.",
-    );
+  if (accelerators % GPUS_PER_NODE !== 0) {
+    logAndQuit(`Only multiples of ${GPUS_PER_NODE} GPUs are allowed.`);
   }
   const nodesRequired = accelerators / GPUS_PER_NODE;
   const type = props.type;
@@ -364,15 +398,13 @@ async function getDefaultProcurementOptions(props: {
       instanceType: type,
       quantity: nodesRequired,
       startsAt: new Date(),
-      durationSeconds: durationHours * 60 * 60,
+      durationSeconds: durationHours * 3600,
     });
 
     let quotePricePerNodeHourInCents: number;
     if (quote) {
-      // Total price divided by duration in hours, GPUs, and nodes
       quotePricePerNodeHourInCents = Math.ceil(
-        quote.price / durationHours /
-          nodesRequired,
+        quote.price / (durationHours * nodesRequired)
       );
     } else {
       quotePricePerNodeHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
@@ -380,8 +412,7 @@ async function getDefaultProcurementOptions(props: {
     pricePerNodeHourInCents = quotePricePerNodeHourInCents;
   }
 
-  const totalPriceInCents = pricePerNodeHourInCents * nodesRequired *
-    durationHours;
+  const totalPriceInCents = pricePerNodeHourInCents * nodesRequired * durationHours;
 
   return {
     durationHours,
@@ -393,84 +424,88 @@ async function getDefaultProcurementOptions(props: {
   };
 }
 
-function DownCommand(props: {
+async function scaleToCount({
+  durationHours,
+  nodesRequired,
+  type,
+  pricePerNodeHourInCents,
+}: {
+  durationHours: number;
+  nodesRequired: number;
   type: string;
+  pricePerNodeHourInCents: number;
 }) {
-  const { exit } = useApp();
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<boolean>(false);
+  const client = await apiClient();
 
-  useEffect(() => {
-    async function turnOffNodes() {
-      try {
-        setIsLoading(true);
-        const client = await apiClient();
+  const procurements = await client.GET("/v0/procurements");
+  if (!procurements.response.ok) {
+    throw new Error(procurements.error?.message || "Failed to list procurements");
+  }
 
-        const procurements = await client.GET("/v0/procurements");
-        if (!procurements.response.ok) {
-          throw new Error(
-            procurements.error?.message || "Failed to list procurements",
-          );
+  const existingProcurement = procurements.data?.data.find(
+    (p: any) => p.instance_group === type
+  );
+
+  if (existingProcurement) {
+    const res = await client.PUT("/v0/procurements/{id}", {
+      params: { path: { id: existingProcurement.id } },
+      body: {
+        quantity: nodesRequired,
+        min_duration_in_hours: durationHours,
+        max_price_per_node_hour: pricePerNodeHourInCents,
+      },
+    });
+    if (!res.response.ok) {
+      throw new Error(res.error?.message || "Failed to update procurement");
+    }
+    return res.data;
+  } else {
+    const res = await client.POST("/v0/procurements", {
+      body: {
+        instance_type: type,
+        quantity: nodesRequired,
+        max_price_per_node_hour: pricePerNodeHourInCents,
+        min_duration_in_hours: Math.max(durationHours, 1),
+      },
+    });
+    if (!res.response.ok) {
+      throw new Error(res.error?.message || "Failed to create procurement");
+    }
+    return res.data;
+  }
+}
+
+async function scaleDown(type: string) {
+  const client = await apiClient();
+  const procurements = await client.GET("/v0/procurements");
+  if (!procurements.response.ok) {
+    throw new Error(procurements.error?.message || "Failed to list procurements");
+  }
+
+  let found = false;
+  if (procurements.data) {
+    for (const procurement of procurements.data.data) {
+      if (procurement.instance_group === type) {
+        const res = await client.PUT("/v0/procurements/{id}", {
+          params: { path: { id: procurement.id } },
+          body: {
+            quantity: 0,
+            block_duration_in_hours: 0,
+          },
+        });
+
+        if (!res.response.ok) {
+          throw new Error(res.error?.message || "Failed to turn off nodes");
         }
 
-        let procurement_found: boolean = false;
-        if (procurements.data) {
-          for (const procurement of procurements.data.data) {
-            if (procurement.instance_group === props.type) {
-              const res = await client.PUT("/v0/procurements/{id}", {
-                params: {
-                  path: {
-                    id: procurement.id,
-                  },
-                },
-                body: {
-                  quantity: 0,
-                  block_duration_in_hours: 0,
-                },
-              });
-
-              if (!res.response.ok) {
-                throw new Error(
-                  res.error?.message || "Failed to turn off nodes",
-                );
-              }
-
-              procurement_found = true;
-            }
-          }
-        }
-
-        if (!procurement_found) {
-          throw new Error(`No procurement found for ${props.type}`);
-        }
-
-        setResult(true);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-        exit();
+        found = true;
       }
     }
+  }
 
-    turnOffNodes();
-  }, [props.type, exit]);
+  if (!found) {
+    throw new Error(`No procurement found for ${type}`);
+  }
 
-  return (
-    <Box flexDirection="column">
-      {isLoading && (
-        <Box>
-          <Spinner type="arc" />
-          <Text>Turning off nodes...</Text>
-        </Box>
-      )}
-      {error && (
-        <Text color="red">
-          Error: {error}
-        </Text>
-      )}
-      {result && <Text color="green">Nodes turned off successfully!</Text>}
-    </Box>
-  );
+  return true;
 }

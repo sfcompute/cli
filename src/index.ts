@@ -10,7 +10,7 @@ import { registerLogin } from "./lib/login.ts";
 import { registerOrders } from "./lib/orders/index.tsx";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
-import { registerDown, registerUp } from "./lib/updown.tsx";
+import { registerScale } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerClusters } from "./lib/clusters/clusters.tsx";
 import { checkVersion } from "./checkVersion.ts";
@@ -34,8 +34,7 @@ registerSell(program);
 registerBalance(program);
 registerTokens(program);
 registerUpgrade(program);
-registerUp(program);
-registerDown(program);
+registerScale(program);
 registerClusters(program);
 registerMe(program);
 
