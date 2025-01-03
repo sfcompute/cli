@@ -29,11 +29,10 @@ export function roundStartDate(startDate: Date): Date {
 
 export function computeApproximateDurationSeconds(
   startDate: Date | "NOW",
-  endDate: Date,
+  endDate: Date
 ): number {
-  const startEpoch = startDate === "NOW"
-    ? currentEpoch()
-    : dateToEpoch(startDate);
+  const startEpoch =
+    startDate === "NOW" ? currentEpoch() : dateToEpoch(startDate);
   const endEpoch = dateToEpoch(endDate);
   return dayjs(epochToDate(endEpoch)).diff(dayjs(epochToDate(startEpoch)), "s");
 }
@@ -58,7 +57,7 @@ interface PriceWholeToCentsReturn {
   invalid: boolean;
 }
 export function priceWholeToCents(
-  price: string | number,
+  price: string | number
 ): PriceWholeToCentsReturn {
   if (
     price === null ||

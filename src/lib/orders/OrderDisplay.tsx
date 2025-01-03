@@ -1,22 +1,25 @@
 import { Box, Text } from "ink";
-import type { HydratedOrder } from "./types.ts";
-import { GPUS_PER_NODE } from "../constants.ts";
 import dayjs from "npm:dayjs@1.11.13";
-import { formatDuration } from "./index.tsx";
-import { Row } from "../Row.tsx";
 import React from "react";
+import { GPUS_PER_NODE } from "../constants.ts";
+import { Row } from "../Row.tsx";
+import { formatDuration } from "./index.tsx";
+import type { HydratedOrder } from "./types.ts";
 
 function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour = order.price * order.quantity /
-    GPUS_PER_NODE / durationInHours / 100;
+  const pricePerGPUHour =
+    (order.price * order.quantity) / GPUS_PER_NODE / durationInHours / 100;
   const durationFormatted = formatDuration(duration);
 
   let executedPricePerGPUHour;
   if (order.execution_price) {
-    executedPricePerGPUHour = order.execution_price * order.quantity /
-      GPUS_PER_NODE / durationInHours / 100;
+    executedPricePerGPUHour =
+      (order.execution_price * order.quantity) /
+      GPUS_PER_NODE /
+      durationInHours /
+      100;
   }
 
   return {
@@ -99,8 +102,7 @@ function OrderMinimal(props: { order: HydratedOrder }) {
       </Box>
       <Box width={33}>
         <Text>
-          {dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} →
-          {" "}
+          {dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} →{" "}
           {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}
         </Text>
       </Box>
@@ -117,9 +119,10 @@ function OrderMinimal(props: { order: HydratedOrder }) {
   );
 }
 
-export function OrderDisplay(
-  props: { orders: HydratedOrder[]; expanded?: boolean },
-) {
+export function OrderDisplay(props: {
+  orders: HydratedOrder[];
+  expanded?: boolean;
+}) {
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
@@ -138,9 +141,11 @@ export function OrderDisplay(
     );
   }
 
-  return props.orders.map((order) => {
-    return props.expanded
-      ? <Order order={order} key={order.id} />
-      : <OrderMinimal order={order} key={order.id} />;
+  return props.orders.map(order => {
+    return props.expanded ? (
+      <Order order={order} key={order.id} />
+    ) : (
+      <OrderMinimal order={order} key={order.id} />
+    );
   });
 }

@@ -10,12 +10,12 @@ function logAndError(msg: string) {
 
 function bumpVersion(
   version: string,
-  type: "major" | "minor" | "patch" | "prerelease",
+  type: "major" | "minor" | "patch" | "prerelease"
 ) {
-  const [major, minor, patch] = version.split(".").map((v) =>
+  const [major, minor, patch] = version.split(".").map(v =>
     Number.parseInt(
       // Remove everything after the - if there is one
-      v.includes("-") ? v.split("-")[0] : v,
+      v.includes("-") ? v.split("-")[0] : v
     )
   );
   switch (type) {
@@ -98,9 +98,9 @@ async function createRelease(version: string) {
   // Verify zip files are valid before creating release
   const distFiles = Array.from(Deno.readDirSync("./dist"));
   const zipFiles = distFiles
-    .filter((entry) => entry.isFile)
-    .filter((entry) => entry.name.endsWith(".zip"))
-    .map((entry) => `./dist/${entry.name}`);
+    .filter(entry => entry.isFile)
+    .filter(entry => entry.name.endsWith(".zip"))
+    .map(entry => `./dist/${entry.name}`);
 
   console.log(zipFiles);
 
@@ -168,10 +168,10 @@ async function cleanDist() {
 program
   .name("release")
   .description(
-    "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
+    "A github release tool for the project. Valid types are: major, minor, patch, prerelease"
   )
   .arguments("[type]")
-  .action(async (type) => {
+  .action(async type => {
     try {
       if (!type || type === "") {
         program.help();
@@ -181,11 +181,9 @@ program
       const validTypes = ["major", "minor", "patch", "prerelease"];
       if (!validTypes.includes(type)) {
         console.error(
-          `Invalid release type: ${type}. Valid types are: ${
-            validTypes.join(
-              ", ",
-            )
-          }`,
+          `Invalid release type: ${type}. Valid types are: ${validTypes.join(
+            ", "
+          )}`
         );
         process.exit(1);
       }
@@ -200,14 +198,14 @@ program
 
   $ brew install gh
 
-  `,
+  `
         );
         process.exit(1);
       }
 
       process.on("SIGINT", () => {
         console.log(
-          "\nRelease process interrupted. Please confirm to exit (ctrl-c again to confirm).",
+          "\nRelease process interrupted. Please confirm to exit (ctrl-c again to confirm)."
         );
         process.once("SIGINT", () => {
           console.log("Exiting...");

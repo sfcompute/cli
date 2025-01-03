@@ -19,7 +19,10 @@ export function registerScale(program: Command) {
   const scale = program
     .command("scale")
     .description("Scale GPUs or show current procurement details")
-    .option("-n, --accelerators <accelerators>", "Set number of GPUs (0 to turn off)")
+    .option(
+      "-n, --accelerators <accelerators>",
+      "Set number of GPUs (0 to turn off)"
+    )
     .option("-t, --type <type>", "Specify node type", "h100i")
     .option("-d, --duration <duration>", "Minimum duration", "2h")
     .option("-p, --price <price>", "Max price per GPU hour, in dollars")
@@ -30,12 +33,12 @@ export function registerScale(program: Command) {
     .command("show")
     .description("Show current procurement details")
     .option("-t, --type <type>", "Specify node type", "h100i")
-    .action((options) => {
+    .action(options => {
       render(<ShowCommand {...options} />);
     });
 
   // Default action when running "fly scale" without "show"
-  scale.action((options) => {
+  scale.action(options => {
     // If -n is provided, attempt to scale
     if (options.accelerators !== undefined) {
       render(<ScaleCommand {...options} />);
@@ -57,8 +60,10 @@ function ScaleCommand(props: {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState<React.ReactNode>(null);
-  const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(null);
+  const [confirmationMessage, setConfirmationMessage] =
+    useState<React.ReactNode>(null);
+  const [balanceLowMessage, setBalanceLowMessage] =
+    useState<React.ReactNode>(null);
   const [procurementResult, setProcurementResult] = useState<any>(null);
   const [
     displayedPricePerNodeHourInCents,
@@ -89,7 +94,8 @@ function ScaleCommand(props: {
         } = await getDefaultProcurementOptions(props);
 
         setDisplayedPricePerNodeHourInCents(pricePerNodeHourInCents);
-        const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents) / GPUS_PER_NODE;
+        const pricePerGpuHourInCents =
+          Math.ceil(pricePerNodeHourInCents) / GPUS_PER_NODE;
 
         if (durationHours < 1) {
           setError("Minimum duration is 1 hour");
@@ -100,7 +106,9 @@ function ScaleCommand(props: {
         if (balance.available.cents < totalPriceInCents) {
           setBalanceLowMessage(
             <Text>
-              You can't afford this. Available: ${(balance.available.cents / 100).toFixed(2)}, Needed: ${(totalPriceInCents / 100).toFixed(2)}
+              You can't afford this. Available: $
+              {(balance.available.cents / 100).toFixed(2)}, Needed: $
+              {(totalPriceInCents / 100).toFixed(2)}
             </Text>
           );
           return;
@@ -170,11 +178,8 @@ function ScaleCommand(props: {
         return;
       }
 
-      const {
-        durationHours,
-        nodesRequired,
-        type,
-      } = getProcurementOptions(props);
+      const { durationHours, nodesRequired, type } =
+        getProcurementOptions(props);
 
       if (!displayedPricePerNodeHourInCents) {
         throw new Error("Price per node hour not set.");
@@ -291,7 +296,9 @@ function ShowCommand(props: { type: string }) {
   const duration = info.min_duration_in_hours;
   const quantity = info.quantity * GPUS_PER_NODE;
   const pricePerNodeHourInCents = info.max_price_per_node_hour;
-  const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents / GPUS_PER_NODE);
+  const pricePerGpuHourInCents = Math.ceil(
+    pricePerNodeHourInCents / GPUS_PER_NODE
+  );
 
   return (
     <Box flexDirection="column">
@@ -307,7 +314,9 @@ function ShowCommand(props: { type: string }) {
         head="Min Duration"
         value={formatDuration(duration * 3600 * 1000)}
       />
-      <Text color="green">Current procurement details fetched successfully.</Text>
+      <Text color="green">
+        Current procurement details fetched successfully.
+      </Text>
     </Box>
   );
 }
@@ -326,7 +335,11 @@ function ConfirmationMessage(props: {
         <Text color="green">↑</Text>
         <Text color="yellow">start GPUs</Text>
       </Box>
-      <Row headWidth={15} head="GPUs" value={`${props.accelerators} x ${props.type}`} />
+      <Row
+        headWidth={15}
+        head="GPUs"
+        value={`${props.accelerators} x ${props.type}`}
+      />
       <Row
         headWidth={15}
         head="price"
@@ -379,12 +392,8 @@ async function getDefaultProcurementOptions(props: {
   price?: string;
   type: string;
 }) {
-  const {
-    durationHours,
-    accelerators,
-    type,
-    nodesRequired,
-  } = getProcurementOptions(props);
+  const { durationHours, accelerators, type, nodesRequired } =
+    getProcurementOptions(props);
 
   let pricePerNodeHourInCents: number;
   if (props.price) {
@@ -412,7 +421,8 @@ async function getDefaultProcurementOptions(props: {
     pricePerNodeHourInCents = quotePricePerNodeHourInCents;
   }
 
-  const totalPriceInCents = pricePerNodeHourInCents * nodesRequired * durationHours;
+  const totalPriceInCents =
+    pricePerNodeHourInCents * nodesRequired * durationHours;
 
   return {
     durationHours,
@@ -439,7 +449,9 @@ async function scaleToCount({
 
   const procurements = await client.GET("/v0/procurements");
   if (!procurements.response.ok) {
-    throw new Error(procurements.error?.message || "Failed to list procurements");
+    throw new Error(
+      procurements.error?.message || "Failed to list procurements"
+    );
   }
 
   const existingProcurement = procurements.data?.data.find(
@@ -479,7 +491,9 @@ async function scaleDown(type: string) {
   const client = await apiClient();
   const procurements = await client.GET("/v0/procurements");
   if (!procurements.response.ok) {
-    throw new Error(procurements.error?.message || "Failed to list procurements");
+    throw new Error(
+      procurements.error?.message || "Failed to list procurements"
+    );
   }
 
   let found = false;

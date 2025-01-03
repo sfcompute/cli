@@ -20,7 +20,7 @@ export function registerBalance(program: Command) {
     .command("balance")
     .description("Get account balance")
     .option("--json", "Output in JSON format")
-    .action(async (options) => {
+    .action(async options => {
       const {
         available: { whole: availableWhole, cents: availableCents },
         reserved: { whole: reservedWhole, cents: reservedCents },
@@ -57,7 +57,7 @@ export function registerBalance(program: Command) {
             "Reserved",
             chalk.gray(formattedReserved),
             chalk.gray(reservedCents.toLocaleString()),
-          ],
+          ]
         );
 
         console.log(table.toString() + "\n");
@@ -98,7 +98,7 @@ export async function getBalance(): Promise<BalanceUsdCents> {
 
   if (!data) {
     return logAndQuit(
-      `Failed to get balance: Unexpected response from server: ${response}`,
+      `Failed to get balance: Unexpected response from server: ${response}`
     );
   }
 

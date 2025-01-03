@@ -4,12 +4,14 @@ import * as path from "node:path";
 import * as os from "node:os";
 import { Buffer } from "node:buffer";
 
-export async function getKeys(): Promise<
-  { publicKey: string; privateKey: string }
-> {
+export async function getKeys(): Promise<{
+  publicKey: string;
+  privateKey: string;
+}> {
   const keys = await loadKeys();
   if (
-    keys && typeof keys.privateKey === "string" &&
+    keys &&
+    typeof keys.privateKey === "string" &&
     typeof keys.publicKey === "string"
   ) {
     return {
@@ -39,20 +41,18 @@ function generateKeyPair() {
   };
 }
 
-export function decryptSecret(
-  props: {
-    encrypted: string;
-    secretKey: string;
-    nonce: string;
-    ephemeralPublicKey: string;
-  },
-) {
+export function decryptSecret(props: {
+  encrypted: string;
+  secretKey: string;
+  nonce: string;
+  ephemeralPublicKey: string;
+}) {
   // Generate nonce and message from encrypted secret
   const decrypted = nacl.default.box.open(
     util.decodeBase64(props.encrypted),
     util.decodeBase64(props.nonce),
     util.decodeBase64(props.ephemeralPublicKey),
-    util.decodeBase64(props.secretKey),
+    util.decodeBase64(props.secretKey)
   );
 
   if (!decrypted) {
