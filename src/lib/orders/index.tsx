@@ -1,7 +1,9 @@
 import type { Command } from "commander";
 import dayjs from "dayjs";
+import { render } from "ink";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import React from "react";
 import { getAuthToken, isLoggedIn } from "../../helpers/config.ts";
 import {
   logAndQuit,
@@ -10,11 +12,9 @@ import {
 } from "../../helpers/errors.ts";
 import { fetchAndHandleErrors } from "../../helpers/fetch.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { render, Text } from "ink";
+import { parseStartAsDate } from "../buy/index.tsx";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
-import React from "react";
-import { parseStartAsDate } from "../buy/index.tsx";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -169,11 +169,16 @@ export function registerOrders(program: Command) {
 
       if (options.json) {
         console.log(JSON.stringify(sortedOrders, null, 2));
+        process.exit(0);
       } else {
         render(<OrderDisplay orders={sortedOrders} />);
-      }
 
-      process.exit(0);
+        // Automatically exit the process if there are no orders
+        // Otherwise leave the process running so the user can interact (scroll) to see the orders
+        if (sortedOrders.length === 0) {
+          process.exit(0);
+        }
+      }
     });
 
   ordersCommand
