@@ -32,3 +32,9 @@ sf --version  # 0.1.0
   - `deno run devv` to test against local API
   - `deno run prod` to test against production API
   - The `deno run <env>` is an alias to the user facing `sf` command. So if you wanted to run `sf login` locally against the local API, run `deno run devv login`
+
+## New Release
+
+This is ran locally
+
+- `deno run release <major|minor|patch>`

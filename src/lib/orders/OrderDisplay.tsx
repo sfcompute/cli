@@ -220,7 +220,23 @@ export function OrderDisplay(props: {
   );
 }
 
-const reducer = (state, action) => {
+interface ScrollState {
+  innerHeight: number;
+  height: number;
+  scrollTop: number;
+}
+
+type ScrollAction =
+  | { type: "SET_INNER_HEIGHT"; innerHeight: number }
+  | { type: "SCROLL_DOWN" }
+  | { type: "SCROLL_DOWN_BULK" }
+  | { type: "SCROLL_UP" }
+  | { type: "SCROLL_UP_BULK" }
+  | { type: "SCROLL_TO_TOP" }
+  | { type: "SCROLL_TO_BOTTOM" }
+  | { type: "SWITCHED_TAB" };
+
+const reducer = (state: ScrollState, action: ScrollAction): ScrollState => {
   switch (action.type) {
     case "SET_INNER_HEIGHT":
       return {
@@ -297,9 +313,12 @@ export function ScrollArea({
   sellOrdersCount: number;
   buyOrdersCount: number;
 }) {
-  const [state, dispatch] = React.useReducer(reducer, {
+  const [state, dispatch] = React.useReducer<
+    React.Reducer<ScrollState, ScrollAction>
+  >(reducer, {
     height,
     scrollTop: 0,
+    innerHeight: 0,
   });
 
   const innerRef = React.useRef(null);
