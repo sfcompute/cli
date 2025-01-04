@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import { Command } from "commander";
 
 const program = new Command();
@@ -127,6 +126,15 @@ async function createRelease(version: string) {
     releaseFlag,
   ]);
   if (result.exitCode !== 0) {
+    console.log(
+      "GitHub release creation failed with exit code:",
+      result.exitCode
+    );
+    console.log("Common failure reasons:");
+    console.log("- GitHub CLI not installed or not authenticated");
+    console.log("- Release tag already exists");
+    console.log("- No write permissions to repository");
+    console.log("- Network connectivity issues");
     logAndError(`Failed to create GitHub release for version ${version}`);
   }
   console.log(`✅ Created GitHub release for version ${version}`);
