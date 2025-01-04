@@ -5,7 +5,7 @@ import { getOrder } from "./fetchers.ts";
 
 export async function waitForOrderToNotBePending(orderId: string) {
   const spinner = ora(
-    `Order ${orderId} - pending (this can take a moment)`,
+    `Order ${orderId} - pending (this can take a moment)`
   ).start();
 
   // 1 minute
@@ -18,7 +18,7 @@ export async function waitForOrderToNotBePending(orderId: string) {
       spinner.succeed();
       return order;
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   spinner.fail();

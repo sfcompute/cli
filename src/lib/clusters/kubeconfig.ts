@@ -53,14 +53,14 @@ export function createKubeconfig(props: {
     apiVersion: "v1",
     kind: "Config",
     preferences: {},
-    clusters: clusters.map((cluster) => ({
+    clusters: clusters.map(cluster => ({
       name: cluster.name,
       cluster: {
         server: cluster.kubernetesApiUrl,
         "certificate-authority-data": cluster.certificateAuthorityData,
       },
     })),
-    users: users.map((user) => ({
+    users: users.map(user => ({
       name: user.name,
       user: {
         token: user.token,
@@ -71,9 +71,9 @@ export function createKubeconfig(props: {
   };
 
   // Generate contexts automatically by matching clusters and users by name
-  kubeconfig.contexts = clusters.map((cluster) => {
+  kubeconfig.contexts = clusters.map(cluster => {
     // Try to find a user with the same name as the cluster
-    let user = users.find((u) => u.name === cluster.name);
+    let user = users.find(u => u.name === cluster.name);
 
     // If no matching user, default to the first user
     if (!user) {
@@ -94,8 +94,7 @@ export function createKubeconfig(props: {
 
   // Set current context based on provided cluster and user names
   if (currentContext) {
-    const contextName =
-      `${currentContext.clusterName}@${currentContext.userName}`;
+    const contextName = `${currentContext.clusterName}@${currentContext.userName}`;
     kubeconfig["current-context"] = contextName;
   } else if (kubeconfig.contexts.length > 0) {
     kubeconfig["current-context"] = kubeconfig.contexts[0].name;
@@ -106,7 +105,7 @@ export function createKubeconfig(props: {
 
 export function mergeNamedItems<T extends { name: string }>(
   items1: T[],
-  items2: T[],
+  items2: T[]
 ): T[] {
   const map = new Map<string, T>();
   for (const item of items1) {
@@ -120,7 +119,7 @@ export function mergeNamedItems<T extends { name: string }>(
 
 export function mergeKubeconfigs(
   oldConfig: Kubeconfig,
-  newConfig?: Kubeconfig,
+  newConfig?: Kubeconfig
 ): Kubeconfig {
   if (!newConfig) {
     return oldConfig;
@@ -130,15 +129,15 @@ export function mergeKubeconfigs(
     apiVersion: newConfig.apiVersion || oldConfig.apiVersion,
     clusters: mergeNamedItems(
       oldConfig.clusters || [],
-      newConfig.clusters || [],
+      newConfig.clusters || []
     ),
     contexts: mergeNamedItems(
       oldConfig.contexts || [],
-      newConfig.contexts || [],
+      newConfig.contexts || []
     ),
     users: mergeNamedItems(oldConfig.users || [], newConfig.users || []),
-    "current-context": newConfig["current-context"] ||
-      oldConfig["current-context"],
+    "current-context":
+      newConfig["current-context"] || oldConfig["current-context"],
     kind: newConfig.kind || oldConfig.kind,
     preferences: { ...oldConfig.preferences, ...newConfig.preferences },
   };

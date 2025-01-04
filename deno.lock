@@ -26,6 +26,7 @@
     "npm:openapi-fetch@~0.11.1": "0.11.3",
     "npm:ora@^8.1.0": "8.1.1",
     "npm:parse-duration@^1.1.0": "1.1.0",
+    "npm:prettier@^3.4.2": "3.4.2",
     "npm:react@^18.3.1": "18.3.1",
     "npm:semver@^7.6.3": "7.6.3",
     "npm:tiny-invariant@^1.3.3": "1.3.3",
@@ -751,6 +752,9 @@
     "patch-console@2.0.0": {
       "integrity": "sha512-0YNdUceMdaQwoKce1gatDScmMo5pu/tfABfnzEqeG0gtTmd7mh/WcwgUjtAeOU7N8nFFlbQBnFK2gXW5fGvmMA=="
     },
+    "prettier@3.4.2": {
+      "integrity": "sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ=="
+    },
     "prop-types@15.8.1": {
       "integrity": "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==",
       "dependencies": [
@@ -1071,6 +1075,7 @@
         "npm:openapi-fetch@~0.11.1",
         "npm:ora@^8.1.0",
         "npm:parse-duration@^1.1.0",
+        "npm:prettier@^3.4.2",
         "npm:react@^18.3.1",
         "npm:semver@^7.6.3",
         "npm:tiny-invariant@^1.3.3",

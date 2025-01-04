@@ -23,11 +23,15 @@ export default function QuoteDisplay(props: { quote: Quote }) {
 
   const durationSeconds = dayjs(props.quote.end_at).diff(
     dayjs(props.quote.start_at),
-    "seconds",
+    "seconds"
   );
   const durationHours = durationSeconds / 3600;
-  const pricePerHour = props.quote.price / durationHours / GPUS_PER_NODE /
-    props.quote.quantity / 100;
+  const pricePerHour =
+    props.quote.price /
+    durationHours /
+    GPUS_PER_NODE /
+    props.quote.quantity /
+    100;
   const priceTotal = props.quote.price / 100;
 
   return (
@@ -44,17 +48,17 @@ export default function QuoteDisplay(props: { quote: Quote }) {
 
 export type Quote =
   | {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    instance_type: string;
-  }
+      price: number;
+      quantity: number;
+      start_at: string;
+      end_at: string;
+      instance_type: string;
+    }
   | {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    contract_id: string;
-  }
+      price: number;
+      quantity: number;
+      start_at: string;
+      end_at: string;
+      contract_id: string;
+    }
   | null;

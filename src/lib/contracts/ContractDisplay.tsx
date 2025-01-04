@@ -27,17 +27,20 @@ export function ContractDisplay(props: { contract: Contract }) {
       <Row
         headWidth={6}
         head="colo"
-        value={props.contract.colocate_with.length > 0
-          ? props.contract.colocate_with.join(", ")
-          : "-"}
+        value={
+          props.contract.colocate_with.length > 0
+            ? props.contract.colocate_with.join(", ")
+            : "-"
+        }
       />
 
       <Box paddingY={1} paddingLeft={2} flexDirection="column">
-        {props.contract.shape.intervals.slice(0, -1).map((interval) => {
+        {props.contract.shape.intervals.slice(0, -1).map(interval => {
           const start = new Date(interval);
           const next = new Date(
-            props.contract.shape
-              .intervals[props.contract.shape.intervals.indexOf(interval) + 1],
+            props.contract.shape.intervals[
+              props.contract.shape.intervals.indexOf(interval) + 1
+            ]
           );
 
           const duration = next.getTime() - start.getTime();
@@ -45,15 +48,16 @@ export function ContractDisplay(props: { contract: Contract }) {
           const nextString = dayjs(next).format("MMM D h:mm a").toLowerCase();
           const durationString = ms(duration);
 
-          const quantity = props.contract.shape
-            .quantities[props.contract.shape.intervals.indexOf(interval)];
+          const quantity =
+            props.contract.shape.quantities[
+              props.contract.shape.intervals.indexOf(interval)
+            ];
 
           return (
             <Box key={interval} gap={1}>
               <Box width={17} alignItems="flex-end">
                 <Text>
-                  {quantity * GPUS_PER_NODE} x {props.contract.instance_type}
-                  {" "}
+                  {quantity * GPUS_PER_NODE} x {props.contract.instance_type}{" "}
                   (gpus)
                 </Text>
               </Box>
@@ -88,7 +92,7 @@ export function ContractList(props: { contracts: Contract[] }) {
 
   return (
     <Box flexDirection="column" gap={1} paddingBottom={1}>
-      {props.contracts.map((contract) => (
+      {props.contracts.map(contract => (
         <ContractDisplay contract={contract} key={contract.id} />
       ))}
     </Box>

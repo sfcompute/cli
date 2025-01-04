@@ -401,108 +401,114 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "buy";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-            } | null;
-          } | {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "sell";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              contract_id: string;
-            } | null;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "buy";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-            } | null;
-          } | {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "sell";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              contract_id: string;
-            } | null;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "buy";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-            } | null;
-          } | {
-            /** @constant */
-            object: "quote";
-            /** @constant */
-            side: "sell";
-            quote: {
-              /** @description Price in cents (1 = $0.01) */
-              price: number;
-              /** @description The number of nodes. */
-              quantity: number;
-              /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-              start_at: string;
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              contract_id: string;
-            } | null;
-          };
+          "application/json":
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "buy";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                } | null;
+              }
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "sell";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  contract_id: string;
+                } | null;
+              };
+          "multipart/form-data":
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "buy";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                } | null;
+              }
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "sell";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  contract_id: string;
+                } | null;
+              };
+          "text/plain":
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "buy";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                } | null;
+              }
+            | {
+                /** @constant */
+                object: "quote";
+                /** @constant */
+                side: "sell";
+                quote: {
+                  /** @description Price in cents (1 = $0.01) */
+                  price: number;
+                  /** @description The number of nodes. */
+                  quantity: number;
+                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
+                  start_at: string;
+                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+                  end_at: string;
+                  contract_id: string;
+                } | null;
+              };
         };
       };
       401: {
@@ -794,168 +800,174 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": {
-          /** @constant */
-          side: "buy";
-          /** @description The instance type. */
-          instance_type: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          colocate_with?: string[];
-        } | {
-          /** @constant */
-          side: "sell";
-          contract_id: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          reprice?: {
-            /**
-             * @description Adjust this order's price linearly from adjustment start to end.
-             * @constant
-             */
-            strategy: "linear";
-            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-            limit: number;
-            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-            start_at?: string;
-            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-            end_at?: string;
-          };
-        };
-        "multipart/form-data": {
-          /** @constant */
-          side: "buy";
-          /** @description The instance type. */
-          instance_type: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          colocate_with?: string[];
-        } | {
-          /** @constant */
-          side: "sell";
-          contract_id: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          reprice?: {
-            /**
-             * @description Adjust this order's price linearly from adjustment start to end.
-             * @constant
-             */
-            strategy: "linear";
-            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-            limit: number;
-            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-            start_at?: string;
-            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-            end_at?: string;
-          };
-        };
-        "text/plain": {
-          /** @constant */
-          side: "buy";
-          /** @description The instance type. */
-          instance_type: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          colocate_with?: string[];
-        } | {
-          /** @constant */
-          side: "sell";
-          contract_id: string;
-          /** @description The number of nodes. */
-          quantity: number;
-          start_at: string | "NOW";
-          /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-          end_at: string;
-          /** @description Price in cents (1 = $0.01) */
-          price: number;
-          flags?: {
-            /** @description If true, this will be a market order. */
-            market?: boolean;
-            /** @description If true, this is a post-only order. */
-            post_only?: boolean;
-            /** @description If true, this is an immediate-or-cancel order. */
-            ioc?: boolean;
-          };
-          reprice?: {
-            /**
-             * @description Adjust this order's price linearly from adjustment start to end.
-             * @constant
-             */
-            strategy: "linear";
-            /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-            limit: number;
-            /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-            start_at?: string;
-            /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
-            end_at?: string;
-          };
-        };
+        "application/json":
+          | {
+              /** @constant */
+              side: "buy";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              colocate_with?: string[];
+            }
+          | {
+              /** @constant */
+              side: "sell";
+              contract_id: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
+              };
+            };
+        "multipart/form-data":
+          | {
+              /** @constant */
+              side: "buy";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              colocate_with?: string[];
+            }
+          | {
+              /** @constant */
+              side: "sell";
+              contract_id: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
+              };
+            };
+        "text/plain":
+          | {
+              /** @constant */
+              side: "buy";
+              /** @description The instance type. */
+              instance_type: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              colocate_with?: string[];
+            }
+          | {
+              /** @constant */
+              side: "sell";
+              contract_id: string;
+              /** @description The number of nodes. */
+              quantity: number;
+              start_at: string | "NOW";
+              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
+              end_at: string;
+              /** @description Price in cents (1 = $0.01) */
+              price: number;
+              flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+              };
+              reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end.
+                 * @constant
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                end_at?: string;
+              };
+            };
       };
     };
     responses: {
@@ -1826,91 +1838,100 @@ export interface operations {
         };
         content: {
           "application/json": {
-            data: ({
-              /** @constant */
-              object: "ssh_credential";
-              id: string;
-              pubkey: string;
-              username: string;
-            } | {
-              /** @constant */
-              object: "k8s_credential";
-              id: string;
-              username?: string;
-              label?: string;
-              pubkey: string;
-              cluster?: {
-                /** @constant */
-                object: "kubernetes_cluster";
-                kubernetes_api_url?: string;
-                name: string;
-                kubernetes_namespace: string;
-                kubernetes_ca_cert?: string;
-              };
-              encrypted_token?: string;
-              nonce?: string;
-              ephemeral_pubkey?: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "ssh_credential";
+                  id: string;
+                  pubkey: string;
+                  username: string;
+                }
+              | {
+                  /** @constant */
+                  object: "k8s_credential";
+                  id: string;
+                  username?: string;
+                  label?: string;
+                  pubkey: string;
+                  cluster?: {
+                    /** @constant */
+                    object: "kubernetes_cluster";
+                    kubernetes_api_url?: string;
+                    name: string;
+                    kubernetes_namespace: string;
+                    kubernetes_ca_cert?: string;
+                  };
+                  encrypted_token?: string;
+                  nonce?: string;
+                  ephemeral_pubkey?: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "multipart/form-data": {
-            data: ({
-              /** @constant */
-              object: "ssh_credential";
-              id: string;
-              pubkey: string;
-              username: string;
-            } | {
-              /** @constant */
-              object: "k8s_credential";
-              id: string;
-              username?: string;
-              label?: string;
-              pubkey: string;
-              cluster?: {
-                /** @constant */
-                object: "kubernetes_cluster";
-                kubernetes_api_url?: string;
-                name: string;
-                kubernetes_namespace: string;
-                kubernetes_ca_cert?: string;
-              };
-              encrypted_token?: string;
-              nonce?: string;
-              ephemeral_pubkey?: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "ssh_credential";
+                  id: string;
+                  pubkey: string;
+                  username: string;
+                }
+              | {
+                  /** @constant */
+                  object: "k8s_credential";
+                  id: string;
+                  username?: string;
+                  label?: string;
+                  pubkey: string;
+                  cluster?: {
+                    /** @constant */
+                    object: "kubernetes_cluster";
+                    kubernetes_api_url?: string;
+                    name: string;
+                    kubernetes_namespace: string;
+                    kubernetes_ca_cert?: string;
+                  };
+                  encrypted_token?: string;
+                  nonce?: string;
+                  ephemeral_pubkey?: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "text/plain": {
-            data: ({
-              /** @constant */
-              object: "ssh_credential";
-              id: string;
-              pubkey: string;
-              username: string;
-            } | {
-              /** @constant */
-              object: "k8s_credential";
-              id: string;
-              username?: string;
-              label?: string;
-              pubkey: string;
-              cluster?: {
-                /** @constant */
-                object: "kubernetes_cluster";
-                kubernetes_api_url?: string;
-                name: string;
-                kubernetes_namespace: string;
-                kubernetes_ca_cert?: string;
-              };
-              encrypted_token?: string;
-              nonce?: string;
-              ephemeral_pubkey?: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "ssh_credential";
+                  id: string;
+                  pubkey: string;
+                  username: string;
+                }
+              | {
+                  /** @constant */
+                  object: "k8s_credential";
+                  id: string;
+                  username?: string;
+                  label?: string;
+                  pubkey: string;
+                  cluster?: {
+                    /** @constant */
+                    object: "kubernetes_cluster";
+                    kubernetes_api_url?: string;
+                    name: string;
+                    kubernetes_namespace: string;
+                    kubernetes_ca_cert?: string;
+                  };
+                  encrypted_token?: string;
+                  nonce?: string;
+                  ephemeral_pubkey?: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
@@ -1993,45 +2014,51 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": {
-          pubkey: string;
-          username: string;
-          /** @constant */
-          object?: "ssh_credential";
-        } | {
-          username: string;
-          label?: string;
-          cluster: string;
-          /** @constant */
-          object: "k8s_credential";
-          pubkey: string;
-        };
-        "multipart/form-data": {
-          pubkey: string;
-          username: string;
-          /** @constant */
-          object?: "ssh_credential";
-        } | {
-          username: string;
-          label?: string;
-          cluster: string;
-          /** @constant */
-          object: "k8s_credential";
-          pubkey: string;
-        };
-        "text/plain": {
-          pubkey: string;
-          username: string;
-          /** @constant */
-          object?: "ssh_credential";
-        } | {
-          username: string;
-          label?: string;
-          cluster: string;
-          /** @constant */
-          object: "k8s_credential";
-          pubkey: string;
-        };
+        "application/json":
+          | {
+              pubkey: string;
+              username: string;
+              /** @constant */
+              object?: "ssh_credential";
+            }
+          | {
+              username: string;
+              label?: string;
+              cluster: string;
+              /** @constant */
+              object: "k8s_credential";
+              pubkey: string;
+            };
+        "multipart/form-data":
+          | {
+              pubkey: string;
+              username: string;
+              /** @constant */
+              object?: "ssh_credential";
+            }
+          | {
+              username: string;
+              label?: string;
+              cluster: string;
+              /** @constant */
+              object: "k8s_credential";
+              pubkey: string;
+            };
+        "text/plain":
+          | {
+              pubkey: string;
+              username: string;
+              /** @constant */
+              object?: "ssh_credential";
+            }
+          | {
+              username: string;
+              label?: string;
+              cluster: string;
+              /** @constant */
+              object: "k8s_credential";
+              pubkey: string;
+            };
       };
     };
     responses: {
@@ -2040,81 +2067,87 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @constant */
-            object: "ssh_credential";
-            id: string;
-            pubkey: string;
-            username: string;
-          } | {
-            /** @constant */
-            object: "k8s_credential";
-            id: string;
-            username?: string;
-            label?: string;
-            pubkey: string;
-            cluster?: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-            };
-            encrypted_token?: string;
-            nonce?: string;
-            ephemeral_pubkey?: string;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "ssh_credential";
-            id: string;
-            pubkey: string;
-            username: string;
-          } | {
-            /** @constant */
-            object: "k8s_credential";
-            id: string;
-            username?: string;
-            label?: string;
-            pubkey: string;
-            cluster?: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-            };
-            encrypted_token?: string;
-            nonce?: string;
-            ephemeral_pubkey?: string;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "ssh_credential";
-            id: string;
-            pubkey: string;
-            username: string;
-          } | {
-            /** @constant */
-            object: "k8s_credential";
-            id: string;
-            username?: string;
-            label?: string;
-            pubkey: string;
-            cluster?: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-            };
-            encrypted_token?: string;
-            nonce?: string;
-            ephemeral_pubkey?: string;
-          };
+          "application/json":
+            | {
+                /** @constant */
+                object: "ssh_credential";
+                id: string;
+                pubkey: string;
+                username: string;
+              }
+            | {
+                /** @constant */
+                object: "k8s_credential";
+                id: string;
+                username?: string;
+                label?: string;
+                pubkey: string;
+                cluster?: {
+                  /** @constant */
+                  object: "kubernetes_cluster";
+                  kubernetes_api_url?: string;
+                  name: string;
+                  kubernetes_namespace: string;
+                  kubernetes_ca_cert?: string;
+                };
+                encrypted_token?: string;
+                nonce?: string;
+                ephemeral_pubkey?: string;
+              };
+          "multipart/form-data":
+            | {
+                /** @constant */
+                object: "ssh_credential";
+                id: string;
+                pubkey: string;
+                username: string;
+              }
+            | {
+                /** @constant */
+                object: "k8s_credential";
+                id: string;
+                username?: string;
+                label?: string;
+                pubkey: string;
+                cluster?: {
+                  /** @constant */
+                  object: "kubernetes_cluster";
+                  kubernetes_api_url?: string;
+                  name: string;
+                  kubernetes_namespace: string;
+                  kubernetes_ca_cert?: string;
+                };
+                encrypted_token?: string;
+                nonce?: string;
+                ephemeral_pubkey?: string;
+              };
+          "text/plain":
+            | {
+                /** @constant */
+                object: "ssh_credential";
+                id: string;
+                pubkey: string;
+                username: string;
+              }
+            | {
+                /** @constant */
+                object: "k8s_credential";
+                id: string;
+                username?: string;
+                label?: string;
+                pubkey: string;
+                cluster?: {
+                  /** @constant */
+                  object: "kubernetes_cluster";
+                  kubernetes_api_url?: string;
+                  name: string;
+                  kubernetes_namespace: string;
+                  kubernetes_ca_cert?: string;
+                };
+                encrypted_token?: string;
+                nonce?: string;
+                ephemeral_pubkey?: string;
+              };
         };
       };
       401: {
@@ -2341,88 +2374,97 @@ export interface operations {
         };
         content: {
           "application/json": {
-            data: ({
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "active";
-              id: string;
-              /** Format: date-time */
-              created_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-              shape: {
-                intervals: string[];
-                quantities: number[];
-              };
-              colocate_with?: string[];
-              cluster_id?: string;
-            } | {
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "pending";
-              id: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "active";
+                  id: string;
+                  /** Format: date-time */
+                  created_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                  shape: {
+                    intervals: string[];
+                    quantities: number[];
+                  };
+                  colocate_with?: string[];
+                  cluster_id?: string;
+                }
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "pending";
+                  id: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "multipart/form-data": {
-            data: ({
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "active";
-              id: string;
-              /** Format: date-time */
-              created_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-              shape: {
-                intervals: string[];
-                quantities: number[];
-              };
-              colocate_with?: string[];
-              cluster_id?: string;
-            } | {
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "pending";
-              id: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "active";
+                  id: string;
+                  /** Format: date-time */
+                  created_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                  shape: {
+                    intervals: string[];
+                    quantities: number[];
+                  };
+                  colocate_with?: string[];
+                  cluster_id?: string;
+                }
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "pending";
+                  id: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
           };
           "text/plain": {
-            data: ({
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "active";
-              id: string;
-              /** Format: date-time */
-              created_at: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-              shape: {
-                intervals: string[];
-                quantities: number[];
-              };
-              colocate_with?: string[];
-              cluster_id?: string;
-            } | {
-              /** @constant */
-              object: "contract";
-              /** @constant */
-              status: "pending";
-              id: string;
-            })[];
+            data: (
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "active";
+                  id: string;
+                  /** Format: date-time */
+                  created_at: string;
+                  /** @description The instance type. */
+                  instance_type: string;
+                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                  shape: {
+                    intervals: string[];
+                    quantities: number[];
+                  };
+                  colocate_with?: string[];
+                  cluster_id?: string;
+                }
+              | {
+                  /** @constant */
+                  object: "contract";
+                  /** @constant */
+                  status: "pending";
+                  id: string;
+                }
+            )[];
             has_more: boolean;
             /** @constant */
             object: "list";
@@ -2512,78 +2554,84 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "active";
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-            shape: {
-              intervals: string[];
-              quantities: number[];
-            };
-            colocate_with?: string[];
-            cluster_id?: string;
-          } | {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "pending";
-            id: string;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "active";
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-            shape: {
-              intervals: string[];
-              quantities: number[];
-            };
-            colocate_with?: string[];
-            cluster_id?: string;
-          } | {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "pending";
-            id: string;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "active";
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-            shape: {
-              intervals: string[];
-              quantities: number[];
-            };
-            colocate_with?: string[];
-            cluster_id?: string;
-          } | {
-            /** @constant */
-            object: "contract";
-            /** @constant */
-            status: "pending";
-            id: string;
-          };
+          "application/json":
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "active";
+                id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** @description The instance type. */
+                instance_type: string;
+                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                shape: {
+                  intervals: string[];
+                  quantities: number[];
+                };
+                colocate_with?: string[];
+                cluster_id?: string;
+              }
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "pending";
+                id: string;
+              };
+          "multipart/form-data":
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "active";
+                id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** @description The instance type. */
+                instance_type: string;
+                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                shape: {
+                  intervals: string[];
+                  quantities: number[];
+                };
+                colocate_with?: string[];
+                cluster_id?: string;
+              }
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "pending";
+                id: string;
+              };
+          "text/plain":
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "active";
+                id: string;
+                /** Format: date-time */
+                created_at: string;
+                /** @description The instance type. */
+                instance_type: string;
+                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                shape: {
+                  intervals: string[];
+                  quantities: number[];
+                };
+                colocate_with?: string[];
+                cluster_id?: string;
+              }
+            | {
+                /** @constant */
+                object: "contract";
+                /** @constant */
+                status: "pending";
+                id: string;
+              };
         };
       };
       401: {

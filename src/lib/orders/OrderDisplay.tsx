@@ -1,22 +1,25 @@
-import { Box, Text } from "ink";
-import type { HydratedOrder } from "./types.ts";
-import { GPUS_PER_NODE } from "../constants.ts";
+import { Box, measureElement, Text, useInput } from "ink";
 import dayjs from "npm:dayjs@1.11.13";
-import { formatDuration } from "./index.tsx";
+import React, { useEffect } from "react";
+import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
-import React from "react";
+import { formatDuration } from "./index.tsx";
+import type { HydratedOrder } from "./types.ts";
 
 function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour = order.price * order.quantity /
-    GPUS_PER_NODE / durationInHours / 100;
+  const pricePerGPUHour =
+    (order.price * order.quantity) / GPUS_PER_NODE / durationInHours / 100;
   const durationFormatted = formatDuration(duration);
 
   let executedPricePerGPUHour;
   if (order.execution_price) {
-    executedPricePerGPUHour = order.execution_price * order.quantity /
-      GPUS_PER_NODE / durationInHours / 100;
+    executedPricePerGPUHour =
+      (order.execution_price * order.quantity) /
+      GPUS_PER_NODE /
+      durationInHours /
+      100;
   }
 
   return {
@@ -25,6 +28,9 @@ function orderDetails(order: HydratedOrder) {
     executedPricePerGPUHour,
   };
 }
+
+const formatDateTime = (date: string) =>
+  dayjs(date).format("MMM D h:mm a").toLowerCase();
 
 function Order(props: { order: HydratedOrder }) {
   const { pricePerGPUHour, durationFormatted } = orderDetails(props.order);
@@ -71,55 +77,88 @@ function Order(props: { order: HydratedOrder }) {
   );
 }
 
-function OrderMinimal(props: { order: HydratedOrder }) {
+function OrderMinimal(props: {
+  order: HydratedOrder;
+  activeTab: "all" | "sell" | "buy";
+}) {
   const { pricePerGPUHour, durationFormatted, executedPricePerGPUHour } =
     orderDetails(props.order);
 
   return (
     <Box gap={1}>
-      <Box width={6} gap={1}>
-        <Text color={props.order.side === "buy" ? "green" : "red"}>
-          {props.order.side === "buy" ? "↑" : "↓"}
-        </Text>
+      <Box width={6}>
         <Text color={props.order.side === "buy" ? "green" : "red"}>
           {props.order.side}
         </Text>
       </Box>
 
-      <Box width={24}>
+      <Box width={18}>
         <Text
           strikethrough={!!executedPricePerGPUHour}
           dimColor={!!executedPricePerGPUHour}
         >
-          ${pricePerGPUHour.toFixed(2)}/gpu/hr
+          ${pricePerGPUHour.toFixed(2)}
+          <Text dimColor>/gpu/hr</Text>
         </Text>
         {executedPricePerGPUHour && (
           <Text>${executedPricePerGPUHour.toFixed(2)}</Text>
         )}
       </Box>
-      <Box width={33}>
-        <Text>
-          {dayjs(props.order.start_at).format("MMM D h:mm a").toLowerCase()} →
-          {" "}
-          {dayjs(props.order.end_at).format("MMM D h:mm a").toLowerCase()}
-        </Text>
+      <Box width={34}>
+        <Text>{durationFormatted} </Text>
+        <Box flexDirection="row" gap={1}>
+          <Box>
+            <Text dimColor>{formatDateTime(props.order.start_at)}</Text>
+          </Box>
+          <Box alignItems="center">
+            <Text dimColor>→</Text>
+          </Box>
+          <Box alignItems="flex-end" justifyContent="flex-end">
+            <Text dimColor>
+              {dayjs(props.order.start_at).isSame(props.order.end_at, "day")
+                ? dayjs(props.order.end_at).format("h:mm a").toLowerCase()
+                : formatDateTime(props.order.end_at)}
+            </Text>
+          </Box>
+        </Box>
       </Box>
-      <Box width={7}>
-        <Text>{durationFormatted}</Text>
-      </Box>
-      <Box width={10}>
-        <Text dimColor>({props.order.status})</Text>
+      <Box width={6}>
+        <Text dimColor>{props.order.status}</Text>
       </Box>
       <Box>
-        <Text>{props.order.id}</Text>
+        <Text dimColor>{props.order.id}</Text>
       </Box>
     </Box>
   );
 }
 
-export function OrderDisplay(
-  props: { orders: HydratedOrder[]; expanded?: boolean },
-) {
+const NUMBER_OF_ORDERS_TO_DISPLAY = 20;
+
+export function OrderDisplay(props: {
+  orders: HydratedOrder[];
+  expanded?: boolean;
+}) {
+  const [activeTab, setActiveTab] = React.useState<"all" | "sell" | "buy">(
+    "all"
+  );
+
+  useInput((input, key) => {
+    if (key.escape || input === "q") {
+      process.exit(0);
+    }
+    if (input === "a") {
+      setActiveTab("all");
+    }
+
+    if (input === "s") {
+      setActiveTab("sell");
+    }
+
+    if (input === "b") {
+      setActiveTab("buy");
+    }
+  });
+
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
@@ -138,9 +177,263 @@ export function OrderDisplay(
     );
   }
 
-  return props.orders.map((order) => {
-    return props.expanded
-      ? <Order order={order} key={order.id} />
-      : <OrderMinimal order={order} key={order.id} />;
+  const orders =
+    activeTab === "all"
+      ? props.orders
+      : props.orders.filter(order => order.side === activeTab);
+
+  const { sellOrdersCount, buyOrdersCount } = React.useMemo(() => {
+    return {
+      sellOrdersCount: props.orders.filter(order => order.side === "sell")
+        .length,
+      buyOrdersCount: props.orders.filter(order => order.side === "buy").length,
+    };
+  }, [props.orders]);
+
+  return (
+    <>
+      <ScrollArea
+        height={NUMBER_OF_ORDERS_TO_DISPLAY}
+        orders={orders}
+        activeTab={activeTab}
+        sellOrdersCount={sellOrdersCount}
+        buyOrdersCount={buyOrdersCount}
+      >
+        {orders.map(order => {
+          return props.expanded ? (
+            <Order order={order} key={order.id} />
+          ) : (
+            <OrderMinimal order={order} key={order.id} activeTab={activeTab} />
+          );
+        })}
+
+        {orders.length === 0 && (
+          <Box>
+            <Text>
+              There are 0 outstanding {activeTab === "all" ? "" : activeTab}{" "}
+              orders right now.
+            </Text>
+          </Box>
+        )}
+      </ScrollArea>
+    </>
+  );
+}
+
+interface ScrollState {
+  innerHeight: number;
+  height: number;
+  scrollTop: number;
+}
+
+type ScrollAction =
+  | { type: "SET_INNER_HEIGHT"; innerHeight: number }
+  | { type: "SCROLL_DOWN" }
+  | { type: "SCROLL_DOWN_BULK" }
+  | { type: "SCROLL_UP" }
+  | { type: "SCROLL_UP_BULK" }
+  | { type: "SCROLL_TO_TOP" }
+  | { type: "SCROLL_TO_BOTTOM" }
+  | { type: "SWITCHED_TAB" };
+
+const reducer = (state: ScrollState, action: ScrollAction): ScrollState => {
+  switch (action.type) {
+    case "SET_INNER_HEIGHT":
+      return {
+        ...state,
+        innerHeight: action.innerHeight,
+      };
+
+    case "SCROLL_DOWN":
+      return {
+        ...state,
+        scrollTop: Math.min(
+          state.innerHeight - state.height,
+          state.scrollTop + 1
+        ),
+      };
+
+    case "SCROLL_DOWN_BULK":
+      return {
+        ...state,
+        scrollTop: Math.min(
+          state.innerHeight - state.height,
+          state.scrollTop + NUMBER_OF_ORDERS_TO_DISPLAY
+        ),
+      };
+
+    case "SCROLL_UP":
+      return {
+        ...state,
+        scrollTop: Math.max(0, state.scrollTop - 1),
+      };
+
+    case "SCROLL_UP_BULK":
+      return {
+        ...state,
+        scrollTop: Math.max(0, state.scrollTop - NUMBER_OF_ORDERS_TO_DISPLAY),
+      };
+
+    case "SCROLL_TO_TOP":
+      return {
+        ...state,
+        scrollTop: 0,
+      };
+
+    case "SCROLL_TO_BOTTOM":
+      return {
+        ...state,
+        scrollTop: state.innerHeight - state.height,
+      };
+
+    case "SWITCHED_TAB": {
+      return {
+        ...state,
+        scrollTop: 0,
+      };
+    }
+
+    default:
+      return state;
+  }
+};
+
+export function ScrollArea({
+  height,
+  children,
+  orders,
+  activeTab,
+  sellOrdersCount,
+  buyOrdersCount,
+}: {
+  height: number;
+  children: React.ReactNode;
+  orders: HydratedOrder[];
+  activeTab: "all" | "sell" | "buy";
+  sellOrdersCount: number;
+  buyOrdersCount: number;
+}) {
+  const [state, dispatch] = React.useReducer<
+    React.Reducer<ScrollState, ScrollAction>
+  >(reducer, {
+    height,
+    scrollTop: 0,
+    innerHeight: 0,
   });
+
+  const innerRef = React.useRef(null);
+  const canScrollUp = state.scrollTop > 0 && orders.length > 0;
+  const numberOfOrdersAboveScrollArea = state.scrollTop;
+  const dateRangeAboveScrollArea =
+    orders.length > 0
+      ? `${formatDateTime(orders[0].start_at)} → ${formatDateTime(orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0")}`
+      : "";
+  const numberOfOrdersBelowScrollArea =
+    orders.length - (state.scrollTop + state.height);
+  const dateRangeBelowScrollArea =
+    orders.length > 0
+      ? `${formatDateTime(orders[state.scrollTop + state.height]?.start_at || "0")} → ${formatDateTime(orders[orders.length - 1].end_at)}`
+      : "";
+  const canScrollDown =
+    state.scrollTop + state.height < state.innerHeight &&
+    numberOfOrdersBelowScrollArea >= 0;
+
+  useEffect(() => {
+    if (!innerRef.current) {
+      return;
+    }
+
+    const dimensions = measureElement(innerRef.current);
+
+    dispatch({
+      type: "SET_INNER_HEIGHT",
+      innerHeight: dimensions.height,
+    });
+  }, []);
+
+  useEffect(() => {
+    dispatch({ type: "SWITCHED_TAB" });
+  }, [activeTab]);
+
+  useInput((input, key) => {
+    if (key.downArrow || input === "j") {
+      dispatch({
+        type: "SCROLL_DOWN",
+      });
+    }
+
+    if (key.upArrow || input === "k") {
+      dispatch({
+        type: "SCROLL_UP",
+      });
+    }
+
+    if (input === "u") {
+      dispatch({
+        type: "SCROLL_UP_BULK",
+      });
+    }
+
+    if (input === "d") {
+      dispatch({
+        type: "SCROLL_DOWN_BULK",
+      });
+    }
+
+    if (input === "g") {
+      dispatch({
+        type: "SCROLL_TO_TOP",
+      });
+    }
+
+    if (input === "G") {
+      dispatch({
+        type: "SCROLL_TO_BOTTOM",
+      });
+    }
+  });
+
+  return (
+    <Box flexDirection="column" gap={0}>
+      <Box flexDirection="column">
+        <Box justifyContent="space-between">
+          <Text dimColor>
+            {canScrollUp
+              ? `↑ ${numberOfOrdersAboveScrollArea.toLocaleString()} more (${dateRangeAboveScrollArea})`
+              : " "}
+          </Text>
+          <Box gap={2}>
+            <Text color={activeTab === "all" ? "cyan" : "white"}>
+              [a]ll <Text dimColor>{sellOrdersCount + buyOrdersCount}</Text>
+            </Text>
+            <Text color={activeTab === "sell" ? "cyan" : "white"}>
+              [s]ell <Text dimColor>{sellOrdersCount}</Text>
+            </Text>
+            <Text color={activeTab === "buy" ? "cyan" : "white"}>
+              [b]uy <Text dimColor>{buyOrdersCount}</Text>
+            </Text>
+          </Box>
+        </Box>
+
+        <Box height={height} flexDirection="column" overflow="hidden">
+          <Box
+            ref={innerRef}
+            flexShrink={0}
+            flexDirection="column"
+            marginTop={-state.scrollTop}
+          >
+            {children}
+          </Box>
+        </Box>
+
+        <Box>
+          <Text dimColor>
+            {canScrollDown
+              ? `↓ ${numberOfOrdersBelowScrollArea.toLocaleString()} more (${dateRangeBelowScrollArea})`
+              : " "}
+          </Text>
+        </Box>
+      </Box>
+    </Box>
+  );
 }

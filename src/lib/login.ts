@@ -29,7 +29,7 @@ export function registerLogin(program: Command) {
       clearScreen();
       console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
       console.log(
-        `  Do these numbers match your browser window?\n  ${validation}\n\n`,
+        `  Do these numbers match your browser window?\n  ${validation}\n\n`
       );
 
       const checkSession = async () => {
@@ -47,11 +47,7 @@ export function registerLogin(program: Command) {
     });
 }
 
-async function createSession({
-  validation,
-}: {
-  validation: string;
-}) {
+async function createSession({ validation }: { validation: string }) {
   const url = await getWebAppUrl("cli_session_create");
 
   try {
@@ -63,7 +59,7 @@ async function createSession({
           "Content-Type": "application/json",
         },
         maxRedirects: 5,
-      },
+      }
     );
 
     return response.data as {
@@ -76,11 +72,7 @@ async function createSession({
   }
 }
 
-async function getSession({
-  token,
-}: {
-  token: string;
-}) {
+async function getSession({ token }: { token: string }) {
   try {
     const url = await getWebAppUrl("cli_session_get", { token });
     const response = await axios.get(url, {

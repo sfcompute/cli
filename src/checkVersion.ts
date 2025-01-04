@@ -6,7 +6,7 @@ import semver from "semver";
 async function checkProductionCLIVersion() {
   try {
     const response = await fetch(
-      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json",
+      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json"
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,7 +39,7 @@ Run 'sf upgrade' to update to the latest version
           padding: 1,
           borderColor: "yellow",
           borderStyle: "round",
-        }),
+        })
       );
     }
   }

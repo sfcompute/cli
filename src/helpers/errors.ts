@@ -20,7 +20,7 @@ export async function logSessionTokenExpiredAndQuit(): Promise<never> {
 
 export function failedToConnect(): never {
   logAndQuit(
-    "Failed to connect to the server. Please check your internet connection and try again.",
+    "Failed to connect to the server. Please check your internet connection and try again."
   );
 }
 

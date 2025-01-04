@@ -22,9 +22,12 @@ const ConfirmInput: React.FC<ConfirmInputProps> = ({
   value = "",
   ...props
 }) => {
-  const handleSubmit = useCallback((newValue: string) => {
-    onSubmit(yn(newValue, { default: isChecked }));
-  }, [isChecked, onSubmit]);
+  const handleSubmit = useCallback(
+    (newValue: string) => {
+      onSubmit(yn(newValue, { default: isChecked }));
+    },
+    [isChecked, onSubmit]
+  );
 
   return (
     <TextInput

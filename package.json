@@ -3,7 +3,8 @@
     "devv": "IS_DEVELOPMENT_CLI_ENV=true deno run --allow-all src/index.ts",
     "release": "deno run --allow-all src/scripts/release.ts",
     "prod": "deno run --allow-all src/index.ts",
-    "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts"
+    "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts",
+    "lint": "prettier --write ."
   },
   "dependencies": {
     "@inquirer/prompts": "^5.1.2",
@@ -26,6 +27,7 @@
     "openapi-fetch": "^0.11.1",
     "ora": "^8.1.0",
     "parse-duration": "^1.1.0",
+    "prettier": "^3.4.2",
     "react": "^18.3.1",
     "semver": "^7.6.3",
     "tiny-invariant": "^1.3.3",
@@ -40,5 +42,5 @@
   "peerDependencies": {
     "typescript": "^5.6.2"
   },
-  "version": "0.1.10"
+  "version": "0.1.13"
 }
