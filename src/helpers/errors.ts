@@ -6,16 +6,18 @@ export function logAndQuit(message: string): never {
   process.exit(1);
 }
 
-export function logLoginMessageAndQuit(): never {
-  const base = getCommandBase();
-  const loginCommand = `${base} login`;
+const base = getCommandBase();
+const loginCommand = `${base} login`;
 
+export function logLoginMessageAndQuit(): never {
   logAndQuit(`You need to login first.\n\n\t$ ${loginCommand}\n`);
 }
 
 export async function logSessionTokenExpiredAndQuit(): Promise<never> {
   await clearAuthFromConfig();
-  logAndQuit("\nYour session has expired. Please login again.");
+  logAndQuit(
+    `\nYour session has expired. Please login again.\n\n\t$ ${loginCommand}\n`
+  );
 }
 
 export function failedToConnect(): never {

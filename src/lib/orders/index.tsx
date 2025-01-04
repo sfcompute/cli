@@ -247,7 +247,12 @@ export async function getOrders(props: {
   });
 
   if (!response.ok) {
-    logAndQuit(`Failed to fetch orders: ${response.statusText}`);
+    switch (response.status) {
+      case 401:
+        return await logSessionTokenExpiredAndQuit();
+      default:
+        return logAndQuit(`Failed to fetch orders: ${response.statusText}`);
+    }
   }
 
   const resp = (await response.json()) as ListResponseBody<HydratedOrder>;
