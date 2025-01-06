@@ -158,6 +158,9 @@ export function registerOrders(program: Command) {
 
         limit: options.limit,
         offset: options.offset,
+
+        sort_by: "start_time",
+        sort_direction: "ASC",
       });
 
       // Sort orders by start time ascending (present to future)
@@ -223,6 +226,9 @@ export async function getOrders(props: {
 
   limit?: number;
   offset?: number;
+
+  sort_by?: "created_at" | "start_time";
+  sort_direction?: "ASC" | "DESC";
 }) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
