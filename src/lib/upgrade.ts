@@ -1,6 +1,28 @@
 import type { Command } from "commander";
 import ora from "ora";
 
+/**
+ * Returns true if the current version is the same as the latest release version.
+ */
+const getIsOnLatestVersion = async (currentVersion: string | undefined) => {
+  if (!currentVersion) {
+    return false;
+  }
+
+  const latestVersionUrl =
+    "https://api.github.com/repos/sfcompute/cli/releases/latest";
+  const latestVersionResponse = await fetch(latestVersionUrl);
+
+  if (latestVersionResponse.ok) {
+    const latestVersionData = await latestVersionResponse.json();
+    const latestVersion = latestVersionData.tag_name;
+
+    return latestVersion === currentVersion;
+  }
+
+  return false;
+};
+
 export function registerUpgrade(program: Command) {
   return program
     .command("upgrade")
@@ -8,6 +30,7 @@ export function registerUpgrade(program: Command) {
     .description("Upgrade to the latest version or a specific version")
     .action(async version => {
       const spinner = ora();
+      const currentVersion = program.version();
 
       if (version) {
         spinner.start(`Checking if version ${version} exists`);
@@ -19,6 +42,20 @@ export function registerUpgrade(program: Command) {
           process.exit(1);
         }
         spinner.succeed();
+      }
+
+      // Check if user has already installed latest version.
+      if (version === currentVersion) {
+        spinner.succeed(`You are already on version ${currentVersion}.`);
+        process.exit(0);
+      }
+
+      const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
+      if (isOnLatestVersion) {
+        spinner.succeed(
+          `You are already on the latest version (${currentVersion}).`
+        );
+        process.exit(0);
       }
 
       // Fetch the install script
