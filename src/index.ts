@@ -91,9 +91,13 @@ const main = async () => {
           const key = arg.slice(2);
           const nextArg = arr[i + 1];
           if (nextArg && !nextArg.startsWith("-")) {
-            acc[key] = isNaN(Number(nextArg)) ? nextArg : Number(nextArg);
+            (acc as Record<string, string | number | boolean>)[key] = isNaN(
+              Number(nextArg)
+            )
+              ? nextArg
+              : Number(nextArg);
           } else {
-            acc[key] = true;
+            (acc as Record<string, boolean>)[key] = true;
           }
         }
         return acc;
