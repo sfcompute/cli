@@ -20,8 +20,6 @@ export const IS_TRACKING_DISABLED =
   process.env.SF_CLI_TELEMETRY_OPTOUT === "1" ||
   process.env.SF_CLI_TELEMETRY_OPTOUT === "true";
 
-const commandDataMap = new Map<Command, { startTime: number }>();
-
 export function setupCliTracking(program: Command) {
   const startTime = Date.now();
   // Track at program level to ensure we catch every CLI invocation
