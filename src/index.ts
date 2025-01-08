@@ -80,7 +80,6 @@ const main = async () => {
       }
 
       if (isError) {
-        console.log(error);
       }
       process.exit(isError ? 1 : 0);
     });
