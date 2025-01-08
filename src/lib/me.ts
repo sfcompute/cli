@@ -1,10 +1,10 @@
 import type { Command } from "commander";
+import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import {
+  logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { isLoggedIn, loadConfig } from "../helpers/config.ts";
-import { logAndQuit } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 
 export function registerMe(program: Command) {
@@ -12,7 +12,7 @@ export function registerMe(program: Command) {
     const accountId = await getLoggedInAccountId();
     console.log(accountId);
 
-    process.exit(0);
+    // process.exit(0);
   });
 }
 

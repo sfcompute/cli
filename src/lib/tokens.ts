@@ -1,5 +1,4 @@
-import { input, select } from "@inquirer/prompts";
-import { confirm } from "@inquirer/prompts";
+import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { Command } from "commander";
@@ -176,7 +175,7 @@ async function createTokenAction() {
   console.log(`${chalk.gray("And other commands you can try:")}`);
   console.log(table.toString());
 
-  process.exit(0);
+  // process.exit(0);
 }
 
 // --
@@ -232,7 +231,7 @@ async function listTokensAction() {
         chalk.magenta(`${base} tokens create`)
     );
 
-    process.exit(0);
+    // process.exit(0);
   }
 
   // display table
@@ -255,7 +254,7 @@ async function listTokensAction() {
   }
   console.log(tokensTable.toString());
 
-  process.exit(0);
+  // process.exit(0);
 }
 
 function formatDate(isoString: string): string {
@@ -287,7 +286,7 @@ async function deleteTokenAction({
     default: false,
   });
   if (!deleteTokenConfirmed) {
-    process.exit(0);
+    // process.exit(0);
   } else {
     const verySureConfirmed = await confirm({
       message:
@@ -296,7 +295,7 @@ async function deleteTokenAction({
     });
 
     if (!verySureConfirmed) {
-      process.exit(0);
+      // process.exit(0);
     } else {
       await deleteTokenById(id);
     }
@@ -333,5 +332,5 @@ async function deleteTokenById(id: string) {
   loadingSpinner.stop();
   console.log(chalk.gray("Token deleted. 🧼"));
 
-  process.exit(0);
+  // process.exit(0);
 }

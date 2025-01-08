@@ -1,5 +1,5 @@
-import { exec } from "node:child_process";
 import type { Command } from "commander";
+import { exec } from "node:child_process";
 import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";
@@ -88,7 +88,6 @@ async function getSession({ token }: { token: string }) {
   } catch (error) {
     console.error("Error getting session:", error);
     process.exit(1);
-    return null;
   }
 }
 

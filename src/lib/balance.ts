@@ -62,8 +62,6 @@ export function registerBalance(program: Command) {
 
         console.log(table.toString() + "\n");
       }
-
-      process.exit(0);
     });
 }
 
@@ -75,11 +73,6 @@ export async function getBalance(): Promise<BalanceUsdCents> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
-
-    return {
-      available: { cents: 0, whole: 0 },
-      reserved: { cents: 0, whole: 0 },
-    };
   }
   const client = await apiClient();
 
