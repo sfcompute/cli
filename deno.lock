@@ -26,6 +26,7 @@
     "npm:openapi-fetch@~0.11.1": "0.11.3",
     "npm:ora@^8.1.0": "8.1.1",
     "npm:parse-duration@^1.1.0": "1.1.0",
+    "npm:posthog-node@^4.3.2": "4.3.2",
     "npm:prettier@^3.4.2": "3.4.2",
     "npm:react@^18.3.1": "18.3.1",
     "npm:semver@^7.6.3": "7.6.3",
@@ -752,6 +753,13 @@
     "patch-console@2.0.0": {
       "integrity": "sha512-0YNdUceMdaQwoKce1gatDScmMo5pu/tfABfnzEqeG0gtTmd7mh/WcwgUjtAeOU7N8nFFlbQBnFK2gXW5fGvmMA=="
     },
+    "posthog-node@4.3.2": {
+      "integrity": "sha512-vy8Mt9IEfniUgqQ1rOCQ31CBO1VNqDGd3ZtHlWR9/YfU6RiuK+9pUXPb4h6HTGzQmjL8NFnjd8K8NMXSX8S6MQ==",
+      "dependencies": [
+        "axios",
+        "rusha"
+      ]
+    },
     "prettier@3.4.2": {
       "integrity": "sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ=="
     },
@@ -831,6 +839,9 @@
     },
     "run-async@3.0.0": {
       "integrity": "sha512-540WwVDOMxA6dN6We19EcT9sc3hkXPw5mzRNGM3FkdN/vtE9NFvj5lFAPNwUDmJjXidm3v7TC1cTE7t17Ulm1Q=="
+    },
+    "rusha@0.8.14": {
+      "integrity": "sha512-cLgakCUf6PedEu15t8kbsjnwIFFR2D4RfL+W3iWFJ4iac7z4B0ZI8fxy4R3J956kAI68HclCFGL8MPoUVC3qVA=="
     },
     "rxjs@7.8.1": {
       "integrity": "sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==",
@@ -1075,6 +1086,7 @@
         "npm:openapi-fetch@~0.11.1",
         "npm:ora@^8.1.0",
         "npm:parse-duration@^1.1.0",
+        "npm:posthog-node@^4.3.2",
         "npm:prettier@^3.4.2",
         "npm:react@^18.3.1",
         "npm:semver@^7.6.3",
