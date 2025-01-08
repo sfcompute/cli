@@ -173,5 +173,5 @@ async function placeSellOrder(options: {
   }
 
   await waitForOrderToNotBePending(data.id);
-  process.exit(0);
+  // process.exit(0);
 }

@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { render } from "ink";
+import React from "react";
 import { apiClient } from "../../apiClient.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
 import {
@@ -7,10 +9,7 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { ContractList } from "./ContractDisplay.tsx";
-import { render } from "ink";
 import type { Contract } from "./types.ts";
-import dayjs from "npm:dayjs@1.11.13";
-import React from "react";
 
 export function registerContracts(program: Command) {
   program
@@ -31,7 +30,7 @@ export function registerContracts(program: Command) {
 
             render(<ContractList contracts={data} />);
           }
-          process.exit(0);
+          // process.exit(0);
         })
     );
 }

@@ -7,6 +7,7 @@ export interface Config {
   api_url: string;
   webapp_url: string;
   auth_token?: string;
+  account_id?: string;
 }
 
 const ProductionConfigDefaults = {
@@ -56,6 +57,7 @@ export async function clearAuthFromConfig() {
   await saveConfig({
     ...config,
     auth_token: undefined,
+    account_id: undefined,
   });
 }
 

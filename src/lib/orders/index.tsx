@@ -172,15 +172,8 @@ export function registerOrders(program: Command) {
 
       if (options.json) {
         console.log(JSON.stringify(sortedOrders, null, 2));
-        process.exit(0);
       } else {
         render(<OrderDisplay orders={sortedOrders} />);
-
-        // Automatically exit the process if there are no orders
-        // Otherwise leave the process running so the user can interact (scroll) to see the orders
-        if (sortedOrders.length === 0) {
-          process.exit(0);
-        }
       }
     });
 
@@ -307,5 +300,5 @@ export async function submitOrderCancellationByIdAction(
 
   // cancellation submitted successfully
   console.log(`Cancellation for Order ${orderId} submitted.`);
-  process.exit(0);
+  // process.exit(0);
 }

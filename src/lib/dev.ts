@@ -34,7 +34,7 @@ export function registerDev(program: Command) {
         chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A"))
       );
 
-      process.exit(0);
+      // process.exit(0);
     });
 
     // connection
@@ -42,7 +42,7 @@ export function registerDev(program: Command) {
       const data = await pingServer();
       console.log(data);
 
-      process.exit(0);
+      // process.exit(0);
     });
   }
 }
@@ -82,7 +82,7 @@ function registerConfig(program: Command) {
 async function showConfigAction() {
   const config = await loadConfig();
   console.log(config);
-  process.exit(0);
+  // process.exit(0);
 }
 
 async function removeConfigAction() {
@@ -93,7 +93,7 @@ async function removeConfigAction() {
   if (confirmedYes) {
     await deleteConfig();
   }
-  process.exit(0);
+  // process.exit(0);
 }
 
 // --
@@ -119,7 +119,7 @@ function registerEpoch(program: Command) {
         });
       }
 
-      process.exit(0);
+      // process.exit(0);
     });
 
   epochCmd
@@ -128,7 +128,7 @@ function registerEpoch(program: Command) {
     .action(async () => {
       const epoch = currentEpoch();
       console.log(epoch);
-      process.exit(0);
+      // process.exit(0);
     });
 }
 
