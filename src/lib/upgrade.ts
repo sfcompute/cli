@@ -47,7 +47,7 @@ export function registerUpgrade(program: Command) {
       // Check if user has already installed latest version.
       if (version === currentVersion) {
         spinner.succeed(`You are already on version ${currentVersion}.`);
-        // process.exit(0);
+        return;
       }
 
       const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
@@ -55,7 +55,7 @@ export function registerUpgrade(program: Command) {
         spinner.succeed(
           `You are already on the latest version (${currentVersion}).`
         );
-        // process.exit(0);
+        return;
       }
 
       // Fetch the install script
@@ -96,6 +96,6 @@ export function registerUpgrade(program: Command) {
       }
 
       spinner.succeed("Upgrade completed successfully");
-      // process.exit(0);
+      return;
     });
 }
