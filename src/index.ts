@@ -14,7 +14,7 @@ import { registerDev } from "./lib/dev.ts";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
 import { registerOrders } from "./lib/orders/index.tsx";
-import { IS_TRACKING_DISABLED, postHogClient } from "./lib/posthog.ts";
+import { IS_TRACKING_DISABLED, analytics } from "./lib/posthog.ts";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerScale } from "./lib/updown.tsx";
@@ -102,9 +102,8 @@ const main = async () => {
         return acc;
       }, {});
 
-      postHogClient.capture({
-        distinctId: exchangeAccountId,
-        event: `cli_sf_${process.argv[2] || "unknown"}${process.argv[3] ? "_" + process.argv[3] : ""}`,
+      analytics.track({
+        event: `${process.argv[2] || "unknown"}${process.argv[3] ? "_" + process.argv[3] : ""}`,
         properties: {
           ...args,
           shell: process.env.SHELL,
@@ -116,11 +115,11 @@ const main = async () => {
     }
 
     try {
-      await postHogClient.shutdown();
+      await analytics.shutdown();
       const c = program.parse(process.argv);
     } catch (err) {
       console.log(err);
-      await postHogClient.shutdown();
+      await analytics.shutdown();
       process.exit(1);
     }
   }
