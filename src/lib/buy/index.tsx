@@ -351,8 +351,29 @@ function BuyOrder(props: BuyOrderProps) {
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
+      const endsAt = roundEndDate(props.endsAt);
+      const startAt =
+        props.startAt === "NOW"
+          ? parseStartAsDate(props.startAt)
+          : props.startAt;
+      const realDurationInHours =
+        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+      const totalPriceInCents = getTotalPrice(
+        props.price,
+        props.size,
+        realDurationInHours
+      );
+
       analytics.track({
         event: "buy_order_quoted",
+        properties: {
+          price: totalPriceInCents,
+          startsAt: startAt,
+          endsAt: endsAt.toDate(),
+          numberNodes: props.size,
+          instanceType: props.type,
+          duration: realDurationInHours,
+        },
       });
       if (submitValue === false) {
         setIsLoading(false);
@@ -360,6 +381,14 @@ function BuyOrder(props: BuyOrderProps) {
         setTimeout(() => {
           analytics.track({
             event: "buy_order_quoted_rejected",
+            properties: {
+              price: totalPriceInCents,
+              startsAt: startAt,
+              endsAt: endsAt.toDate(),
+              numberNodes: props.size,
+              instanceType: props.type,
+              duration: realDurationInHours,
+            },
           });
           exit();
         }, 0);
@@ -368,6 +397,14 @@ function BuyOrder(props: BuyOrderProps) {
 
       analytics.track({
         event: "buy_order_quoted_accepted",
+        properties: {
+          price: totalPriceInCents,
+          startsAt: startAt,
+          endsAt: endsAt.toDate(),
+          numberNodes: props.size,
+          instanceType: props.type,
+          duration: realDurationInHours,
+        },
       });
       submitOrder();
     },

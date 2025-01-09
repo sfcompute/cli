@@ -76,7 +76,9 @@ const trackEvent = ({
     }
   };
 
-  runner();
+  if (!IS_TRACKING_DISABLED) {
+    runner();
+  }
 };
 
 export const analytics = {
