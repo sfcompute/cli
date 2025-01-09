@@ -1,27 +1,26 @@
+import { parseDate } from "chrono-node";
 import type { Command } from "commander";
+import { Box, Text, render, useApp } from "ink";
+import Spinner from "ink-spinner";
+import ms from "ms";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import parseDurationFromLibrary from "parse-duration";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { roundStartDate } from "../../helpers/units.ts";
-import parseDurationFromLibrary from "parse-duration";
-import { Box, render, useApp } from "ink";
-import { parseDate } from "chrono-node";
-import { GPUS_PER_NODE } from "../constants.ts";
+import ConfirmInput from "../ConfirmInput.tsx";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Text } from "ink";
-import ConfirmInput from "../ConfirmInput.tsx";
-import React from "react";
 import { Row } from "../Row.tsx";
-import ms from "ms";
-import Spinner from "ink-spinner";
-import invariant from "tiny-invariant";
+import { GPUS_PER_NODE } from "../constants.ts";
+import { analytics } from "../posthog.ts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -352,15 +351,61 @@ function BuyOrder(props: BuyOrderProps) {
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
+      const endsAt = roundEndDate(props.endsAt);
+      const startAt =
+        props.startAt === "NOW"
+          ? parseStartAsDate(props.startAt)
+          : props.startAt;
+      const realDurationInHours =
+        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+      const totalPriceInCents = getTotalPrice(
+        props.price,
+        props.size,
+        realDurationInHours
+      );
+
+      analytics.track({
+        event: "buy_order_quoted",
+        properties: {
+          price: totalPriceInCents,
+          startsAt: startAt,
+          endsAt: endsAt.toDate(),
+          numberNodes: props.size,
+          instanceType: props.type,
+          duration: realDurationInHours,
+        },
+      });
       if (submitValue === false) {
         setIsLoading(false);
         setResultMessage("Order not placed, use 'y' to confirm");
         setTimeout(() => {
+          analytics.track({
+            event: "buy_order_quoted_rejected",
+            properties: {
+              price: totalPriceInCents,
+              startsAt: startAt,
+              endsAt: endsAt.toDate(),
+              numberNodes: props.size,
+              instanceType: props.type,
+              duration: realDurationInHours,
+            },
+          });
           exit();
         }, 0);
         return;
       }
 
+      analytics.track({
+        event: "buy_order_quoted_accepted",
+        properties: {
+          price: totalPriceInCents,
+          startsAt: startAt,
+          endsAt: endsAt.toDate(),
+          numberNodes: props.size,
+          instanceType: props.type,
+          duration: realDurationInHours,
+        },
+      });
       submitOrder();
     },
     [exit, setIsLoading]
