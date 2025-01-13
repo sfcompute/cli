@@ -212,7 +212,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       </Box>
     </Box>
   ) : (
-    <BuyOrder {...orderProps} />
+    <BuyOrder {...orderProps} yes={props.options.yes} />
   );
 }
 
@@ -314,6 +314,7 @@ type BuyOrderProps = {
   endsAt: Date;
   type: string;
   colocate?: Array<string>;
+  yes?: boolean;
 };
 function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -448,11 +449,17 @@ function BuyOrder(props: BuyOrderProps) {
     };
   }, [isLoading, order, exit, setOrder]);
 
+  useEffect(() => {
+    if (!isLoading && props.yes) {
+      submitOrder();
+    }
+  }, [isLoading, props.yes]);
+
   return (
     <Box gap={1} flexDirection="column">
       <BuyOrderPreview {...props} />
 
-      {!isLoading && (
+      {!isLoading && !props.yes && (
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
