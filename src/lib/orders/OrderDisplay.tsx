@@ -1,8 +1,8 @@
-import { Box, measureElement, Text, useInput } from "ink";
+import { Box, Text, measureElement, useInput } from "ink";
 import dayjs from "npm:dayjs@1.11.13";
 import React, { useEffect } from "react";
-import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "./index.tsx";
 import type { HydratedOrder } from "./types.ts";
 
@@ -104,7 +104,7 @@ function OrderMinimal(props: {
           <Text>${executedPricePerGPUHour.toFixed(2)}</Text>
         )}
       </Box>
-      <Box width={34}>
+      <Box width={38}>
         <Text>{durationFormatted} </Text>
         <Box flexDirection="row" gap={1}>
           <Box>
