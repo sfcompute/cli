@@ -129,7 +129,7 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
       }
       setQuote(quote);
     })();
-  }, [props.options]);
+  }, []);
 
   return isLoading ? (
     <Box gap={1}>
@@ -172,8 +172,6 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
   // submit a quote request, handle loading state
   useEffect(() => {
     (async () => {
-      const quote = await getQuoteFromParsedSfBuyOptions(props.options);
-
       // Grab the price per GPU hour, either
       let pricePerGpuHour: number | null = parsePricePerGpuHour(
         props.options.price
@@ -230,7 +228,7 @@ function roundEndDate(endDate: Date) {
   return dayjs(endDate).add(1, "hour").startOf("hour");
 }
 
-function getTotalPrice(
+export function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
   durationInHours: number
@@ -297,7 +295,7 @@ function BuyOrderPreview(props: {
       <Row
         headWidth={7}
         head="rate"
-        value={`$${(props.price / 100).toFixed(2)}/gpu/hr`}
+        value={`~$${(props.price / 100).toFixed(2)}/gpu/hr`}
       />
       <Row headWidth={7} head="total" value={`$${totalPrice.toFixed(2)}`} />
     </Box>
@@ -567,7 +565,7 @@ export async function placeBuyOrder(options: {
   return data;
 }
 
-function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
+export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
     parseStartAsDate(quote.start_at)
   );

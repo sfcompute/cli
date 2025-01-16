@@ -3,6 +3,8 @@ import { Row } from "./Row.tsx";
 import dayjs from "dayjs";
 import { GPUS_PER_NODE } from "./constants.ts";
 import React from "react";
+import { getPricePerGpuHourFromQuote, getTotalPrice } from "./buy/index.tsx";
+import ms from "ms";
 
 export default function QuoteDisplay(props: { quote: Quote }) {
   if (!props.quote) {
@@ -21,27 +23,17 @@ export default function QuoteDisplay(props: { quote: Quote }) {
     );
   }
 
-  const durationSeconds = dayjs(props.quote.end_at).diff(
-    dayjs(props.quote.start_at),
-    "seconds"
-  );
-  const durationHours = durationSeconds / 3600;
-  const pricePerHour =
-    props.quote.price /
-    durationHours /
-    GPUS_PER_NODE /
-    props.quote.quantity /
-    100;
-  const priceTotal = props.quote.price / 100;
+  const pricePerGpuHourCents = getPricePerGpuHourFromQuote(props.quote);
+  const totalPrice = props.quote.price / 100;
 
   return (
     <Box flexDirection="column" paddingBottom={1}>
       <Row
         headWidth={10}
         head="rate"
-        value={`$${pricePerHour.toFixed(2)}/gpu/hr`}
+        value={`~$${(pricePerGpuHourCents / 100).toFixed(2)}/gpu/hr`}
       />
-      <Row headWidth={10} head="total" value={`$${priceTotal.toFixed(2)}`} />
+      <Row headWidth={10} head="total" value={`$${totalPrice.toFixed(2)}`} />
     </Box>
   );
 }
