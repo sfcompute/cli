@@ -597,8 +597,7 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
     1,
     durationSeconds - Math.ceil(durationSeconds * 0.1),
   );
-  // clip the max duration to the given duration + 1 hour
-  const maxDurationSeconds = Math.min(
+  const maxDurationSeconds = Math.max(
     durationSeconds + 3600,
     durationSeconds + Math.ceil(durationSeconds * 0.1),
   );
