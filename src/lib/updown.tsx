@@ -406,8 +406,10 @@ async function getDefaultProcurementOptions(props: {
     const quote = await getQuote({
       instanceType: type,
       quantity: nodesRequired,
-      startsAt: new Date(),
-      durationSeconds: durationHours * 3600,
+      minStartTime: new Date(),
+      maxStartTime: new Date(),
+      minDurationSeconds: durationHours * 3600,
+      maxDurationSeconds: durationHours * 3600 + 3600,
     });
 
     let quotePricePerNodeHourInCents: number;
