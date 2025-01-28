@@ -370,7 +370,7 @@ function BuyOrder(props: BuyOrderProps) {
         properties: {
           price: totalPriceInCents,
           startsAt: startAt,
-          endsAt: endsAt.toDate(),
+          endsAt,
           numberNodes: props.size,
           instanceType: props.type,
           duration: realDurationInHours,
@@ -385,7 +385,7 @@ function BuyOrder(props: BuyOrderProps) {
             properties: {
               price: totalPriceInCents,
               startsAt: startAt,
-              endsAt: endsAt.toDate(),
+              endsAt,
               numberNodes: props.size,
               instanceType: props.type,
               duration: realDurationInHours,
@@ -401,7 +401,7 @@ function BuyOrder(props: BuyOrderProps) {
         properties: {
           price: totalPriceInCents,
           startsAt: startAt,
-          endsAt: endsAt.toDate(),
+          endsAt,
           numberNodes: props.size,
           instanceType: props.type,
           duration: realDurationInHours,
