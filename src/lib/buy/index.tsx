@@ -660,7 +660,17 @@ export async function getQuote(options: QuoteOptions) {
     );
   }
 
-  return data.quote;
+  if (!data.quote) {
+    return null;
+  }
+
+  return {
+    ...data.quote,
+    price: Number(data.quote.price),
+    quantity: Number(data.quote.quantity),
+    start_at: data.quote.start_at,
+    end_at: data.quote.end_at,
+  }
 }
 
 export async function getOrder(orderId: string) {

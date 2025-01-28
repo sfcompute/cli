@@ -364,7 +364,7 @@ async function removeClusterUserAction({
 }) {
   const api = await apiClient(token);
 
-  const { data, error, response } = await api.DELETE("/v0/credentials/{id}", {
+  const { data, error, response } = await api.DELETE("/v0/credentials/{id}" as any, {
     params: {
       path: {
         id,
