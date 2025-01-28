@@ -251,7 +251,7 @@ function ShowCommand(props: { type: string }) {
         }
 
         const current = procurements.data?.data.find(
-          (p: any) => p.instance_group === props.type
+          (p: any) => p.instance_type === props.type
         );
         if (!current) {
           setInfo(null);
@@ -455,13 +455,14 @@ async function scaleToCount({
   }
 
   const existingProcurement = procurements.data?.data.find(
-    (p: any) => p.instance_group === type
+    (p: any) => p.instance_type === type
   );
 
   if (existingProcurement) {
     const res = await client.PUT("/v0/procurements/{id}", {
       params: { path: { id: existingProcurement.id } },
       body: {
+        instance_type: type,
         quantity: nodesRequired,
         min_duration_in_hours: durationHours,
         max_price_per_node_hour: pricePerNodeHourInCents,
@@ -499,12 +500,14 @@ async function scaleDown(type: string) {
   let found = false;
   if (procurements.data) {
     for (const procurement of procurements.data.data) {
-      if (procurement.instance_group === type) {
+      if (procurement.instance_type === type) {
         const res = await client.PUT("/v0/procurements/{id}", {
           params: { path: { id: procurement.id } },
           body: {
+            instance_type: type,
             quantity: 0,
-            block_duration_in_hours: 0,
+            max_price_per_node_hour: procurement.max_price_per_node_hour,
+            min_duration_in_hours: procurement.min_duration_in_hours,
           },
         });
 
