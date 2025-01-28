@@ -61,11 +61,11 @@ export function registerBuy(program: Command) {
 
 export function parseStart(start?: string) {
   if (!start) {
-    return "NOW";
+    return "NOW" as const;
   }
 
   if (start === "NOW" || start === "now") {
-    return "NOW";
+    return "NOW" as const;
   }
 
   const parsed = parseDate(start);
@@ -166,6 +166,7 @@ async function buyOrderAction(options: SfBuyOptions) {
   }
 }
 
+
 function QuoteAndBuy(props: { options: SfBuyOptions }) {
   const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
 
@@ -176,26 +177,27 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       let pricePerGpuHour: number | null = parsePricePerGpuHour(
         props.options.price
       );
+
+      let startAt = parseStart(props.options.start);
+      let duration = parseDuration(props.options.duration);
+      let endsAt = dayjs(startAt).add(duration, "seconds").toDate();
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
-          pricePerGpuHour = await getAggressivePricePerHour(props.options.type);
-        } else {
-          pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+          return logAndQuit("No quote found for the desired order. Try with a different start date, duration, or price.");
         }
-      }
 
-      const duration = parseDuration(props.options.duration);
-      const startDate = parseStartAsDate(props.options.start);
-      const endsAt = roundEndDate(
-        dayjs(startDate).add(duration, "seconds").toDate()
-      ).toDate();
+        pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+        startAt = quote.start_at === "NOW" ? "NOW" as const : parseStartAsDate(quote.start_at);
+        endsAt = dayjs(quote.end_at).toDate();
+        duration = dayjs(endsAt).diff(dayjs(startAt), "seconds");
+      }
 
       setOrderProps({
         type: props.options.type,
         price: pricePerGpuHour,
         size: parseAccelerators(props.options.accelerators),
-        startAt: startDate,
+        startAt,
         endsAt,
         colocate: props.options.colocate,
       });
@@ -325,7 +327,7 @@ function BuyOrder(props: BuyOrderProps) {
   );
 
   async function submitOrder() {
-    const endsAt = roundEndDate(props.endsAt);
+    const endsAt = props.endsAt;
     const startAt =
       props.startAt === "NOW" ? parseStartAsDate(props.startAt) : props.startAt;
     const realDurationInHours =
@@ -340,7 +342,7 @@ function BuyOrder(props: BuyOrderProps) {
         realDurationInHours
       ),
       startsAt: props.startAt,
-      endsAt: endsAt.toDate(),
+      endsAt,
       colocateWith: props.colocate || [],
       numberNodes: props.size,
     });
@@ -350,7 +352,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
-      const endsAt = roundEndDate(props.endsAt);
+      const endsAt = props.endsAt;
       const startAt =
         props.startAt === "NOW"
           ? parseStartAsDate(props.startAt)
@@ -574,12 +576,27 @@ export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
+function parseAndRoundStart(start: string | undefined) {
+  const parsed = parseStart(start);
+  if (parsed === "NOW") {
+    return parsed;
+  }
+
+  if (dayjs(parsed).isBefore(dayjs().add(1, "minute"))) {
+    return "NOW" as const;
+  }
+
+  return roundStartDate(parsed);
+}
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
+  const startsAt = parseAndRoundStart(options.start);
+  const durationSeconds = parseDuration(options.duration);
+  const quantity = parseAccelerators(options.accelerators);
   return await getQuote({
     instanceType: options.type,
-    quantity: parseAccelerators(options.accelerators),
-    startsAt: parseStart(options.start),
-    durationSeconds: parseDuration(options.duration),
+    quantity,
+    startsAt,
+    durationSeconds,
   });
 }
 
@@ -600,9 +617,9 @@ export async function getQuote(options: QuoteOptions) {
         quantity: options.quantity,
         duration: options.durationSeconds,
         min_start_date:
-          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+          options.startsAt === "NOW" ? "NOW" as const: options.startsAt.toISOString(),
         max_start_date:
-          options.startsAt === "NOW" ? "NOW" : options.startsAt.toISOString(),
+          options.startsAt === "NOW" ? "NOW" as const : options.startsAt.toISOString(),
       },
     },
     // timeout after 600 seconds

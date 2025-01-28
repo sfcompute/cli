@@ -22,9 +22,9 @@ export function roundStartDate(startDate: Date): Date {
   const startEpoch = dateToEpoch(startDate);
   if (startEpoch <= now + 1) {
     return epochToDate(now + 1);
-  } else {
-    return epochToDate(roundEpochUpToHour(startEpoch));
   }
+
+  return epochToDate(roundEpochUpToHour(startEpoch));
 }
 
 export function computeApproximateDurationSeconds(
