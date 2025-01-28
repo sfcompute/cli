@@ -592,19 +592,33 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
   const startsAt = parseAndRoundStart(options.start);
   const durationSeconds = parseDuration(options.duration);
   const quantity = parseAccelerators(options.accelerators);
+
+  const minDurationSeconds = Math.max(
+    1,
+    durationSeconds - Math.ceil(durationSeconds * 0.1),
+  );
+  const maxDurationSeconds = Math.max(
+    durationSeconds + 3600,
+    durationSeconds + Math.ceil(durationSeconds * 0.1),
+  );
+
   return await getQuote({
     instanceType: options.type,
     quantity,
-    startsAt,
-    durationSeconds,
+    minStartTime: startsAt,
+    maxStartTime: startsAt,
+    minDurationSeconds,
+    maxDurationSeconds,
   });
 }
 
 type QuoteOptions = {
   instanceType: string;
   quantity: number;
-  startsAt: Date | "NOW";
-  durationSeconds: number;
+  minStartTime: Date | "NOW";
+  maxStartTime: Date | "NOW";
+  minDurationSeconds: number;
+  maxDurationSeconds: number;
 };
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
@@ -615,11 +629,12 @@ export async function getQuote(options: QuoteOptions) {
         side: "buy",
         instance_type: options.instanceType,
         quantity: options.quantity,
-        duration: options.durationSeconds,
         min_start_date:
-          options.startsAt === "NOW" ? "NOW" as const: options.startsAt.toISOString(),
+          options.minStartTime === "NOW" ? "NOW" as const: options.minStartTime.toISOString(),
         max_start_date:
-          options.startsAt === "NOW" ? "NOW" as const : options.startsAt.toISOString(),
+          options.maxStartTime === "NOW" ? "NOW" as const : options.maxStartTime.toISOString(),
+        min_duration: options.minDurationSeconds,
+        max_duration: options.maxDurationSeconds,
       },
     },
     // timeout after 600 seconds
