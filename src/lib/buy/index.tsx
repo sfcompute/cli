@@ -189,7 +189,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
         startAt = quote.start_at === "NOW" ? "NOW" as const : parseStartAsDate(quote.start_at);
-        endsAt = dayjs(quote.end_at);
+        endsAt = dayjs(quote.end_at).toDate();
         duration = dayjs(endsAt).diff(dayjs(startAt), "seconds");
       }
 
@@ -327,7 +327,7 @@ function BuyOrder(props: BuyOrderProps) {
   );
 
   async function submitOrder() {
-    const endsAt = roundEndDate(props.endsAt);
+    const endsAt = props.endsAt;
     const startAt =
       props.startAt === "NOW" ? parseStartAsDate(props.startAt) : props.startAt;
     const realDurationInHours =
@@ -342,7 +342,7 @@ function BuyOrder(props: BuyOrderProps) {
         realDurationInHours
       ),
       startsAt: props.startAt,
-      endsAt: endsAt.toDate(),
+      endsAt,
       colocateWith: props.colocate || [],
       numberNodes: props.size,
     });
@@ -352,7 +352,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
-      const endsAt = roundEndDate(props.endsAt);
+      const endsAt = props.endsAt;
       const startAt =
         props.startAt === "NOW"
           ? parseStartAsDate(props.startAt)
