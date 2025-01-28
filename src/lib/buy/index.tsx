@@ -184,7 +184,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
-          return logAndQuit("no quote found for the desired order.");
+          return logAndQuit("No quote found for the desired order. Try with a different start date, duration, or price.");
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
