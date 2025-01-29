@@ -55,6 +55,7 @@ export function registerUpgrade(program: Command) {
         spinner.succeed(
           `You are already on the latest version (${currentVersion}).`
         );
+        process.exit(0);
         return;
       }
 
@@ -96,6 +97,7 @@ export function registerUpgrade(program: Command) {
       }
 
       spinner.succeed("Upgrade completed successfully");
+      process.exit(0);
       return;
     });
 }
