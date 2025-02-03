@@ -4,7 +4,8 @@
     "release": "deno run --allow-all src/scripts/release.ts",
     "prod": "deno run --allow-all src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts",
-    "lint": "prettier --write ."
+    "lint": "prettier --write .",
+    "test": "deno test"
   },
   "dependencies": {
     "@inquirer/prompts": "^5.1.2",
@@ -43,5 +44,5 @@
   "peerDependencies": {
     "typescript": "^5.6.2"
   },
-  "version": "0.1.30"
+  "version": "0.1.31"
 }
