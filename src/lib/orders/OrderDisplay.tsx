@@ -159,6 +159,12 @@ export function OrderDisplay(props: {
     }
   });
 
+  useEffect(() => {
+    if (props.orders.length === 0) {
+      process.exit(0);
+    }
+  }, [props.orders]);
+
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
