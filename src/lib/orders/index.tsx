@@ -5,6 +5,7 @@ import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import React from "react";
 import { getAuthToken, isLoggedIn } from "../../helpers/config.ts";
+import { parseDurationArgument } from "../../helpers/duration.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
@@ -122,6 +123,9 @@ export function registerOrders(program: Command) {
     .option("--offset <number>", "Offset the results (for pagination)")
     .option("--json", "Output in JSON format")
     .action(async options => {
+      const minDuration = parseDurationArgument(options.minDuration);
+      const maxDuration = parseDurationArgument(options.maxDuration);
+
       const orders = await getOrders({
         side: options.side,
         instance_type: options.type,
@@ -132,8 +136,8 @@ export function registerOrders(program: Command) {
         max_price: options.maxPrice,
         min_start_date: options.minStart,
         max_start_date: options.maxStart,
-        min_duration: options.minDuration,
-        max_duration: options.maxDuration,
+        min_duration: minDuration,
+        max_duration: maxDuration,
         min_quantity: options.minQuantity,
         max_quantity: options.maxQuantity,
 
