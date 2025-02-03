@@ -83,6 +83,10 @@ async function checkProductionCLIVersion() {
 }
 
 export async function checkVersion() {
+  // Skip version check if running upgrade command
+  const args = process.argv.slice(2);
+  if (args[0] === "upgrade") return;
+
   const version = pkg.version;
   const latestVersion = await checkProductionCLIVersion();
 
