@@ -1,18 +1,17 @@
 import type { Command } from "commander";
+import { Box, Text, render, useApp } from "ink";
+import Spinner from "ink-spinner";
+import React, { useEffect, useState } from "react";
+import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { Row } from "../Row.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
-  createKubeconfig,
   KUBECONFIG_PATH,
+  createKubeconfig,
   syncKubeconfig,
 } from "./kubeconfig.ts";
-import yaml from "yaml";
-import { Box, render, Text, useApp } from "ink";
-import React from "react";
-import { Row } from "../Row.tsx";
-import { useCallback, useEffect, useRef, useState } from "react";
-import Spinner from "ink-spinner";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -103,11 +102,9 @@ function ClusterDisplay({
 }) {
   return (
     <Box flexDirection="column">
-      {clusters.map(cluster => (
-        <Box key={cluster.name} flexDirection="column">
-          <Box gap={1}>
-            <Text color="green">{cluster.name}</Text>
-          </Box>
+      {clusters.map((cluster, index) => (
+        <Box key={`${cluster.name}-${index}`} flexDirection="column">
+          <Row headWidth={11} head="name" value={cluster.name} />
           <Row
             headWidth={11}
             head="k8s api"
@@ -144,6 +141,12 @@ async function listClustersAction({
     return logAndQuit(
       `Failed to get clusters: Unexpected response from server: ${response}`
     );
+  }
+
+  if (data.data.length === 0) {
+    console.log("You don't have any clusters. You can buy one by running");
+    console.log("\tsf buy");
+    return;
   }
 
   if (returnJson) {
@@ -364,13 +367,16 @@ async function removeClusterUserAction({
 }) {
   const api = await apiClient(token);
 
-  const { data, error, response } = await api.DELETE("/v0/credentials/{id}" as any, {
-    params: {
-      path: {
-        id,
+  const { data, error, response } = await api.DELETE(
+    "/v0/credentials/{id}" as any,
+    {
+      params: {
+        path: {
+          id,
+        },
       },
-    },
-  });
+    }
+  );
 
   if (!response.ok) {
     return logAndQuit(
