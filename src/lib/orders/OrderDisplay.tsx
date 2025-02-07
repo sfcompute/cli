@@ -10,7 +10,7 @@ function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
   const pricePerGPUHour =
-    (order.price * order.quantity) / GPUS_PER_NODE / durationInHours / 100;
+    order.price / (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
   const durationFormatted = formatDuration(duration);
 
   let executedPricePerGPUHour;
@@ -158,6 +158,12 @@ export function OrderDisplay(props: {
       setActiveTab("buy");
     }
   });
+
+  useEffect(() => {
+    if (props.orders.length === 0) {
+      process.exit(0);
+    }
+  }, [props.orders]);
 
   if (props.orders.length === 0) {
     return (
