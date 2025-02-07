@@ -98,7 +98,12 @@ function parseDuration(duration?: string) {
     return 1 * 60 * 60; // 1 hour
   }
 
-  const parsed = parseDurationFromLibrary(duration);
+  // Assumes the units is hours if no units are provided
+  let durationStr = duration;
+  if (!/[a-zA-Z]$/.test(duration)) {
+    durationStr = `${duration}h`;
+  }
+  const parsed = parseDurationFromLibrary(durationStr);
   if (!parsed) {
     return logAndQuit(`Invalid duration: ${duration}`);
   }
