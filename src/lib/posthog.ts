@@ -8,7 +8,7 @@ const postHogClient = new PostHog(
     host: "https://us.posthog.com",
     flushAt: 1,
     flushInterval: 0,
-  }
+  },
 );
 // Uncomment this out to see Posthog debugging logs.
 // postHogClient.debug();

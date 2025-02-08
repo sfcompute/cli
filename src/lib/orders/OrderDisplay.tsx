@@ -1,4 +1,4 @@
-import { Box, Text, measureElement, useInput } from "ink";
+import { Box, measureElement, Text, useInput } from "ink";
 import dayjs from "npm:dayjs@1.11.13";
 import React, { useEffect } from "react";
 import { Row } from "../Row.tsx";
@@ -9,14 +9,13 @@ import type { HydratedOrder } from "./types.ts";
 function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour =
-    order.price / (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
+  const pricePerGPUHour = order.price /
+    (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
   const durationFormatted = formatDuration(duration);
 
   let executedPricePerGPUHour;
   if (order.execution_price) {
-    executedPricePerGPUHour =
-      (order.execution_price * order.quantity) /
+    executedPricePerGPUHour = (order.execution_price * order.quantity) /
       GPUS_PER_NODE /
       durationInHours /
       100;
@@ -105,7 +104,7 @@ function OrderMinimal(props: {
         )}
       </Box>
       <Box width={38}>
-        <Text>{durationFormatted} </Text>
+        <Text>{durationFormatted}</Text>
         <Box flexDirection="row" gap={1}>
           <Box>
             <Text dimColor>{formatDateTime(props.order.start_at)}</Text>
@@ -139,7 +138,7 @@ export function OrderDisplay(props: {
   expanded?: boolean;
 }) {
   const [activeTab, setActiveTab] = React.useState<"all" | "sell" | "buy">(
-    "all"
+    "all",
   );
 
   useInput((input, key) => {
@@ -183,16 +182,17 @@ export function OrderDisplay(props: {
     );
   }
 
-  const orders =
-    activeTab === "all"
-      ? props.orders
-      : props.orders.filter(order => order.side === activeTab);
+  const orders = activeTab === "all"
+    ? props.orders
+    : props.orders.filter((order) => order.side === activeTab);
 
   const { sellOrdersCount, buyOrdersCount } = React.useMemo(() => {
     return {
-      sellOrdersCount: props.orders.filter(order => order.side === "sell")
+      sellOrdersCount: props.orders.filter((order) => order.side === "sell")
         .length,
-      buyOrdersCount: props.orders.filter(order => order.side === "buy").length,
+      buyOrdersCount: props.orders.filter((order) =>
+        order.side === "buy"
+      ).length,
     };
   }, [props.orders]);
 
@@ -205,18 +205,23 @@ export function OrderDisplay(props: {
         sellOrdersCount={sellOrdersCount}
         buyOrdersCount={buyOrdersCount}
       >
-        {orders.map(order => {
-          return props.expanded ? (
-            <Order order={order} key={order.id} />
-          ) : (
-            <OrderMinimal order={order} key={order.id} activeTab={activeTab} />
-          );
+        {orders.map((order) => {
+          return props.expanded
+            ? <Order order={order} key={order.id} />
+            : (
+              <OrderMinimal
+                order={order}
+                key={order.id}
+                activeTab={activeTab}
+              />
+            );
         })}
 
         {orders.length === 0 && (
           <Box>
             <Text>
-              There are 0 outstanding {activeTab === "all" ? "" : activeTab}{" "}
+              There are 0 outstanding {activeTab === "all" ? "" : activeTab}
+              {" "}
               orders right now.
             </Text>
           </Box>
@@ -255,7 +260,7 @@ const reducer = (state: ScrollState, action: ScrollAction): ScrollState => {
         ...state,
         scrollTop: Math.min(
           state.innerHeight - state.height,
-          state.scrollTop + 1
+          state.scrollTop + 1,
         ),
       };
 
@@ -264,7 +269,7 @@ const reducer = (state: ScrollState, action: ScrollAction): ScrollState => {
         ...state,
         scrollTop: Math.min(
           state.innerHeight - state.height,
-          state.scrollTop + NUMBER_OF_ORDERS_TO_DISPLAY
+          state.scrollTop + NUMBER_OF_ORDERS_TO_DISPLAY,
         ),
       };
 
@@ -330,18 +335,19 @@ export function ScrollArea({
   const innerRef = React.useRef(null);
   const canScrollUp = state.scrollTop > 0 && orders.length > 0;
   const numberOfOrdersAboveScrollArea = state.scrollTop;
-  const dateRangeAboveScrollArea =
-    orders.length > 0
-      ? `${formatDateTime(orders[0].start_at)} → ${formatDateTime(orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0")}`
-      : "";
-  const numberOfOrdersBelowScrollArea =
-    orders.length - (state.scrollTop + state.height);
-  const dateRangeBelowScrollArea =
-    orders.length > 0
-      ? `${formatDateTime(orders[state.scrollTop + state.height]?.start_at || "0")} → ${formatDateTime(orders[orders.length - 1].end_at)}`
-      : "";
-  const canScrollDown =
-    state.scrollTop + state.height < state.innerHeight &&
+  const dateRangeAboveScrollArea = orders.length > 0
+    ? `${formatDateTime(orders[0].start_at)} → ${
+      formatDateTime(orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0")
+    }`
+    : "";
+  const numberOfOrdersBelowScrollArea = orders.length -
+    (state.scrollTop + state.height);
+  const dateRangeBelowScrollArea = orders.length > 0
+    ? `${
+      formatDateTime(orders[state.scrollTop + state.height]?.start_at || "0")
+    } → ${formatDateTime(orders[orders.length - 1].end_at)}`
+    : "";
+  const canScrollDown = state.scrollTop + state.height < state.innerHeight &&
     numberOfOrdersBelowScrollArea >= 0;
 
   useEffect(() => {

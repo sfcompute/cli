@@ -52,7 +52,7 @@ export function decryptSecret(props: {
     util.decodeBase64(props.encrypted),
     util.decodeBase64(props.nonce),
     util.decodeBase64(props.ephemeralPublicKey),
-    util.decodeBase64(props.secretKey)
+    util.decodeBase64(props.secretKey),
   );
 
   if (!decrypted) {

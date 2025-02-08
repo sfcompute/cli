@@ -28,7 +28,7 @@ export function registerClusters(program: Command) {
     .description("List clusters")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
-    .action(async options => {
+    .action(async (options) => {
       await listClustersAction({
         returnJson: options.json,
         token: options.token,
@@ -48,7 +48,7 @@ export function registerClusters(program: Command) {
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
-    .action(async options => {
+    .action(async (options) => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
@@ -75,7 +75,7 @@ export function registerClusters(program: Command) {
     .alias("ls")
     .description("List users in a cluster")
     .option("--token <token>", "API token")
-    .action(async options => {
+    .action(async (options) => {
       await listClusterUsers({ token: options.token });
     });
 
@@ -84,7 +84,7 @@ export function registerClusters(program: Command) {
     .description("Generate or sync kubeconfig")
     .option("--token <token>", "API token")
     .option("--print", "Print the config instead of syncing to file")
-    .action(async options => {
+    .action(async (options) => {
       await kubeconfigAction({
         token: options.token,
         print: options.print,
@@ -103,7 +103,7 @@ function ClusterDisplay({
 }) {
   return (
     <Box flexDirection="column">
-      {clusters.map(cluster => (
+      {clusters.map((cluster) => (
         <Box key={cluster.name} flexDirection="column">
           <Box gap={1}>
             <Text color="green">{cluster.name}</Text>
@@ -142,7 +142,7 @@ async function listClustersAction({
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get clusters: Unexpected response from server: ${response}`
+      `Failed to get clusters: Unexpected response from server: ${response}`,
     );
   }
 
@@ -151,12 +151,12 @@ async function listClustersAction({
   } else {
     render(
       <ClusterDisplay
-        clusters={data.data.map(cluster => ({
+        clusters={data.data.map((cluster) => ({
           name: cluster.name,
           kubernetes_api_url: cluster.kubernetes_api_url || "",
           kubernetes_namespace: cluster.kubernetes_namespace || "",
         }))}
-      />
+      />,
     );
   }
 }
@@ -168,7 +168,7 @@ function ClusterUserDisplay({
 }) {
   return (
     <Box flexDirection="column">
-      {users.map(user => (
+      {users.map((user) => (
         <Box key={user.name} flexDirection="column">
           <Box gap={1}>
             <Text color="green">{user.name}</Text>
@@ -190,7 +190,8 @@ async function isCredentialReady(id: string) {
   const { data } = await api.GET("/v0/credentials");
 
   const cred = data?.data.find(
-    credential => credential.id === id && credential.object === "k8s_credential"
+    (credential) =>
+      credential.id === id && credential.object === "k8s_credential",
   );
 
   if (!cred) {
@@ -216,19 +217,19 @@ async function listClusterUsers({ token }: { token?: string }) {
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get users in cluster: Unexpected response from server: ${response}`
+      `Failed to get users in cluster: Unexpected response from server: ${response}`,
     );
   }
 
   const k8s = data.data.filter(
-    credential => credential.object === "k8s_credential"
+    (credential) => credential.object === "k8s_credential",
   );
 
   const users: Array<{ name: string; is_usable: boolean; cluster: string }> =
     [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
-      k.encrypted_token && k.nonce && k.ephemeral_pubkey
+      k.encrypted_token && k.nonce && k.ephemeral_pubkey,
     );
     users.push({
       name: k.username || "",
@@ -347,7 +348,7 @@ async function addClusterUserAction({
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to add user to cluster: Unexpected response from server: ${response}`
+      `Failed to add user to cluster: Unexpected response from server: ${response}`,
     );
   }
 
@@ -364,24 +365,27 @@ async function removeClusterUserAction({
 }) {
   const api = await apiClient(token);
 
-  const { data, error, response } = await api.DELETE("/v0/credentials/{id}" as any, {
-    params: {
-      path: {
-        id,
+  const { data, error, response } = await api.DELETE(
+    "/v0/credentials/{id}" as any,
+    {
+      params: {
+        path: {
+          id,
+        },
       },
     },
-  });
+  );
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to remove user from cluster: ${response.statusText}`
+      `Failed to remove user from cluster: ${response.statusText}`,
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to remove user from cluster: Unexpected response from server: ${response}`
+      `Failed to remove user from cluster: Unexpected response from server: ${response}`,
     );
   }
 
@@ -401,14 +405,14 @@ async function kubeconfigAction({
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to list users in cluster: ${response.statusText}`
+      `Failed to list users in cluster: ${response.statusText}`,
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to list users in cluster: Unexpected response from server: ${response}`
+      `Failed to list users in cluster: Unexpected response from server: ${response}`,
     );
   }
 
