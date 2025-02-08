@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { Option } from "commander";
 import dayjs from "dayjs";
 import { render } from "ink";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
@@ -57,9 +58,13 @@ export function registerOrders(program: Command) {
     .description("List orders")
     .option("--side <side>", "Filter by order side (buy or sell)")
     .option("-t, --type <type>", "Filter by instance type")
-    .option(
-      "--public",
-      "Include public orders. Only includes open orders. Adding `--only-open` will do nothing.",
+    .addOption(
+      new Option(
+        "--public",
+        "Include public orders. Only includes open orders.",
+      )
+      .conflicts(["only-filled", "only-cancelled"])
+      .implies(["only-open"])
     )
     .option("--min-price <price>", "Filter by minimum price (in cents)")
     .option("--max-price <price>", "Filter by maximum price (in cents)")
@@ -85,9 +90,26 @@ export function registerOrders(program: Command) {
       "--contract-id <id>",
       "Filter by contract ID (only for sell orders)",
     )
-    .option("--only-open", "Show only open orders")
-    .option("--exclude-filled", "Exclude filled orders")
-    .option("--only-filled", "Show only filled orders")
+    .addOption(
+      new Option("--only-open", "Show only open orders")
+        .conflicts(["only-filled", "only-cancelled"])
+    )
+    .addOption(
+      new Option("--only-filled", "Show only filled orders")
+        .conflicts(["exclude-filled", "only-cancelled", "only-open", "public"])
+    )
+    .addOption(
+      new Option("--only-cancelled", "Show only cancelled orders")
+        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"])
+    )
+    .addOption(
+      new Option("--exclude-filled", "Exclude filled orders")
+        .conflicts(["only-filled"])
+    )
+    .option(
+      "--include-cancelled",
+      "Include cancelled orders",
+    )
     .option(
       "--min-filled-at <date>",
       "Filter by minimum filled date (ISO 8601 datestring)",
@@ -104,8 +126,6 @@ export function registerOrders(program: Command) {
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
     )
-    .option("--include-cancelled", "Include cancelled orders")
-    .option("--only-cancelled", "Show only cancelled orders")
     .option(
       "--min-cancelled-at <date>",
       "Filter by minimum cancelled date (ISO 8601 datestring)",
@@ -128,44 +148,6 @@ export function registerOrders(program: Command) {
     .action(async (options) => {
       const minDuration = parseDurationArgument(options.minDuration);
       const maxDuration = parseDurationArgument(options.maxDuration);
-
-      // `--public` implies `--only-open`
-      if (options.public && options.onlyFilled) {
-        logAndQuit(
-          "--public and --only-filled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.public && options.onlyCancelled) {
-        logAndQuit(
-          "--public and --only-cancelled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.onlyOpen && options.onlyFilled) {
-        logAndQuit(
-          "--only-open and --only-filled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.onlyOpen && options.onlyCancelled) {
-        logAndQuit(
-          "--only-open and --only-cancelled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.excludeFilled && options.onlyFilled) {
-        logAndQuit(
-          "--exclude-filled and --only-filled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.excludeCancelled && options.onlyCancelled) {
-        logAndQuit(
-          "--exclude-cancelled and --only-cancelled are mutually exclusive. Please choose one.",
-        );
-      }
-      if (options.onlyFilled && options.onlyCancelled) {
-        logAndQuit(
-          "--only-filled and --only-cancelled are mutually exclusive. Please choose one.",
-        );
-      }
-
       const orders = await getOrders({
         side: options.side,
         instance_type: options.type,
