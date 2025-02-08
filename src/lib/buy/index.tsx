@@ -98,7 +98,12 @@ function parseDuration(duration?: string) {
     return 1 * 60 * 60; // 1 hour
   }
 
-  const parsed = parseDurationFromLibrary(duration);
+  // Assumes the units is hours if no units are provided
+  let durationStr = duration;
+  if (!/[a-zA-Z]$/.test(duration)) {
+    durationStr = `${duration}h`;
+  }
+  const parsed = parseDurationFromLibrary(durationStr);
   if (!parsed) {
     return logAndQuit(`Invalid duration: ${duration}`);
   }
@@ -178,21 +183,31 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       );
 
       let startAt = parseStart(props.options.start);
+      if (startAt === "NOW") {
+        startAt = dayjs().toDate();
+      }
+
       let duration = parseDuration(props.options.duration);
+
       let endsAt = dayjs(startAt).add(duration, "seconds").toDate();
+
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
           return logAndQuit(
-            "No quote found for the desired order. Try with a different start date, duration, or price.",
+            "No quote found for the desired order. Try with a different start date, duration, or price."
           );
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-        startAt = quote.start_at === "NOW"
-          ? "NOW" as const
-          : parseStartAsDate(quote.start_at);
+
+        startAt =
+          quote.start_at === "NOW"
+            ? ("NOW" as const)
+            : parseStartAsDate(quote.start_at);
+
         endsAt = dayjs(quote.end_at).toDate();
+
         duration = dayjs(endsAt).diff(dayjs(startAt), "seconds");
       }
 
@@ -597,11 +612,11 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
 
   const minDurationSeconds = Math.max(
     1,
-    durationSeconds - Math.ceil(durationSeconds * 0.1),
+    durationSeconds - Math.ceil(durationSeconds * 0.1)
   );
   const maxDurationSeconds = Math.max(
     durationSeconds + 3600,
-    durationSeconds + Math.ceil(durationSeconds * 0.1),
+    durationSeconds + Math.ceil(durationSeconds * 0.1)
   );
 
   return await getQuote({
@@ -631,12 +646,14 @@ export async function getQuote(options: QuoteOptions) {
         side: "buy",
         instance_type: options.instanceType,
         quantity: options.quantity,
-        min_start_date: options.minStartTime === "NOW"
-          ? "NOW" as const
-          : options.minStartTime.toISOString(),
-        max_start_date: options.maxStartTime === "NOW"
-          ? "NOW" as const
-          : options.maxStartTime.toISOString(),
+        min_start_date:
+          options.minStartTime === "NOW"
+            ? ("NOW" as const)
+            : options.minStartTime.toISOString(),
+        max_start_date:
+          options.maxStartTime === "NOW"
+            ? ("NOW" as const)
+            : options.maxStartTime.toISOString(),
         min_duration: options.minDurationSeconds,
         max_duration: options.maxDurationSeconds,
       },
