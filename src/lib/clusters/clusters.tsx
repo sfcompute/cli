@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { Box, Text, render, useApp } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import React, { useEffect, useState } from "react";
 import yaml from "yaml";
@@ -8,8 +8,8 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
-  KUBECONFIG_PATH,
   createKubeconfig,
+  KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
 
@@ -376,7 +376,7 @@ async function removeClusterUserAction({
           id,
         },
       },
-    }
+    },
   );
 
   if (!response.ok) {

@@ -57,7 +57,10 @@ export function registerOrders(program: Command) {
     .description("List orders")
     .option("--side <side>", "Filter by order side (buy or sell)")
     .option("-t, --type <type>", "Filter by instance type")
-    .option("--public", "Include public orders. Only includes open orders. Adding `--only-open` will do nothing.")
+    .option(
+      "--public",
+      "Include public orders. Only includes open orders. Adding `--only-open` will do nothing.",
+    )
     .option("--min-price <price>", "Filter by minimum price (in cents)")
     .option("--max-price <price>", "Filter by maximum price (in cents)")
     .option(
