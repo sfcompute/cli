@@ -63,8 +63,10 @@ export function registerOrders(program: Command) {
         "--public",
         "Include public orders. Only includes open orders.",
       )
-        .conflicts(["only-filled", "only-cancelled"])
-        .implies(["only-open"]),
+        .conflicts(["onlyFilled", "onlyCancelled"])
+        .implies({
+          onlyOpen: true,
+        }),
     )
     .option("--min-price <price>", "Filter by minimum price (in cents)")
     .option("--max-price <price>", "Filter by maximum price (in cents)")
@@ -92,15 +94,15 @@ export function registerOrders(program: Command) {
     )
     .addOption(
       new Option("--only-open", "Show only open orders")
-        .conflicts(["only-filled", "only-cancelled"]),
+        .conflicts(["onlyFilled", "onlyCancelled"]),
     )
     .addOption(
       new Option("--exclude-filled", "Exclude filled orders")
-        .conflicts(["only-filled"]),
+        .conflicts(["onlyFilled"]),
     )
     .addOption(
       new Option("--only-filled", "Show only filled orders")
-        .conflicts(["exclude-filled", "only-cancelled", "only-open", "public"]),
+        .conflicts(["excludeFilled", "onlyCancelled", "onlyOpen", "public"]),
     )
     .option(
       "--min-filled-at <date>",
@@ -124,7 +126,10 @@ export function registerOrders(program: Command) {
     )
     .addOption(
       new Option("--only-cancelled", "Show only cancelled orders")
-        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"]),
+        .conflicts(["onlyFilled", "onlyOpen", "public"])
+        .implies({
+          includeCancelled: true,
+        }),
     )
     .option(
       "--min-cancelled-at <date>",
