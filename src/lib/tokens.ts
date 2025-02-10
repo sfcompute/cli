@@ -2,7 +2,7 @@ import process from "node:process";
 import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import Table from "cli-table3";
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import ora from "ora";
 import { getCommandBase } from "../helpers/command.ts";

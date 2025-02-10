@@ -1,4 +1,4 @@
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import { exec } from "node:child_process";
 import process from "node:process";
 import ora from "ora";

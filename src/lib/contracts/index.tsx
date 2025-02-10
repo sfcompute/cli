@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command } from "@commander-js/extra-typings";
 import { render } from "ink";
 import React from "react";
 import { apiClient } from "../../apiClient.ts";

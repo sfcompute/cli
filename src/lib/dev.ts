@@ -1,7 +1,7 @@
 import process from "node:process";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import dayjs from "npm:dayjs@1.11.13";
 import utc from "npm:dayjs@1.11.13/plugin/utc.js";
 import {

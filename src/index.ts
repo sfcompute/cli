@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { Command } from "commander";
+import { Command } from "@commander-js/extra-typings";
 import os from "node:os";
 import process from "node:process";
 import pkg from "../package.json" with { type: "json" };

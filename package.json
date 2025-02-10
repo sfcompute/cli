@@ -8,6 +8,7 @@
     "test": "deno test"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "^12.1.0",
     "@inquirer/prompts": "^5.1.2",
     "@types/ms": "^0.7.34",
     "axios": "^1.7.2",
