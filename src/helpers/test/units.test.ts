@@ -63,6 +63,7 @@ Deno.test("price whole to cents", () => {
 
   const invalidPrices = [null, undefined, [], {}];
   for (const input of invalidPrices) {
+    // deno-lint-ignore no-explicit-any -- we pass in invalid types on purpose for testing here
     const { cents, invalid } = priceWholeToCents(input as any);
 
     assertEquals(cents, null);

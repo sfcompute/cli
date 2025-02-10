@@ -1,4 +1,4 @@
-import { Option, type Command } from "@commander-js/extra-typings";
+import { type Command, Option } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import { render } from "ink";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
@@ -290,7 +290,7 @@ export async function getOrders(props: {
 
 export async function submitOrderCancellationByIdAction(
   orderId: string,
-): Promise<any> {
+) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();

@@ -90,13 +90,13 @@ async function loadKeys() {
 
   try {
     publicKey = await Deno.readTextFile(publicKeyPath);
-  } catch (err) {
+  } catch {
     // Leave publicKey as null if read fails
   }
 
   try {
     privateKey = await Deno.readTextFile(privateKeyPath);
-  } catch (err) {
+  } catch {
     // Leave privateKey as null if read fails
   }
 

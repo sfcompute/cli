@@ -29,7 +29,7 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
 
   quote_get: "/v0/quote",
 
-  instances_list: "/v0/instances", 
+  instances_list: "/v0/instances",
   instances_get: ({ id }: IdParams): string => `/v0/instances/${id}`,
 
   credentials_create: "/v0/credentials",
@@ -47,7 +47,7 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
 
 export async function getWebAppUrl<T extends TokenParams | never>(
   key: keyof typeof webPaths,
-  params?: T
+  params?: T,
 ): Promise<string> {
   const config = await loadConfig();
   const path = webPaths[key];
@@ -59,7 +59,7 @@ export async function getWebAppUrl<T extends TokenParams | never>(
 
 export async function getApiUrl<T extends IdParams | never>(
   key: keyof typeof apiPaths,
-  params?: T
+  params?: T,
 ): Promise<string> {
   const config = await loadConfig();
   const path = apiPaths[key];
