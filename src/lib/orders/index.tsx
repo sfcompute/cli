@@ -103,14 +103,6 @@ export function registerOrders(program: Command) {
         .conflicts(["exclude-filled", "only-cancelled", "only-open", "public"]),
     )
     .option(
-      "--include-cancelled",
-      "Include cancelled orders",
-    )
-    .addOption(
-      new Option("--only-cancelled", "Show only cancelled orders")
-        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"]),
-    )
-    .option(
       "--min-filled-at <date>",
       "Filter by minimum filled date (ISO 8601 datestring)",
     )
@@ -125,6 +117,14 @@ export function registerOrders(program: Command) {
     .option(
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
+    )
+    .option(
+      "--include-cancelled",
+      "Include cancelled orders",
+    )
+    .addOption(
+      new Option("--only-cancelled", "Show only cancelled orders")
+        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"]),
     )
     .option(
       "--min-cancelled-at <date>",
