@@ -25,19 +25,10 @@ import { analytics } from "../posthog.ts";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-interface SfBuyOptions {
-  type: string;
-  accelerators?: string;
-  duration: string;
-  price: string;
-  start?: string;
-  yes?: boolean;
-  quote?: boolean;
-  colocate?: Array<string>;
-}
+type SfBuyOptions = ReturnType<ReturnType<typeof _registerBuy>["opts"]>;
 
-export function registerBuy(program: Command) {
-  program
+function _registerBuy(program: Command) {
+  return program
     .command("buy")
     .description("Place a buy order")
     .requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
@@ -56,7 +47,32 @@ export function registerBuy(program: Command) {
       [],
     )
     .option("--quote", "Only provide a quote for the order")
-    .action(buyOrderAction);
+    .action(function buyOrderAction(options) {
+      /*
+       * Flow is:
+       * 1. If --quote, get quote and exit
+       * 2. If -p is provided, use it as the price
+       * 3. Otherwise, get a price by quoting the market
+       * 4. If --yes isn't provided, ask for confirmation
+       * 5. Place order
+       */
+      if (options.quote) {
+        render(<QuoteComponent options={options} />);
+      } else {
+        const nodes = parseAccelerators(options.accelerators);
+        if (!Number.isInteger(nodes)) {
+          return logAndQuit(
+            `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
+          );
+        }
+
+        render(<QuoteAndBuy options={options} />);
+      }
+    });
+}
+
+export function registerBuy(program: Command) {
+  _registerBuy(program);
 }
 
 export function parseStart(start?: string) {
@@ -146,29 +162,6 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
       </Box>
     )
     : <QuoteDisplay quote={quote} />;
-}
-
-/*
-Flow is:
-1. If --quote, get quote and exit
-2. If -p is provided, use it as the price
-3. Otherwise, get a price by quoting the market
-4. If --yes isn't provided, ask for confirmation
-5. Place order
- */
-async function buyOrderAction(options: SfBuyOptions) {
-  if (options.quote) {
-    render(<QuoteComponent options={options} />);
-  } else {
-    const nodes = parseAccelerators(options.accelerators);
-    if (!Number.isInteger(nodes)) {
-      return logAndQuit(
-        `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
-      );
-    }
-
-    render(<QuoteAndBuy options={options} />);
-  }
 }
 
 function QuoteAndBuy(props: { options: SfBuyOptions }) {

@@ -2,6 +2,7 @@ import { Box, render, Text, useApp } from "ink";
 import React, { useCallback, useEffect, useState } from "react";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient.ts";
+import type { paths } from "../schema.ts";
 import { logAndQuit } from "../helpers/errors.ts";
 import { dollarsToCents } from "../helpers/units.ts";
 import { getBalance } from "./balance.ts";
@@ -11,7 +12,12 @@ import ConfirmInput from "./ConfirmInput.tsx";
 import Spinner from "ink-spinner";
 import { GPUS_PER_NODE } from "./constants.ts";
 import { Row } from "./Row.tsx";
-import { Command } from "commander";
+import { Command } from "@commander-js/extra-typings";
+
+type Procurement =
+  paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
+    "application/json"
+  ]["data"][number];
 
 const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Example default price
 
@@ -19,7 +25,7 @@ export function registerScale(program: Command) {
   const scale = program
     .command("scale")
     .description("Scale GPUs or show current procurement details")
-    .option(
+    .requiredOption(
       "-n, --accelerators <accelerators>",
       "Set number of GPUs (0 to turn off)",
     )
@@ -66,7 +72,10 @@ function ScaleCommand(props: {
   const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(
     null,
   );
-  const [procurementResult, setProcurementResult] = useState<any>(null);
+  const [
+    procurementResult,
+    setProcurementResult,
+  ] = useState<true | Procurement | Procurement[] | null>(null);
   const [
     displayedPricePerNodeHourInCents,
     setDisplayedPricePerNodeHourInCents,
@@ -134,8 +143,12 @@ function ScaleCommand(props: {
             pricePerNodeHourInCents,
           });
         }
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       }
     }
 
@@ -163,8 +176,12 @@ function ScaleCommand(props: {
           pricePerNodeHourInCents,
         });
         setProcurementResult(result);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
         exit();
@@ -237,10 +254,11 @@ function ScaleCommand(props: {
 }
 
 function ShowCommand(props: { type: string }) {
-  const { exit } = useApp();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [info, setInfo] = useState<any>(null);
+  const [info, setInfo] = useState<
+    Procurement | null
+  >(null);
 
   useEffect(() => {
     async function fetchInfo() {
@@ -254,15 +272,19 @@ function ShowCommand(props: { type: string }) {
         }
 
         const current = procurements.data?.data.find(
-          (p: any) => p.instance_type === props.type,
+          (p) => p.instance_type === props.type,
         );
         if (!current) {
           setInfo(null);
         } else {
           setInfo(current);
         }
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -462,7 +484,7 @@ async function scaleToCount({
   }
 
   const existingProcurement = procurements.data?.data.find(
-    (p: any) => p.instance_type === type,
+    (p) => p.instance_type === type,
   );
 
   if (existingProcurement) {
@@ -478,7 +500,7 @@ async function scaleToCount({
     if (!res.response.ok) {
       throw new Error(res.error?.message || "Failed to update procurement");
     }
-    return res.data;
+    return res.data ?? null;
   } else {
     const res = await client.POST("/v0/procurements", {
       body: {
@@ -491,7 +513,7 @@ async function scaleToCount({
     if (!res.response.ok) {
       throw new Error(res.error?.message || "Failed to create procurement");
     }
-    return res.data;
+    return res.data ?? null;
   }
 }
 

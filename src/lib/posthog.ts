@@ -21,26 +21,7 @@ export const IS_TRACKING_DISABLED =
   process.env.SF_CLI_TELEMETRY_OPTOUT === "1" ||
   process.env.SF_CLI_TELEMETRY_OPTOUT === "true";
 
-/**
- * Type copied from posthog-node because it's not exported
- */
-interface IdentifyMessage {
-  distinctId: string;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  properties?: Record<string | number, any>;
-  disableGeoip?: boolean;
-}
-
-/**
- * Type copied from posthog-node because it's not exported
- */
-interface EventMessage extends IdentifyMessage {
-  event: string;
-  groups?: Record<string, string | number>;
-  sendFeatureFlags?: boolean;
-  timestamp?: Date;
-  uuid?: string;
-}
+type EventMessage = Parameters<typeof postHogClient.capture>[0];
 
 const trackEvent = ({
   properties,
