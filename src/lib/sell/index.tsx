@@ -1,19 +1,18 @@
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import { apiClient } from "../../apiClient.ts";
+import { paths } from "../../schema.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { parseStartDate, roundStartDate } from "../../helpers/units.ts";
 import parseDurationFromLibrary from "parse-duration";
-import { Box, render, useApp, useInput } from "ink";
+import { Box, render, useApp } from "ink";
 import { parseDate } from "chrono-node";
 import { GPUS_PER_NODE } from "../constants.ts";
-import QuoteDisplay from "../Quote.tsx";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
 import ConfirmInput from "../ConfirmInput.tsx";
@@ -25,18 +24,13 @@ import invariant from "tiny-invariant";
 import { getContract } from "../../helpers/fetchers.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
 
+type SellOrderFlags =
+  paths["/v0/orders"]["post"]["requestBody"]["content"]["application/json"][
+    "flags"
+  ];
+
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
-
-interface SfSellOptions {
-  price: string;
-  contractId: string;
-  accelerators?: string;
-  start?: string;
-  duration?: string;
-  flags?: Record<string, any>;
-  yes?: boolean;
-}
 
 export function registerSell(program: Command) {
   program
@@ -56,7 +50,65 @@ export function registerSell(program: Command) {
       JSON.parse,
     )
     .option("-y, --yes", "Automatically confirm the order")
-    .action(sellOrderAction);
+    .action(
+      async function sellOrderAction(options) {
+        if (!(await isLoggedIn())) {
+          return logLoginMessageAndQuit();
+        }
+
+        const pricePerGpuHour = parsePricePerGpuHour(options.price);
+        if (!pricePerGpuHour) {
+          return logAndQuit(`Invalid price: ${options.price}`);
+        }
+
+        const contractId = options.contractId;
+
+        if (!contractId || !contractId.startsWith("cont_")) {
+          return logAndQuit(`Invalid contract ID: ${contractId}`);
+        }
+
+        const size = parseAccelerators(options.accelerators);
+        if (isNaN(size) || size <= 0) {
+          return logAndQuit(
+            `Invalid number of accelerators: ${options.accelerators}`,
+          );
+        }
+
+        const durationSeconds = parseDuration(options.duration);
+        if (!durationSeconds || durationSeconds <= 0) {
+          return logAndQuit(`Invalid duration: ${options.duration}`);
+        }
+
+        const startDate = parseStartAsDate(options.start);
+        if (!startDate) {
+          return logAndQuit(`Invalid start date: ${options.start}`);
+        }
+
+        const endDate = roundEndDate(
+          dayjs(startDate).add(durationSeconds, "seconds").toDate(),
+        ).toDate();
+
+        // Fetch contract details
+        const contract = await getContract(contractId);
+        if (!contract) {
+          return logAndQuit(`Contract not found: ${contractId}`);
+        }
+
+        // Prepare order details
+        const orderDetails = {
+          price: pricePerGpuHour,
+          contractId: contractId,
+          size: size,
+          startAt: startDate,
+          endsAt: endDate,
+          flags: options.flags,
+          autoConfirm: options.yes || false,
+        };
+
+        // Render the SellOrder component
+        render(<SellOrder {...orderDetails} />);
+      },
+    );
 }
 
 function parseStart(start?: string) {
@@ -132,71 +184,13 @@ type Order =
   | Awaited<ReturnType<typeof getOrder>>
   | Awaited<ReturnType<typeof placeSellOrder>>;
 
-async function sellOrderAction(options: SfSellOptions) {
-  if (!(await isLoggedIn())) {
-    return logLoginMessageAndQuit();
-  }
-
-  const pricePerGpuHour = parsePricePerGpuHour(options.price);
-  if (!pricePerGpuHour) {
-    return logAndQuit(`Invalid price: ${options.price}`);
-  }
-
-  const contractId = options.contractId;
-
-  if (!contractId || !contractId.startsWith("cont_")) {
-    return logAndQuit(`Invalid contract ID: ${contractId}`);
-  }
-
-  const size = parseAccelerators(options.accelerators);
-  if (isNaN(size) || size <= 0) {
-    return logAndQuit(
-      `Invalid number of accelerators: ${options.accelerators}`,
-    );
-  }
-
-  const durationSeconds = parseDuration(options.duration);
-  if (!durationSeconds || durationSeconds <= 0) {
-    return logAndQuit(`Invalid duration: ${options.duration}`);
-  }
-
-  const startDate = parseStartAsDate(options.start);
-  if (!startDate) {
-    return logAndQuit(`Invalid start date: ${options.start}`);
-  }
-
-  const endDate = roundEndDate(
-    dayjs(startDate).add(durationSeconds, "seconds").toDate(),
-  ).toDate();
-
-  // Fetch contract details
-  const contract = await getContract(contractId);
-  if (!contract) {
-    return logAndQuit(`Contract not found: ${contractId}`);
-  }
-
-  // Prepare order details
-  const orderDetails = {
-    price: pricePerGpuHour,
-    contractId: contractId,
-    size: size,
-    startAt: startDate,
-    endsAt: endDate,
-    flags: options.flags,
-    autoConfirm: options.yes || false,
-  };
-
-  // Render the SellOrder component
-  render(<SellOrder {...orderDetails} />);
-}
-
 function SellOrder(props: {
   price: number;
   contractId: string;
   size: number;
   startAt: Date | "NOW";
   endsAt: Date;
-  flags?: Record<string, any>;
+  flags?: SellOrderFlags;
   autoConfirm?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -286,7 +280,7 @@ function SellOrder(props: {
       {isLoading && (
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="arc" />}
-          {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
+          {order && order.status === "open" && <Text color="yellow">•</Text>}
           {!order && <Text>Placing order...</Text>}
           {order && (
             <Box gap={1}>
@@ -322,7 +316,7 @@ function SellOrderPreview(props: {
   size: number;
   startAt: Date | "NOW";
   endsAt: Date;
-  flags?: Record<string, any>;
+  flags?: SellOrderFlags;
 }) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
@@ -353,7 +347,7 @@ function SellOrderPreview(props: {
         </Box>
         <Box gap={1}>
           <Text>{start}</Text>
-          <Text dimColor={true}>
+          <Text dimColor>
             {props.startAt === "NOW" ? "(now)" : `(${startFromNow})`}
           </Text>
         </Box>
@@ -364,7 +358,7 @@ function SellOrderPreview(props: {
         </Box>
         <Box gap={1}>
           <Text>{end}</Text>
-          <Text dimColor={true}>({endFromNow})</Text>
+          <Text dimColor>({endFromNow})</Text>
         </Box>
       </Box>
       <Row headWidth={7} head="dur" value={`~${realDurationString}`} />
@@ -389,7 +383,7 @@ export async function placeSellOrder(options: {
   quantity: number;
   startAt: Date | "NOW";
   endsAt: Date;
-  flags?: Record<string, any>;
+  flags?: SellOrderFlags;
 }) {
   const realDurationHours = dayjs(options.endsAt).diff(
     dayjs(options.startAt === "NOW" ? new Date() : options.startAt),

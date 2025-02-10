@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import ora from "ora";
 import { logAndQuit } from "./errors.ts";
 import { getOrder } from "./fetchers.ts";

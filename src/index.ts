@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
-import { Command } from "commander";
+import { Command } from "@commander-js/extra-typings";
 import os from "node:os";
+import process from "node:process";
 import pkg from "../package.json" with { type: "json" };
 import { checkVersion } from "./checkVersion.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";
@@ -78,9 +79,6 @@ const main = async () => {
           isError = false;
           break;
       }
-
-      if (isError) {
-      }
       process.exit(isError ? 1 : 0);
     });
 
@@ -118,7 +116,7 @@ const main = async () => {
 
     try {
       await analytics.shutdown();
-      const c = program.parse(process.argv);
+      program.parse(process.argv);
     } catch (err) {
       console.log(err);
       await analytics.shutdown();

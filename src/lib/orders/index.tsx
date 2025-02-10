@@ -1,5 +1,4 @@
-import type { Command } from "commander";
-import { Option } from "commander";
+import { type Command, Option } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import { render } from "ink";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
@@ -56,7 +55,11 @@ export function registerOrders(program: Command) {
     .command("ls")
     .alias("list")
     .description("List orders")
-    .option("--side <side>", "Filter by order side (buy or sell)")
+    .addOption(
+      new Option("--side <side>", "Filter by order side (buy or sell)").choices(
+        ["buy", "sell"] as const,
+      ),
+    )
     .option("-t, --type <type>", "Filter by instance type")
     .addOption(
       new Option(
@@ -68,8 +71,16 @@ export function registerOrders(program: Command) {
           onlyOpen: true,
         }),
     )
-    .option("--min-price <price>", "Filter by minimum price (in cents)")
-    .option("--max-price <price>", "Filter by maximum price (in cents)")
+    .option(
+      "--min-price <price>",
+      "Filter by minimum price (in cents)",
+      parseInt,
+    )
+    .option(
+      "--max-price <price>",
+      "Filter by maximum price (in cents)",
+      parseInt,
+    )
     .option(
       "--min-start <date>",
       "Filter by minimum start date (ISO 8601 datestring)",
@@ -86,8 +97,8 @@ export function registerOrders(program: Command) {
       "--max-duration <duration>",
       "Filter by maximum duration (in seconds)",
     )
-    .option("--min-quantity <quantity>", "Filter by minimum quantity")
-    .option("--max-quantity <quantity>", "Filter by maximum quantity")
+    .option("--min-quantity <quantity>", "Filter by minimum quantity", parseInt)
+    .option("--max-quantity <quantity>", "Filter by maximum quantity", parseInt)
     .option(
       "--contract-id <id>",
       "Filter by contract ID (only for sell orders)",
@@ -115,10 +126,12 @@ export function registerOrders(program: Command) {
     .option(
       "--min-fill-price <price>",
       "Filter by minimum fill price (in cents)",
+      parseInt,
     )
     .option(
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
+      parseInt,
     )
     .option(
       "--include-cancelled",
@@ -147,8 +160,12 @@ export function registerOrders(program: Command) {
       "--max-placed-at <date>",
       "Filter by maximum placed date (ISO 8601 datestring)",
     )
-    .option("--limit <number>", "Limit the number of results")
-    .option("--offset <number>", "Offset the results (for pagination)")
+    .option("--limit <number>", "Limit the number of results", parseInt)
+    .option(
+      "--offset <number>",
+      "Offset the results (for pagination)",
+      parseInt,
+    )
     .option("--json", "Output in JSON format")
     .action(async (options) => {
       const minDuration = parseDurationArgument(options.minDuration);
@@ -291,7 +308,7 @@ export async function getOrders(props: {
 
 export async function submitOrderCancellationByIdAction(
   orderId: string,
-): Promise<any> {
+) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();

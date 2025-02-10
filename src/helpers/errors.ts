@@ -1,3 +1,4 @@
+import process from "node:process";
 import { getCommandBase } from "./command.ts";
 import { clearAuthFromConfig } from "./config.ts";
 

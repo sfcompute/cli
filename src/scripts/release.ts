@@ -1,4 +1,5 @@
-import { Command } from "commander";
+import { Command } from "@commander-js/extra-typings";
+import process from "node:process";
 
 const program = new Command();
 

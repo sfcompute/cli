@@ -1,6 +1,7 @@
+import process from "node:process";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import dayjs from "npm:dayjs@1.11.13";
 import utc from "npm:dayjs@1.11.13/plugin/utc.js";
 import {
@@ -27,7 +28,7 @@ export function registerDev(program: Command) {
 
     // time
     registerEpoch(program);
-    program.command("utc").action(async () => {
+    program.command("utc").action(() => {
       const unixEpochSecondsNow = dayjs().unix();
       console.log(unixEpochSecondsNow);
       console.log(
@@ -102,7 +103,7 @@ function registerEpoch(program: Command) {
   const epochCmd = program
     .command("epoch [timestamps...]")
     .description("Get current epoch timestamp or convert given timestamps")
-    .action(async (timestamps: string[]) => {
+    .action((timestamps: string[]) => {
       if (timestamps.length === 0) {
         const epoch = currentEpoch();
         console.log(epoch);
@@ -127,7 +128,7 @@ function registerEpoch(program: Command) {
   epochCmd
     .command("now")
     .description("Get current epoch timestamp")
-    .action(async () => {
+    .action(() => {
       const epoch = currentEpoch();
       console.log(epoch);
       // process.exit(0);

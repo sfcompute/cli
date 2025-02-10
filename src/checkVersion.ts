@@ -4,6 +4,7 @@ import { execSync } from "node:child_process";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import process from "node:process";
 import semver from "semver";
 import pkg from "../package.json" with { type: "json" };
 

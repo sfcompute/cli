@@ -1,4 +1,4 @@
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import {
   logAndQuit,

@@ -1,4 +1,4 @@
-import type { Command } from "commander";
+import type { Command } from "@commander-js/extra-typings";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import React, { useEffect, useState } from "react";
@@ -369,6 +369,7 @@ async function removeClusterUserAction({
   const api = await apiClient(token);
 
   const { data, error, response } = await api.DELETE(
+    // deno-lint-ignore no-explicit-any -- TODO: FIXME: include path in OpenAPI schema or rewrite this to use a different route
     "/v0/credentials/{id}" as any,
     {
       params: {
@@ -449,7 +450,7 @@ async function kubeconfigAction({
         nonce: item.nonce,
         ephemeralPublicKey: item.ephemeral_pubkey,
       });
-    } catch (e) {
+    } catch {
       continue;
     }
 
