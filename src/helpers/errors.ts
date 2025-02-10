@@ -16,13 +16,13 @@ export function logLoginMessageAndQuit(): never {
 export async function logSessionTokenExpiredAndQuit(): Promise<never> {
   await clearAuthFromConfig();
   logAndQuit(
-    `\nYour session has expired. Please login again.\n\n\t$ ${loginCommand}\n`
+    `\nYour session has expired. Please login again.\n\n\t$ ${loginCommand}\n`,
   );
 }
 
 export function failedToConnect(): never {
   logAndQuit(
-    "Failed to connect to the server. Please check your internet connection and try again."
+    "Failed to connect to the server. Please check your internet connection and try again.",
   );
 }
 

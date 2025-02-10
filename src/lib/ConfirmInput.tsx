@@ -26,7 +26,7 @@ const ConfirmInput: React.FC<ConfirmInputProps> = ({
     (newValue: string) => {
       onSubmit(yn(newValue, { default: isChecked }));
     },
-    [isChecked, onSubmit]
+    [isChecked, onSubmit],
   );
 
   return (

@@ -38,7 +38,7 @@ const apiPaths = {
 
 export async function getWebAppUrl(
   key: keyof typeof webPaths,
-  params?: any
+  params?: any,
 ): Promise<string> {
   const config = await loadConfig();
   const path = webPaths[key];
@@ -51,7 +51,7 @@ export async function getWebAppUrl(
 
 export async function getApiUrl(
   key: keyof typeof apiPaths,
-  params?: any
+  params?: any,
 ): Promise<string> {
   const config = await loadConfig();
   const path = apiPaths[key];

@@ -22,7 +22,7 @@ export function registerContracts(program: Command) {
         .alias("ls")
         .option("--json", "Output in JSON format")
         .description("List all contracts")
-        .action(async options => {
+        .action(async (options) => {
           if (options.json) {
             console.log(await listContracts());
           } else {
@@ -31,7 +31,7 @@ export function registerContracts(program: Command) {
             render(<ContractList contracts={data} />);
           }
           // process.exit(0);
-        })
+        }),
     );
 }
 
@@ -58,7 +58,7 @@ async function listContracts(): Promise<Contract[]> {
 
   if (!data) {
     return logAndQuit(
-      `Failed to get contracts: Unexpected response from server: ${response}`
+      `Failed to get contracts: Unexpected response from server: ${response}`,
     );
   }
 

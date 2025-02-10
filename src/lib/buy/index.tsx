@@ -1,6 +1,6 @@
 import { parseDate } from "chrono-node";
 import type { Command } from "commander";
-import { Box, Text, render, useApp } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
 import dayjs from "npm:dayjs@1.11.13";
@@ -46,14 +46,14 @@ export function registerBuy(program: Command) {
     .option("-p, --price <price>", "The price in dollars, per GPU hour")
     .option(
       "-s, --start <start>",
-      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'"
+      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
     )
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-colo, --colocate <contracts_to_colocate_with>",
       "Colocate with existing contracts",
-      value => value.split(","),
-      []
+      (value) => value.split(","),
+      [],
     )
     .option("--quote", "Only provide a quote for the order")
     .action(buyOrderAction);
@@ -136,16 +136,16 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
     })();
   }, []);
 
-  return isLoading ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return isLoading
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : (
-    <QuoteDisplay quote={quote} />
-  );
+    )
+    : <QuoteDisplay quote={quote} />;
 }
 
 /*
@@ -163,7 +163,7 @@ async function buyOrderAction(options: SfBuyOptions) {
     const nodes = parseAccelerators(options.accelerators);
     if (!Number.isInteger(nodes)) {
       return logAndQuit(
-        `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`
+        `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
       );
     }
 
@@ -179,7 +179,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
     (async () => {
       // Grab the price per GPU hour, either
       let pricePerGpuHour: number | null = parsePricePerGpuHour(
-        props.options.price
+        props.options.price,
       );
 
       let startAt = parseStart(props.options.start);
@@ -195,16 +195,15 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
           return logAndQuit(
-            "No quote found for the desired order. Try with a different start date, duration, or price."
+            "No quote found for the desired order. Try with a different start date, duration, or price.",
           );
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
 
-        startAt =
-          quote.start_at === "NOW"
-            ? ("NOW" as const)
-            : parseStartAsDate(quote.start_at);
+        startAt = quote.start_at === "NOW"
+          ? ("NOW" as const)
+          : parseStartAsDate(quote.start_at);
 
         endsAt = dayjs(quote.end_at).toDate();
 
@@ -222,16 +221,16 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
     })();
   }, []);
 
-  return orderProps === null ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return orderProps === null
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : (
-    <BuyOrder {...orderProps} yes={props.options.yes} />
-  );
+    )
+    : <BuyOrder {...orderProps} yes={props.options.yes} />;
 }
 
 function roundEndDate(endDate: Date) {
@@ -251,7 +250,7 @@ function roundEndDate(endDate: Date) {
 export function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
-  durationInHours: number
+  durationInHours: number,
 ) {
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
@@ -279,8 +278,8 @@ function BuyOrderPreview(props: {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice =
-    getTotalPrice(props.price, props.size, realDurationHours) / 100;
+  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
+    100;
 
   return (
     <Box flexDirection="column">
@@ -341,15 +340,16 @@ function BuyOrder(props: BuyOrderProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [loadingMsg, setLoadingMsg] = useState<string | null>(
-    "Placing order..."
+    "Placing order...",
   );
 
   async function submitOrder() {
     const endsAt = props.endsAt;
-    const startAt =
-      props.startAt === "NOW" ? parseStartAsDate(props.startAt) : props.startAt;
-    const realDurationInHours =
-      dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+    const startAt = props.startAt === "NOW"
+      ? parseStartAsDate(props.startAt)
+      : props.startAt;
+    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
+      3600;
 
     setIsLoading(true);
     const order = await placeBuyOrder({
@@ -357,7 +357,7 @@ function BuyOrder(props: BuyOrderProps) {
       totalPriceInCents: getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours
+        realDurationInHours,
       ),
       startsAt: props.startAt,
       endsAt,
@@ -371,16 +371,15 @@ function BuyOrder(props: BuyOrderProps) {
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       const endsAt = props.endsAt;
-      const startAt =
-        props.startAt === "NOW"
-          ? parseStartAsDate(props.startAt)
-          : props.startAt;
-      const realDurationInHours =
-        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+      const startAt = props.startAt === "NOW"
+        ? parseStartAsDate(props.startAt)
+        : props.startAt;
+      const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
+        3600;
       const totalPriceInCents = getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours
+        realDurationInHours,
       );
 
       analytics.track({
@@ -427,7 +426,7 @@ function BuyOrder(props: BuyOrderProps) {
       });
       submitOrder();
     },
-    [exit, setIsLoading]
+    [exit, setIsLoading],
   );
 
   useEffect(() => {
@@ -440,7 +439,7 @@ function BuyOrder(props: BuyOrderProps) {
         const o = await getOrder(order.id);
         if (!o) {
           setLoadingMsg(
-            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed."
+            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
           );
           return;
         }
@@ -536,12 +535,12 @@ export async function placeBuyOrder(options: {
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
-    "totalPriceInCents must be a whole number"
+    "totalPriceInCents must be a whole number",
   );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
   invariant(
     options.numberNodes === Math.ceil(options.numberNodes),
-    "numberNodes must be a whole number"
+    "numberNodes must be a whole number",
   );
 
   const api = await apiClient();
@@ -551,10 +550,9 @@ export async function placeBuyOrder(options: {
       instance_type: options.instanceType,
       quantity: options.numberNodes,
       // round start date again because the user might take a long time to confirm
-      start_at:
-        options.startsAt === "NOW"
-          ? "NOW"
-          : roundStartDate(options.startsAt).toISOString(),
+      start_at: options.startsAt === "NOW"
+        ? "NOW"
+        : roundStartDate(options.startsAt).toISOString(),
       end_at: options.endsAt.toISOString(),
       price: options.totalPriceInCents,
       colocate_with: options.colocateWith,
@@ -565,7 +563,7 @@ export async function placeBuyOrder(options: {
     switch (response.status) {
       case 400:
         return logAndQuit(
-          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`
+          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`,
         );
       case 401:
         return await logSessionTokenExpiredAndQuit();
@@ -578,7 +576,7 @@ export async function placeBuyOrder(options: {
 
   if (!data) {
     return logAndQuit(
-      `Failed to place order: Unexpected response from server: ${response}`
+      `Failed to place order: Unexpected response from server: ${response}`,
     );
   }
 
@@ -587,7 +585,7 @@ export async function placeBuyOrder(options: {
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartAsDate(quote.start_at)
+    parseStartAsDate(quote.start_at),
   );
   const durationHours = durationSeconds / 3600 / 1000;
 
@@ -613,11 +611,11 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
 
   const minDurationSeconds = Math.max(
     1,
-    durationSeconds - Math.ceil(durationSeconds * 0.1)
+    durationSeconds - Math.ceil(durationSeconds * 0.1),
   );
   const maxDurationSeconds = Math.max(
     durationSeconds + 3600,
-    durationSeconds + Math.ceil(durationSeconds * 0.1)
+    durationSeconds + Math.ceil(durationSeconds * 0.1),
   );
 
   return await getQuote({
@@ -647,14 +645,12 @@ export async function getQuote(options: QuoteOptions) {
         side: "buy",
         instance_type: options.instanceType,
         quantity: options.quantity,
-        min_start_date:
-          options.minStartTime === "NOW"
-            ? ("NOW" as const)
-            : options.minStartTime.toISOString(),
-        max_start_date:
-          options.maxStartTime === "NOW"
-            ? ("NOW" as const)
-            : options.maxStartTime.toISOString(),
+        min_start_date: options.minStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.minStartTime.toISOString(),
+        max_start_date: options.maxStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.maxStartTime.toISOString(),
         min_duration: options.minDurationSeconds,
         max_duration: options.maxDurationSeconds,
       },
@@ -678,7 +674,7 @@ export async function getQuote(options: QuoteOptions) {
 
   if (!data) {
     return logAndQuit(
-      `Failed to get quote: Unexpected response from server: ${response}`
+      `Failed to get quote: Unexpected response from server: ${response}`,
     );
   }
 

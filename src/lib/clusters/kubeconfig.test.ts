@@ -48,12 +48,12 @@ Deno.test("Merges clusters without overwriting unique entries", () => {
 
   assertEquals(mergedConfig.clusters.length, 2);
   assert(
-    mergedConfig.clusters.some(cluster => cluster.name === "cluster1"),
-    "cluster1 should exist in merged clusters"
+    mergedConfig.clusters.some((cluster) => cluster.name === "cluster1"),
+    "cluster1 should exist in merged clusters",
   );
   assert(
-    mergedConfig.clusters.some(cluster => cluster.name === "cluster2"),
-    "cluster2 should exist in merged clusters"
+    mergedConfig.clusters.some((cluster) => cluster.name === "cluster2"),
+    "cluster2 should exist in merged clusters",
   );
 });
 
@@ -275,7 +275,7 @@ Deno.test(
     assertEquals(mergedConfig.apiVersion, "v1");
     assertEquals(mergedConfig.kind, "Config");
     assertEquals(mergedConfig["current-context"], "context1");
-  }
+  },
 );
 
 Deno.test("Handles optional fields like namespace correctly", () => {
@@ -323,7 +323,7 @@ Deno.test("Handles optional fields like namespace correctly", () => {
   assertEquals(
     mergedConfig.contexts[0].context.namespace,
     "namespace2",
-    "Namespace should be updated from config2"
+    "Namespace should be updated from config2",
   );
 });
 

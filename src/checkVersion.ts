@@ -68,7 +68,7 @@ async function checkProductionCLIVersion() {
   // Fetch from network
   try {
     const response = await fetch(
-      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json"
+      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json",
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -102,7 +102,7 @@ export async function checkVersion() {
 
   if (isPatchUpdate) {
     console.log(
-      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`)
+      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
       execSync("sf upgrade", { stdio: "inherit" });
@@ -130,7 +130,7 @@ Run 'sf upgrade' to update to the latest version
         padding: 1,
         borderColor: "yellow",
         borderStyle: "round",
-      })
+      }),
     );
   }
 }
