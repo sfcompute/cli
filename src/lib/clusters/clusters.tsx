@@ -167,7 +167,9 @@ async function listClustersAction({
 function ClusterUserDisplay({
   users,
 }: {
-  users: Array<{ id: string; name: string; is_usable: boolean; cluster: string }>;
+  users: Array<
+    { id: string; name: string; is_usable: boolean; cluster: string }
+  >;
 }) {
   return (
     <Box flexDirection="column">
@@ -228,8 +230,9 @@ async function listClusterUsers({ token }: { token?: string }) {
     (credential) => credential.object === "k8s_credential",
   );
 
-  const users: Array<{ id: string; name: string; is_usable: boolean; cluster: string }> =
-    [];
+  const users: Array<
+    { id: string; name: string; is_usable: boolean; cluster: string }
+  > = [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
       k.encrypted_token && k.nonce && k.ephemeral_pubkey,
