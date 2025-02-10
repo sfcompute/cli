@@ -1,10 +1,7 @@
+import React from "react";
 import { Box, Text } from "ink";
 import { Row } from "./Row.tsx";
-import dayjs from "dayjs";
-import { GPUS_PER_NODE } from "./constants.ts";
-import React from "react";
-import { getPricePerGpuHourFromQuote, getTotalPrice } from "./buy/index.tsx";
-import ms from "ms";
+import { getPricePerGpuHourFromQuote } from "./buy/index.tsx";
 
 export default function QuoteDisplay(props: { quote: Quote }) {
   if (!props.quote) {
