@@ -95,20 +95,20 @@ export function registerOrders(program: Command) {
         .conflicts(["only-filled", "only-cancelled"]),
     )
     .addOption(
-      new Option("--only-filled", "Show only filled orders")
-        .conflicts(["exclude-filled", "only-cancelled", "only-open", "public"]),
-    )
-    .addOption(
-      new Option("--only-cancelled", "Show only cancelled orders")
-        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"]),
-    )
-    .addOption(
       new Option("--exclude-filled", "Exclude filled orders")
         .conflicts(["only-filled"]),
+    )
+    .addOption(
+      new Option("--only-filled", "Show only filled orders")
+        .conflicts(["exclude-filled", "only-cancelled", "only-open", "public"]),
     )
     .option(
       "--include-cancelled",
       "Include cancelled orders",
+    )
+    .addOption(
+      new Option("--only-cancelled", "Show only cancelled orders")
+        .conflicts(["exclude-cancelled", "only-filled", "only-open", "public"]),
     )
     .option(
       "--min-filled-at <date>",
