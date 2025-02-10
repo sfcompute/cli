@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import process from "node:process";
 
 const program = new Command();
 

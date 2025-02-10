@@ -1,3 +1,4 @@
+import process from "node:process";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { Command } from "commander";

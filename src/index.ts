@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import os from "node:os";
+import process from "node:process";
 import pkg from "../package.json" with { type: "json" };
 import { checkVersion } from "./checkVersion.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";

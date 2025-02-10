@@ -1,6 +1,7 @@
 import { unlinkSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import process from "node:process";
 import type { EmptyObject } from "../types/empty.ts";
 
 export interface Config {

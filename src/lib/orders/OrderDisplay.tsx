@@ -5,6 +5,7 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "./index.tsx";
 import type { HydratedOrder } from "./types.ts";
+import process from "node:process";
 
 function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
@@ -40,8 +41,8 @@ function Order(props: { order: HydratedOrder }) {
         <Text color={props.order.side === "buy" ? "green" : "red"}>
           {props.order.side === "buy" ? "↑" : "↓"}
         </Text>
-        <Text color={"yellow"}>{props.order.side}</Text>
-        <Text color={"yellow"}>{props.order.id}</Text>
+        <Text color="yellow">{props.order.side}</Text>
+        <Text color="yellow">{props.order.id}</Text>
         <Text dimColor>({props.order.status})</Text>
       </Box>
       <Row

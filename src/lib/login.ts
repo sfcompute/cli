@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { exec } from "node:child_process";
+import process from "node:process";
 import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";

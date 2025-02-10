@@ -1,3 +1,4 @@
+import process from "node:process";
 import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import Table from "cli-table3";

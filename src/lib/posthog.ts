@@ -1,3 +1,4 @@
+import process from "node:process";
 import { PostHog } from "posthog-node";
 import { loadConfig, saveConfig } from "../helpers/config.ts";
 import { getApiUrl } from "../helpers/urls.ts";

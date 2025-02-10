@@ -492,7 +492,7 @@ function BuyOrder(props: BuyOrderProps) {
       {isLoading && (
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="dots" />}
-          {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
+          {order && order.status === "open" && <Text color="yellow">•</Text>}
           {!order && <Text>{loadingMsg}</Text>}
           {order && (
             <Box gap={1}>

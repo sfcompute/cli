@@ -286,7 +286,7 @@ function SellOrder(props: {
       {isLoading && (
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="arc" />}
-          {order && order.status === "open" && <Text color={"yellow"}>•</Text>}
+          {order && order.status === "open" && <Text color="yellow">•</Text>}
           {!order && <Text>Placing order...</Text>}
           {order && (
             <Box gap={1}>

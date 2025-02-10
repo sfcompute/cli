@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import process from "node:process";
 import ora from "ora";
 
 /**

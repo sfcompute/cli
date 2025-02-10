@@ -21,7 +21,7 @@ export function ContractDisplay(props: { contract: Contract }) {
     <Box flexDirection="column">
       <Box gap={1}>
         <Text>{statusIcon}</Text>
-        <Text color={"yellow"}>{props.contract.id}</Text>
+        <Text color="yellow">{props.contract.id}</Text>
       </Box>
       <Row headWidth={6} head="type" value={props.contract.instance_type} />
       <Row
