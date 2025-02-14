@@ -9,7 +9,7 @@ const postHogClient = new PostHog(
     host: "https://us.posthog.com",
     flushAt: 1,
     flushInterval: 0,
-  },
+  }
 );
 // Uncomment this out to see Posthog debugging logs.
 // postHogClient.debug();
@@ -61,6 +61,27 @@ const trackEvent = ({
   if (!IS_TRACKING_DISABLED) {
     runner();
   }
+};
+
+type FeatureFlags = "vms";
+
+/**
+ * Checks if a feature is enabled for the current user.
+ */
+export const isFeatureEnabled = async (feature: FeatureFlags) => {
+  const config = await loadConfig();
+  const exchangeAccountId = config.account_id;
+
+  if (!exchangeAccountId) {
+    return false;
+  }
+
+  const result = await postHogClient.isFeatureEnabled(
+    feature,
+    exchangeAccountId
+  );
+
+  return result;
 };
 
 export const analytics = {
