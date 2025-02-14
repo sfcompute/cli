@@ -20,6 +20,7 @@ import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerScale } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
+import { registerVM } from "./lib/vm.ts";
 
 const program = new Command();
 
@@ -42,6 +43,7 @@ registerUpgrade(program);
 registerScale(program);
 registerClusters(program);
 registerMe(program);
+await registerVM(program);
 
 // (development commands)
 registerDev(program);
