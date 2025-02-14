@@ -1,4 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
+import process from "node:process";
 import { isFeatureEnabled } from "./posthog.ts";
 
 export async function registerVM(program: Command) {
@@ -11,7 +12,7 @@ export async function registerVM(program: Command) {
   program
     .command("vm")
     .description("Manage virtual machines")
-    .action(async () => {
+    .action(() => {
       console.log("VMs!!!");
 
       process.exit(0);
