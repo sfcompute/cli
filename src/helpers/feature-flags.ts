@@ -42,7 +42,7 @@ export async function loadFeatureFlags(): Promise<FeatureFlagCache> {
 
 export async function getCachedFeatureFlag(
   feature: string,
-  accountId: string
+  accountId: string,
 ): Promise<CachedFeatureFlag | null> {
   const cache = await loadFeatureFlags();
   const key = `${accountId}:${feature}`;
@@ -65,7 +65,7 @@ export async function getCachedFeatureFlag(
 export async function cacheFeatureFlag(
   feature: string,
   accountId: string,
-  value: boolean
+  value: boolean,
 ): Promise<void> {
   const cache = await loadFeatureFlags();
   const key = `${accountId}:${feature}`;
