@@ -1,6 +1,10 @@
 import process from "node:process";
 import { PostHog } from "posthog-node";
 import { loadConfig, saveConfig } from "../helpers/config.ts";
+import {
+  cacheFeatureFlag,
+  getCachedFeatureFlag,
+} from "../helpers/feature-flags.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 
 const postHogClient = new PostHog(
@@ -76,12 +80,23 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
     return false;
   }
 
+  // Check cache first
+  const cachedFlag = await getCachedFeatureFlag(feature, exchangeAccountId);
+  if (cachedFlag) {
+    return cachedFlag.value;
+  }
+
+  // If not in cache or expired, fetch from PostHog
   const result = await postHogClient.isFeatureEnabled(
     feature,
     exchangeAccountId
   );
 
-  return result;
+  // Cache the result (PostHog returns undefined if there's an error, default to false)
+  const finalResult = result ?? false;
+  await cacheFeatureFlag(feature, exchangeAccountId, finalResult);
+
+  return finalResult;
 };
 
 export const analytics = {
