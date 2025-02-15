@@ -1,4 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import React, { useEffect, useState } from "react";

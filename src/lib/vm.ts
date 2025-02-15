@@ -1,5 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
 import process from "node:process";
+import * as console from "node:console";
 import { isFeatureEnabled } from "./posthog.ts";
 
 export async function registerVM(program: Command) {

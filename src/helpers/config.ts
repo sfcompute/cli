@@ -1,4 +1,5 @@
 import { unlinkSync } from "node:fs";
+import * as console from "node:console";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";

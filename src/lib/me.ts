@@ -1,4 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
 import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import {
   logAndQuit,

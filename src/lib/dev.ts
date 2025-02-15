@@ -1,4 +1,5 @@
 import process from "node:process";
+import * as console from "node:console";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { Command } from "@commander-js/extra-typings";

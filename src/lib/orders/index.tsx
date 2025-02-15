@@ -16,6 +16,7 @@ import { getApiUrl } from "../../helpers/urls.ts";
 import { parseStartAsDate } from "../buy/index.tsx";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
+import * as console from "node:console";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);

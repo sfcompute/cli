@@ -1,6 +1,8 @@
 import type { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
 import { exec } from "node:child_process";
 import process from "node:process";
+import { setTimeout } from "node:timers";
 import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";
