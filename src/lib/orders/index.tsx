@@ -330,6 +330,7 @@ export async function submitOrderCancellationByIdAction(
     }
 
     const error = await response.json();
+    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
     switch (error.code) {
       case "order.not_found":
         return logAndQuit(`Order ${orderId} not found`);
@@ -342,6 +343,7 @@ export async function submitOrderCancellationByIdAction(
   }
 
   const resp = await response.json();
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   const cancellationSubmitted = resp.object === "pending";
   if (!cancellationSubmitted) {
     return logAndQuit(`Failed to cancel order ${orderId}`);

@@ -1,5 +1,6 @@
 import { parseDate } from "chrono-node";
 import type { Command } from "@commander-js/extra-typings";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";

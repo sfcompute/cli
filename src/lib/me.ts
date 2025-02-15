@@ -41,5 +41,6 @@ export async function getLoggedInAccountId() {
 
   const data = await response.json();
 
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   return data.id;
 }

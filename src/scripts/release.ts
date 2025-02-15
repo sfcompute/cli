@@ -1,4 +1,4 @@
-import { Command, Argument } from "@commander-js/extra-typings";
+import { Argument, Command } from "@commander-js/extra-typings";
 import process from "node:process";
 import * as console from "node:console";
 
@@ -180,7 +180,11 @@ program
   .description(
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
-  .addArgument(new Argument("type").choices(["major", "minor", "patch", "prerelease"] as const))
+  .addArgument(
+    new Argument("type").choices(
+      ["major", "minor", "patch", "prerelease"] as const,
+    ),
+  )
   .action(async (type) => {
     try {
       const ghCheckResult = await new Deno.Command("which", {
