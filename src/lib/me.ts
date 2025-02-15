@@ -16,7 +16,7 @@ export function registerMe(program: Command) {
   });
 }
 
-async function getLoggedInAccountId() {
+export async function getLoggedInAccountId() {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
