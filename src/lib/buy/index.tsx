@@ -192,7 +192,10 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         );
       } else if (end) {
         endsAt = end;
-        props.options.duration = dayjs(endsAt).diff(dayjs(coercedStart), "seconds");
+        props.options.duration = dayjs(endsAt).diff(
+          dayjs(coercedStart),
+          "seconds",
+        );
       } else {
         throw new Error("Either duration or end must be set");
       }
