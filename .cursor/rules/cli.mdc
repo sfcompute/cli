@@ -1,6 +1,6 @@
 ---
 description: Describes the CLI project
-globs: 
+globs: *.(ts|tsx)
 ---
 - This is a CLI program written in Deno using the `commander` library and `@commander-js/extra-typings`.
 
