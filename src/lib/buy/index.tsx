@@ -624,19 +624,19 @@ export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
   const params = {
-      query: {
-        side: "buy",
-        instance_type: options.instanceType,
-        quantity: options.quantity,
-        min_start_date: options.minStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.minStartTime.toISOString(),
-        max_start_date: options.maxStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.maxStartTime.toISOString(),
-        min_duration: options.minDurationSeconds,
-        max_duration: options.maxDurationSeconds,
-      },
+    query: {
+      side: "buy",
+      instance_type: options.instanceType,
+      quantity: options.quantity,
+      min_start_date: options.minStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.minStartTime.toISOString(),
+      max_start_date: options.maxStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.maxStartTime.toISOString(),
+      min_duration: options.minDurationSeconds,
+      max_duration: options.maxDurationSeconds,
+    },
   } as const;
 
   const { data, error, response } = await api.GET("/v0/quote", {
