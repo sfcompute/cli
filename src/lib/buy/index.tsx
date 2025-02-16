@@ -220,14 +220,6 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         colocate,
         yes,
       } = props.options;
-      
-      console.log("setting order props", {
-        type,
-        price: pricePerGpuHour,
-        size: accelerators / GPUS_PER_NODE,
-        startAt,
-        endsAt,
-      });
 
       setOrderProps({
         type,
@@ -555,8 +547,6 @@ export async function placeBuyOrder(options: {
     price: options.totalPriceInCents,
     colocate_with: options.colocateWith,
   } as const;
-  console.log("place buy body:", body);
-  
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
   });
@@ -648,7 +638,6 @@ export async function getQuote(options: QuoteOptions) {
         max_duration: options.maxDurationSeconds,
       },
   } as const;
-  console.log("get quote params:", params);
 
   const { data, error, response } = await api.GET("/v0/quote", {
     params,
