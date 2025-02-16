@@ -181,7 +181,9 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (duration) {
         // If duration is set, calculate end from start + duration
         const coercedStart = parseStartDate(start);
-        endsAt = roundEndDate(dayjs(coercedStart).add(duration, "seconds").toDate());
+        endsAt = roundEndDate(
+          dayjs(coercedStart).add(duration, "seconds").toDate(),
+        );
       } else if (end) {
         // If end is set, calculate duration from end - start
         endsAt = end;
