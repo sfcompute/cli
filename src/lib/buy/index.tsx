@@ -187,7 +187,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (duration) {
         // If duration is set, calculate end from start + duration
         endsAt = roundEndDate(
-          dayjs(startAt).add(duration, "seconds").toDate(),
+          dayjs(coercedStart).add(duration, "seconds").toDate(),
         );
       } else if (end) {
         endsAt = end;
@@ -220,6 +220,14 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         colocate,
         yes,
       } = props.options;
+      
+      console.log("setting order props", {
+        type,
+        price: pricePerGpuHour,
+        size: accelerators / GPUS_PER_NODE,
+        startAt,
+        endsAt,
+      });
 
       setOrderProps({
         type,
@@ -535,19 +543,22 @@ export async function placeBuyOrder(options: {
   );
 
   const api = await apiClient();
+  const body = {
+    side: "buy",
+    instance_type: options.instanceType,
+    quantity: options.numberNodes,
+    // round start date again because the user might take a long time to confirm
+    start_at: options.startsAt === "NOW"
+      ? "NOW"
+      : roundStartDate(options.startsAt).toISOString(),
+    end_at: roundEndDate(options.endsAt).toISOString(),
+    price: options.totalPriceInCents,
+    colocate_with: options.colocateWith,
+  } as const;
+  console.log("place buy body:", body);
+  
   const { data, error, response } = await api.POST("/v0/orders", {
-    body: {
-      side: "buy",
-      instance_type: options.instanceType,
-      quantity: options.numberNodes,
-      // round start date again because the user might take a long time to confirm
-      start_at: options.startsAt === "NOW"
-        ? "NOW"
-        : roundStartDate(options.startsAt).toISOString(),
-      end_at: roundEndDate(options.endsAt).toISOString(),
-      price: options.totalPriceInCents,
-      colocate_with: options.colocateWith,
-    },
+    body,
   });
 
   if (!response.ok) {
@@ -622,8 +633,7 @@ type QuoteOptions = {
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
-  const { data, error, response } = await api.GET("/v0/quote", {
-    params: {
+  const params = {
       query: {
         side: "buy",
         instance_type: options.instanceType,
@@ -637,7 +647,11 @@ export async function getQuote(options: QuoteOptions) {
         min_duration: options.minDurationSeconds,
         max_duration: options.maxDurationSeconds,
       },
-    },
+  } as const;
+  console.log("get quote params:", params);
+
+  const { data, error, response } = await api.GET("/v0/quote", {
+    params,
     // timeout after 600 seconds
     signal: AbortSignal.timeout(600 * 1000),
   });
