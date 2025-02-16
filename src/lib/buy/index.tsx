@@ -76,7 +76,7 @@ function _registerBuy(program: Command) {
       "Colocate with existing contracts",
       (value) => value.split(","),
     )
-    .option("--quote", "Only provide a quote for the order")
+    .option("-q, --quote", "Only provide a quote for the order")
     .action(function buyOrderAction(options) {
       /*
        * Flow is:
@@ -109,13 +109,13 @@ function parseAccelerators(accelerators?: string) {
     return 1;
   }
 
-  const nodes = Number.parseInt(accelerators) / GPUS_PER_NODE;
-  if (!Number.isInteger(nodes)) {
+  const parsedValue = Number.parseInt(accelerators);
+  if (!Number.isInteger(parsedValue / GPUS_PER_NODE)) {
     return logAndQuit(
       `You can only buy whole nodes, or 8 GPUs at a time. Got: ${accelerators}`,
     );
   }
-  return nodes;
+  return parsedValue;
 }
 
 function parseDuration(duration?: string) {
@@ -342,8 +342,8 @@ function BuyOrder(props: BuyOrderProps) {
 
   async function submitOrder() {
     const { startAt, endsAt } = props;
-    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
-      3600;
+    const realDurationInHours =
+      dayjs(endsAt).diff(dayjs(parseStartDate(startAt))) / 1000 / 3600;
 
     setIsLoading(true);
     const order = await placeBuyOrder({
@@ -589,8 +589,8 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
     : roundStartDate(parseStartDate(options.start));
   const durationSeconds = options.duration
     ? options.duration
-    : dayjs(options.end).diff(dayjs(startsAt), "seconds");
-  const quantity = options.accelerators;
+    : dayjs(options.end).diff(dayjs(parseStartDate(startsAt)), "seconds");
+  const quantity = options.accelerators / GPUS_PER_NODE;
 
   const minDurationSeconds = Math.max(
     1,
