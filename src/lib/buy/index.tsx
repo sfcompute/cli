@@ -27,6 +27,7 @@ import QuoteDisplay from "../Quote.tsx";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { analytics } from "../posthog.ts";
+import console from "node:console";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -54,7 +55,7 @@ function _registerBuy(program: Command) {
       "-s, --start <start>",
       "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
       parseStartDateOrNow,
-      new Date(),
+      "NOW",
     )
     .addOption(
       new Option(
@@ -67,7 +68,7 @@ function _registerBuy(program: Command) {
     .hook("preAction", (command) => {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
-        throw new Error("Exactly one of --duration or --end must be specified");
+        logAndQuit("Exactly one of --duration or --end must be specified");
       }
     })
     .option("-y, --yes", "Automatically confirm the order")
@@ -109,7 +110,13 @@ function parseAccelerators(accelerators?: string) {
     return 1;
   }
 
-  return Number.parseInt(accelerators) / GPUS_PER_NODE;
+  const nodes = Number.parseInt(accelerators) / GPUS_PER_NODE;
+  if (!Number.isInteger(nodes)) {
+    return logAndQuit(
+      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${accelerators}`,
+    );
+  }
+  return nodes;
 }
 
 function parseDuration(duration?: string) {
@@ -177,16 +184,15 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       );
       let startAt = start;
       let endsAt: Date;
-
+      const coercedStart = parseStartDate(start);
       if (duration) {
         // If duration is set, calculate end from start + duration
-        const coercedStart = parseStartDate(start);
         endsAt = roundEndDate(
-          dayjs(coercedStart).add(duration, "seconds").toDate(),
+          dayjs(startAt).add(duration, "seconds").toDate(),
         );
       } else if (end) {
-        // If end is set, calculate duration from end - start
         endsAt = end;
+        props.options.duration = dayjs(endsAt).diff(dayjs(coercedStart), "seconds");
       } else {
         throw new Error("Either duration or end must be set");
       }
@@ -216,7 +222,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       setOrderProps({
         type,
         price: pricePerGpuHour,
-        size: accelerators,
+        size: accelerators / GPUS_PER_NODE,
         startAt,
         endsAt,
         colocate,
