@@ -10,5 +10,8 @@
   },
   "fmt": {
     "exclude": ["src/schema.ts"]
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.fetch", "deno.web"]
   }
 }

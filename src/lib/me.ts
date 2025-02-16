@@ -1,4 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
 import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -40,5 +41,6 @@ export async function getLoggedInAccountId() {
 
   const data = await response.json();
 
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   return data.id;
 }

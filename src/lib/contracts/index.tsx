@@ -1,4 +1,5 @@
 import { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
 import { render } from "ink";
 import React from "react";
 import { apiClient } from "../../apiClient.ts";

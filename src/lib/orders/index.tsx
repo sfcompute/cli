@@ -13,9 +13,10 @@ import {
 } from "../../helpers/errors.ts";
 import { fetchAndHandleErrors } from "../../helpers/fetch.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { parseStartAsDate } from "../buy/index.tsx";
+import { parseStartDate } from "../../helpers/units.ts";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
+import * as console from "node:console";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -213,8 +214,8 @@ export function registerOrders(program: Command) {
 
       // Sort orders by start time ascending (present to future)
       const sortedOrders = [...orders].sort((a, b) => {
-        const aStart = parseStartAsDate(a.start_at);
-        const bStart = parseStartAsDate(b.start_at);
+        const aStart = parseStartDate(a.start_at);
+        const bStart = parseStartDate(b.start_at);
         return aStart.getTime() - bStart.getTime();
       });
 
@@ -329,6 +330,7 @@ export async function submitOrderCancellationByIdAction(
     }
 
     const error = await response.json();
+    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
     switch (error.code) {
       case "order.not_found":
         return logAndQuit(`Order ${orderId} not found`);
@@ -341,6 +343,7 @@ export async function submitOrderCancellationByIdAction(
   }
 
   const resp = await response.json();
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   const cancellationSubmitted = resp.object === "pending";
   if (!cancellationSubmitted) {
     return logAndQuit(`Failed to cancel order ${orderId}`);

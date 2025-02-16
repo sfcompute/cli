@@ -1,6 +1,7 @@
 import boxen from "boxen";
 import chalk from "chalk";
 import { execSync } from "node:child_process";
+import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -69,12 +70,13 @@ async function checkProductionCLIVersion() {
   // Fetch from network
   try {
     const response = await fetch(
-      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json"
+      "https://raw.githubusercontent.com/sfcompute/cli/refs/heads/main/package.json",
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+    // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
+    const data = await response.json() as any;
     await writeCache(data.version);
     return data.version;
   } catch (error) {
@@ -103,7 +105,7 @@ export async function checkVersion() {
 
   if (isPatchUpdate) {
     console.log(
-      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`)
+      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
       execSync("sf upgrade", { stdio: "inherit" });
@@ -131,7 +133,7 @@ Run 'sf upgrade' to update to the latest version
         padding: 1,
         borderColor: "yellow",
         borderStyle: "round",
-      })
+      }),
     );
   }
 }

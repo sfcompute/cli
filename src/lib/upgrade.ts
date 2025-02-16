@@ -1,5 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
 import process from "node:process";
+import * as console from "node:console";
 import ora from "ora";
 
 /**
@@ -16,6 +17,7 @@ const getIsOnLatestVersion = async (currentVersion: string | undefined) => {
 
   if (latestVersionResponse.ok) {
     const latestVersionData = await latestVersionResponse.json();
+    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
     const latestVersion = latestVersionData.tag_name;
 
     return latestVersion === currentVersion;

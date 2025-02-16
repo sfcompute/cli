@@ -1,6 +1,8 @@
 import type { Command } from "@commander-js/extra-typings";
+import * as console from "node:console";
 import { exec } from "node:child_process";
 import process from "node:process";
+import { setTimeout } from "node:timers";
 import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";
@@ -32,7 +34,7 @@ export function registerLogin(program: Command) {
       clearScreen();
       console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
       console.log(
-        `  Do these numbers match your browser window?\n  ${validation}\n\n`
+        `  Do these numbers match your browser window?\n  ${validation}\n\n`,
       );
 
       const checkSession = async () => {
@@ -73,7 +75,7 @@ async function createSession({ validation }: { validation: string }) {
           "Content-Type": "application/json",
         },
         maxRedirects: 5,
-      }
+      },
     );
 
     return response.data as {

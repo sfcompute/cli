@@ -1,4 +1,5 @@
 import ora from "ora";
+import { setTimeout } from "node:timers";
 import { logAndQuit } from "./errors.ts";
 import { getOrder } from "./fetchers.ts";
 
