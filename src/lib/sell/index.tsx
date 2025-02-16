@@ -1,4 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
+import { clearInterval, setInterval } from "node:timers";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
@@ -101,7 +102,7 @@ export function registerSell(program: Command) {
           size: size,
           startAt: startDate,
           endsAt: endDate,
-          flags: options.flags,
+          flags: options.flags as SellOrderFlags, // TODO: explicitly parse and validate this
           autoConfirm: options.yes || false,
         };
 
