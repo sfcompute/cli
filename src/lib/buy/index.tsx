@@ -27,7 +27,6 @@ import QuoteDisplay from "../Quote.tsx";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { analytics } from "../posthog.ts";
-import console from "node:console";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
