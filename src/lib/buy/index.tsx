@@ -1,5 +1,5 @@
 import { parseDate } from "chrono-node";
-import type { Command } from "@commander-js/extra-typings";
+import { type Command, Option } from "@commander-js/extra-typings";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
@@ -15,7 +15,12 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { roundEndDate, roundStartDate, parseStartDate } from "../../helpers/units.ts";
+import {
+  parseStartDate,
+  parseStartDateOrNow,
+  roundEndDate,
+  roundStartDate,
+} from "../../helpers/units.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
@@ -33,19 +38,43 @@ function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
-    .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
-    .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
+    .option(
+      "-n, --accelerators <quantity>",
+      "Specify the number of GPUs",
+      parseAccelerators,
+      8,
+    )
+    .option(
+      "-d, --duration <duration>",
+      "Specify the duration. We will round up so that your order ends at the nearest hour.",
+      parseDuration,
+    )
     .option("-p, --price <price>", "The price in dollars, per GPU hour")
     .option(
       "-s, --start <start>",
       "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
+      parseStartDateOrNow,
+      new Date(),
     )
+    .addOption(
+      new Option(
+        "-e, --end <end>",
+        "Specify the end date. Can be a date, or a relative time like '+1d'. We will round up to the nearest hour.",
+      )
+        .argParser(parseEnd)
+        .conflicts("duration"),
+    )
+    .hook("preAction", (command) => {
+      const { duration, end } = command.opts();
+      if ((!duration && !end) || (!!duration && !!end)) {
+        throw new Error("Exactly one of --duration or --end must be specified");
+      }
+    })
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-colo, --colocate <contracts_to_colocate_with>",
       "Colocate with existing contracts",
       (value) => value.split(","),
-      [],
     )
     .option("--quote", "Only provide a quote for the order")
     .action(function buyOrderAction(options) {
@@ -60,13 +89,6 @@ function _registerBuy(program: Command) {
       if (options.quote) {
         render(<QuoteComponent options={options} />);
       } else {
-        const nodes = parseAccelerators(options.accelerators);
-        if (!Number.isInteger(nodes)) {
-          return logAndQuit(
-            `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
-          );
-        }
-
         render(<QuoteAndBuy options={options} />);
       }
     });
@@ -126,10 +148,7 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
     (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
       setIsLoading(false);
-      if (!quote) {
-        return;
-      }
-      setQuote(quote);
+      if (quote) setQuote(quote);
     })();
   }, []);
 
@@ -151,19 +170,24 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
   // submit a quote request, handle loading state
   useEffect(() => {
     (async () => {
+      const { start, duration, end } = props.options;
       // Grab the price per GPU hour, either
-      let pricePerGpuHour: number | null = parsePricePerGpuHour(
+      let pricePerGpuHour = parsePricePerGpuHour(
         props.options.price,
       );
+      let startAt = start;
+      let endsAt: Date;
 
-      let startAt = parseStart(props.options.start);
-      if (startAt === "NOW") {
-        startAt = dayjs().toDate();
+      if (duration) {
+        // If duration is set, calculate end from start + duration
+        const coercedStart = parseStartDate(start);
+        endsAt = roundEndDate(dayjs(coercedStart).add(duration, "seconds").toDate());
+      } else if (end) {
+        // If end is set, calculate duration from end - start
+        endsAt = end;
+      } else {
+        throw new Error("Either duration or end must be set");
       }
-
-      let duration = parseDuration(props.options.duration);
-
-      let endsAt = dayjs(startAt).add(duration, "seconds").toDate();
 
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
@@ -175,25 +199,29 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
 
-        startAt = quote.start_at === "NOW"
-          ? ("NOW" as const)
-          : parseStartAsDate(quote.start_at);
+        startAt = parseStartDateOrNow(quote.start_at);
 
         endsAt = dayjs(quote.end_at).toDate();
-
-        duration = dayjs(endsAt).diff(dayjs(startAt), "seconds");
       }
 
+      const {
+        type,
+        accelerators,
+        colocate,
+        yes,
+      } = props.options;
+
       setOrderProps({
-        type: props.options.type,
+        type,
         price: pricePerGpuHour,
-        size: parseAccelerators(props.options.accelerators),
+        size: accelerators,
         startAt,
         endsAt,
-        colocate: props.options.colocate,
+        colocate,
+        yes,
       });
     })();
-  }, []);
+  }, [props.options]);
 
   return orderProps === null
     ? (
@@ -204,7 +232,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         </Box>
       </Box>
     )
-    : <BuyOrder {...orderProps} yes={props.options.yes} />;
+    : <BuyOrder {...orderProps} />;
 }
 
 export function getTotalPrice(
@@ -285,7 +313,7 @@ type Order =
 type BuyOrderProps = {
   price: number;
   size: number;
-  startAt: Date;
+  startAt: Date | "NOW";
   endsAt: Date;
   type: string;
   colocate?: Array<string>;
@@ -506,7 +534,7 @@ export async function placeBuyOrder(options: {
       start_at: options.startsAt === "NOW"
         ? "NOW"
         : roundStartDate(options.startsAt).toISOString(),
-      end_at: options.endsAt.toISOString(),
+      end_at: roundEndDate(options.endsAt).toISOString(),
       price: options.totalPriceInCents,
       colocate_with: options.colocateWith,
     },
@@ -537,14 +565,18 @@ export async function placeBuyOrder(options: {
 }
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
-  const durationSeconds = dayjs(quote.end_at).diff(parseStartDate(quote.start_at));
+  const durationSeconds = dayjs(quote.end_at).diff(
+    parseStartDate(quote.start_at),
+  );
   const durationHours = durationSeconds / 3600 / 1000;
 
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt = roundStartDate(options.start);
+  const startsAt = options.start === "NOW"
+    ? "NOW"
+    : roundStartDate(parseStartDate(options.start));
   const durationSeconds = options.duration
     ? options.duration
     : dayjs(options.end).diff(dayjs(startsAt), "seconds");
