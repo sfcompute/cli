@@ -13,7 +13,7 @@ import {
 } from "../../helpers/errors.ts";
 import { fetchAndHandleErrors } from "../../helpers/fetch.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { parseStartAsDate } from "../buy/index.tsx";
+import { parseStartDate } from "../../helpers/units.ts";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
 import * as console from "node:console";
@@ -214,8 +214,8 @@ export function registerOrders(program: Command) {
 
       // Sort orders by start time ascending (present to future)
       const sortedOrders = [...orders].sort((a, b) => {
-        const aStart = parseStartAsDate(a.start_at);
-        const bStart = parseStartAsDate(b.start_at);
+        const aStart = parseStartDate(a.start_at);
+        const bStart = parseStartDate(b.start_at);
         return aStart.getTime() - bStart.getTime();
       });
 

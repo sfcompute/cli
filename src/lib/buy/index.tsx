@@ -15,7 +15,7 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { roundStartDate } from "../../helpers/units.ts";
+import { roundEndDate, roundStartDate, parseStartDate } from "../../helpers/units.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
@@ -76,30 +76,10 @@ export function registerBuy(program: Command) {
   _registerBuy(program);
 }
 
-export function parseStart(start?: string) {
-  if (!start) {
-    return "NOW" as const;
-  }
-
-  if (start === "NOW" || start === "now") {
-    return "NOW" as const;
-  }
-
-  const parsed = parseDate(start);
-  if (!parsed) {
-    return logAndQuit(`Invalid start date: ${start}`);
-  }
-
-  return parsed;
-}
-
-export function parseStartAsDate(start?: string) {
-  const date = parseStart(start);
-  if (date === "NOW") {
-    return new Date();
-  }
-
-  return date;
+function parseEnd(value: string) {
+  const parsed = parseDate(value);
+  if (!parsed) logAndQuit(`Invalid end date: ${value}`);
+  return roundEndDate(parsed);
 }
 
 function parseAccelerators(accelerators?: string) {
@@ -227,20 +207,6 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
     : <BuyOrder {...orderProps} yes={props.options.yes} />;
 }
 
-function roundEndDate(endDate: Date) {
-  const minutes = endDate.getMinutes();
-  const seconds = endDate.getSeconds();
-  const ms = endDate.getMilliseconds();
-
-  // If already at an hour boundary (no minutes/seconds/ms), return as-is
-  if (minutes === 0 && seconds === 0 && ms === 0) {
-    return dayjs(endDate);
-  }
-
-  // Otherwise round up to next hour
-  return dayjs(endDate).add(1, "hour").startOf("hour");
-}
-
 export function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
@@ -259,13 +225,11 @@ function BuyOrderPreview(props: {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
   const startFromNow = startDate.fromNow();
 
-  const endDate = roundEndDate(props.endsAt);
+  const endDate = dayjs(roundEndDate(props.endsAt));
   const end = endDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
   const endFromNow = endDate.fromNow();
 
   const realDuration = endDate.diff(startDate);
@@ -321,12 +285,13 @@ type Order =
 type BuyOrderProps = {
   price: number;
   size: number;
-  startAt: Date | "NOW";
+  startAt: Date;
   endsAt: Date;
   type: string;
   colocate?: Array<string>;
   yes?: boolean;
 };
+
 function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -338,10 +303,7 @@ function BuyOrder(props: BuyOrderProps) {
   );
 
   async function submitOrder() {
-    const endsAt = props.endsAt;
-    const startAt = props.startAt === "NOW"
-      ? parseStartAsDate(props.startAt)
-      : props.startAt;
+    const { startAt, endsAt } = props;
     const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
       3600;
 
@@ -364,10 +326,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
-      const endsAt = props.endsAt;
-      const startAt = props.startAt === "NOW"
-        ? parseStartAsDate(props.startAt)
-        : props.startAt;
+      const { startAt, endsAt } = props;
       const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
         3600;
       const totalPriceInCents = getTotalPrice(
@@ -578,30 +537,18 @@ export async function placeBuyOrder(options: {
 }
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
-  const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartAsDate(quote.start_at),
-  );
+  const durationSeconds = dayjs(quote.end_at).diff(parseStartDate(quote.start_at));
   const durationHours = durationSeconds / 3600 / 1000;
 
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
-function parseAndRoundStart(start: string | undefined) {
-  const parsed = parseStart(start);
-  if (parsed === "NOW") {
-    return parsed;
-  }
-
-  if (dayjs(parsed).isBefore(dayjs().add(1, "minute"))) {
-    return "NOW" as const;
-  }
-
-  return roundStartDate(parsed);
-}
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt = parseAndRoundStart(options.start);
-  const durationSeconds = parseDuration(options.duration);
-  const quantity = parseAccelerators(options.accelerators);
+  const startsAt = roundStartDate(options.start);
+  const durationSeconds = options.duration
+    ? options.duration
+    : dayjs(options.end).diff(dayjs(startsAt), "seconds");
+  const quantity = options.accelerators;
 
   const minDurationSeconds = Math.max(
     1,

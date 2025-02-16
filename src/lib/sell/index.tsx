@@ -11,7 +11,7 @@ import {
 } from "../../helpers/errors.ts";
 import parseDurationFromLibrary from "parse-duration";
 import { Box, render, useApp } from "ink";
-import { parseDate } from "chrono-node";
+import { parseStartDate } from "../../helpers/units.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "ink";
@@ -79,7 +79,7 @@ export function registerSell(program: Command) {
           return logAndQuit(`Invalid duration: ${options.duration}`);
         }
 
-        const startDate = parseStartAsDate(options.start);
+        const startDate = parseStartDate(options.start);
         if (!startDate) {
           return logAndQuit(`Invalid start date: ${options.start}`);
         }
@@ -109,32 +109,6 @@ export function registerSell(program: Command) {
         render(<SellOrder {...orderDetails} />);
       },
     );
-}
-
-function parseStart(start?: string) {
-  if (!start) {
-    return "NOW";
-  }
-
-  if (start === "NOW" || start === "now") {
-    return "NOW";
-  }
-
-  const parsed = parseDate(start);
-  if (!parsed) {
-    return logAndQuit(`Invalid start date: ${start}`);
-  }
-
-  return parsed;
-}
-
-function parseStartAsDate(start?: string) {
-  const date = parseStart(start);
-  if (date === "NOW") {
-    return new Date();
-  }
-
-  return date;
 }
 
 function parseAccelerators(accelerators?: string) {

@@ -102,16 +102,12 @@ export function dollarsToCents(dollars: number): Cents {
   return Math.ceil(dollars * 100);
 }
 
-export function parseStartDate(startDate: string): Date | "NOW" | null {
+export function parseStartDate(startDate?: string): Date {
+  if (!startDate) return new Date();
+
   const nowRe = /\b(?:"|')?[nN][oO][wW](?:"|')?\b/;
-  if (nowRe.test(startDate)) {
-    return "NOW";
-  }
+  if (nowRe.test(startDate)) return new Date();
 
   const chronoDate = chrono.parseDate(startDate);
-  if (!chronoDate) {
-    return null;
-  }
-
-  return chronoDate;
+  return chronoDate ?? new Date();
 }
