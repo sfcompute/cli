@@ -13,6 +13,7 @@ import { getWebAppUrl } from "../helpers/urls.ts";
 // through redirects correctly
 import axios from "axios";
 import { clearFeatureFlags } from "../helpers/feature-flags.ts";
+import { getLoggedInAccountId } from "./me.ts";
 
 export function registerLogin(program: Command) {
   program
@@ -39,8 +40,16 @@ export function registerLogin(program: Command) {
       const checkSession = async () => {
         const session = await getSession({ token: result.token });
         if (session?.token) {
+          let accountId: undefined | string;
+
+          try {
+            accountId = await getLoggedInAccountId(session.token);
+          } catch {
+            // No-op
+          }
           await saveConfig({
             auth_token: session.token,
+            account_id: accountId,
           });
           await clearFeatureFlags();
           spinner.succeed("Logged in successfully");
