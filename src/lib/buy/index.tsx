@@ -76,6 +76,7 @@ function _registerBuy(program: Command) {
       "Colocate with existing contracts",
       (value) => value.split(","),
     )
+    .option("--vcluster", "Enable vcluster virtualization technology")
     .option("-q, --quote", "Only provide a quote for the order")
     .action(function buyOrderAction(options) {
       /*
@@ -219,16 +220,18 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         accelerators,
         colocate,
         yes,
+        vcluster,
       } = props.options;
 
       setOrderProps({
-        type,
         price: pricePerGpuHour,
         size: accelerators / GPUS_PER_NODE,
         startAt,
         endsAt,
+        type,
         colocate,
         yes,
+        vcluster,
       });
     })();
   }, [props.options]);
@@ -328,6 +331,7 @@ type BuyOrderProps = {
   type: string;
   colocate?: Array<string>;
   yes?: boolean;
+  vcluster?: boolean;
 };
 
 function BuyOrder(props: BuyOrderProps) {
@@ -357,6 +361,7 @@ function BuyOrder(props: BuyOrderProps) {
       endsAt,
       colocateWith: props.colocate || [],
       numberNodes: props.size,
+      vcluster: props.vcluster,
     });
     setOrder(order);
   }
@@ -523,6 +528,7 @@ export async function placeBuyOrder(options: {
   endsAt: Date;
   colocateWith: Array<string>;
   numberNodes: number;
+  vcluster?: boolean;
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
@@ -546,6 +552,7 @@ export async function placeBuyOrder(options: {
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
     colocate_with: options.colocateWith,
+    vcluster: options.vcluster,
   } as const;
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
