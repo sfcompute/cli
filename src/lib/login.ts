@@ -1,6 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
-import * as console from "node:console";
 import { exec } from "node:child_process";
+import * as console from "node:console";
 import process from "node:process";
 import { setTimeout } from "node:timers";
 import ora from "ora";
@@ -13,7 +13,6 @@ import { getWebAppUrl } from "../helpers/urls.ts";
 // through redirects correctly
 import axios from "axios";
 import { clearFeatureFlags } from "../helpers/feature-flags.ts";
-import { getLoggedInAccountId } from "./me.ts";
 
 export function registerLogin(program: Command) {
   program
@@ -34,22 +33,14 @@ export function registerLogin(program: Command) {
       clearScreen();
       console.log(`\n\n  Click here to login:\n  ${url}\n\n`);
       console.log(
-        `  Do these numbers match your browser window?\n  ${validation}\n\n`,
+        `  Do these numbers match your browser window?\n  ${validation}\n\n`
       );
 
       const checkSession = async () => {
         const session = await getSession({ token: result.token });
         if (session?.token) {
-          let accountId: undefined | string;
-
-          try {
-            accountId = await getLoggedInAccountId();
-          } catch {
-            // No-op
-          }
           await saveConfig({
             auth_token: session.token,
-            account_id: accountId,
           });
           await clearFeatureFlags();
           spinner.succeed("Logged in successfully");
@@ -75,7 +66,7 @@ async function createSession({ validation }: { validation: string }) {
           "Content-Type": "application/json",
         },
         maxRedirects: 5,
-      },
+      }
     );
 
     return response.data as {
