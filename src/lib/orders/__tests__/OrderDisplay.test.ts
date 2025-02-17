@@ -43,7 +43,7 @@ Deno.test(
     const result = orderDetails(zeroOrder);
     const expectedPricePerGPUHour = 100 / (1 * 1 * GPUS_PER_NODE);
     assertEquals(result.pricePerGPUHour, expectedPricePerGPUHour);
-  }
+  },
 );
 
 Deno.test(
@@ -57,7 +57,7 @@ Deno.test(
     const result = orderDetails(executedOrder);
     const expectedExecutedPrice = 80 / (1 * 1 * GPUS_PER_NODE);
     assertEquals(result.executedPriceDollarsPerGPUHour, expectedExecutedPrice);
-  }
+  },
 );
 
 Deno.test(
@@ -65,7 +65,7 @@ Deno.test(
   () => {
     const result = orderDetails(baseOrder);
     assertEquals(result.executedPriceDollarsPerGPUHour, undefined);
-  }
+  },
 );
 
 Deno.test("orderDetails - formats duration correctly", () => {
