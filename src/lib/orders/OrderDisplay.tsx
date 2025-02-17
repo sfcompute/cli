@@ -17,7 +17,7 @@ function orderDetails(order: HydratedOrder) {
   const executedPriceDollarsPerGPUHour = order.execution_price !== undefined && order.execution_price !== null
     ? (
       order.execution_price // cents
-        / (order.quantity * GPUS_PER_NODE * durationInHours) // cents per node-hour
+        / (order.quantity * GPUS_PER_NODE * durationInHours) // cents per gpu-hour
         / 100 // dollars per gpu-hour
     )
     : undefined;
