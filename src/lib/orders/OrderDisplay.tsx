@@ -1,13 +1,13 @@
 import { Box, measureElement, Text, useInput } from "ink";
+import process from "node:process";
 import dayjs from "npm:dayjs@1.11.13";
 import React, { useEffect } from "react";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "./index.tsx";
 import type { HydratedOrder } from "./types.ts";
-import process from "node:process";
 
-function orderDetails(order: HydratedOrder) {
+export function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
   const pricePerGPUHour = order.price /
@@ -16,11 +16,9 @@ function orderDetails(order: HydratedOrder) {
 
   const executedPriceDollarsPerGPUHour =
     typeof order.execution_price === "number"
-      ? (
-        order.execution_price / // cents
+      ? order.execution_price / // cents
         (order.quantity * GPUS_PER_NODE * durationInHours) / // cents per gpu-hour
         100 // dollars per gpu-hour
-      )
       : undefined;
 
   return {
@@ -339,14 +337,18 @@ export function ScrollArea({
   const numberOfOrdersAboveScrollArea = state.scrollTop;
   const dateRangeAboveScrollArea = orders.length > 0
     ? `${formatDateTime(orders[0].start_at)} → ${
-      formatDateTime(orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0")
+      formatDateTime(
+        orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0",
+      )
     }`
     : "";
   const numberOfOrdersBelowScrollArea = orders.length -
     (state.scrollTop + state.height);
   const dateRangeBelowScrollArea = orders.length > 0
     ? `${
-      formatDateTime(orders[state.scrollTop + state.height]?.start_at || "0")
+      formatDateTime(
+        orders[state.scrollTop + state.height]?.start_at || "0",
+      )
     } → ${formatDateTime(orders[orders.length - 1].end_at)}`
     : "";
   const canScrollDown = state.scrollTop + state.height < state.innerHeight &&
