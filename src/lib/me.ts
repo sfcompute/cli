@@ -17,18 +17,23 @@ export function registerMe(program: Command) {
   });
 }
 
-export async function getLoggedInAccountId() {
-  const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
-    logLoginMessageAndQuit();
+export async function getLoggedInAccountId(tokenOverride?: string) {
+  let token = tokenOverride;
+
+  if (!token) {
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
+      logLoginMessageAndQuit();
+    }
+    const config = await loadConfig();
+    token = config.auth_token;
   }
-  const config = await loadConfig();
 
   const response = await fetch(await getApiUrl("me"), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${config.auth_token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
   if (!response.ok) {

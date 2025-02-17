@@ -1,6 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
-import * as console from "node:console";
 import { exec } from "node:child_process";
+import * as console from "node:console";
 import process from "node:process";
 import { setTimeout } from "node:timers";
 import ora from "ora";
@@ -43,7 +43,7 @@ export function registerLogin(program: Command) {
           let accountId: undefined | string;
 
           try {
-            accountId = await getLoggedInAccountId();
+            accountId = await getLoggedInAccountId(session.token);
           } catch {
             // No-op
           }
