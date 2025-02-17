@@ -14,18 +14,18 @@ function orderDetails(order: HydratedOrder) {
     (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
   const durationFormatted = formatDuration(duration);
 
-  let executedPricePerGPUHour;
-  if (order.execution_price) {
-    executedPricePerGPUHour = (order.execution_price * order.quantity) /
-      GPUS_PER_NODE /
-      durationInHours /
-      100;
-  }
+  const executedPriceDollarsPerGPUHour = order.execution_price !== undefined && order.execution_price !== null
+    ? (
+      order.execution_price // cents
+        / (order.quantity * GPUS_PER_NODE * durationInHours) // cents per node-hour
+        / 100 // dollars per gpu-hour
+    )
+    : undefined;
 
   return {
     pricePerGPUHour,
     durationFormatted,
-    executedPricePerGPUHour,
+    executedPricePerGPUHour: executedPriceDollarsPerGPUHour,
   };
 }
 
