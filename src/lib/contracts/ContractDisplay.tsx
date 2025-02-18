@@ -84,8 +84,8 @@ export function ContractDisplay(props: { contract: Contract }) {
   let color: React.ComponentProps<typeof Badge>["color"] | undefined;
   let statusIcon: React.ReactNode;
   if (startsAt > now) {
-    statusIcon = <Badge color="grey">Upcoming</Badge>;
-    color = "grey";
+    statusIcon = <Badge color="green">Upcoming</Badge>;
+    color = "green";
   } else if (endsAt < now) {
     color = "gray";
     statusIcon = <Badge color="gray">Expired</Badge>;
