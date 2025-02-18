@@ -6,3 +6,4 @@ globs: *.(ts|tsx)
 
 - When using node globals like `console.log`, `setTimeout`, `process`, etc, import them from the corresponding explicit `node:console`, `node:timers`, and `node:process`, etc.
 - Where possible, use the `openapi-typescript`/`openapi-fetch` client instead of writing raw fetch calls.
+- <Badge> renders the content as uppercase so tests should assert on the uppercase text.
