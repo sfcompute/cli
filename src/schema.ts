@@ -46,13 +46,13 @@ export interface paths {
         get: operations["getV0GridsById"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteV0GridsById"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v0/grids/{id}/grids/{id}/disable": {
+    "/v0/grids/{id}/disable": {
         parameters: {
             query?: never;
             header?: never;
@@ -65,10 +65,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["patchV0GridsByIdGridsByIdDisable"];
+        patch: operations["patchV0GridsByIdDisable"];
         trace?: never;
     };
-    "/v0/grids/{id}/grids/{id}/enable": {
+    "/v0/grids/{id}/enable": {
         parameters: {
             query?: never;
             header?: never;
@@ -81,23 +81,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["patchV0GridsByIdGridsByIdEnable"];
-        trace?: never;
-    };
-    "/v0/grids/{id}/grids/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteV0GridsByIdGridsById"];
-        options?: never;
-        head?: never;
-        patch?: never;
+        patch: operations["patchV0GridsByIdEnable"];
         trace?: never;
     };
     "/v0/procurements/{id}": {
@@ -126,6 +110,54 @@ export interface paths {
         get: operations["getV0Procurements"];
         put?: never;
         post: operations["postV0Procurements"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vm/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getV0VmLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vm/script": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["postV0VmScript"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vm/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getV0VmNodes"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -721,7 +753,7 @@ export interface operations {
             };
         };
     };
-    patchV0GridsByIdGridsByIdDisable: {
+    deleteV0GridsById: {
         parameters: {
             query?: never;
             header?: never;
@@ -740,7 +772,7 @@ export interface operations {
             };
         };
     };
-    patchV0GridsByIdGridsByIdEnable: {
+    patchV0GridsByIdDisable: {
         parameters: {
             query?: never;
             header?: never;
@@ -759,7 +791,7 @@ export interface operations {
             };
         };
     };
-    deleteV0GridsByIdGridsById: {
+    patchV0GridsByIdEnable: {
         parameters: {
             query?: never;
             header?: never;
@@ -1290,6 +1322,69 @@ export interface operations {
             };
         };
     };
+    getV0VmLogs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postV0VmScript: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    script: string;
+                };
+                "multipart/form-data": {
+                    script: string;
+                };
+                "text/plain": {
+                    script: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getV0VmNodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getV0Prices: {
         parameters: {
             query?: {
@@ -1468,153 +1563,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number | string;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number | string;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number | string;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "multipart/form-data": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number | string;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number | string;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number | string;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                    "text/plain": {
-                        data: {
-                            /** @constant */
-                            object: "order";
-                            id: string;
-                            side: "buy" | "sell";
-                            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired";
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description The number of nodes. */
-                            quantity: number | string;
-                            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                            start_at: string;
-                            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                            end_at: string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number | string;
-                            flags: {
-                                /** @description If true, this will be a market order. */
-                                market?: boolean;
-                                /** @description If true, this is a post-only order. */
-                                post_only?: boolean;
-                                /** @description If true, this is an immediate-or-cancel order. */
-                                ioc?: boolean;
-                            };
-                            executed: boolean;
-                            executed_at?: string;
-                            /** @description Execution price in cents (1 = $0.01) */
-                            execution_price?: number | string;
-                            cancelled: boolean;
-                            cancelled_at?: string;
-                            colocate_with?: string[];
-                            created_at: string;
-                        }[];
-                        has_more: boolean;
-                        /** @constant */
-                        object: "list";
-                    };
-                };
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "multipart/form-data": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                    "text/plain": {
-                        /** @constant */
-                        object: "error";
-                        /** @constant */
-                        code: "internal_server";
-                        message: string;
-                        details?: Record<string, never>;
-                    };
-                };
+                content?: never;
             };
         };
     };
@@ -2369,6 +2318,30 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         }[];
                         has_more: boolean;
                         /** @constant */
@@ -2382,6 +2355,30 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         }[];
                         has_more: boolean;
                         /** @constant */
@@ -2395,6 +2392,30 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         }[];
                         has_more: boolean;
                         /** @constant */
@@ -2504,10 +2525,58 @@ export interface operations {
                                 name: string;
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
+                                contract?: {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "active";
+                                    id: string;
+                                    /** Format: date-time */
+                                    created_at: string;
+                                    /** @description The instance type. */
+                                    instance_type: string;
+                                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                    shape: {
+                                        intervals: string[];
+                                        quantities: number[];
+                                    };
+                                    colocate_with?: string[];
+                                    cluster_id?: string;
+                                } | {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "pending";
+                                    id: string;
+                                };
                             };
                             encrypted_token?: string;
                             nonce?: string;
                             ephemeral_pubkey?: string;
+                            contracts?: ({
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            })[];
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -2534,10 +2603,58 @@ export interface operations {
                                 name: string;
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
+                                contract?: {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "active";
+                                    id: string;
+                                    /** Format: date-time */
+                                    created_at: string;
+                                    /** @description The instance type. */
+                                    instance_type: string;
+                                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                    shape: {
+                                        intervals: string[];
+                                        quantities: number[];
+                                    };
+                                    colocate_with?: string[];
+                                    cluster_id?: string;
+                                } | {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "pending";
+                                    id: string;
+                                };
                             };
                             encrypted_token?: string;
                             nonce?: string;
                             ephemeral_pubkey?: string;
+                            contracts?: ({
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            })[];
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -2564,10 +2681,58 @@ export interface operations {
                                 name: string;
                                 kubernetes_namespace: string;
                                 kubernetes_ca_cert?: string;
+                                contract?: {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "active";
+                                    id: string;
+                                    /** Format: date-time */
+                                    created_at: string;
+                                    /** @description The instance type. */
+                                    instance_type: string;
+                                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                    shape: {
+                                        intervals: string[];
+                                        quantities: number[];
+                                    };
+                                    colocate_with?: string[];
+                                    cluster_id?: string;
+                                } | {
+                                    /** @constant */
+                                    object: "contract";
+                                    /** @constant */
+                                    status: "pending";
+                                    id: string;
+                                };
                             };
                             encrypted_token?: string;
                             nonce?: string;
                             ephemeral_pubkey?: string;
+                            contracts?: ({
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            })[];
                         })[];
                         has_more: boolean;
                         /** @constant */
@@ -2718,10 +2883,58 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         };
                         encrypted_token?: string;
                         nonce?: string;
                         ephemeral_pubkey?: string;
+                        contracts?: ({
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                                intervals: string[];
+                                quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                        } | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                        })[];
                     };
                     "multipart/form-data": {
                         /** @constant */
@@ -2743,10 +2956,58 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         };
                         encrypted_token?: string;
                         nonce?: string;
                         ephemeral_pubkey?: string;
+                        contracts?: ({
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                                intervals: string[];
+                                quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                        } | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                        })[];
                     };
                     "text/plain": {
                         /** @constant */
@@ -2768,10 +3029,58 @@ export interface operations {
                             name: string;
                             kubernetes_namespace: string;
                             kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
                         };
                         encrypted_token?: string;
                         nonce?: string;
                         ephemeral_pubkey?: string;
+                        contracts?: ({
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                                intervals: string[];
+                                quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                        } | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                        })[];
                     };
                 };
             };
