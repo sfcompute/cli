@@ -10,10 +10,6 @@ import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
-import {
-  createIntervalData,
-  IntervalDisplay,
-} from "../contracts/ContractDisplay.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
@@ -147,39 +143,10 @@ const ClusterRowWithContracts = (
     return null;
   }
 
-  const startsAt = new Date(cluster.contract.shape.intervals[0]);
-  const endsAt = new Date(
-    cluster.contract.shape
-      .intervals[cluster.contract.shape.intervals.length - 1],
-  );
-  const now = new Date();
-  let color: React.ComponentProps<typeof Badge>["color"] | undefined;
-  let statusIcon: React.ReactNode;
-  if (startsAt > now) {
-    statusIcon = <Badge color="green">Upcoming</Badge>;
-    color = "green";
-  } else if (endsAt < now) {
-    color = "gray";
-    statusIcon = <Badge color="gray">Expired</Badge>;
-  } else {
-    color = "cyan";
-    statusIcon = <Badge color="cyan">Active</Badge>;
-  }
-
-  const intervalData = createIntervalData(
-    cluster.contract.shape,
-    cluster.contract.instance_type,
-  );
-
   return (
     <Box flexDirection="column" gap={1}>
-      <Box gap={1}>
-        <Box width={10}>
-          <Text>{statusIcon}</Text>
-        </Box>
-        <Box paddingLeft={0.1}>
-          <Text color={color}>{cluster.contract.id}</Text>
-        </Box>
+      <Box>
+        <Badge color="cyan">{cluster.contract.id}</Badge>
       </Box>
 
       <Box flexDirection="column">
@@ -200,26 +167,6 @@ const ClusterRowWithContracts = (
           head="Add User"
           value={`sf clusters users add --cluster ${cluster.name} --user myuser`}
         />
-
-        <Box flexDirection="column">
-          {intervalData.map((data, index) => {
-            return (
-              <Box
-                key={`${index}-${data.quantity}`}
-                paddingLeft={index === 0 ? 0 : COLUMN_WIDTH}
-              >
-                {index === 0 && (
-                  <Box paddingRight={5}>
-                    <Text dimColor>Orders</Text>
-                  </Box>
-                )}
-                <IntervalDisplay
-                  data={data}
-                />
-              </Box>
-            );
-          })}
-        </Box>
       </Box>
     </Box>
   );
