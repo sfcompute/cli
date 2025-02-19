@@ -1,19 +1,27 @@
 import type { Command } from "@commander-js/extra-typings";
-import * as console from "node:console";
-import { clearInterval, setInterval, setTimeout } from "node:timers";
+import { Badge } from "@inkjs/ui";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
+import * as console from "node:console";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
+// biome-ignore lint/style/useImportType: <explanation>
 import React, { useEffect, useState } from "react";
 import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
+import {
+  createIntervalData,
+  IntervalDisplay,
+} from "../contracts/ContractDisplay.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
   KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
+import { MOCK_CLUSTERS } from "./mock.ts";
+import type { UserFacingCluster } from "./types.ts";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -96,32 +104,123 @@ export function registerClusters(program: Command) {
 function ClusterDisplay({
   clusters,
 }: {
-  clusters: Array<{
-    name: string;
-    kubernetes_api_url: string;
-    kubernetes_namespace: string;
-  }>;
+  clusters: Array<UserFacingCluster>;
 }) {
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" gap={2}>
       {clusters.map((cluster, index) => (
-        <Box key={`${cluster.name}-${index}`} flexDirection="column">
-          <Row headWidth={11} head="name" value={cluster.name} />
-          <Row
-            headWidth={11}
-            head="k8s api"
-            value={cluster.kubernetes_api_url}
-          />
-          <Row
-            headWidth={11}
-            head="namespace"
-            value={cluster.kubernetes_namespace}
-          />
-        </Box>
+        <ClusterRow cluster={cluster} key={`${cluster.name}-${index}`} />
       ))}
     </Box>
   );
 }
+
+const ClusterRow = ({ cluster }: { cluster: UserFacingCluster }) => {
+  if (cluster.contract) {
+    return <ClusterRowWithContracts cluster={cluster} />;
+  }
+
+  return (
+    <Box flexDirection="column">
+      <Row headWidth={11} head="name" value={cluster.name} />
+      <Row
+        headWidth={11}
+        head="k8s api"
+        value={cluster.kubernetes_api_url || ""}
+      />
+      <Row
+        headWidth={11}
+        head="namespace"
+        value={cluster.kubernetes_namespace}
+      />
+    </Box>
+  );
+};
+
+const COLUMN_WIDTH = 11;
+
+const ClusterRowWithContracts = (
+  { cluster }: {
+    cluster: UserFacingCluster;
+  },
+) => {
+  if (!cluster.contract) {
+    return null;
+  }
+
+  const startsAt = new Date(cluster.contract.shape.intervals[0]);
+  const endsAt = new Date(
+    cluster.contract.shape
+      .intervals[cluster.contract.shape.intervals.length - 1],
+  );
+  const now = new Date();
+  let color: React.ComponentProps<typeof Badge>["color"] | undefined;
+  let statusIcon: React.ReactNode;
+  if (startsAt > now) {
+    statusIcon = <Badge color="green">Upcoming</Badge>;
+    color = "green";
+  } else if (endsAt < now) {
+    color = "gray";
+    statusIcon = <Badge color="gray">Expired</Badge>;
+  } else {
+    color = "cyan";
+    statusIcon = <Badge color="cyan">Active</Badge>;
+  }
+
+  const intervalData = createIntervalData(
+    cluster.contract?.shape,
+    cluster.contract?.instance_type,
+  );
+
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Box gap={1}>
+        <Text>{statusIcon}</Text>
+        <Text color={color}>{cluster.contract.id}</Text>
+      </Box>
+
+      <Box flexDirection="column">
+        <Row headWidth={COLUMN_WIDTH} head="Name" value={cluster.name} />
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="K8s API"
+          value={cluster.kubernetes_api_url || ""}
+        />
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Namespace"
+          value={cluster.kubernetes_namespace}
+        />
+
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Add User"
+          value={`sf clusters users add --cluster ${cluster.name} --user myuser`}
+        />
+
+        <Box flexDirection="column">
+          {intervalData.map((data, index) => {
+            return (
+              <Box
+                key={`${index}-${data.quantity}`}
+                paddingLeft={index === 0 ? 0 : COLUMN_WIDTH}
+              >
+                {index === 0 && (
+                  <Box paddingRight={5}>
+                    <Text dimColor>Orders</Text>
+                  </Box>
+                )}
+                <IntervalDisplay
+                  data={data}
+                />
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
 async function listClustersAction({
   returnJson,
@@ -156,11 +255,11 @@ async function listClustersAction({
   } else {
     render(
       <ClusterDisplay
-        clusters={data.data.map((cluster) => ({
-          name: cluster.name,
-          kubernetes_api_url: cluster.kubernetes_api_url || "",
-          kubernetes_namespace: cluster.kubernetes_namespace || "",
-        }))}
+        clusters={[...data.data, ...MOCK_CLUSTERS].filter((
+          cluster,
+        ): cluster is UserFacingCluster =>
+          cluster.contract?.status === "active" || !cluster.contract
+        )}
       />,
     );
   }

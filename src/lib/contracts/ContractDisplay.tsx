@@ -27,7 +27,7 @@ interface IntervalData {
   state: "Upcoming" | "Active" | "Expired";
 }
 
-function createIntervalData(
+export function createIntervalData(
   shape: Contract["shape"],
   instanceType: string,
 ): IntervalData[] {
@@ -51,7 +51,7 @@ function createIntervalData(
   });
 }
 
-function IntervalDisplay({ data }: { data: IntervalData }) {
+export function IntervalDisplay({ data }: { data: IntervalData }) {
   const isDimmed = data.state === "Expired";
 
   return (
