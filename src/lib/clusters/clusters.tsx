@@ -167,8 +167,8 @@ const ClusterRowWithContracts = (
   }
 
   const intervalData = createIntervalData(
-    cluster.contract?.shape,
-    cluster.contract?.instance_type,
+    cluster.contract.shape,
+    cluster.contract.instance_type,
   );
 
   return (
