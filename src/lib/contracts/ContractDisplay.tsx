@@ -102,8 +102,12 @@ export function ContractDisplay(props: { contract: Contract }) {
   return (
     <Box flexDirection="column">
       <Box gap={1}>
-        <Text>{statusIcon}</Text>
-        <Text color={color}>{props.contract.id}</Text>
+        <Box width={11}>
+          <Text>{statusIcon}</Text>
+        </Box>
+        <Box paddingLeft={0.1}>
+          <Text color={color}>{props.contract.id}</Text>
+        </Box>
       </Box>
       <Box flexDirection="column" paddingTop={0.5}>
         <Row

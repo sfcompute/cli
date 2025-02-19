@@ -20,7 +20,6 @@ import {
   KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
-import { MOCK_CLUSTERS } from "./mock.ts";
 import type { UserFacingCluster } from "./types.ts";
 
 export function registerClusters(program: Command) {
@@ -175,8 +174,12 @@ const ClusterRowWithContracts = (
   return (
     <Box flexDirection="column" gap={1}>
       <Box gap={1}>
-        <Text>{statusIcon}</Text>
-        <Text color={color}>{cluster.contract.id}</Text>
+        <Box width={10}>
+          <Text>{statusIcon}</Text>
+        </Box>
+        <Box paddingLeft={0.1}>
+          <Text color={color}>{cluster.contract.id}</Text>
+        </Box>
       </Box>
 
       <Box flexDirection="column">
@@ -255,7 +258,7 @@ async function listClustersAction({
   } else {
     render(
       <ClusterDisplay
-        clusters={[...data.data, ...MOCK_CLUSTERS].filter((
+        clusters={data.data.filter((
           cluster,
         ): cluster is UserFacingCluster =>
           cluster.contract?.status === "active" || !cluster.contract
