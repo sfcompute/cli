@@ -1,9 +1,9 @@
-import { parseDate } from "chrono-node";
 import { type Command, Option } from "@commander-js/extra-typings";
-import { clearInterval, setInterval, setTimeout } from "node:timers";
+import { parseDate } from "chrono-node";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
@@ -546,6 +546,9 @@ export async function placeBuyOrder(options: {
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
     colocate_with: options.colocateWith,
+    flags: {
+      ioc: true,
+    },
   } as const;
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
