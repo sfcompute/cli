@@ -10,7 +10,7 @@ import semver from "semver";
 import pkg from "../package.json" with { type: "json" };
 
 const CACHE_FILE = join(homedir(), ".sfcompute", "version-cache");
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+const CACHE_TTL = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
 interface VersionCache {
   version: string;
