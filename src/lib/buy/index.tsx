@@ -483,9 +483,15 @@ function BuyOrder(props: BuyOrderProps) {
       {isLoading && (
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="dots" />}
-          {order && order.status === "open" && <Text color="yellow">•</Text>}
           {!order && <Text>{loadingMsg}</Text>}
-          {order && (
+          {order && order.status === "open" && <Text color="yellow">•</Text>}
+          {order && order.status === "cancelled" && (
+            <Box gap={1} flexDirection="column">
+              <Text color="red">Order could not be filled: {order.id}</Text>
+              <Text>You were not charged. Try placing a new order with a different price, duration, or number of GPUs.</Text>
+            </Box>
+          )}
+          {order && order.status !== "cancelled" && (
             <Box gap={1}>
               <Text>Order placed: {order.id}</Text>
               <Text>- ({order.status})</Text>
