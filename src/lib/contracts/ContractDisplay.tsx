@@ -2,11 +2,15 @@ import { Badge } from "@inkjs/ui";
 import { Box, Text } from "ink";
 import { formatDateRange } from "little-date";
 import ms from "ms";
-// biome-ignore lint/style/useImportType: <explanation>
 import * as React from "react";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-import type { Contract } from "./types.ts";
+import type { ActiveContract, Contract } from "./types.ts";
+import {
+  type ContractState,
+  getContractState,
+  getContractStateColor,
+} from "./utils.ts";
 
 interface IntervalData {
   /**
@@ -24,20 +28,17 @@ interface IntervalData {
   instanceType: string;
   start: Date;
   end: Date;
-  state: "Upcoming" | "Active" | "Expired";
+  state: ContractState;
 }
 
 export function createIntervalData(
-  shape: Contract["shape"],
+  shape: ActiveContract["shape"],
   instanceType: string,
 ): IntervalData[] {
-  const now = new Date();
-
   return shape.intervals.slice(0, -1).map((interval, index) => {
     const start = new Date(interval);
     const end = new Date(shape.intervals[index + 1]);
     const duration = end.getTime() - start.getTime();
-    const state = start > now ? "Upcoming" : end < now ? "Expired" : "Active";
 
     return {
       dateRangeLabel: formatDateRange(start, end, { separator: "→" }),
@@ -46,7 +47,10 @@ export function createIntervalData(
       instanceType,
       start,
       end,
-      state,
+      state: getContractState({
+        intervals: [interval, shape.intervals[index + 1]],
+        quantities: [],
+      }),
     };
   });
 }
@@ -76,23 +80,9 @@ export function ContractDisplay(props: { contract: Contract }) {
     return null;
   }
 
-  const startsAt = new Date(props.contract.shape.intervals[0]);
-  const endsAt = new Date(
-    props.contract.shape.intervals[props.contract.shape.intervals.length - 1],
-  );
-  const now = new Date();
-  let color: React.ComponentProps<typeof Badge>["color"] | undefined;
-  let statusIcon: React.ReactNode;
-  if (startsAt > now) {
-    statusIcon = <Badge color="green">Upcoming</Badge>;
-    color = "green";
-  } else if (endsAt < now) {
-    color = "gray";
-    statusIcon = <Badge color="gray">Expired</Badge>;
-  } else {
-    color = "cyan";
-    statusIcon = <Badge color="cyan">Active</Badge>;
-  }
+  const state = getContractState(props.contract.shape);
+  const color = getContractStateColor(state);
+  const statusIcon = <Badge color={color}>{state}</Badge>;
 
   const intervalData = createIntervalData(
     props.contract.shape,

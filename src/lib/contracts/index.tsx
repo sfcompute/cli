@@ -1,6 +1,6 @@
 import { Command } from "@commander-js/extra-typings";
-import * as console from "node:console";
 import { render } from "ink";
+import * as console from "node:console";
 import React from "react";
 import { apiClient } from "../../apiClient.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
@@ -10,7 +10,8 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { ContractList } from "./ContractDisplay.tsx";
-import type { Contract } from "./types.ts";
+import type { ActiveContract, Contract } from "./types.ts";
+import { getContractState } from "./utils.ts";
 
 export function registerContracts(program: Command) {
   program
@@ -22,21 +23,23 @@ export function registerContracts(program: Command) {
       new Command("list")
         .alias("ls")
         .option("--json", "Output in JSON format")
+        .option(
+          "--all",
+          "Show all contracts including expired ones (Active, Upcoming, Expired)",
+        )
         .description("List all contracts")
         .action(async (options) => {
           if (options.json) {
-            console.log(await listContracts());
+            console.log(await listContracts(options.all));
           } else {
-            const data = await listContracts();
-
+            const data = await listContracts(options.all);
             render(<ContractList contracts={data} />);
           }
-          // process.exit(0);
         }),
     );
 }
 
-async function listContracts(): Promise<Contract[]> {
+async function listContracts(showAll = false): Promise<Contract[]> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     return logLoginMessageAndQuit();
@@ -63,14 +66,19 @@ async function listContracts(): Promise<Contract[]> {
     );
   }
 
-  // filter out pending contracts
-  // we use loop instead of filter bc type
   const contracts: Contract[] = [];
   for (const contract of data.data) {
-    if (contract.status === "active") {
+    if (contract.status === "pending") {
+      contracts.push(contract as Contract);
+      continue;
+    }
+
+    const activeContract = contract as ActiveContract;
+    const state = getContractState(activeContract.shape);
+    if (showAll || state === "Active" || state === "Upcoming") {
       contracts.push({
-        ...contract,
-        colocate_with: contract.colocate_with ?? [],
+        ...activeContract,
+        colocate_with: activeContract.colocate_with ?? [],
       });
     }
   }
