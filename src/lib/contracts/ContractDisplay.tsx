@@ -2,11 +2,10 @@ import { Badge } from "@inkjs/ui";
 import { Box, Text } from "ink";
 import { formatDateRange } from "little-date";
 import ms from "ms";
-// biome-ignore lint/style/useImportType: <explanation>
 import * as React from "react";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-import type { Contract } from "./types.ts";
+import type { ActiveContract, Contract } from "./types.ts";
 import {
   type ContractState,
   getContractState,
@@ -33,11 +32,9 @@ interface IntervalData {
 }
 
 export function createIntervalData(
-  shape: Contract["shape"],
+  shape: ActiveContract["shape"],
   instanceType: string,
 ): IntervalData[] {
-  const now = new Date();
-
   return shape.intervals.slice(0, -1).map((interval, index) => {
     const start = new Date(interval);
     const end = new Date(shape.intervals[index + 1]);
@@ -51,10 +48,8 @@ export function createIntervalData(
       start,
       end,
       state: getContractState({
-        shape: {
-          intervals: [interval, shape.intervals[index + 1]],
-          quantities: [],
-        },
+        intervals: [interval, shape.intervals[index + 1]],
+        quantities: [],
       }),
     };
   });
@@ -85,7 +80,7 @@ export function ContractDisplay(props: { contract: Contract }) {
     return null;
   }
 
-  const state = getContractState(props.contract);
+  const state = getContractState(props.contract.shape);
   const color = getContractStateColor(state);
   const statusIcon = <Badge color={color}>{state}</Badge>;
 

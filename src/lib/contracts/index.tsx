@@ -74,7 +74,7 @@ async function listContracts(showAll = false): Promise<Contract[]> {
     }
 
     const activeContract = contract as ActiveContract;
-    const state = getContractState(activeContract);
+    const state = getContractState(activeContract.shape);
     if (showAll || state === "Active" || state === "Upcoming") {
       contracts.push({
         ...activeContract,
