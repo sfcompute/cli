@@ -488,7 +488,10 @@ function BuyOrder(props: BuyOrderProps) {
           {order && order.status === "cancelled" && (
             <Box gap={1} flexDirection="column">
               <Text color="red">Order could not be filled: {order.id}</Text>
-              <Text>You were not charged. Try placing a new order with a different price, duration, or number of GPUs.</Text>
+              <Text>
+                You were not charged. Try placing a new order with a different
+                price, duration, or number of GPUs.
+              </Text>
             </Box>
           )}
           {order && order.status !== "cancelled" && (
