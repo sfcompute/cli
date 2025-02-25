@@ -336,7 +336,9 @@ function UserAddedDisplay(props: {
 
         <Box gap={1} paddingBottom={1}>
           <Spinner type="arc" />
-          <Text>Waiting for user to be ready...</Text>
+          <Text>
+            Waiting for user to be ready, this should take about 30 seconds...
+          </Text>
         </Box>
 
         <Box paddingLeft={2} flexDirection="column" gap={1}>
