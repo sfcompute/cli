@@ -4,7 +4,6 @@ import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import * as console from "node:console";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
-// biome-ignore lint/style/useImportType: <explanation>
 import React, { useEffect, useState } from "react";
 import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
@@ -17,6 +16,10 @@ import {
   syncKubeconfig,
 } from "./kubeconfig.ts";
 import type { UserFacingCluster } from "./types.ts";
+import {
+  isValidRFC1123Subdomain,
+  sanitizeToRFC1123Subdomain,
+} from "./utils.ts";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -48,7 +51,10 @@ export function registerClusters(program: Command) {
     .command("add")
     .description("Add a user to a cluster (always regenerates keys)")
     .requiredOption("--cluster <cluster>", "name of the cluster")
-    .requiredOption("--user <username>", "Username to add")
+    .requiredOption(
+      "--user <username>",
+      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized.",
+    )
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
@@ -375,7 +381,7 @@ function UserAddedDisplay(props: {
 
 async function addClusterUserAction({
   clusterName,
-  username,
+  username: rawUsername,
   token,
   print,
 }: {
@@ -390,6 +396,10 @@ async function addClusterUserAction({
   await regenerateKeys();
 
   const { publicKey } = await getKeys();
+
+  const username = isValidRFC1123Subdomain(rawUsername)
+    ? rawUsername
+    : sanitizeToRFC1123Subdomain(rawUsername);
 
   const { data, error, response } = await api.POST("/v0/credentials", {
     body: {
