@@ -65,7 +65,7 @@ export function registerOrders(program: Command) {
     .addOption(
       new Option(
         "--public",
-        "This option is deprecated. It's not longer possible to view public orders.",
+        "This option is deprecated. It's no longer possible to view public orders.",
       )
         .conflicts(["onlyFilled", "onlyCancelled"])
         .implies({
@@ -186,8 +186,6 @@ export function registerOrders(program: Command) {
       const orders = await getOrders({
         side: options.side,
         instance_type: options.type,
-
-        include_public: false,
 
         min_price: options.minPrice,
         max_price: options.maxPrice,
