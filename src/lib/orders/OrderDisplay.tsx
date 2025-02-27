@@ -170,11 +170,6 @@ export function OrderDisplay(props: {
         <Text>No orders found.</Text>
 
         <Box paddingLeft={4} flexDirection="column">
-          <Text dimColor># View all public standing orders</Text>
-          <Text color="yellow">sf orders list --public</Text>
-        </Box>
-
-        <Box paddingLeft={4} flexDirection="column">
           <Text dimColor># Place an order to buy compute</Text>
           <Text color="yellow">sf buy</Text>
         </Box>
