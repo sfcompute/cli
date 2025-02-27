@@ -113,6 +113,7 @@ if ! unzip -t "${TMPDIR}/${BINARY_NAME}.zip" >/dev/null 2>&1; then
 fi
 
 # Extract the zip file in the temporary directory.
+mkdir "${TMPDIR}/dist"
 echo "unzip -o \"${TMPDIR}/${BINARY_NAME}.zip\" -d \"${TMPDIR}/dist\""
 unzip -o "${TMPDIR}/${BINARY_NAME}.zip" -d "${TMPDIR}/dist" || { echo "Failed to extract sf"; exit 1; }
 
