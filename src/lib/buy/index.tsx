@@ -156,7 +156,7 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
       setIsLoading(false);
       if (quote) setQuote(quote);
     })();
-  }, []);
+  }, [props.options]);
 
   return isLoading
     ? (
@@ -317,6 +317,8 @@ function BuyOrderPreview(props: {
   );
 }
 
+const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
+
 type Order =
   | Awaited<ReturnType<typeof getOrder>>
   | Awaited<ReturnType<typeof placeBuyOrder>>;
@@ -340,7 +342,7 @@ function BuyOrder(props: BuyOrderProps) {
     "Placing order...",
   );
 
-  async function submitOrder() {
+  const submitOrder = useCallback(async () => {
     const { startAt, endsAt } = props;
     const realDurationInHours =
       dayjs(endsAt).diff(dayjs(parseStartDate(startAt))) / 1000 / 3600;
@@ -359,7 +361,7 @@ function BuyOrder(props: BuyOrderProps) {
       numberNodes: props.size,
     });
     setOrder(order);
-  }
+  }, [props]);
 
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
@@ -417,7 +419,7 @@ function BuyOrder(props: BuyOrderProps) {
       });
       submitOrder();
     },
-    [exit, setIsLoading],
+    [props, exit, submitOrder],
   );
 
   useEffect(() => {
@@ -455,17 +457,17 @@ function BuyOrder(props: BuyOrderProps) {
         intervalRef.current = null;
       }
     };
-  }, [isLoading, order, exit, setOrder]);
+  }, [isLoading, order, exit]);
 
   useEffect(() => {
     if (!isLoading && props.yes) {
       submitOrder();
     }
-  }, [isLoading, props.yes]);
+  }, [isLoading, props.yes, submitOrder]);
 
   return (
     <Box gap={1} flexDirection="column">
-      <BuyOrderPreview {...props} />
+      <MemoizedBuyOrderPreview {...props} />
 
       {!isLoading && !props.yes && (
         <Box gap={1}>
