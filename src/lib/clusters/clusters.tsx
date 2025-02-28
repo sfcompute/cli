@@ -211,11 +211,17 @@ async function listClustersAction({
   } else {
     render(
       <ClusterDisplay
-        clusters={data.data.filter((
-          cluster,
-        ): cluster is UserFacingCluster =>
-          cluster.contract?.status === "active" || !cluster.contract
-        )}
+        clusters={data.data
+          .filter((cluster) =>
+            cluster.contract?.status === "active" || !cluster.contract
+          )
+          .map((cluster) =>
+            ({
+              ...cluster,
+              // @ts-expect-error - ignore
+              state: cluster.contract?.state || "Active",
+            }) as UserFacingCluster
+          )}
       />,
     );
   }
