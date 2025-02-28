@@ -36,9 +36,16 @@ export async function getLoggedInAccountId(tokenOverride?: string) {
       Authorization: `Bearer ${token}`,
     },
   });
+
   if (!response.ok) {
     if (response.status === 401) {
       logSessionTokenExpiredAndQuit();
+    }
+
+    if (response.status === 403) {
+      logAndQuit(
+        "Your SF Compute account is still under review. You cannot use the CLI until your account is approved.\n\nIf you have any questions you can reach out to onboarding@sfcompute.com",
+      );
     }
 
     logAndQuit("Failed to fetch account info");
