@@ -212,6 +212,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v0/orders/{id}/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getV0OrdersByIdClusters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v0/clusters": {
         parameters: {
             query?: never;
@@ -505,17 +521,17 @@ export interface operations {
                     num_orders: number | string;
                     /**
                      * Format: date-time
-                     * @description The start time of the first order in the grid. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
+                     * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
                      */
                     grid_front?: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should start placing orders. If this date is in the past, it will be clamped such that the first orders are placed immediately.
+                     * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
                      */
                     start_at: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should stop placing new orders automatically. Must be on the hour. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
+                     * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
                      */
                     end_at?: string;
                     order: {
@@ -580,17 +596,17 @@ export interface operations {
                     num_orders: number | string;
                     /**
                      * Format: date-time
-                     * @description The start time of the first order in the grid. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
+                     * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
                      */
                     grid_front?: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should start placing orders. If this date is in the past, it will be clamped such that the first orders are placed immediately.
+                     * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
                      */
                     start_at: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should stop placing new orders automatically. Must be on the hour. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
+                     * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
                      */
                     end_at?: string;
                     order: {
@@ -655,17 +671,17 @@ export interface operations {
                     num_orders: number | string;
                     /**
                      * Format: date-time
-                     * @description The start time of the first order in the grid. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
+                     * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
                      */
                     grid_front?: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should start placing orders. If this date is in the past, it will be clamped such that the first orders are placed immediately.
+                     * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
                      */
                     start_at: string;
                     /**
                      * Format: date-time
-                     * @description The time at which the grid should stop placing new orders automatically. Must be on the hour. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
+                     * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
                      */
                     end_at?: string;
                     order: {
@@ -2293,6 +2309,205 @@ export interface operations {
             };
         };
     };
+    getV0OrdersByIdClusters: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Generate a bearer token with `$ sf tokens create`. */
+                authorization?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                    "multipart/form-data": {
+                        data: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                    "text/plain": {
+                        data: {
+                            /** @constant */
+                            object: "kubernetes_cluster";
+                            kubernetes_api_url?: string;
+                            name: string;
+                            kubernetes_namespace: string;
+                            kubernetes_ca_cert?: string;
+                            contract?: {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "active";
+                                id: string;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** @description The instance type. */
+                                instance_type: string;
+                                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                                shape: {
+                                    intervals: string[];
+                                    quantities: number[];
+                                };
+                                colocate_with?: string[];
+                                cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
+                            } | {
+                                /** @constant */
+                                object: "contract";
+                                /** @constant */
+                                status: "pending";
+                                id: string;
+                            };
+                        }[];
+                        has_more: boolean;
+                        /** @constant */
+                        object: "list";
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "not_authenticated";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "multipart/form-data": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                    "text/plain": {
+                        /** @constant */
+                        object: "error";
+                        /** @constant */
+                        code: "internal_server";
+                        message: string;
+                        details?: Record<string, never>;
+                    };
+                };
+            };
+        };
+    };
     getV0Clusters: {
         parameters: {
             query?: never;
@@ -2335,6 +2550,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2372,6 +2588,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2409,6 +2626,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2542,6 +2760,7 @@ export interface operations {
                                     };
                                     colocate_with?: string[];
                                     cluster_id?: string;
+                                    state: "Upcoming" | "Expired" | "Active";
                                 } | {
                                     /** @constant */
                                     object: "contract";
@@ -2570,6 +2789,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2620,6 +2840,7 @@ export interface operations {
                                     };
                                     colocate_with?: string[];
                                     cluster_id?: string;
+                                    state: "Upcoming" | "Expired" | "Active";
                                 } | {
                                     /** @constant */
                                     object: "contract";
@@ -2648,6 +2869,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2698,6 +2920,7 @@ export interface operations {
                                     };
                                     colocate_with?: string[];
                                     cluster_id?: string;
+                                    state: "Upcoming" | "Expired" | "Active";
                                 } | {
                                     /** @constant */
                                     object: "contract";
@@ -2726,6 +2949,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2900,6 +3124,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -2928,6 +3153,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -2973,6 +3199,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -3001,6 +3228,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -3046,6 +3274,7 @@ export interface operations {
                                 };
                                 colocate_with?: string[];
                                 cluster_id?: string;
+                                state: "Upcoming" | "Expired" | "Active";
                             } | {
                                 /** @constant */
                                 object: "contract";
@@ -3074,6 +3303,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -3154,6 +3384,7 @@ export interface operations {
                 active_within_interval_start?: string;
                 active_within_interval_end?: string;
                 instance_type?: string;
+                state?: "all" | "active" | "upcoming" | "expired";
             };
             header?: {
                 /** @description Generate a bearer token with `$ sf tokens create`. */
@@ -3187,6 +3418,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -3216,6 +3448,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -3245,6 +3478,7 @@ export interface operations {
                             };
                             colocate_with?: string[];
                             cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
                         } | {
                             /** @constant */
                             object: "contract";
@@ -3358,6 +3592,7 @@ export interface operations {
                         };
                         colocate_with?: string[];
                         cluster_id?: string;
+                        state: "Upcoming" | "Expired" | "Active";
                     } | {
                         /** @constant */
                         object: "contract";
@@ -3382,6 +3617,7 @@ export interface operations {
                         };
                         colocate_with?: string[];
                         cluster_id?: string;
+                        state: "Upcoming" | "Expired" | "Active";
                     } | {
                         /** @constant */
                         object: "contract";
@@ -3406,6 +3642,7 @@ export interface operations {
                         };
                         colocate_with?: string[];
                         cluster_id?: string;
+                        state: "Upcoming" | "Expired" | "Active";
                     } | {
                         /** @constant */
                         object: "contract";
