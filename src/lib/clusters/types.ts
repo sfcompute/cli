@@ -4,6 +4,7 @@ export interface UserFacingCluster {
   name: string;
   kubernetes_namespace: string;
   kubernetes_ca_cert?: string;
+  state: "Active" | "Upcoming" | "Expired";
   contract?: {
     object: "contract";
     status: "active";
