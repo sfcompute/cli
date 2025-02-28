@@ -141,7 +141,12 @@ export function ContractList(props: { contracts: Contract[] }) {
   if (props.contracts.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
-        <Text>No contracts found.</Text>
+        <Text>No active or upcoming contracts found.</Text>
+
+        <Box paddingLeft={4} flexDirection="column">
+          <Text dimColor># To show expired contracts</Text>
+          <Text color="yellow">sf contracts ls --all</Text>
+        </Box>
 
         <Box paddingLeft={4} flexDirection="column">
           <Text dimColor># Place a buy order to get started</Text>
