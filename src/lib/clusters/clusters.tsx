@@ -58,12 +58,14 @@ export function registerClusters(program: Command) {
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
+    .option("--vcluster", "Use vcluster configuration instead of direct namespace access")
     .action(async (options) => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
         token: options.token,
         print: options.print,
+        vcluster: options.vcluster,
       });
     });
 
@@ -94,10 +96,12 @@ export function registerClusters(program: Command) {
     .description("Generate or sync kubeconfig")
     .option("--token <token>", "API token")
     .option("--print", "Print the config instead of syncing to file")
+    .option("--vcluster", "Use vcluster configuration instead of direct namespace access")
     .action(async (options) => {
       await kubeconfigAction({
         token: options.token,
         print: options.print,
+        vcluster: options.vcluster,
       });
     });
 }
@@ -315,6 +319,7 @@ function UserAddedDisplay(props: {
   id: string;
   username: string;
   print?: boolean;
+  vcluster?: boolean;
 }) {
   const [isReady, setIsReady] = useState(false);
   const { exit } = useApp();
@@ -327,14 +332,14 @@ function UserAddedDisplay(props: {
         setIsReady(true);
 
         // Once ready, sync or print config before exiting
-        await kubeconfigAction({ print: props.print });
+        await kubeconfigAction({ print: props.print, vcluster: props.vcluster });
         setTimeout(() => {
           exit();
         }, 0);
       }
     }, 500);
     return () => clearInterval(interval);
-  }, [props.id, props.print]);
+  }, [props.id, props.print, props.vcluster]);
 
   if (!isReady) {
     return (
@@ -390,11 +395,13 @@ async function addClusterUserAction({
   username: rawUsername,
   token,
   print,
+  vcluster,
 }: {
   clusterName: string;
   username: string;
   token?: string;
   print?: boolean;
+  vcluster?: boolean;
 }) {
   const api = await apiClient(token);
 
@@ -429,7 +436,7 @@ async function addClusterUserAction({
   }
 
   // Render UI that waits for the user to become ready, then sync/print config
-  render(<UserAddedDisplay id={data.id} username={username} print={print} />);
+  render(<UserAddedDisplay id={data.id} username={username} print={print} vcluster={vcluster} />);
 }
 
 async function removeClusterUserAction({
@@ -472,9 +479,11 @@ async function removeClusterUserAction({
 async function kubeconfigAction({
   token,
   print,
+  vcluster,
 }: {
   token?: string;
   print?: boolean;
+  vcluster?: boolean;
 }) {
   const api = await apiClient(token);
 
@@ -506,6 +515,7 @@ async function kubeconfigAction({
     namespace?: string;
   }> = [];
   const users: Array<{ name: string; token: string }> = [];
+  
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
@@ -544,12 +554,77 @@ async function kubeconfigAction({
     });
   }
 
+  // First create and sync the regular kubeconfig to access the namespace
   const kubeconfig = createKubeconfig({ clusters, users });
 
-  if (print) {
-    console.log(yaml.stringify(kubeconfig));
-  } else {
+  if (!print) {
     await syncKubeconfig(kubeconfig);
-    console.log(`Config written to ${KUBECONFIG_PATH}`);
+    if (!vcluster) {
+      console.log(`Config written to ${KUBECONFIG_PATH}`);
+    }
+  } else if (!vcluster) {
+    console.log(yaml.stringify(kubeconfig));
+    return;
+  }
+
+  // If vcluster flag is set, get the vcluster config after we've synced the regular config
+  if (vcluster) {
+    // Find the first valid cluster and user to use for vcluster config
+    const clusterItem = data.data.find(item => 
+      item.object === "k8s_credential" && 
+      item.cluster && 
+      item.cluster.kubernetes_namespace
+    );
+
+    if (!clusterItem || !clusterItem.cluster) {
+      console.error("No valid cluster found for vcluster configuration");
+      return;
+    }
+
+    try {
+      // Construct the namespace name
+      const namespace = clusterItem.cluster.kubernetes_namespace;
+      const vclusterName = `vc-${namespace}`;
+      
+      console.log(`Retrieving vcluster config from namespace ${namespace}...`);
+      
+      // Execute the kubectl command to get the vcluster config
+      const { execSync } = require("node:child_process");
+      const vclusterConfig = execSync(
+        `kubectl get secret ${vclusterName} -n ${namespace} --template={{.data.config}} | base64 --decode`,
+        { encoding: "utf-8" }
+      );
+      
+      // Parse the vcluster config
+      const parsedConfig = yaml.parse(vclusterConfig);
+      
+      if (parsedConfig && parsedConfig.clusters && parsedConfig.clusters.length > 0) {
+        // Replace the server URL with the original cluster URL
+        for (const cluster of parsedConfig.clusters) {
+          if (cluster.cluster && cluster.cluster.server) {
+            // Keep the original server URL
+            cluster.cluster.server = clusterItem.cluster.kubernetes_api_url || "";
+          }
+        }
+        
+        // Use the modified vcluster config
+        if (print) {
+          console.log(yaml.stringify(parsedConfig));
+        } else {
+          await syncKubeconfig(parsedConfig);
+          console.log(`vCluster config written to ${KUBECONFIG_PATH}`);
+        }
+      } else {
+        console.error("Invalid vcluster config format");
+        if (!print) {
+          console.log("Regular kubeconfig has been written as a fallback");
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to get vcluster config: ${error instanceof Error ? error.message : String(error)}`);
+      if (!print) {
+        console.log("Regular kubeconfig has been written as a fallback");
+      }
+    }
   }
 }

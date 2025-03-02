@@ -31,6 +31,7 @@ export interface Kubeconfig {
   kind: string;
   preferences: Record<string, unknown>;
 }
+
 export function createKubeconfig(props: {
   clusters: Array<{
     name: string;
@@ -76,8 +77,12 @@ export function createKubeconfig(props: {
     let user = users.find((u) => u.name === cluster.name);
 
     // If no matching user, default to the first user
-    if (!user) {
+    if (!user && users.length > 0) {
       user = users[0];
+    }
+
+    if (!user) {
+      return null;
     }
 
     const contextName = `${cluster.name}@${user.name}`;
@@ -90,7 +95,7 @@ export function createKubeconfig(props: {
         namespace: cluster.namespace,
       },
     };
-  });
+  }).filter(Boolean) as Kubeconfig["contexts"];
 
   // Set current context based on provided cluster and user names
   if (currentContext) {
