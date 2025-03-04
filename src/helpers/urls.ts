@@ -42,6 +42,11 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
   tokens_create: "/v0/tokens",
   tokens_list: "/v0/tokens",
   tokens_delete_by_id: ({ id }: IdParams): string => `/v0/tokens/${id}`,
+
+  vms_instances_list: "/v0/vms/instances",
+  vms_logs_list: "/v0/vms/logs",
+  vms_script_post: "/v0/vms/script",
+  vms_script_get: "/v0/vms/script",
 };
 
 export async function getWebAppUrl<T extends TokenParams | never>(

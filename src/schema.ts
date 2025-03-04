@@ -116,14 +116,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v0/vm/logs": {
+    "/v0/vms/script": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getV0VmLogs"];
+        get: operations["getV0VmsScript"];
+        put?: never;
+        post: operations["postV0VmsScript"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getV0VmsLogs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -132,30 +148,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v0/vm/script": {
+    "/v0/vms/instances": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        post: operations["postV0VmScript"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/vm/nodes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getV0VmNodes"];
+        get: operations["getV0VmsInstances"];
         put?: never;
         post?: never;
         delete?: never;
@@ -324,9 +324,9 @@ export interface operations {
         parameters: {
             query: {
                 side: "buy" | "sell";
-                /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. The difference between this and `max_start_time` can be at most 24 hours. */
+                /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. */
                 min_start_date: "NOW" | string;
-                /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. The difference between this and `min_start_time` can be at most 24 hours. */
+                /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. */
                 max_start_date: "NOW" | string;
                 /** @description desired duration, in seconds. Since contracts must end on the hour, the actual duration returned by the quote may be longer than the requested duration by up to 59 minutes. If `min_duration` and `max_duration` are provided, this value is ignored. If this is not provided, `min_duration` and `max_duration` must be provided. */
                 duration?: string | (number | string);
@@ -1338,7 +1338,7 @@ export interface operations {
             };
         };
     };
-    getV0VmLogs: {
+    getV0VmsScript: {
         parameters: {
             query?: never;
             header?: never;
@@ -1355,7 +1355,7 @@ export interface operations {
             };
         };
     };
-    postV0VmScript: {
+    postV0VmsScript: {
         parameters: {
             query?: never;
             header?: never;
@@ -1384,7 +1384,24 @@ export interface operations {
             };
         };
     };
-    getV0VmNodes: {
+    getV0VmsLogs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getV0VmsInstances: {
         parameters: {
             query?: never;
             header?: never;
@@ -1643,9 +1660,9 @@ export interface operations {
                         strategy: "linear";
                         /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                         limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                        /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                         start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                        /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
                         end_at?: string;
                     } | {
                         /**
@@ -1717,9 +1734,9 @@ export interface operations {
                         strategy: "linear";
                         /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                         limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                        /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                         start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                        /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
                         end_at?: string;
                     } | {
                         /**
@@ -1791,9 +1808,9 @@ export interface operations {
                         strategy: "linear";
                         /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
                         limit: number;
-                        /** @description When to start adjusting the order’s price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                        /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
                         start_at?: string;
-                        /** @description When to stop adjusting the order’s price. If this date is past the order’s end time, it will be clamped such that the adjustment ends at the order’s end time. */
+                        /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
                         end_at?: string;
                     } | {
                         /**
@@ -2079,6 +2096,8 @@ export interface operations {
                         cancelled_at?: string;
                         colocate_with?: string[];
                         created_at: string;
+                        rejected: boolean;
+                        rejected_reason?: string;
                     };
                     "multipart/form-data": {
                         /** @constant */
@@ -2112,6 +2131,8 @@ export interface operations {
                         cancelled_at?: string;
                         colocate_with?: string[];
                         created_at: string;
+                        rejected: boolean;
+                        rejected_reason?: string;
                     };
                     "text/plain": {
                         /** @constant */
@@ -2145,6 +2166,8 @@ export interface operations {
                         cancelled_at?: string;
                         colocate_with?: string[];
                         created_at: string;
+                        rejected: boolean;
+                        rejected_reason?: string;
                     };
                 };
             };
