@@ -173,7 +173,7 @@ export async function registerVM(program: Command) {
 						}
 					}
 				}
-			} catch (err) {
+			} catch (err: any) {
 				// Handle broken pipe errors at the top level too
 				if (err.message?.includes("Broken pipe") || err.name === "BrokenPipe") {
 					return;
