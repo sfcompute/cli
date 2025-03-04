@@ -32,8 +32,6 @@ export async function registerVM(program: Command) {
         },
       });
 
-      console.log("response", response);
-
       if (!response.ok) {
         if (response.status === 401) {
           await logSessionTokenExpiredAndQuit();
@@ -43,17 +41,15 @@ export async function registerVM(program: Command) {
 
       const { data } = await response.json();
 
-      if (!data) {
+      if (!data?.length) {
         logAndQuit("No VMs found");
       }
-
-	  console.log(data);
 
       console.table(
         data.map((instance) => ({
           id: instance.id,
           instance_group_id: instance.instance_group_id,
-          status: instance.status,
+          status: instance.current_status,
           last_updated_at: instance.last_updated_at,
         })),
       );
@@ -111,12 +107,12 @@ export async function registerVM(program: Command) {
 
       const { data } = await response.json();
 
-      if (!data?.data?.length) {
+      if (!data?.length) {
         console.log("No logs found");
         return;
       }
 
-      for (const log of data.data) {
+      for (const log of data) {
         console.log(
           `(instance ${log.instance_id}) [${log.timestamp}] ${log.message}`,
         );
