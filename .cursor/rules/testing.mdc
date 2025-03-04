@@ -1,0 +1,8 @@
+---
+description: How to write tests
+globs: 
+alwaysApply: true
+---
+
+- This is a CLI app written in Deno
+- Tests should use Deno's built-in test runner

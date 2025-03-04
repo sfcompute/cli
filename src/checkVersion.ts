@@ -1,6 +1,7 @@
 import boxen from "boxen";
 import chalk from "chalk";
 import { execSync } from "node:child_process";
+import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -9,7 +10,7 @@ import semver from "semver";
 import pkg from "../package.json" with { type: "json" };
 
 const CACHE_FILE = join(homedir(), ".sfcompute", "version-cache");
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+const CACHE_TTL = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
 interface VersionCache {
   version: string;
@@ -74,11 +75,12 @@ async function checkProductionCLIVersion() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+    // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
+    const data = await response.json() as any;
     await writeCache(data.version);
     return data.version;
   } catch (error) {
-    console.error("boba failed to check latest CLI version:", error);
+    console.error("failed to check latest CLI version:", error);
     return null;
   }
 }

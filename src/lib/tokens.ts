@@ -1,4 +1,5 @@
 import process from "node:process";
+import * as console from "node:console";
 import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import Table from "cli-table3";
@@ -40,7 +41,7 @@ export function registerTokens(program: Command) {
 
   tokens
     .command("delete")
-    .command("rm")
+    .alias("rm")
     .description("Delete a token")
     .requiredOption("--id <id>", "Specify the token ID")
     .option("--force", "Force delete the token, skipping confirmation")
@@ -137,6 +138,7 @@ async function createTokenAction() {
   // display token to user
   const data = await response.json();
   loadingSpinner.succeed(chalk.gray("Access token created 🎉"));
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   console.log(chalk.green(data.token) + "\n");
 
   // tell them they will set this in the Authorization header
@@ -160,9 +162,10 @@ async function createTokenAction() {
   const pingUrl = await getApiUrl("ping");
   console.log(`${chalk.gray("Here is a sample curl to get your started:")}`);
   console.log(
-    chalk.white(`curl --request GET \\
-  --url ${pingUrl} \\
-  --header 'Authorization: Bearer ${data.token}'`),
+    chalk.white(
+      // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
+      `curl --request GET --url ${pingUrl} --header 'Authorization: Bearer ${data.token}'`,
+    ),
   );
   console.log("\n");
 
@@ -214,6 +217,7 @@ async function listTokensAction() {
 
   // show account tokens
   const responseBody = await response.json();
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   const tokens = responseBody.data as Array<TokenObject>;
 
   // show empty table if no tokens
@@ -322,6 +326,7 @@ async function deleteTokenById(id: string) {
     }
 
     const error = await response.json();
+    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
     if (error.code === "token.not_found") {
       loadingSpinner.fail("Token not found");
       process.exit(1);

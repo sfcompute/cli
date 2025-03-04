@@ -1,6 +1,7 @@
 import { type Command, Option } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import { render } from "ink";
+import * as console from "node:console";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import React from "react";
@@ -12,8 +13,8 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { fetchAndHandleErrors } from "../../helpers/fetch.ts";
+import { parseStartDate } from "../../helpers/units.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { parseStartAsDate } from "../buy/index.tsx";
 import { OrderDisplay } from "./OrderDisplay.tsx";
 import type { HydratedOrder, ListResponseBody } from "./types.ts";
 
@@ -64,7 +65,7 @@ export function registerOrders(program: Command) {
     .addOption(
       new Option(
         "--public",
-        "Include public orders. Only includes open orders.",
+        "This option is deprecated. It's no longer possible to view public orders.",
       )
         .conflicts(["onlyFilled", "onlyCancelled"])
         .implies({
@@ -74,12 +75,12 @@ export function registerOrders(program: Command) {
     .option(
       "--min-price <price>",
       "Filter by minimum price (in cents)",
-      parseInt,
+      Number.parseInt,
     )
     .option(
       "--max-price <price>",
       "Filter by maximum price (in cents)",
-      parseInt,
+      Number.parseInt,
     )
     .option(
       "--min-start <date>",
@@ -97,23 +98,38 @@ export function registerOrders(program: Command) {
       "--max-duration <duration>",
       "Filter by maximum duration (in seconds)",
     )
-    .option("--min-quantity <quantity>", "Filter by minimum quantity", parseInt)
-    .option("--max-quantity <quantity>", "Filter by maximum quantity", parseInt)
+    .option(
+      "--min-quantity <quantity>",
+      "Filter by minimum quantity",
+      Number.parseInt,
+    )
+    .option(
+      "--max-quantity <quantity>",
+      "Filter by maximum quantity",
+      Number.parseInt,
+    )
     .option(
       "--contract-id <id>",
       "Filter by contract ID (only for sell orders)",
     )
     .addOption(
-      new Option("--only-open", "Show only open orders")
-        .conflicts(["onlyFilled", "onlyCancelled"]),
+      new Option("--only-open", "Show only open orders").conflicts([
+        "onlyFilled",
+        "onlyCancelled",
+      ]),
     )
     .addOption(
-      new Option("--exclude-filled", "Exclude filled orders")
-        .conflicts(["onlyFilled"]),
+      new Option("--exclude-filled", "Exclude filled orders").conflicts([
+        "onlyFilled",
+      ]),
     )
     .addOption(
-      new Option("--only-filled", "Show only filled orders")
-        .conflicts(["excludeFilled", "onlyCancelled", "onlyOpen", "public"]),
+      new Option("--only-filled", "Show only filled orders").conflicts([
+        "excludeFilled",
+        "onlyCancelled",
+        "onlyOpen",
+        "public",
+      ]),
     )
     .option(
       "--min-filled-at <date>",
@@ -126,17 +142,14 @@ export function registerOrders(program: Command) {
     .option(
       "--min-fill-price <price>",
       "Filter by minimum fill price (in cents)",
-      parseInt,
+      Number.parseInt,
     )
     .option(
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
-      parseInt,
+      Number.parseInt,
     )
-    .option(
-      "--include-cancelled",
-      "Include cancelled orders",
-    )
+    .option("--include-cancelled", "Include cancelled orders")
     .addOption(
       new Option("--only-cancelled", "Show only cancelled orders")
         .conflicts(["onlyFilled", "onlyOpen", "public"])
@@ -160,11 +173,11 @@ export function registerOrders(program: Command) {
       "--max-placed-at <date>",
       "Filter by maximum placed date (ISO 8601 datestring)",
     )
-    .option("--limit <number>", "Limit the number of results", parseInt)
+    .option("--limit <number>", "Limit the number of results", Number.parseInt)
     .option(
       "--offset <number>",
       "Offset the results (for pagination)",
-      parseInt,
+      Number.parseInt,
     )
     .option("--json", "Output in JSON format")
     .action(async (options) => {
@@ -173,8 +186,6 @@ export function registerOrders(program: Command) {
       const orders = await getOrders({
         side: options.side,
         instance_type: options.type,
-
-        include_public: options.public,
 
         min_price: options.minPrice,
         max_price: options.maxPrice,
@@ -213,8 +224,8 @@ export function registerOrders(program: Command) {
 
       // Sort orders by start time ascending (present to future)
       const sortedOrders = [...orders].sort((a, b) => {
-        const aStart = parseStartAsDate(a.start_at);
-        const bStart = parseStartAsDate(b.start_at);
+        const aStart = parseStartDate(a.start_at);
+        const bStart = parseStartDate(b.start_at);
         return aStart.getTime() - bStart.getTime();
       });
 
@@ -234,8 +245,6 @@ export function registerOrders(program: Command) {
 export async function getOrders(props: {
   side?: "buy" | "sell";
   instance_type?: string;
-
-  include_public?: boolean;
 
   min_price?: number;
   max_price?: number;
@@ -306,9 +315,7 @@ export async function getOrders(props: {
   return resp.data;
 }
 
-export async function submitOrderCancellationByIdAction(
-  orderId: string,
-) {
+export async function submitOrderCancellationByIdAction(orderId: string) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
@@ -329,6 +336,7 @@ export async function submitOrderCancellationByIdAction(
     }
 
     const error = await response.json();
+    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
     switch (error.code) {
       case "order.not_found":
         return logAndQuit(`Order ${orderId} not found`);
@@ -341,6 +349,7 @@ export async function submitOrderCancellationByIdAction(
   }
 
   const resp = await response.json();
+  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   const cancellationSubmitted = resp.object === "pending";
   if (!cancellationSubmitted) {
     return logAndQuit(`Failed to cancel order ${orderId}`);

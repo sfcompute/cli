@@ -1,6 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
 import { isFeatureEnabled } from "./posthog.ts";
-import { apiClient } from "../apiClient.ts";
 import { readFileSync } from "node:fs";
 import {
 	logAndQuit,

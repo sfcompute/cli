@@ -10,7 +10,7 @@ interface FeatureFlagCache {
   [key: string]: CachedFeatureFlag;
 }
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const FEATURE_FLAG_CACHE_TTL = 60 * 60 * 1000;
 
 function getFeatureFlagCachePath(): string {
   const configDir = join(homedir(), ".sfcompute");
@@ -24,8 +24,8 @@ export async function saveFeatureFlags(flags: FeatureFlagCache): Promise<void> {
   try {
     await Deno.mkdir(configDir, { recursive: true });
     await Deno.writeTextFile(cachePath, JSON.stringify(flags, null, 2));
-  } catch (error) {
-    console.error("boba error saving feature flags:", error);
+  } catch {
+    // Silent error
   }
 }
 
@@ -42,7 +42,7 @@ export async function loadFeatureFlags(): Promise<FeatureFlagCache> {
 
 export async function getCachedFeatureFlag(
   feature: string,
-  accountId: string
+  accountId: string,
 ): Promise<CachedFeatureFlag | null> {
   const cache = await loadFeatureFlags();
   const key = `${accountId}:${feature}`;
@@ -65,15 +65,24 @@ export async function getCachedFeatureFlag(
 export async function cacheFeatureFlag(
   feature: string,
   accountId: string,
-  value: boolean
+  value: boolean,
 ): Promise<void> {
   const cache = await loadFeatureFlags();
   const key = `${accountId}:${feature}`;
 
   cache[key] = {
     value,
-    expiresAt: Date.now() + ONE_DAY_MS,
+    expiresAt: Date.now() + FEATURE_FLAG_CACHE_TTL,
   };
 
   await saveFeatureFlags(cache);
+}
+
+export async function clearFeatureFlags(): Promise<void> {
+  const cachePath = getFeatureFlagCachePath();
+  try {
+    await Deno.remove(cachePath);
+  } catch {
+    // Silent error if file doesn't exist
+  }
 }

@@ -1,8 +1,9 @@
+import { type Command, Option } from "@commander-js/extra-typings";
 import { parseDate } from "chrono-node";
-import type { Command } from "@commander-js/extra-typings";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
@@ -14,7 +15,12 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { roundStartDate } from "../../helpers/units.ts";
+import {
+  parseStartDate,
+  parseStartDateOrNow,
+  roundEndDate,
+  roundStartDate,
+} from "../../helpers/units.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
@@ -32,21 +38,45 @@ function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
-    .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
-    .requiredOption("-d, --duration <duration>", "Specify the duration", "1h")
+    .option(
+      "-n, --accelerators <quantity>",
+      "Specify the number of GPUs",
+      parseAccelerators,
+      8,
+    )
+    .option(
+      "-d, --duration <duration>",
+      "Specify the duration. We will round up so that your order ends at the nearest hour.",
+      parseDuration,
+    )
     .option("-p, --price <price>", "The price in dollars, per GPU hour")
     .option(
       "-s, --start <start>",
       "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
+      parseStartDateOrNow,
+      "NOW",
     )
+    .addOption(
+      new Option(
+        "-e, --end <end>",
+        "Specify the end date. Can be a date, or a relative time like '+1d'. We will round up to the nearest hour.",
+      )
+        .argParser(parseEnd)
+        .conflicts("duration"),
+    )
+    .hook("preAction", (command) => {
+      const { duration, end } = command.opts();
+      if ((!duration && !end) || (!!duration && !!end)) {
+        logAndQuit("Exactly one of --duration or --end must be specified");
+      }
+    })
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-colo, --colocate <contracts_to_colocate_with>",
       "Colocate with existing contracts",
       (value) => value.split(","),
-      [],
     )
-    .option("--quote", "Only provide a quote for the order")
+    .option("-q, --quote", "Only provide a quote for the order")
     .action(function buyOrderAction(options) {
       /*
        * Flow is:
@@ -59,13 +89,6 @@ function _registerBuy(program: Command) {
       if (options.quote) {
         render(<QuoteComponent options={options} />);
       } else {
-        const nodes = parseAccelerators(options.accelerators);
-        if (!Number.isInteger(nodes)) {
-          return logAndQuit(
-            `You can only buy whole nodes, or 8 GPUs at a time. Got: ${options.accelerators}`,
-          );
-        }
-
         render(<QuoteAndBuy options={options} />);
       }
     });
@@ -75,30 +98,10 @@ export function registerBuy(program: Command) {
   _registerBuy(program);
 }
 
-export function parseStart(start?: string) {
-  if (!start) {
-    return "NOW" as const;
-  }
-
-  if (start === "NOW" || start === "now") {
-    return "NOW" as const;
-  }
-
-  const parsed = parseDate(start);
-  if (!parsed) {
-    return logAndQuit(`Invalid start date: ${start}`);
-  }
-
-  return parsed;
-}
-
-export function parseStartAsDate(start?: string) {
-  const date = parseStart(start);
-  if (date === "NOW") {
-    return new Date();
-  }
-
-  return date;
+function parseEnd(value: string) {
+  const parsed = parseDate(value);
+  if (!parsed) logAndQuit(`Invalid end date: ${value}`);
+  return roundEndDate(parsed);
 }
 
 function parseAccelerators(accelerators?: string) {
@@ -106,7 +109,13 @@ function parseAccelerators(accelerators?: string) {
     return 1;
   }
 
-  return Number.parseInt(accelerators) / GPUS_PER_NODE;
+  const parsedValue = Number.parseInt(accelerators);
+  if (!Number.isInteger(parsedValue / GPUS_PER_NODE)) {
+    return logAndQuit(
+      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${accelerators}`,
+    );
+  }
+  return parsedValue;
 }
 
 function parseDuration(duration?: string) {
@@ -145,12 +154,9 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
     (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
       setIsLoading(false);
-      if (!quote) {
-        return;
-      }
-      setQuote(quote);
+      if (quote) setQuote(quote);
     })();
-  }, []);
+  }, [props.options]);
 
   return isLoading
     ? (
@@ -170,19 +176,28 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
   // submit a quote request, handle loading state
   useEffect(() => {
     (async () => {
+      const { start, duration, end } = props.options;
       // Grab the price per GPU hour, either
-      let pricePerGpuHour: number | null = parsePricePerGpuHour(
+      let pricePerGpuHour = parsePricePerGpuHour(
         props.options.price,
       );
-
-      let startAt = parseStart(props.options.start);
-      if (startAt === "NOW") {
-        startAt = dayjs().toDate();
+      let startAt = start;
+      let endsAt: Date;
+      const coercedStart = parseStartDate(start);
+      if (duration) {
+        // If duration is set, calculate end from start + duration
+        endsAt = roundEndDate(
+          dayjs(coercedStart).add(duration, "seconds").toDate(),
+        );
+      } else if (end) {
+        endsAt = end;
+        props.options.duration = dayjs(endsAt).diff(
+          dayjs(coercedStart),
+          "seconds",
+        );
+      } else {
+        throw new Error("Either duration or end must be set");
       }
-
-      let duration = parseDuration(props.options.duration);
-
-      let endsAt = dayjs(startAt).add(duration, "seconds").toDate();
 
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
@@ -194,25 +209,29 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
 
-        startAt = quote.start_at === "NOW"
-          ? ("NOW" as const)
-          : parseStartAsDate(quote.start_at);
+        startAt = parseStartDateOrNow(quote.start_at);
 
         endsAt = dayjs(quote.end_at).toDate();
-
-        duration = dayjs(endsAt).diff(dayjs(startAt), "seconds");
       }
 
+      const {
+        type,
+        accelerators,
+        colocate,
+        yes,
+      } = props.options;
+
       setOrderProps({
-        type: props.options.type,
+        type,
         price: pricePerGpuHour,
-        size: parseAccelerators(props.options.accelerators),
+        size: accelerators / GPUS_PER_NODE,
         startAt,
         endsAt,
-        colocate: props.options.colocate,
+        colocate,
+        yes,
       });
     })();
-  }, []);
+  }, [props.options]);
 
   return orderProps === null
     ? (
@@ -223,21 +242,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         </Box>
       </Box>
     )
-    : <BuyOrder {...orderProps} yes={props.options.yes} />;
-}
-
-function roundEndDate(endDate: Date) {
-  const minutes = endDate.getMinutes();
-  const seconds = endDate.getSeconds();
-  const ms = endDate.getMilliseconds();
-
-  // If already at an hour boundary (no minutes/seconds/ms), return as-is
-  if (minutes === 0 && seconds === 0 && ms === 0) {
-    return dayjs(endDate);
-  }
-
-  // Otherwise round up to next hour
-  return dayjs(endDate).add(1, "hour").startOf("hour");
+    : <BuyOrder {...orderProps} />;
 }
 
 export function getTotalPrice(
@@ -258,13 +263,11 @@ function BuyOrderPreview(props: {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
   const startFromNow = startDate.fromNow();
 
-  const endDate = roundEndDate(props.endsAt);
+  const endDate = dayjs(roundEndDate(props.endsAt));
   const end = endDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
   const endFromNow = endDate.fromNow();
 
   const realDuration = endDate.diff(startDate);
@@ -314,6 +317,8 @@ function BuyOrderPreview(props: {
   );
 }
 
+const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
+
 type Order =
   | Awaited<ReturnType<typeof getOrder>>
   | Awaited<ReturnType<typeof placeBuyOrder>>;
@@ -326,6 +331,7 @@ type BuyOrderProps = {
   colocate?: Array<string>;
   yes?: boolean;
 };
+
 function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -336,13 +342,10 @@ function BuyOrder(props: BuyOrderProps) {
     "Placing order...",
   );
 
-  async function submitOrder() {
-    const endsAt = props.endsAt;
-    const startAt = props.startAt === "NOW"
-      ? parseStartAsDate(props.startAt)
-      : props.startAt;
-    const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
-      3600;
+  const submitOrder = useCallback(async () => {
+    const { startAt, endsAt } = props;
+    const realDurationInHours =
+      dayjs(endsAt).diff(dayjs(parseStartDate(startAt))) / 1000 / 3600;
 
     setIsLoading(true);
     const order = await placeBuyOrder({
@@ -358,15 +361,12 @@ function BuyOrder(props: BuyOrderProps) {
       numberNodes: props.size,
     });
     setOrder(order);
-  }
+  }, [props]);
 
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
-      const endsAt = props.endsAt;
-      const startAt = props.startAt === "NOW"
-        ? parseStartAsDate(props.startAt)
-        : props.startAt;
+      const { startAt, endsAt } = props;
       const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
         3600;
       const totalPriceInCents = getTotalPrice(
@@ -419,7 +419,7 @@ function BuyOrder(props: BuyOrderProps) {
       });
       submitOrder();
     },
-    [exit, setIsLoading],
+    [props, exit, submitOrder],
   );
 
   useEffect(() => {
@@ -457,17 +457,17 @@ function BuyOrder(props: BuyOrderProps) {
         intervalRef.current = null;
       }
     };
-  }, [isLoading, order, exit, setOrder]);
+  }, [isLoading, order, exit]);
 
   useEffect(() => {
     if (!isLoading && props.yes) {
       submitOrder();
     }
-  }, [isLoading, props.yes]);
+  }, [isLoading, props.yes, submitOrder]);
 
   return (
     <Box gap={1} flexDirection="column">
-      <BuyOrderPreview {...props} />
+      <MemoizedBuyOrderPreview {...props} />
 
       {!isLoading && !props.yes && (
         <Box gap={1}>
@@ -485,9 +485,18 @@ function BuyOrder(props: BuyOrderProps) {
       {isLoading && (
         <Box gap={1}>
           {(!order || order.status === "pending") && <Spinner type="dots" />}
-          {order && order.status === "open" && <Text color="yellow">•</Text>}
           {!order && <Text>{loadingMsg}</Text>}
-          {order && (
+          {order && order.status === "open" && <Text color="yellow">•</Text>}
+          {order && order.status === "cancelled" && (
+            <Box gap={1} flexDirection="column">
+              <Text color="red">Order could not be filled: {order.id}</Text>
+              <Text>
+                You were not charged. Try placing a new order with a different
+                price, duration, or number of GPUs.
+              </Text>
+            </Box>
+          )}
+          {order && order.status !== "cancelled" && (
             <Box gap={1}>
               <Text>Order placed: {order.id}</Text>
               <Text>- ({order.status})</Text>
@@ -537,19 +546,23 @@ export async function placeBuyOrder(options: {
   );
 
   const api = await apiClient();
-  const { data, error, response } = await api.POST("/v0/orders", {
-    body: {
-      side: "buy",
-      instance_type: options.instanceType,
-      quantity: options.numberNodes,
-      // round start date again because the user might take a long time to confirm
-      start_at: options.startsAt === "NOW"
-        ? "NOW"
-        : roundStartDate(options.startsAt).toISOString(),
-      end_at: options.endsAt.toISOString(),
-      price: options.totalPriceInCents,
-      colocate_with: options.colocateWith,
+  const body = {
+    side: "buy",
+    instance_type: options.instanceType,
+    quantity: options.numberNodes,
+    // round start date again because the user might take a long time to confirm
+    start_at: options.startsAt === "NOW"
+      ? "NOW"
+      : roundStartDate(options.startsAt).toISOString(),
+    end_at: roundEndDate(options.endsAt).toISOString(),
+    price: options.totalPriceInCents,
+    colocate_with: options.colocateWith,
+    flags: {
+      ioc: true,
     },
+  } as const;
+  const { data, error, response } = await api.POST("/v0/orders", {
+    body,
   });
 
   if (!response.ok) {
@@ -578,29 +591,21 @@ export async function placeBuyOrder(options: {
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartAsDate(quote.start_at),
+    parseStartDate(quote.start_at),
   );
   const durationHours = durationSeconds / 3600 / 1000;
 
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
-function parseAndRoundStart(start: string | undefined) {
-  const parsed = parseStart(start);
-  if (parsed === "NOW") {
-    return parsed;
-  }
-
-  if (dayjs(parsed).isBefore(dayjs().add(1, "minute"))) {
-    return "NOW" as const;
-  }
-
-  return roundStartDate(parsed);
-}
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt = parseAndRoundStart(options.start);
-  const durationSeconds = parseDuration(options.duration);
-  const quantity = parseAccelerators(options.accelerators);
+  const startsAt = options.start === "NOW"
+    ? "NOW"
+    : roundStartDate(parseStartDate(options.start));
+  const durationSeconds = options.duration
+    ? options.duration
+    : dayjs(options.end).diff(dayjs(parseStartDate(startsAt)), "seconds");
+  const quantity = options.accelerators / GPUS_PER_NODE;
 
   const minDurationSeconds = Math.max(
     1,
@@ -632,22 +637,24 @@ type QuoteOptions = {
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
-  const { data, error, response } = await api.GET("/v0/quote", {
-    params: {
-      query: {
-        side: "buy",
-        instance_type: options.instanceType,
-        quantity: options.quantity,
-        min_start_date: options.minStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.minStartTime.toISOString(),
-        max_start_date: options.maxStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.maxStartTime.toISOString(),
-        min_duration: options.minDurationSeconds,
-        max_duration: options.maxDurationSeconds,
-      },
+  const params = {
+    query: {
+      side: "buy",
+      instance_type: options.instanceType,
+      quantity: options.quantity,
+      min_start_date: options.minStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.minStartTime.toISOString(),
+      max_start_date: options.maxStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.maxStartTime.toISOString(),
+      min_duration: options.minDurationSeconds,
+      max_duration: options.maxDurationSeconds,
     },
+  } as const;
+
+  const { data, error, response } = await api.GET("/v0/quote", {
+    params,
     // timeout after 600 seconds
     signal: AbortSignal.timeout(600 * 1000),
   });

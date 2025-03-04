@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import Table from "cli-table3";
+import * as console from "node:console";
 import type { Command } from "@commander-js/extra-typings";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";

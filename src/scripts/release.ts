@@ -1,5 +1,6 @@
-import { Command } from "@commander-js/extra-typings";
+import { Argument, Command } from "@commander-js/extra-typings";
 import process from "node:process";
+import * as console from "node:console";
 
 const program = new Command();
 
@@ -179,26 +180,13 @@ program
   .description(
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
-  .arguments("[type]")
+  .addArgument(
+    new Argument("type").choices(
+      ["major", "minor", "patch", "prerelease"] as const,
+    ),
+  )
   .action(async (type) => {
     try {
-      if (!type || type === "") {
-        program.help();
-        process.exit(1);
-      }
-
-      const validTypes = ["major", "minor", "patch", "prerelease"];
-      if (!validTypes.includes(type)) {
-        console.error(
-          `Invalid release type: ${type}. Valid types are: ${
-            validTypes.join(
-              ", ",
-            )
-          }`,
-        );
-        process.exit(1);
-      }
-
       const ghCheckResult = await new Deno.Command("which", {
         args: ["gh"],
       }).output();

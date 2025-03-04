@@ -1,6 +1,9 @@
 import type { Command } from "@commander-js/extra-typings";
+import { Badge } from "@inkjs/ui";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
+import * as console from "node:console";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import React, { useEffect, useState } from "react";
 import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
@@ -12,6 +15,11 @@ import {
   KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
+import type { UserFacingCluster } from "./types.ts";
+import {
+  isValidRFC1123Subdomain,
+  sanitizeToRFC1123Subdomain,
+} from "./utils.ts";
 
 export function registerClusters(program: Command) {
   const clusters = program
@@ -43,7 +51,10 @@ export function registerClusters(program: Command) {
     .command("add")
     .description("Add a user to a cluster (always regenerates keys)")
     .requiredOption("--cluster <cluster>", "name of the cluster")
-    .requiredOption("--user <username>", "Username to add")
+    .requiredOption(
+      "--user <username>",
+      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized.",
+    )
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
@@ -94,32 +105,78 @@ export function registerClusters(program: Command) {
 function ClusterDisplay({
   clusters,
 }: {
-  clusters: Array<{
-    name: string;
-    kubernetes_api_url: string;
-    kubernetes_namespace: string;
-  }>;
+  clusters: Array<UserFacingCluster>;
 }) {
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" gap={2}>
       {clusters.map((cluster, index) => (
-        <Box key={`${cluster.name}-${index}`} flexDirection="column">
-          <Row headWidth={11} head="name" value={cluster.name} />
-          <Row
-            headWidth={11}
-            head="k8s api"
-            value={cluster.kubernetes_api_url}
-          />
-          <Row
-            headWidth={11}
-            head="namespace"
-            value={cluster.kubernetes_namespace}
-          />
-        </Box>
+        <ClusterRow cluster={cluster} key={`${cluster.name}-${index}`} />
       ))}
     </Box>
   );
 }
+
+const ClusterRow = ({ cluster }: { cluster: UserFacingCluster }) => {
+  if (cluster.contract) {
+    return <ClusterRowWithContracts cluster={cluster} />;
+  }
+
+  return (
+    <Box flexDirection="column">
+      <Row headWidth={11} head="name" value={cluster.name} />
+      <Row
+        headWidth={11}
+        head="k8s api"
+        value={cluster.kubernetes_api_url || ""}
+      />
+      <Row
+        headWidth={11}
+        head="namespace"
+        value={cluster.kubernetes_namespace}
+      />
+    </Box>
+  );
+};
+
+const COLUMN_WIDTH = 11;
+
+const ClusterRowWithContracts = (
+  { cluster }: {
+    cluster: UserFacingCluster;
+  },
+) => {
+  if (!cluster.contract) {
+    return null;
+  }
+
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Box>
+        <Badge color="cyan">{cluster.contract.id}</Badge>
+      </Box>
+
+      <Box flexDirection="column">
+        <Row headWidth={COLUMN_WIDTH} head="Name" value={cluster.name} />
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="K8s API"
+          value={cluster.kubernetes_api_url || ""}
+        />
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Namespace"
+          value={cluster.kubernetes_namespace}
+        />
+
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Add User"
+          value={`sf clusters users add --cluster ${cluster.name} --user myuser`}
+        />
+      </Box>
+    </Box>
+  );
+};
 
 async function listClustersAction({
   returnJson,
@@ -154,11 +211,17 @@ async function listClustersAction({
   } else {
     render(
       <ClusterDisplay
-        clusters={data.data.map((cluster) => ({
-          name: cluster.name,
-          kubernetes_api_url: cluster.kubernetes_api_url || "",
-          kubernetes_namespace: cluster.kubernetes_namespace || "",
-        }))}
+        clusters={data.data
+          .filter((cluster) =>
+            cluster.contract?.status === "active" || !cluster.contract
+          )
+          .map((cluster) =>
+            ({
+              ...cluster,
+              // @ts-expect-error - ignore
+              state: cluster.contract?.state || "Active",
+            }) as UserFacingCluster
+          )}
       />,
     );
   }
@@ -285,7 +348,9 @@ function UserAddedDisplay(props: {
 
         <Box gap={1} paddingBottom={1}>
           <Spinner type="arc" />
-          <Text>Waiting for user to be ready...</Text>
+          <Text>
+            Waiting for user to be ready, this should take about 30 seconds...
+          </Text>
         </Box>
 
         <Box paddingLeft={2} flexDirection="column" gap={1}>
@@ -322,7 +387,7 @@ function UserAddedDisplay(props: {
 
 async function addClusterUserAction({
   clusterName,
-  username,
+  username: rawUsername,
   token,
   print,
 }: {
@@ -337,6 +402,10 @@ async function addClusterUserAction({
   await regenerateKeys();
 
   const { publicKey } = await getKeys();
+
+  const username = isValidRFC1123Subdomain(rawUsername)
+    ? rawUsername
+    : sanitizeToRFC1123Subdomain(rawUsername);
 
   const { data, error, response } = await api.POST("/v0/credentials", {
     body: {

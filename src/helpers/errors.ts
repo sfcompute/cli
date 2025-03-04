@@ -1,4 +1,5 @@
 import process from "node:process";
+import * as console from "node:console";
 import { getCommandBase } from "./command.ts";
 import { clearAuthFromConfig } from "./config.ts";
 
