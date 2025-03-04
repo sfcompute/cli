@@ -47,7 +47,7 @@ export async function registerVM(program: Command) {
       }
 
       console.table(
-        data.map((instance) => ({
+        data.map((instance: any) => ({
           id: instance.id,
           instance_group_id: instance.instance_group_id,
           status: instance.current_status,
@@ -64,7 +64,7 @@ export async function registerVM(program: Command) {
       try {
         script = readFileSync(options.file, "utf-8");
       } catch (err) {
-        logAndQuit(`Failed to read script file: ${err.message}`);
+        logAndQuit("Failed to read script file");
       }
 
       const url = await getApiUrl("vms_script_post");
