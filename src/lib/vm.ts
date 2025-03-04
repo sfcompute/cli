@@ -7,6 +7,7 @@ import {
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 import { getAuthToken } from "../helpers/config.ts";
+import console from "node:console";
 
 export async function registerVM(program: Command) {
   const isEnabled = await isFeatureEnabled("vms");
