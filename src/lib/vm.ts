@@ -31,6 +31,9 @@ export async function registerVM(program: Command) {
           Authorization: `Bearer ${await getAuthToken()}`,
         },
       });
+
+      console.log("response", response);
+
       if (!response.ok) {
         if (response.status === 401) {
           await logSessionTokenExpiredAndQuit();
@@ -40,12 +43,14 @@ export async function registerVM(program: Command) {
 
       const { data } = await response.json();
 
-      if (!data?.data) {
+      if (!data) {
         logAndQuit("No VMs found");
       }
 
+	  console.log(data);
+
       console.table(
-        data.data.map((instance) => ({
+        data.map((instance) => ({
           id: instance.id,
           instance_group_id: instance.instance_group_id,
           status: instance.status,

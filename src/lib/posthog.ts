@@ -99,38 +99,6 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
 	return finalResult;
 };
 
-type FeatureFlags = "vms";
-
-/**
- * Checks if a feature is enabled for the current user.
- */
-export const isFeatureEnabled = async (feature: FeatureFlags) => {
-  const config = await loadConfig();
-  const exchangeAccountId = config.account_id;
-
-  if (!exchangeAccountId) {
-    return false;
-  }
-
-  // Check cache first
-  const cachedFlag = await getCachedFeatureFlag(feature, exchangeAccountId);
-  if (cachedFlag) {
-    return cachedFlag.value;
-  }
-
-  // If not in cache or expired, fetch from PostHog
-  const result = await postHogClient.isFeatureEnabled(
-    feature,
-    exchangeAccountId,
-  );
-
-  // Cache the result (PostHog returns undefined if there's an error, default to false)
-  const finalResult = result ?? false;
-  await cacheFeatureFlag(feature, exchangeAccountId, finalResult);
-
-  return finalResult;
-};
-
 export const analytics = {
 	track: trackEvent,
 	shutdown: () => postHogClient.shutdown(),
