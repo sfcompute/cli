@@ -24,7 +24,9 @@ export async function registerVM(program: Command) {
 	vm.command("list")
 		.description("List all virtual machines")
 		.action(async () => {
-			const { data, error, response } = await client.GET("/v0/vm/nodes");
+			const { data: _data, error: _error, response } = await client.GET("/v0/vms/instances");
+			const data = _data as any;
+			const error = _error as any;
 
 			if (!response.ok) {
 				if (response.status === 401) {
@@ -38,10 +40,11 @@ export async function registerVM(program: Command) {
 			}
 
 			console.table(
-				data.data.map((node) => ({
-					id: node.id,
-					status: node.status,
-					created_at: node.created_at,
+				data.data.map((instance) => ({
+					id: instance.id,
+					instance_group_id: instance.instance_group_id,
+					status: instance.status,
+					last_updated_at: instance.last_updated_at,
 				})),
 			);
 		});
@@ -57,7 +60,7 @@ export async function registerVM(program: Command) {
 				logAndQuit(`Failed to read script file: ${err.message}`);
 			}
 
-			const { error, response } = await client.POST("/v0/vm/script", {
+			const { error, response } = await client.POST("/v0/vms/script", {
 				body: { script },
 			});
 
@@ -74,7 +77,9 @@ export async function registerVM(program: Command) {
 	vm.command("logs")
 		.description("View VM logs")
 		.action(async () => {
-			const { data, error, response } = await client.GET("/v0/vm/logs");
+			const { data: _data, error: _error, response } = await client.GET("/v0/vms/logs");
+			const data = _data as any;
+			const error = _error as any;
 
 			if (!response.ok) {
 				if (response.status === 401) {
@@ -89,7 +94,7 @@ export async function registerVM(program: Command) {
 			}
 
 			for (const log of data.data) {
-				console.log(`[${log.timestamp}] ${log.message}`);
+				console.log(`(instance ${log.instance_id}) [${log.timestamp}] ${log.message}`);
 			}
 		});
 }
