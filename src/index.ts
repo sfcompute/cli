@@ -16,7 +16,7 @@ import { registerDev } from "./lib/dev.ts";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
 import { registerOrders } from "./lib/orders/index.tsx";
-import { IS_TRACKING_DISABLED, analytics } from "./lib/posthog.ts";
+import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerScale } from "./lib/updown.tsx";
@@ -73,7 +73,7 @@ const main = async () => {
       }
     }
 
-    program.exitOverride(error => {
+    program.exitOverride((error) => {
       let isError = true;
 
       switch (error.code) {
@@ -93,8 +93,8 @@ const main = async () => {
           const nextArg = arr[i + 1];
           if (nextArg && !nextArg.startsWith("-")) {
             (acc as Record<string, string | number | boolean>)[key] = isNaN(
-              Number(nextArg)
-            )
+                Number(nextArg),
+              )
               ? nextArg
               : Number(nextArg);
           } else {

@@ -3,6 +3,6 @@ declare namespace Deno {
   function readTextFile(path: string): Promise<string>;
   function mkdir(
     path: string,
-    options?: { recursive?: boolean }
+    options?: { recursive?: boolean },
   ): Promise<void>;
 }
