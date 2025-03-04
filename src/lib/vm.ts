@@ -120,35 +120,65 @@ export async function registerVM(program: Command) {
 				return;
 			}
 
-			for (const log of data) {
-				// Format timestamp to be more human-readable and consistent length
-				const timestamp = new Date(log.timestamp);
-				const formattedTime = timestamp
-					.toISOString()
-					.replace("T", " ")
-					.replace(/\.\d+Z$/, "")
-					.padEnd(19); // ISO format: YYYY-MM-DD HH:MM:SS
+			try {
+				for (const log of data) {
+					// Format timestamp to be more human-readable and consistent length
+					const timestamp = new Date(log.timestamp);
+					const formattedTime = timestamp
+						.toISOString()
+						.replace("T", " ")
+						.replace(/\.\d+Z$/, "")
+						.padEnd(19); // ISO format: YYYY-MM-DD HH:MM:SS
 
-				if (log.message.includes("\n")) {
-					// If the message contains newlines, preserve them
-					const prefix = `(instance ${log.instance_id}) [${formattedTime}] `;
-					const lines = log.message.split("\n");
+					if (log.message.includes("\n")) {
+						// If the message contains newlines, preserve them
+						const prefix = `(instance ${log.instance_id}) [${formattedTime}] `;
+						const lines = log.message.split("\n");
 
-					// Remove empty line at the end if it exists
-					if (lines[lines.length - 1] === "") {
-						lines.pop();
+						// Remove empty line at the end if it exists
+						if (lines[lines.length - 1] === "") {
+							lines.pop();
+						}
+
+						try {
+							console.log(prefix + lines[0]);
+							for (let i = 1; i < lines.length; i++) {
+								console.log(lines[i]);
+							}
+						} catch (err: any) {
+							// If pipe is broken, stop processing
+							if (
+								err.message?.includes("Broken pipe") ||
+								err.name === "BrokenPipe"
+							) {
+								return;
+							}
+							throw err;
+						}
+					} else {
+						// For single line messages, print as before
+						try {
+							console.log(
+								`(instance ${log.instance_id}) [${formattedTime}] ${log.message}`,
+							);
+						} catch (err: any) {
+							// If pipe is broken, stop processing
+							if (
+								err.message?.includes("Broken pipe") ||
+								err.name === "BrokenPipe"
+							) {
+								return;
+							}
+							throw err;
+						}
 					}
-
-					console.log(prefix + lines[0]);
-					for (let i = 1; i < lines.length; i++) {
-						console.log(lines[i]);
-					}
-				} else {
-					// For single line messages, print as before
-					console.log(
-						`(instance ${log.instance_id}) [${formattedTime}] ${log.message}`,
-					);
 				}
+			} catch (err) {
+				// Handle broken pipe errors at the top level too
+				if (err.message?.includes("Broken pipe") || err.name === "BrokenPipe") {
+					return;
+				}
+				throw err;
 			}
 		});
 }
