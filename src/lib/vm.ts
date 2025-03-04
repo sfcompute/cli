@@ -6,6 +6,8 @@ import {
 	logAndQuit,
 	logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
+import { getApiUrl } from "../helpers/urls.ts";
+import { getAuthToken } from "../helpers/config.ts";
 
 export async function registerVM(program: Command) {
 	const isEnabled = await isFeatureEnabled("vms");
@@ -19,21 +21,25 @@ export async function registerVM(program: Command) {
 		.aliases(["v", "vms"])
 		.description("Manage virtual machines");
 
-	const client = await apiClient();
-
 	vm.command("list")
 		.description("List all virtual machines")
 		.action(async () => {
-			const { data: _data, error: _error, response } = await client.GET("/v0/vms/instances");
-			const data = _data as any;
-			const error = _error as any;
-
+			const url = await getApiUrl("vms_instances_list");
+			const response = await fetch(url, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${await getAuthToken()}`,
+				},
+			});
 			if (!response.ok) {
 				if (response.status === 401) {
 					await logSessionTokenExpiredAndQuit();
 				}
-				logAndQuit(`Failed to list VMs: ${error?.message}`);
+				logAndQuit(`Failed to list VMs: ${response.statusText}`);
 			}
+
+			const { data } = await response.json();
 
 			if (!data?.data) {
 				logAndQuit("No VMs found");
@@ -60,15 +66,21 @@ export async function registerVM(program: Command) {
 				logAndQuit(`Failed to read script file: ${err.message}`);
 			}
 
-			const { error, response } = await client.POST("/v0/vms/script", {
-				body: { script },
+			const url = await getApiUrl("vms_script_post");
+			const response = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${await getAuthToken()}`,
+				},
+				body: JSON.stringify({ script }),
 			});
 
 			if (!response.ok) {
 				if (response.status === 401) {
 					await logSessionTokenExpiredAndQuit();
 				}
-				logAndQuit(`Failed to upload script: ${error?.message}`);
+				logAndQuit(`Failed to upload script: ${response.statusText}`);
 			}
 
 			console.log("Successfully uploaded startup script");
@@ -77,16 +89,23 @@ export async function registerVM(program: Command) {
 	vm.command("logs")
 		.description("View VM logs")
 		.action(async () => {
-			const { data: _data, error: _error, response } = await client.GET("/v0/vms/logs");
-			const data = _data as any;
-			const error = _error as any;
+			const url = await getApiUrl("vms_logs_list");
+			const response = await fetch(url, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${await getAuthToken()}`,
+				},
+			});
 
 			if (!response.ok) {
 				if (response.status === 401) {
 					await logSessionTokenExpiredAndQuit();
 				}
-				logAndQuit(`Failed to fetch logs: ${error?.message}`);
+				logAndQuit(`Failed to fetch logs: ${response.statusText}`);
 			}
+
+			const { data } = await response.json();
 
 			if (!data?.data?.length) {
 				console.log("No logs found");
