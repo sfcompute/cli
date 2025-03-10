@@ -29,7 +29,7 @@
     "npm:openapi-fetch@~0.11.1": "0.11.3",
     "npm:ora@^8.1.0": "8.2.0",
     "npm:parse-duration@^1.1.0": "1.1.2",
-    "npm:posthog-node@^4.3.2": "4.5.0",
+    "npm:posthog-node@^4.10.1": "4.10.1",
     "npm:prettier@^3.4.2": "3.5.0",
     "npm:react@^18.3.1": "18.3.1",
     "npm:semver@^7.6.3": "7.7.1",
@@ -813,8 +813,8 @@
     "patch-console@2.0.0": {
       "integrity": "sha512-0YNdUceMdaQwoKce1gatDScmMo5pu/tfABfnzEqeG0gtTmd7mh/WcwgUjtAeOU7N8nFFlbQBnFK2gXW5fGvmMA=="
     },
-    "posthog-node@4.5.0": {
-      "integrity": "sha512-h1WTHYvgOZ7kBGH0XfKVOVsSyFgCEbgzC2RIw7fetsW6RrSvxPYcaycKUDfqa5EGbvU0SYLbqAeeqNZjPDaznA==",
+    "posthog-node@4.10.1": {
+      "integrity": "sha512-rEzVszfaOkUFTjEabDcRLJNRqMwTOeU1WpqKgQEDV3x82O4ODifkvkoCERaPxl/ossi1NtqKXBOZ+XnhQ19pNQ==",
       "dependencies": [
         "axios"
       ]
@@ -1183,7 +1183,7 @@
         "npm:openapi-fetch@~0.11.1",
         "npm:ora@^8.1.0",
         "npm:parse-duration@^1.1.0",
-        "npm:posthog-node@^4.3.2",
+        "npm:posthog-node@^4.10.1",
         "npm:prettier@^3.4.2",
         "npm:react@^18.3.1",
         "npm:semver@^7.6.3",
