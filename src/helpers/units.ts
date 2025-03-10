@@ -17,11 +17,11 @@ export function epochToDate(epoch: Epoch): Date {
   return new Date(epoch * MILLS_PER_EPOCH);
 }
 
-export function roundStartDate(startDate: Date): Date {
+export function roundStartDate(startDate: Date): Date | "NOW" {
   const now = currentEpoch();
   const startEpoch = dateToEpoch(startDate);
   if (startEpoch <= now + 1) {
-    return epochToDate(now + 1);
+    return "NOW" as const;
   }
 
   return epochToDate(roundEpochUpToHour(startEpoch));

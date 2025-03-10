@@ -546,14 +546,25 @@ export async function placeBuyOrder(options: {
   );
 
   const api = await apiClient();
+
+  // round start date again because the user might take a long time to confirm
+  let start_at: string;
+  if (options.startsAt === "NOW") {
+    start_at = "NOW";
+  } else {
+    const roundedStartDate = roundStartDate(options.startsAt);
+    if (roundedStartDate === "NOW") {
+      start_at = "NOW" as const;
+    } else {
+      start_at = roundedStartDate.toISOString();
+    }
+  }
+
   const body = {
     side: "buy",
     instance_type: options.instanceType,
     quantity: options.numberNodes,
-    // round start date again because the user might take a long time to confirm
-    start_at: options.startsAt === "NOW"
-      ? "NOW"
-      : roundStartDate(options.startsAt).toISOString(),
+    start_at,
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
     colocate_with: options.colocateWith,
