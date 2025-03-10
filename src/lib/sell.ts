@@ -77,14 +77,14 @@ export function registerSell(program: Command) {
           },
         });
 
-      let startDate = options.start
+      const startDate = options.start
         ? chrono.parseDate(options.start)
         : contractStartDate;
       if (!startDate) {
         return logAndQuit("Invalid start date");
       }
 
-      startDate = roundStartDate(startDate);
+      const roundedStartDate = roundStartDate(startDate);
 
       let endDate = contractEndDate;
       if (options.duration) {
@@ -92,7 +92,7 @@ export function registerSell(program: Command) {
         if (!durationSecs) {
           return logAndQuit("Invalid duration");
         }
-        endDate = dayjs(startDate).add(durationSecs, "s").toDate();
+        endDate = dayjs(roundedStartDate === "NOW" ? new Date() : roundedStartDate).add(durationSecs, "s").toDate();
       }
 
       endDate = roundEndDate(endDate);
@@ -115,7 +115,7 @@ export function registerSell(program: Command) {
         quantity: forceAsNumber(options.accelerators) / GPUS_PER_NODE,
         price: totalPrice,
         contract_id: options.contractId,
-        start_at: startDate.toISOString(),
+        start_at: roundedStartDate === "NOW" ? "NOW" : roundedStartDate.toISOString(),
         end_at: endDate.toISOString(),
       };
 
@@ -128,12 +128,11 @@ export function registerSell(program: Command) {
         switch (response.status) {
           case 400:
             return logAndQuit(
-              `Bad Request: ${error?.message}: ${
-                JSON.stringify(
-                  error?.details,
-                  null,
-                  2,
-                )
+              `Bad Request: ${error?.message}: ${JSON.stringify(
+                error?.details,
+                null,
+                2,
+              )
               }`,
             );
           // return logAndQuit(`Bad Request: ${error?.message}`);
