@@ -76,7 +76,7 @@ async function checkProductionCLIVersion() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
-    const data = await response.json() as any;
+    const data = (await response.json()) as any;
     await writeCache(data.version);
     return data.version;
   } catch (error) {

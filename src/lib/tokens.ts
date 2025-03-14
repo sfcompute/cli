@@ -139,7 +139,7 @@ async function createTokenAction() {
   const data = await response.json();
   loadingSpinner.succeed(chalk.gray("Access token created 🎉"));
   // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
-  console.log(chalk.green(data.token) + "\n");
+  console.log(`${chalk.green(data.token)}\n`);
 
   // tell them they will set this in the Authorization header
   console.log(
@@ -229,13 +229,14 @@ async function listTokensAction() {
     table.push([
       { colSpan: 1, content: "No access tokens found", hAlign: "center" },
     ]);
-    console.log(table.toString() + "\n");
+    console.log(`${table.toString()}\n`);
 
     // prompt user that they can generate one
     const base = getCommandBase();
     console.log(
-      chalk.gray("Generate your first token with: ") +
-        chalk.magenta(`${base} tokens create`),
+      `${chalk.gray("Generate your first token with: ")}${
+        chalk.magenta(`${base} tokens create`)
+      }`,
     );
 
     process.exit(0);
@@ -284,6 +285,8 @@ async function deleteTokenAction({
 
   if (force) {
     await deleteTokenById(id);
+    console.log(`${chalk.green("✓")} Token deleted successfully`);
+    process.exit(0);
   }
 
   const deleteTokenConfirmed = await confirm({
@@ -298,8 +301,9 @@ async function deleteTokenAction({
     process.exit(0);
   } else {
     const verySureConfirmed = await confirm({
-      message: chalk.red("Very sure?") + " " +
-        chalk.gray("(just double-checking)"),
+      message: `${chalk.red("Very sure?")} ${
+        chalk.gray("(just double-checking)")
+      }`,
       default: false,
     });
 

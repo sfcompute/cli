@@ -1,7 +1,7 @@
+import type { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 import Table from "cli-table3";
 import * as console from "node:console";
-import type { Command } from "@commander-js/extra-typings";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
 import {
@@ -61,7 +61,7 @@ export function registerBalance(program: Command) {
           ],
         );
 
-        console.log(table.toString() + "\n");
+        console.log(`${table.toString()}\n`);
       }
     });
 }

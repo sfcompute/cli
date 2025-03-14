@@ -1,14 +1,14 @@
 import type { Command } from "@commander-js/extra-typings";
-import { isFeatureEnabled } from "./posthog.ts";
+import console from "node:console";
 import { readFileSync } from "node:fs";
+import { setTimeout } from "node:timers";
+import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
-import { getAuthToken } from "../helpers/config.ts";
-import console from "node:console";
-import { setTimeout } from "node:timers";
+import { isFeatureEnabled } from "./posthog.ts";
 
 export async function registerVM(program: Command) {
   const isEnabled = await isFeatureEnabled("vms");
@@ -146,7 +146,7 @@ export async function registerVM(program: Command) {
           try {
             const errorResponse = await response.json();
             errorDetails = JSON.stringify(errorResponse, null, 2);
-          } catch (e) {
+          } catch {
             errorDetails = await response.text();
           }
 
@@ -195,7 +195,7 @@ export async function registerVM(program: Command) {
             throw new Error("Invalid date");
           }
           return date.toISOString();
-        } catch (err) {
+        } catch {
           logAndQuit(
             `Invalid timestamp format: ${timestamp}. Please use ISO format (e.g., 2023-01-01T00:00:00Z)`,
           );
