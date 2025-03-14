@@ -26,6 +26,7 @@ import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
 
 dayjs.extend(relativeTime);
@@ -41,7 +42,7 @@ function _registerBuy(program: Command) {
     .option(
       "-n, --accelerators <quantity>",
       "Specify the number of GPUs",
-      parseAccelerators,
+      (val) => parseAccelerators(val, "buy"),
       8,
     )
     .option(
@@ -102,20 +103,6 @@ function parseEnd(value: string) {
   const parsed = parseDate(value);
   if (!parsed) logAndQuit(`Invalid end date: ${value}`);
   return roundEndDate(parsed);
-}
-
-function parseAccelerators(accelerators?: string) {
-  if (!accelerators) {
-    return 1;
-  }
-
-  const parsedValue = Number.parseInt(accelerators);
-  if (!Number.isInteger(parsedValue / GPUS_PER_NODE)) {
-    return logAndQuit(
-      `You can only buy whole nodes, or 8 GPUs at a time. Got: ${accelerators}`,
-    );
-  }
-  return parsedValue;
 }
 
 function parseDuration(duration?: string) {

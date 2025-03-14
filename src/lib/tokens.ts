@@ -1,10 +1,10 @@
-import process from "node:process";
-import * as console from "node:console";
+import type { Command } from "@commander-js/extra-typings";
 import { confirm, input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import Table from "cli-table3";
-import type { Command } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
+import * as console from "node:console";
+import process from "node:process";
 import ora from "ora";
 import { getCommandBase } from "../helpers/command.ts";
 import { getAuthToken, isLoggedIn } from "../helpers/config.ts";

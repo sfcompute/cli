@@ -1,5 +1,5 @@
-import * as chrono from "chrono-node";
 import type { Command } from "@commander-js/extra-typings";
+import * as chrono from "chrono-node";
 import dayjs from "dayjs";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient.ts";
@@ -18,6 +18,7 @@ import {
 } from "../helpers/units.ts";
 import { waitForOrderToNotBePending } from "../helpers/waitingForOrder.ts";
 import { GPUS_PER_NODE } from "./constants.ts";
+import { parseAccelerators } from "./index.ts";
 import type { PlaceSellOrderParameters } from "./orders/types.ts";
 
 export function registerSell(program: Command) {
@@ -29,7 +30,7 @@ export function registerSell(program: Command) {
     .option(
       "-n, --accelerators <quantity>",
       "Specify the number of GPUs",
-      parseInt,
+      (val) => parseAccelerators(val, "sell"),
       8,
     )
     .option("-s, --start <start>", "Specify the start time (ISO 8601 format)")
@@ -92,7 +93,11 @@ export function registerSell(program: Command) {
         if (!durationSecs) {
           return logAndQuit("Invalid duration");
         }
-        endDate = dayjs(roundedStartDate === "NOW" ? new Date() : roundedStartDate).add(durationSecs, "s").toDate();
+        endDate = dayjs(
+          roundedStartDate === "NOW" ? new Date() : roundedStartDate,
+        )
+          .add(durationSecs, "s")
+          .toDate();
       }
 
       endDate = roundEndDate(endDate);
@@ -115,7 +120,9 @@ export function registerSell(program: Command) {
         quantity: forceAsNumber(options.accelerators) / GPUS_PER_NODE,
         price: totalPrice,
         contract_id: options.contractId,
-        start_at: roundedStartDate === "NOW" ? "NOW" : roundedStartDate.toISOString(),
+        start_at: roundedStartDate === "NOW"
+          ? "NOW"
+          : roundedStartDate.toISOString(),
         end_at: endDate.toISOString(),
       };
 
@@ -128,16 +135,21 @@ export function registerSell(program: Command) {
         switch (response.status) {
           case 400:
             return logAndQuit(
-              `Bad Request: ${error?.message}: ${JSON.stringify(
-                error?.details,
-                null,
-                2,
-              )
+              `Bad Request: ${error?.message}: ${
+                JSON.stringify(
+                  error?.details,
+                  null,
+                  2,
+                )
               }`,
             );
           // return logAndQuit(`Bad Request: ${error?.message}`);
           case 401:
             return await logSessionTokenExpiredAndQuit();
+          case 403:
+            return logAndQuit(
+              "Selling is not enabled on your account yet. Contact us at contact@sfcompute.com if you are interested.",
+            );
           default:
             return logAndQuit(
               `Failed to place sell order: ${response.statusText}`,
