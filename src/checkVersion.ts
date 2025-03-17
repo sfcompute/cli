@@ -75,8 +75,15 @@ async function checkProductionCLIVersion() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
-    const data = (await response.json()) as any;
+    const data = (await response.json()) as { version: string };
+
+    // If current version is stable and latest is prerelease, ignore the prerelease
+    const currentIsStable = !semver.prerelease(pkg.version);
+    const latestIsPrerelease = semver.prerelease(data.version);
+    if (currentIsStable && latestIsPrerelease) {
+      return pkg.version; // Return current version to prevent upgrade notification
+    }
+
     await writeCache(data.version);
     return data.version;
   } catch (error) {
@@ -97,13 +104,18 @@ export async function checkVersion() {
 
   if (version === latestVersion) return;
 
+  // Don't upgrade from stable to prerelease
+  const currentIsStable = !semver.prerelease(version);
+  const latestIsPrerelease = semver.prerelease(latestVersion);
+  if (currentIsStable && latestIsPrerelease) return;
+
   const isOutdated = semver.lt(version, latestVersion);
   if (!isOutdated) return;
 
-  // Only auto-upgrade for patch changes
+  // Only auto-upgrade for patch changes and when not going to a prerelease
   const isPatchUpdate = semver.diff(version, latestVersion) === "patch";
 
-  if (isPatchUpdate) {
+  if (isPatchUpdate && !latestIsPrerelease) {
     console.log(
       chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
@@ -118,8 +130,8 @@ export async function checkVersion() {
     } catch {
       // Silent error, just run the command the user wanted to run
     }
-  } else {
-    // For non-patch updates, show the update message
+  } else if (!latestIsPrerelease) {
+    // Only show update message for non-prerelease versions
     const message = `
 Please update your CLI.
 
