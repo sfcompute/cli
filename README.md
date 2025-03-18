@@ -21,6 +21,7 @@ sf --version  # 0.1.0
 ### Setup
 
 - Install [Deno](https://docs.deno.com/runtime/)
+  - `2.2.3`
 - Install dependencies `deno install`
   - Use same mental model as `npm install`
 - Auth your CLI with `deno run prod login`
