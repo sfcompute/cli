@@ -92,20 +92,33 @@ function OrderMinimal(props: {
       </Box>
 
       <Box width={18}>
-        <Text
-          strikethrough={!!executedPriceDollarsPerGPUHour}
-          dimColor={!!executedPriceDollarsPerGPUHour}
-        >
-          ${pricePerGPUHour.toFixed(2)}
-          <Text dimColor>/gpu/hr</Text>
-        </Text>
-        {executedPriceDollarsPerGPUHour && (
-          <Text>${executedPriceDollarsPerGPUHour.toFixed(2)}</Text>
-        )}
+        {executedPriceDollarsPerGPUHour &&
+            executedPriceDollarsPerGPUHour.toFixed(2) !==
+              pricePerGPUHour.toFixed(2)
+          ? (
+            <>
+              <Text
+                strikethrough
+                dimColor
+              >
+                ${pricePerGPUHour.toFixed(2)}
+                <Text dimColor>/gpu/hr</Text>
+              </Text>
+              <Text>${executedPriceDollarsPerGPUHour.toFixed(2)}</Text>
+            </>
+          )
+          : (
+            <Text>
+              ${pricePerGPUHour.toFixed(2)}
+              <Text dimColor>/gpu/hr</Text>
+            </Text>
+          )}
       </Box>
-      <Box width={38}>
-        <Text>{durationFormatted}</Text>
-        <Box flexDirection="row" gap={1}>
+      <Box width={44}>
+        <Box width={8}>
+          <Text>{durationFormatted}</Text>
+        </Box>
+        <Box marginRight={1} flexDirection="row" gap={1}>
           <Box>
             <Text dimColor>{formatDateTime(props.order.start_at)}</Text>
           </Box>
@@ -362,6 +375,7 @@ export function ScrollArea({
     });
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     dispatch({ type: "SWITCHED_TAB" });
   }, [activeTab]);
