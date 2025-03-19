@@ -235,12 +235,19 @@ function ClusterUserDisplay({
   >;
 }) {
   return (
-    <Box flexDirection="column">
+    <Box flexDirection="column" gap={1}>
       {users.map((user) => (
         <Box key={user.id} flexDirection="column">
-          <Box gap={1}>
-            <Text color="green">{user.name}</Text>
-          </Box>
+          <Row
+            headWidth={11}
+            head="name"
+            value={user.name}
+          />
+          <Row
+            headWidth={11}
+            head="id"
+            value={user.id}
+          />
           <Row
             headWidth={11}
             head="status"
