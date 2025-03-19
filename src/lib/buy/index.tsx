@@ -195,6 +195,8 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+        // Add 1 cent to price to make order more likely to fill
+        pricePerGpuHour += 1;
 
         startAt = parseStartDateOrNow(quote.start_at);
 
