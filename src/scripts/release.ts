@@ -1,6 +1,6 @@
 import { Argument, Command } from "@commander-js/extra-typings";
-import process from "node:process";
 import * as console from "node:console";
+import process from "node:process";
 
 const program = new Command();
 
@@ -42,7 +42,11 @@ async function saveVersion(version: string) {
   const packageJson = await Deno.readTextFile("package.json");
   const packageObj = JSON.parse(packageJson);
   packageObj.version = version;
-  await Deno.writeTextFile("package.json", JSON.stringify(packageObj, null, 2));
+  // Ensure exactly one newline at the end of the file
+  await Deno.writeTextFile(
+    "package.json",
+    `${JSON.stringify(packageObj, null, 2)}\n`,
+  );
 }
 
 const COMPILE_TARGETS: string[] = [
@@ -182,7 +186,12 @@ program
   )
   .addArgument(
     new Argument("type").choices(
-      ["major", "minor", "patch", "prerelease"] as const,
+      [
+        "major",
+        "minor",
+        "patch",
+        "prerelease",
+      ] as const,
     ),
   )
   .action(async (type) => {
