@@ -81,6 +81,14 @@ function _registerBuy(program: Command) {
       "-q, --quote",
       "Get a price quote without placing an order. Useful for scripting.",
     )
+    .configureHelp({
+      optionDescription: (option) => {
+        if (option.flags === "-h, --help") {
+          return "Display help for buy";
+        }
+        return option.description;
+      },
+    })
     .addHelpText(
       "before",
       `
