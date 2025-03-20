@@ -565,10 +565,17 @@ export async function placeBuyOrder(options: {
 
   if (!response.ok) {
     switch (response.status) {
-      case 400:
+      case 400: {
+        if (error?.message === "Insufficient balance") {
+          return logAndQuit(
+            "Order not placed. You don't have enough funds. Add funds with\n\t🏦 Bank transfer: https://sfcompute.com/dashboard?bankTransferDialogOpen=true\n\t💳 Credit card: https://sfcompute.com/dashboard?payWithCardDialogOpen=true",
+          );
+        }
+
         return logAndQuit(
           `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`,
         );
+      }
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
