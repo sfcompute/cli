@@ -4,7 +4,7 @@ import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import * as console from "node:console";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -325,13 +325,16 @@ function UserAddedDisplay(props: {
 }) {
   const [isReady, setIsReady] = useState(false);
   const { exit } = useApp();
+  const actionExecutedRef = useRef(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const interval = setInterval(async () => {
       const ready = await isCredentialReady(props.id);
-      if (ready) {
+      if (ready && !actionExecutedRef.current) {
         clearInterval(interval);
         setIsReady(true);
+        actionExecutedRef.current = true;
 
         // Once ready, sync or print config before exiting
         await kubeconfigAction({ print: props.print });
@@ -449,8 +452,8 @@ async function removeClusterUserAction({
   const api = await apiClient(token);
 
   const { data, error, response } = await api.DELETE(
-    // deno-lint-ignore no-explicit-any -- TODO: FIXME: include path in OpenAPI schema or rewrite this to use a different route
-    "/v0/credentials/{id}" as any,
+    // @ts-expect-error - TODO: FIXME: include path in OpenAPI schema or rewrite this to use a different route
+    "/v0/credentials/{id}",
     {
       params: {
         path: {
