@@ -38,29 +38,29 @@ function _registerBuy(program: Command) {
   return program
     .command("buy")
     .description("Place a buy order")
-    .requiredOption("-t, --type <type>", "Specify the type of node", "h100i")
+    .requiredOption("-t, --type <type>", "Type of GPU", "h100i")
     .option(
       "-n, --accelerators <quantity>",
-      "Specify the number of GPUs",
+      "Number of GPUs to purchase",
       (val) => parseAccelerators(val, "buy"),
       8,
     )
     .option(
       "-d, --duration <duration>",
-      "Specify the duration. We will round up so that your order ends at the nearest hour.",
+      "Duration of reservation (rounded up to the nearest hour)",
       parseDuration,
     )
-    .option("-p, --price <price>", "The price in dollars, per GPU hour")
+    .option("-p, --price <price>", "Price in dollars per GPU hour")
     .option(
       "-s, --start <start>",
-      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
+      "Start time (date, relative time like '+1d', or 'NOW')",
       parseStartDateOrNow,
       "NOW",
     )
     .addOption(
       new Option(
         "-e, --end <end>",
-        "Specify the end date. Can be a date, or a relative time like '+1d'. We will round up to the nearest hour.",
+        "End time (date or relative time like '+1d', rounded up to nearest hour)",
       )
         .argParser(parseEnd)
         .conflicts("duration"),
@@ -68,16 +68,44 @@ function _registerBuy(program: Command) {
     .hook("preAction", (command) => {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
-        logAndQuit("Exactly one of --duration or --end must be specified");
+        logAndQuit("Specify either --duration or --end, but not both");
       }
     })
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-colo, --colocate <contracts_to_colocate_with>",
+      "-colo, --colocate <contract_id>",
       "Colocate with existing contracts",
       (value) => value.split(","),
     )
-    .option("-q, --quote", "Only provide a quote for the order")
+    .option(
+      "-q, --quote",
+      "Get a price quote without placing an order. Useful for scripting.",
+    )
+    .configureHelp({
+      optionDescription: (option) => {
+        if (option.flags === "-h, --help") {
+          return "Display help for buy";
+        }
+        return option.description;
+      },
+    })
+    .addHelpText(
+      "before",
+      `
+Examples:
+  \x1b[2m# Buy 8 H100s for 1 hour at market price\x1b[0m
+  $ sf buy -n 8 -d 1h
+
+  \x1b[2m# Buy 32 H100s for 6 hours starting in 3 hours\x1b[0m
+  $ sf buy -n 32 -d 6h -s +3h
+
+  \x1b[2m# Buy 64 H100s for 12 hours starting tomorrow at 9am\x1b[0m
+  $ sf buy -n 64 -d 12h -s "tomorrow at 9am"
+
+  \x1b[2m# Extend an existing contract that ends at 4pm by 4 hours\x1b[0m
+  $ sf buy -s 4pm -d 4h -colo <contract_id>
+`,
+    )
     .action(function buyOrderAction(options) {
       /*
        * Flow is:
@@ -117,7 +145,7 @@ function parseDuration(duration?: string) {
   }
   const parsed = parseDurationFromLibrary(durationStr);
   if (!parsed) {
-    return logAndQuit(`Invalid duration: ${duration}`);
+    return logAndQuit(`Invalid duration: ${duration} (examples: 1h, 30m, 2d)`);
   }
 
   return parsed / 1000;
@@ -478,8 +506,8 @@ function BuyOrder(props: BuyOrderProps) {
             <Box gap={1} flexDirection="column">
               <Text color="red">Order could not be filled: {order.id}</Text>
               <Text>
-                You were not charged. Try placing a new order with a different
-                price, duration, or number of GPUs.
+                No charges applied. Try again with different parameters (price,
+                duration, or quantity).
               </Text>
             </Box>
           )}
@@ -497,14 +525,13 @@ function BuyOrder(props: BuyOrderProps) {
       {order && order.status === "open" && (
         <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
           <Text>
-            Your order is open, but not filled. You can check it's status
-            with...
+            Order is open but not yet filled. Check status with:
           </Text>
           <Box paddingLeft={2}>
             <Text color="green">sf orders ls</Text>
           </Box>
 
-          <Text>Or you can cancel it with...</Text>
+          <Text>Cancel this order with:</Text>
           <Box paddingLeft={2}>
             <Text color="green">sf orders cancel {order.id}</Text>
           </Box>
