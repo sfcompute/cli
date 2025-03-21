@@ -8,6 +8,7 @@ import pkg from "../package.json" with { type: "json" };
 import { checkVersion } from "./checkVersion.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";
 import { getApiUrl } from "./helpers/urls.ts";
+import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
 import { registerClusters } from "./lib/clusters/clusters.tsx";
@@ -25,7 +26,7 @@ import { registerVM } from "./lib/vm.ts";
 
 const program = new Command();
 
-await checkVersion();
+await Promise.all([checkVersion(), getAppBanner()]);
 
 program
   .name("sf")
