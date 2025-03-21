@@ -2,6 +2,7 @@ import type { Command } from "@commander-js/extra-typings";
 import console from "node:console";
 import { readFileSync } from "node:fs";
 import { setTimeout } from "node:timers";
+import Table from "cli-table3";
 import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -9,6 +10,13 @@ import {
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 import { isFeatureEnabled } from "./posthog.ts";
+
+type VMInstance = {
+  id: string;
+  instance_group_id: string;
+  status: string;
+  last_updated_at: string;
+};
 
 export async function registerVM(program: Command) {
   const isEnabled = await isFeatureEnabled("vms");
@@ -47,21 +55,39 @@ export async function registerVM(program: Command) {
         logAndQuit("No VMs found");
       }
 
-      console.table(
-        data.map(
-          (instance: {
-            id: string;
-            instance_group_id: string;
-            current_status: string;
-            last_updated_at: string;
-          }) => ({
-            id: instance.id,
-            instance_group_id: instance.instance_group_id,
-            status: instance.current_status,
-            last_updated_at: instance.last_updated_at,
-          }),
-        ),
+      const formattedData = data.map(
+        (instance: {
+          id: string;
+          instance_group_id: string;
+          current_status: string;
+          last_updated_at: string;
+        }): VMInstance => ({
+          id: instance.id,
+          instance_group_id: instance.instance_group_id,
+          status: instance.current_status,
+          last_updated_at: instance.last_updated_at,
+        }),
       );
+
+      const table = new Table({
+        head: [
+          "ID",
+          "Instance group ID",
+          "Status",
+          "Last updated at",
+        ],
+      });
+
+      formattedData.forEach((instance: VMInstance) => {
+        table.push([
+          instance.id,
+          instance.instance_group_id,
+          instance.status,
+          instance.last_updated_at,
+        ]);
+      });
+
+      console.log(table.toString());
     });
 
   vm.command("script")
