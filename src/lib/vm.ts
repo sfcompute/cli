@@ -10,6 +10,36 @@ import {
 import { getApiUrl } from "../helpers/urls.ts";
 import { isFeatureEnabled } from "./posthog.ts";
 
+async function cloudInitUserDataSet(file: string) {
+  let userData: string;
+  try {
+    userData = readFileSync(file, "utf-8");
+  } catch {
+    logAndQuit("Failed to read user-data file");
+  }
+
+  const url = await getApiUrl("vms_script_post");
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${await getAuthToken()}`,
+    },
+    body: JSON.stringify({ script: userData }),
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      await logSessionTokenExpiredAndQuit();
+    }
+    logAndQuit(
+      `Failed to upload cloud-init user-data: ${response.statusText}`,
+    );
+  }
+
+  console.log("Successfully uploaded cloud-init user-data");
+}
+
 export async function registerVM(program: Command) {
   const isEnabled = await isFeatureEnabled("vms");
 
@@ -64,35 +94,56 @@ export async function registerVM(program: Command) {
       );
     });
 
-  vm.command("script")
-    .description("Push a startup script to VMs")
-    .requiredOption("-f, --file <file>", "Path to startup script file")
+  vm.command("script").description(
+    "OBSOLETE - Now an alias for `sf vm cloud-init user-data set`",
+  ).requiredOption("-f, --file <file>", "Path to user-data file")
     .action(async (options) => {
-      let script: string;
-      try {
-        script = readFileSync(options.file, "utf-8");
-      } catch {
-        logAndQuit("Failed to read script file");
-      }
+      console.error("OBSOLETE - Please use `sf vm cloud-init user-data set`.");
+      console.error("Calling `sf vm cloud-init user-data set` on your behalf");
+      await cloudInitUserDataSet(options.file);
+    });
 
-      const url = await getApiUrl("vms_script_post");
+  const cloudInit = vm.command("cloud-init").description(
+    "Manage cloud-init related VM settings",
+  );
+  const userData = cloudInit.command("user-data").description(
+    "Manage cloud-init user-data information",
+  );
+
+  userData.command("set").description(
+    "Upload a cloud-init user-data file used with VMs",
+  )
+    .requiredOption("-f, --file <file>", "Path to user-data file")
+    .action(async (options) => {
+      await cloudInitUserDataSet(options.file);
+    });
+
+  userData.command("get").description(
+    "Retrieve the cloud-init user-data file used with VMs",
+  )
+    .action(async () => {
+      const url = await getApiUrl("vms_script_get");
       const response = await fetch(url, {
-        method: "POST",
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${await getAuthToken()}`,
         },
-        body: JSON.stringify({ script }),
       });
 
       if (!response.ok) {
         if (response.status === 401) {
           await logSessionTokenExpiredAndQuit();
+        } else if (response.status === 404) {
+          console.log("No user-data set");
+        } else {
+          logAndQuit(
+            `Failed to retrieve cloud-init user-data: ${response.statusText}`,
+          );
         }
-        logAndQuit(`Failed to upload script: ${response.statusText}`);
+      } else {
+        const data = await response.json();
+        console.log(data.script);
       }
-
-      console.log("Successfully uploaded startup script");
     });
 
   vm.command("logs")
