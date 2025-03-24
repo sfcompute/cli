@@ -41,19 +41,15 @@ alwaysApply: true
 
 ## 2. Essential CLI Behaviors
 
-1. **Argument Parsing**  
-   - Use a standard argument-parsing library (e.g., Python’s `argparse`, Rust’s `clap`).  
-   - Leverage built-in features for spelling suggestions, help text, etc.
-
-2. **Exit Codes**  
+1. **Exit Codes**  
    - Return **0** on success, **non-zero** on failure.  
    - Map different failure modes to distinct exit codes when relevant.
 
-3. **stdout & stderr**  
+2. **stdout & stderr**  
    - Send primary output to **stdout**.  
    - Send logs, prompts, and errors to **stderr**.
 
-4. **Help & Documentation**  
+3. **Help & Documentation**  
    - **Display help** with no arguments, `-h`, or `--help`.  
    - Provide concise help with usage, a brief description, and top flags/subcommands.  
    - Show **full help** (including all flags and commands) with `-h` or `--help`.  
@@ -77,6 +73,8 @@ alwaysApply: true
    - Show output on success, but keep it brief (e.g., “Operation succeeded”).  
    - Show progress for slow operations. Keep the user informed and reassured.  
    - **Confirm** destructive actions with a prompt unless suppressed by `-f` or `--force`.
+   - Every action needs an output. Never output nothing.
+   - Actions should recommend a next step e.g., after running `sf buy`, recommend running `sf contracts list`
 
 4. **Color & Symbols**  
    - Use color sparingly; disable it when:
@@ -185,4 +183,60 @@ alwaysApply: true
 
 2. **Easy to Type**  
    - Minimize awkward finger movements, especially if users call it frequently.
+
+## 10. Progress Indicators 
+
+1. **When to Show Them**  
+   - For any operation that could take more than a second or two (e.g., network calls, file I/O), provide an immediate visual cue.  
+   - In Ink, you can import a spinner component (e.g., [`ink-spinner`](mdc:https:/www.npmjs.com/package/ink-spinner)) and conditionally render it once your CLI command starts lengthy work.  
+   - Within Commander.js, watch for a command’s action handler to begin, then mount your Ink component to render the spinner.
+
+2. **Clarity and Feedback**  
+   - Keep the user informed by wrapping the spinner in descriptive text. For instance:
+     ```jsx
+     import {Text} from 'ink';
+     import Spinner from 'ink-spinner';
+
+     const MyProgressComponent = () => (
+       <Text>
+         <Spinner /> Processing files...
+       </Text>
+     );
+     ```
+   - If you have multiple tasks, consider displaying them sequentially or adopting multiple Ink components (e.g., one per task) in a single interface.  
+   - Always stop or remove the spinner once the operation finishes and provide a clear success/failure message.
+
+3. **Respect Non-TTY Environments**  
+   - Check `process.stdout.isTTY` before rendering animated or multi-line progress.  
+   - If `isTTY` is false, you may:
+     - Skip spinner animations and print simple status lines instead (e.g., “Processing… 1/5 completed”).  
+     - Provide users with a `--plain` or `--no-progress` flag in Commander.js to disable all progress animations explicitly.
+
+4. **Verbose vs. Quiet**  
+   - Integrate progress rendering with Commander.js flags:
+     - `--verbose` or `-v`: Display more granular progress details (per-file, per-step).  
+     - `--quiet` or `-q`: Omit or minimize progress indicators entirely.  
+   - For example:
+     ```js
+     program
+       .option('-v, --verbose', 'Show verbose output')
+       .option('-q, --quiet', 'Suppress non-error output');
+     ```
+   - In your Ink components, conditionally render spinners or logging based on `program.opts().verbose` or `program.opts().quiet`.
+
+5. **Error Handling and Retry**  
+   - Stop the spinner immediately when an error occurs, and display a clear error message.  
+   - If partial progress is possible (e.g., downloaded part of a file), guide users on how to resume with a retry or partial state.  
+   - For example:
+     ```js
+     async function handleDownload() {
+       try {
+         render(<MyProgressComponent />);
+         await downloadFile();
+         // Stop the spinner, show success
+       } catch (error) {
+         // Stop the spinner, show error message
+       }
+     }
+     ```
 
