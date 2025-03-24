@@ -247,7 +247,7 @@ async function listTokensAction() {
     head: [
       chalk.gray("Token ID"),
       chalk.gray("Name"),
-      chalk.gray("Last Active At"),
+      chalk.gray("Last active"),
       chalk.gray("Expires"),
     ],
     colWidths: [40, 15, 25, 25],
