@@ -1,6 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
 import * as chrono from "chrono-node";
-import dayjs from "dayjs";
+import dayjs from "npm:dayjs";
 import parseDuration from "parse-duration";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
