@@ -1,0 +1,188 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 1. General Design Principles
+
+1. **Human-First**  
+   - If humans primarily use your CLI, design it for **humans first**.  
+   - Keep commands, flags, and feedback understandable at a glance.
+
+2. **Composability**  
+   - Adhere to UNIX conventions (stdin, stdout, stderr, exit codes).  
+   - Make your CLI easy to combine with other tools via piping and scripts.
+
+3. **Consistency**  
+   - Follow existing CLI conventions where possible (e.g., `-h`, `--help`).  
+   - Standardize naming, output style, and argument/flag syntax across commands.
+
+4. **Balance in Output**  
+   - Provide enough information for clarity, but avoid overwhelming the user.  
+   - Respect both human readability and machine readability (consider `--json`).
+
+5. **Discoverability**  
+   - Offer meaningful help and examples.  
+   - Suggest next steps, correct mistakes politely, and surface features without burying them.
+
+6. **Conversational Interaction**  
+   - Recognize that users run multiple related commands to achieve a goal.  
+   - Provide helpful errors, confirmations, and suggestions to guide them step by step.
+
+7. **Robustness & Empathy**  
+   - Handle unexpected input gracefully.  
+   - Always appear stable and trustworthy.  
+   - Include thoughtful error messages and gentle guidance.
+
+8. **Willingness to Break Rules Deliberately**  
+   - Adhere to known patterns, but if a rule truly harms your users, break it intentionally.  
+   - Document and justify your decisions.
+
+
+## 2. Essential CLI Behaviors
+
+1. **Argument Parsing**  
+   - Use a standard argument-parsing library (e.g., Python’s `argparse`, Rust’s `clap`).  
+   - Leverage built-in features for spelling suggestions, help text, etc.
+
+2. **Exit Codes**  
+   - Return **0** on success, **non-zero** on failure.  
+   - Map different failure modes to distinct exit codes when relevant.
+
+3. **stdout & stderr**  
+   - Send primary output to **stdout**.  
+   - Send logs, prompts, and errors to **stderr**.
+
+4. **Help & Documentation**  
+   - **Display help** with no arguments, `-h`, or `--help`.  
+   - Provide concise help with usage, a brief description, and top flags/subcommands.  
+   - Show **full help** (including all flags and commands) with `-h` or `--help`.  
+   - **Examples** should be near the top of help text, especially for common or complex tasks.  
+   - Link to more extensive docs online or in man pages.  
+   - Provide a **feedback channel** (URL or repository link).
+
+
+
+## 3. Output Guidelines
+
+1. **Human-Readable by Default**  
+   - Favor short, clear messages about what happened (especially after changes).  
+   - Use paging (e.g., `less`) only when in a TTY and the text is long.
+
+2. **Machine-Readable Options**  
+   - Provide `--json` (or similar) for structured output.  
+   - Provide `--plain` if color or special formatting might break simple text parsing.
+
+3. **Minimal but Informative**  
+   - Show output on success, but keep it brief (e.g., “Operation succeeded”).  
+   - Show progress for slow operations. Keep the user informed and reassured.  
+   - **Confirm** destructive actions with a prompt unless suppressed by `-f` or `--force`.
+
+4. **Color & Symbols**  
+   - Use color sparingly; disable it when:
+     - `NO_COLOR` is set
+     - Output is not in a TTY
+     - User passes `--no-color`  
+   - Emoji or symbols are acceptable if they clarify without distracting.
+
+5. **Errors**  
+   - Rewrite error messages in plain language with actionable suggestions.  
+   - Summarize multiple similar errors under a single explanatory header.  
+   - Provide instructions for bug reporting without overwhelming default output.
+
+
+## 4. Arguments & Flags
+
+1. **Prefer Named Flags Over Positional Arguments**  
+   - Exceptions: simple commands like `cp <source> <destination>` or multiple files for `rm file1 file2 file3`.  
+   - Always provide long and short flag names (e.g., `-h`, `--help`).
+
+2. **Common Flags**  
+   - `-h, --help`, `--json`, `-q, --quiet`, `-d, --debug`, `-f, --force`, `--version`, `-o, --output`.  
+   - Avoid using these for non-standard purposes.
+
+3. **Prompt for Missing Data**  
+   - If crucial data is not provided, prompt for it interactively (only if in a TTY).  
+   - Provide a non-interactive mode with flags or `--no-input`.
+
+4. **Confirmation for Destructive Actions**  
+   - Prompt the user to type `y`/`yes` (or a resource name) for high-risk operations.  
+   - Provide `--force` or `--confirm` for usage in scripts.
+
+5. **`-` as stdin/stdout**  
+   - When the input or output is a file, allow `-` to denote stdin or stdout.
+
+
+## 5. Subcommands
+
+1. **Use Subcommands for Complex Tools**  
+   - Group related functionalities (e.g., `git add`, `git commit`).  
+   - Keep naming, output style, and flags consistent across subcommands.
+
+2. **Noun–Verb or Verb–Noun Pattern**  
+   - Choose a consistent approach (e.g., `docker container create`).  
+   - Avoid ambiguous or similarly named commands.
+
+3. **No Hidden Magic**  
+   - Don’t allow a catch-all subcommand that guesses user intent.  
+   - Disallow arbitrary abbreviations that block future expansions.
+
+
+## 6. Interactivity & Signals
+
+1. **Interact Only if in a TTY**  
+   - If not a TTY, either fail or require explicit flags to provide necessary info.  
+   - Provide `--no-input` to disable prompts entirely.
+
+2. **Secrets**  
+   - Never take passwords or tokens via flags; use stdin or files.  
+   - Disable echo when prompting for secrets.
+
+3. **Graceful Interrupts**  
+   - Respect `Ctrl-C` (SIGINT); exit quickly or skip lengthy cleanup.  
+   - If partial cleanup is risky, clarify how to force termination.
+
+
+## 7. Configuration & Environment Variables
+
+1. **Configuration Precedence**  
+   - **Flags** → **environment variables** → **project-level config** → **user-level config** → **system-level config**.  
+   - Use flags for frequent changes, environment variables for context-based changes, and config files for stable or versioned settings.
+
+2. **XDG Base Directories**  
+   - Follow `~/.config` for user-level config where applicable.  
+   - Minimize creation of hidden dotfiles.
+
+3. **.env Usage**  
+   - Accept environment variables from `.env` for local, project-specific convenience.  
+   - For complex or shared configuration, prefer a dedicated config file under version control.
+
+4. **No Secrets in Environment Variables**  
+   - Environment variables can easily leak into logs, process states, or Docker inspect.  
+   - Accept secrets only via credential files, pipes, sockets, or secure services.
+
+
+## 8. Future-Proofing
+
+1. **Stable Interfaces**  
+   - Subcommands, flags, outputs: do not break them without a deprecation window.  
+   - Use additive changes wherever possible.
+
+2. **Deprecation Warnings**  
+   - Print a warning when users invoke soon-to-be-removed flags or subcommands.  
+   - Suggest an immediate migration path.
+
+3. **Avoid Catch-All or Automatic Behavior**  
+   - Don’t let a non-existent subcommand become a future naming conflict.  
+   - Skip arbitrary abbreviations that could block future expansions.
+
+
+## 9. Naming
+
+1. **Lowercase & Short**  
+   - Keep your executable name memorable and collision-free.  
+   - Avoid overly generic names or collisions with existing commands.
+
+2. **Easy to Type**  
+   - Minimize awkward finger movements, especially if users call it frequently.
+
