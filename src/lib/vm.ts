@@ -1,12 +1,16 @@
 import type { Command } from "@commander-js/extra-typings";
 import console from "node:console";
+import { confirm } from "@inquirer/prompts";
+import ora from "ora";
 import { readFileSync } from "node:fs";
 import { setTimeout } from "node:timers";
 import Table from "cli-table3";
 import { getAuthToken } from "../helpers/config.ts";
+import process from "node:process";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
+  logSupportCTAAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 import { isFeatureEnabled } from "./posthog.ts";
@@ -322,5 +326,60 @@ export async function registerVM(program: Command) {
         }
         throw err;
       }
+    });
+
+  vm.command("replace")
+    .description("Replace a virtual machine")
+    .requiredOption("-i, --id <id>", "ID of the VM to replace")
+    .action(async (options) => {
+      // Replace is a destructive action - get confirmation
+      const replaceConfirmed = await confirm({
+        message:
+          `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
+        default: false,
+      });
+      if (!replaceConfirmed) {
+        process.exit(0);
+      }
+
+      const loadingSpinner = ora(`Replacing VM ${options.id}`).start();
+
+      const url = await getApiUrl("vms_replace");
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getAuthToken()}`,
+        },
+        body: JSON.stringify({ vm_id: options.id.toString() }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          await logSessionTokenExpiredAndQuit();
+        }
+
+        if (response.status === 404) {
+          loadingSpinner.fail("VM doesn't exist - double check the ID");
+          process.exit(1);
+        }
+
+        // unexpected error - display support CTA and quit
+        loadingSpinner.fail("Failed to replace VM");
+        logSupportCTAAndQuit();
+      }
+
+      const { replaced, replaced_by }: {
+        replaced: string;
+        replaced_by: string;
+      } = await response.json();
+      if (!replaced || !replaced_by) {
+        loadingSpinner.fail("Invalid API response format");
+        logSupportCTAAndQuit();
+      }
+      loadingSpinner.succeed(
+        `Replaced VM instance ${replaced} with VM ${replaced_by}`,
+      );
+      process.exit(0);
     });
 }
