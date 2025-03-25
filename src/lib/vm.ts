@@ -323,4 +323,29 @@ export async function registerVM(program: Command) {
         throw err;
       }
     });
+
+  vm.command("replace")
+    .description("Replace a virtual machine")
+    .requiredOption("-i, --id <id>", "ID of the VM to replace")
+    .action(async (options) => {
+      const url = await getApiUrl("vms_replace");
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getAuthToken()}`,
+        },
+        body: JSON.stringify({ vm_id: options.id.toString() }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          await logSessionTokenExpiredAndQuit();
+        }
+        logAndQuit(`Failed to replace VM: ${response.statusText}`);
+      }
+
+      const { replaced, replaced_by } = await response.json();
+      console.log(`Replaced VM instance ${replaced} with VM ${replaced_by}`);
+    });
 }

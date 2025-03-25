@@ -47,6 +47,7 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
   vms_logs_list: "/v0/vms/logs",
   vms_script_post: "/v0/vms/script",
   vms_script_get: "/v0/vms/script",
+  vms_replace: "/v0/vms/replace",
 };
 
 export async function getWebAppUrl<T extends TokenParams | never>(
