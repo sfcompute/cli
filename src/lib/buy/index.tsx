@@ -81,6 +81,10 @@ function _registerBuy(program: Command) {
       "-q, --quote",
       "Get a price quote without placing an order. Useful for scripting.",
     )
+    .option(
+      "--standing",
+      "Places a standing order. Default behavior is to place a market order.",
+    )
     .configureHelp({
       optionDescription: (option) => {
         if (option.flags === "-h, --help") {
@@ -104,6 +108,9 @@ Examples:
 
   \x1b[2m# Extend an existing contract that ends at 4pm by 4 hours\x1b[0m
   $ sf buy -s 4pm -d 4h -colo <contract_id>
+
+  \x1b[2m# Place a standing order at a specific price\x1b[0m
+  $ sf buy -n 16 -d 24h -p 1.50 --standing
 `,
     )
     .action(function buyOrderAction(options) {
@@ -234,6 +241,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         accelerators,
         colocate,
         yes,
+        standing,
       } = props.options;
 
       setOrderProps({
@@ -244,6 +252,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         endsAt,
         colocate,
         yes,
+        standing,
       });
     })();
   }, [props.options]);
@@ -345,6 +354,7 @@ type BuyOrderProps = {
   type: string;
   colocate?: Array<string>;
   yes?: boolean;
+  standing?: boolean;
 };
 
 function BuyOrder(props: BuyOrderProps) {
@@ -374,6 +384,7 @@ function BuyOrder(props: BuyOrderProps) {
       endsAt,
       colocateWith: props.colocate || [],
       numberNodes: props.size,
+      standing: props.standing,
     });
     setOrder(order);
   }, [props]);
@@ -548,6 +559,7 @@ export async function placeBuyOrder(options: {
   endsAt: Date;
   colocateWith: Array<string>;
   numberNodes: number;
+  standing?: boolean;
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
@@ -583,7 +595,7 @@ export async function placeBuyOrder(options: {
     price: options.totalPriceInCents,
     colocate_with: options.colocateWith,
     flags: {
-      ioc: true,
+      ioc: !options.standing,
     },
   } as const;
   const { data, error, response } = await api.POST("/v0/orders", {
