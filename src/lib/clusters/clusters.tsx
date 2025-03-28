@@ -14,8 +14,10 @@ import {
   createKubeconfig,
   KUBECONFIG_PATH,
   syncKubeconfig,
+  type Kubeconfig,
 } from "./kubeconfig.ts";
 import type { UserFacingCluster } from "./types.ts";
+import { type K8sCredential } from "./credentialTypes.ts";
 import {
   isValidRFC1123Subdomain,
   sanitizeToRFC1123Subdomain,
@@ -523,19 +525,22 @@ async function kubeconfigAction({
     }
 
     // Handle vcluster with encrypted_kubeconfig
+    const credential = item as K8sCredential;
+
     if (
-      item.cluster_type === "vcluster" && item.encrypted_kubeconfig &&
-      item.nonce && item.ephemeral_pubkey
+      credential.cluster_type === "vcluster" && credential.encrypted_kubeconfig &&
+      credential.nonce && credential.ephemeral_pubkey
     ) {
       try {
         const decryptedKubeconfig = decryptSecret({
-          encrypted: item.encrypted_kubeconfig,
+          encrypted: credential.encrypted_kubeconfig,
           secretKey: privateKey,
-          nonce: item.nonce,
-          ephemeralPublicKey: item.ephemeral_pubkey,
+          nonce: credential.nonce,
+          ephemeralPublicKey: credential.ephemeral_pubkey,
         });
 
         // Parse the decrypted kubeconfig
+        const parsedKubeconfig = yaml.parse(decryptedKubeconfig) as Kubeconfig;
 
         // If we're printing, just use the direct kubeconfig
         if (print) {
@@ -544,7 +549,7 @@ async function kubeconfigAction({
         }
 
         // Otherwise, we'll sync this kubeconfig
-        await syncKubeconfig(decryptedKubeconfig);
+        await syncKubeconfig(parsedKubeconfig);
         console.log(`Config written to ${KUBECONFIG_PATH}`);
         return;
       } catch (err) {
