@@ -528,8 +528,10 @@ async function kubeconfigAction({
     const credential = item as K8sCredential;
 
     if (
-      credential.cluster_type === "vcluster" && credential.encrypted_kubeconfig &&
-      credential.nonce && credential.ephemeral_pubkey
+      credential.cluster_type === "vcluster" &&
+      credential.encrypted_kubeconfig &&
+      credential.nonce &&
+      credential.ephemeral_pubkey
     ) {
       try {
         const decryptedKubeconfig = decryptSecret({
