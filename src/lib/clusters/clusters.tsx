@@ -516,10 +516,44 @@ async function kubeconfigAction({
     namespace?: string;
   }> = [];
   const users: Array<{ name: string; token: string }> = [];
+
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
     }
+
+    // Handle vcluster with encrypted_kubeconfig
+    if (
+      item.cluster_type === "vcluster" && item.encrypted_kubeconfig &&
+      item.nonce && item.ephemeral_pubkey
+    ) {
+      try {
+        const decryptedKubeconfig = decryptSecret({
+          encrypted: item.encrypted_kubeconfig,
+          secretKey: privateKey,
+          nonce: item.nonce,
+          ephemeralPublicKey: item.ephemeral_pubkey,
+        });
+
+        // Parse the decrypted kubeconfig
+
+        // If we're printing, just use the direct kubeconfig
+        if (print) {
+          console.log(decryptedKubeconfig);
+          return;
+        }
+
+        // Otherwise, we'll sync this kubeconfig
+        await syncKubeconfig(decryptedKubeconfig);
+        console.log(`Config written to ${KUBECONFIG_PATH}`);
+        return;
+      } catch (err) {
+        console.error(`Failed to decrypt kubeconfig: ${err}`);
+        // Continue with regular flow if decryption fails
+      }
+    }
+
+    // Regular flow for non-vcluster or if vcluster decryption failed
     if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
@@ -554,6 +588,7 @@ async function kubeconfigAction({
     });
   }
 
+  // If we didn't find a vcluster with encrypted_kubeconfig, proceed with the regular flow
   const kubeconfig = createKubeconfig({ clusters, users });
 
   if (print) {
