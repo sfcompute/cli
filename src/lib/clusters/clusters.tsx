@@ -12,10 +12,12 @@ import { Row } from "../Row.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
+  type Kubeconfig,
   KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
 import type { UserFacingCluster } from "./types.ts";
+import { type K8sCredential } from "./credentialTypes.ts";
 import {
   isValidRFC1123Subdomain,
   sanitizeToRFC1123Subdomain,
@@ -277,7 +279,11 @@ async function isCredentialReady(id: string) {
     return false;
   }
 
-  return Boolean(cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey);
+  return Boolean(
+    (cred.encrypted_token &&
+      cred.nonce &&
+      cred.ephemeral_pubkey) || (cred as K8sCredential).encrypted_kubeconfig,
+  );
 }
 
 async function listClusterUsers({ token }: { token?: string }) {
@@ -514,27 +520,61 @@ async function kubeconfigAction({
     certificateAuthorityData: string;
     kubernetesApiUrl: string;
     namespace?: string;
+    cluster_type?: string;
   }> = [];
   const users: Array<{ name: string; token: string }> = [];
+
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
     }
-    if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
+
+    // Handle vcluster with encrypted_kubeconfig
+    const credential = item as K8sCredential;
+    if (!item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
 
-    let token: string | undefined;
+    if (
+      credential.cluster_type === "vcluster" &&
+      credential.encrypted_kubeconfig
+    ) {
+      try {
+        const decryptedKubeConfig = decryptSecret({
+          encrypted: credential.encrypted_kubeconfig,
+          secretKey: privateKey,
+          nonce: credential.nonce,
+          ephemeralPublicKey: credential.ephemeral_pubkey,
+        });
 
-    try {
-      token = decryptSecret({
-        encrypted: item.encrypted_token,
-        secretKey: privateKey,
-        nonce: item.nonce,
-        ephemeralPublicKey: item.ephemeral_pubkey,
-      });
-    } catch {
-      continue;
+        users.push({
+          name: item.username || "",
+          kubeconfig: decryptedKubeConfig || "",
+        });
+        // Parse the decrypted kubeconfig
+      } catch (err) {
+        console.error(
+          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
+        );
+      }
+    } else {
+      let token: string | undefined;
+
+      try {
+        token = decryptSecret({
+          encrypted: item.encrypted_token,
+          secretKey: privateKey,
+          nonce: item.nonce,
+          ephemeralPublicKey: item.ephemeral_pubkey,
+        });
+
+        users.push({
+          name: item.username || "",
+          token: token || "",
+        });
+      } catch {
+        continue;
+      }
     }
 
     if (!item.cluster) {
@@ -546,20 +586,16 @@ async function kubeconfigAction({
       kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
       certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
       namespace: item.cluster.kubernetes_namespace || "",
-    });
-
-    users.push({
-      name: item.username || "",
-      token,
+      cluster_type: credential.cluster_type || "",
     });
   }
 
-  const kubeconfig = createKubeconfig({ clusters, users });
+  const kubeconfigData = createKubeconfig({ clusters, users });
 
   if (print) {
-    console.log(yaml.stringify(kubeconfig));
+    console.log(yaml.stringify(kubeconfigData));
   } else {
-    await syncKubeconfig(kubeconfig);
+    await syncKubeconfig(kubeconfigData);
     console.log(`Config written to ${KUBECONFIG_PATH}`);
   }
 }

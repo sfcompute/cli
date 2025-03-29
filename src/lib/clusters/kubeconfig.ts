@@ -1,5 +1,6 @@
 import os from "node:os";
 import path from "node:path";
+import * as console from "node:console";
 import yaml from "yaml";
 
 export interface Kubeconfig {
@@ -31,16 +32,19 @@ export interface Kubeconfig {
   kind: string;
   preferences: Record<string, unknown>;
 }
+
 export function createKubeconfig(props: {
   clusters: Array<{
     name: string;
     certificateAuthorityData: string;
     kubernetesApiUrl: string;
     namespace?: string;
+    cluster_type?: string;
   }>;
   users: Array<{
     name: string;
     token: string;
+    kubeconfig?: string;
   }>;
   currentContext?: {
     clusterName: string;
@@ -49,29 +53,102 @@ export function createKubeconfig(props: {
 }) {
   const { clusters, users, currentContext } = props;
 
+  // Initialize the base kubeconfig
   const kubeconfig: Kubeconfig = {
     apiVersion: "v1",
     kind: "Config",
     preferences: {},
-    clusters: clusters.map((cluster) => ({
+    clusters: [],
+    users: [],
+    contexts: [],
+    "current-context": "",
+  };
+
+  // Process users with direct kubeconfig first
+  const processedUsers = new Set<string>();
+  const processedClusters = new Set<string>();
+
+  // First, process any users that have a full kubeconfig
+  for (const user of users) {
+    if (user.kubeconfig) {
+      try {
+        // Parse the user's kubeconfig
+        const userKubeconfig = yaml.parse(user.kubeconfig) as Kubeconfig;
+        
+        // Merge clusters from user kubeconfig
+        if (userKubeconfig.clusters) {
+          for (const cluster of userKubeconfig.clusters) {
+            if (!processedClusters.has(cluster.name)) {
+              kubeconfig.clusters.push(cluster);
+              processedClusters.add(cluster.name);
+            }
+          }
+        }
+        
+        // Merge users from user kubeconfig
+        if (userKubeconfig.users) {
+          for (const userEntry of userKubeconfig.users) {
+            if (!processedUsers.has(userEntry.name)) {
+              kubeconfig.users.push(userEntry);
+              processedUsers.add(userEntry.name);
+            }
+          }
+        }
+        
+        // Merge contexts from user kubeconfig
+        if (userKubeconfig.contexts) {
+          for (const context of userKubeconfig.contexts) {
+            kubeconfig.contexts.push(context);
+          }
+        }
+        
+        // If the user kubeconfig has a current-context, use it
+        if (userKubeconfig["current-context"]) {
+          kubeconfig["current-context"] = userKubeconfig["current-context"];
+        }
+      } catch (error) {
+        console.error(`Failed to parse kubeconfig for user ${user.name}:`, error);
+      }
+    }
+  }
+
+  // Now process the regular clusters and users
+  for (const cluster of clusters) {
+    // Skip clusters that were already processed from user kubeconfigs
+    if (processedClusters.has(cluster.name)) {
+      continue;
+    }
+    
+    kubeconfig.clusters.push({
       name: cluster.name,
       cluster: {
         server: cluster.kubernetesApiUrl,
         "certificate-authority-data": cluster.certificateAuthorityData,
       },
-    })),
-    users: users.map((user) => ({
+    });
+  }
+
+  for (const user of users) {
+    // Skip users that were already processed from kubeconfigs
+    if (processedUsers.has(user.name) || user.kubeconfig) {
+      continue;
+    }
+    
+    kubeconfig.users.push({
       name: user.name,
       user: {
         token: user.token,
       },
-    })),
-    contexts: [],
-    "current-context": "",
-  };
+    });
+  }
 
-  // Generate contexts automatically by matching clusters and users by name
-  kubeconfig.contexts = clusters.map((cluster) => {
+  // Generate contexts for any remaining clusters and users
+  for (const cluster of clusters) {
+    // Skip if we already have contexts for this cluster from user kubeconfigs
+    if (kubeconfig.contexts.some(ctx => ctx.context.cluster === cluster.name)) {
+      continue;
+    }
+    
     // Try to find a user with the same name as the cluster
     let user = users.find((u) => u.name === cluster.name);
 
@@ -80,24 +157,29 @@ export function createKubeconfig(props: {
       user = users[0];
     }
 
+    // Skip if the user doesn't exist in the kubeconfig
+    if (!kubeconfig.users.some(u => u.name === user?.name)) {
+      continue;
+    }
+
     const contextName = `${cluster.name}@${user.name}`;
 
-    return {
+    kubeconfig.contexts.push({
       name: contextName,
       context: {
         cluster: cluster.name,
         user: user.name,
         namespace: cluster.namespace,
       },
-    };
-  });
+    });
+  }
 
   // Set current context based on provided cluster and user names
   if (currentContext) {
     const contextName =
       `${currentContext.clusterName}@${currentContext.userName}`;
     kubeconfig["current-context"] = contextName;
-  } else if (kubeconfig.contexts.length > 0) {
+  } else if (kubeconfig.contexts.length > 0 && !kubeconfig["current-context"]) {
     kubeconfig["current-context"] = kubeconfig.contexts[0].name;
   }
 
