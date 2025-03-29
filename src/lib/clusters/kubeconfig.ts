@@ -1,6 +1,6 @@
+import * as console from "node:console";
 import os from "node:os";
 import path from "node:path";
-import * as console from "node:console";
 import yaml from "yaml";
 
 export interface Kubeconfig {
@@ -43,7 +43,7 @@ export function createKubeconfig(props: {
   }>;
   users: Array<{
     name: string;
-    token: string;
+    token?: string;
     kubeconfig?: string;
   }>;
   currentContext?: {
@@ -74,7 +74,7 @@ export function createKubeconfig(props: {
       try {
         // Parse the user's kubeconfig
         const userKubeconfig = yaml.parse(user.kubeconfig) as Kubeconfig;
-        
+
         // Merge clusters from user kubeconfig
         if (userKubeconfig.clusters) {
           for (const cluster of userKubeconfig.clusters) {
@@ -84,7 +84,7 @@ export function createKubeconfig(props: {
             }
           }
         }
-        
+
         // Merge users from user kubeconfig
         if (userKubeconfig.users) {
           for (const userEntry of userKubeconfig.users) {
@@ -94,20 +94,23 @@ export function createKubeconfig(props: {
             }
           }
         }
-        
+
         // Merge contexts from user kubeconfig
         if (userKubeconfig.contexts) {
           for (const context of userKubeconfig.contexts) {
             kubeconfig.contexts.push(context);
           }
         }
-        
+
         // If the user kubeconfig has a current-context, use it
         if (userKubeconfig["current-context"]) {
           kubeconfig["current-context"] = userKubeconfig["current-context"];
         }
       } catch (error) {
-        console.error(`Failed to parse kubeconfig for user ${user.name}:`, error);
+        console.error(
+          `Failed to parse kubeconfig for user ${user.name}:`,
+          error,
+        );
       }
     }
   }
@@ -118,7 +121,7 @@ export function createKubeconfig(props: {
     if (processedClusters.has(cluster.name)) {
       continue;
     }
-    
+
     kubeconfig.clusters.push({
       name: cluster.name,
       cluster: {
@@ -133,7 +136,7 @@ export function createKubeconfig(props: {
     if (processedUsers.has(user.name) || user.kubeconfig) {
       continue;
     }
-    
+
     kubeconfig.users.push({
       name: user.name,
       user: {
@@ -145,10 +148,12 @@ export function createKubeconfig(props: {
   // Generate contexts for any remaining clusters and users
   for (const cluster of clusters) {
     // Skip if we already have contexts for this cluster from user kubeconfigs
-    if (kubeconfig.contexts.some(ctx => ctx.context.cluster === cluster.name)) {
+    if (
+      kubeconfig.contexts.some((ctx) => ctx.context.cluster === cluster.name)
+    ) {
       continue;
     }
-    
+
     // Try to find a user with the same name as the cluster
     let user = users.find((u) => u.name === cluster.name);
 
@@ -158,7 +163,7 @@ export function createKubeconfig(props: {
     }
 
     // Skip if the user doesn't exist in the kubeconfig
-    if (!kubeconfig.users.some(u => u.name === user?.name)) {
+    if (!kubeconfig.users.some((u) => u.name === user?.name)) {
       continue;
     }
 

@@ -5,7 +5,7 @@
     "prod": "deno run --allow-all src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts",
     "lint": "prettier --write .",
-    "test": "deno test"
+    "test": "deno test --allow-all"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^12.1.0",

@@ -9,15 +9,14 @@ import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
+import { isVClusterCredential, type K8sCredential } from "./credentialTypes.ts";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
-  type Kubeconfig,
   KUBECONFIG_PATH,
   syncKubeconfig,
 } from "./kubeconfig.ts";
 import type { UserFacingCluster } from "./types.ts";
-import { type K8sCredential } from "./credentialTypes.ts";
 import {
   isValidRFC1123Subdomain,
   sanitizeToRFC1123Subdomain,
@@ -104,11 +103,7 @@ export function registerClusters(program: Command) {
     });
 }
 
-function ClusterDisplay({
-  clusters,
-}: {
-  clusters: Array<UserFacingCluster>;
-}) {
+function ClusterDisplay({ clusters }: { clusters: Array<UserFacingCluster> }) {
   return (
     <Box flexDirection="column" gap={2}>
       {clusters.map((cluster, index) => (
@@ -142,11 +137,11 @@ const ClusterRow = ({ cluster }: { cluster: UserFacingCluster }) => {
 
 const COLUMN_WIDTH = 11;
 
-const ClusterRowWithContracts = (
-  { cluster }: {
-    cluster: UserFacingCluster;
-  },
-) => {
+const ClusterRowWithContracts = ({
+  cluster,
+}: {
+  cluster: UserFacingCluster;
+}) => {
   if (!cluster.contract) {
     return null;
   }
@@ -214,15 +209,17 @@ async function listClustersAction({
     render(
       <ClusterDisplay
         clusters={data.data
-          .filter((cluster) =>
-            cluster.contract?.status === "active" || !cluster.contract
+          .filter(
+            (cluster) =>
+              cluster.contract?.status === "active" || !cluster.contract,
           )
-          .map((cluster) =>
-            ({
-              ...cluster,
-              // @ts-expect-error - ignore
-              state: cluster.contract?.state || "Active",
-            }) as UserFacingCluster
+          .map(
+            (cluster) =>
+              ({
+                ...cluster,
+                // @ts-expect-error - ignore
+                state: cluster.contract?.state || "Active",
+              }) as UserFacingCluster,
           )}
       />,
     );
@@ -232,24 +229,19 @@ async function listClustersAction({
 function ClusterUserDisplay({
   users,
 }: {
-  users: Array<
-    { id: string; name: string; is_usable: boolean; cluster: string }
-  >;
+  users: Array<{
+    id: string;
+    name: string;
+    is_usable: boolean;
+    cluster: string;
+  }>;
 }) {
   return (
     <Box flexDirection="column" gap={1}>
       {users.map((user) => (
         <Box key={user.id} flexDirection="column">
-          <Row
-            headWidth={11}
-            head="name"
-            value={user.name}
-          />
-          <Row
-            headWidth={11}
-            head="id"
-            value={user.id}
-          />
+          <Row headWidth={11} head="name" value={user.name} />
+          <Row headWidth={11} head="id" value={user.id} />
           <Row
             headWidth={11}
             head="status"
@@ -280,9 +272,8 @@ async function isCredentialReady(id: string) {
   }
 
   return Boolean(
-    (cred.encrypted_token &&
-      cred.nonce &&
-      cred.ephemeral_pubkey) || (cred as K8sCredential).encrypted_kubeconfig,
+    (cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey) ||
+      (cred as K8sCredential).encrypted_kubeconfig,
   );
 }
 
@@ -306,9 +297,12 @@ async function listClusterUsers({ token }: { token?: string }) {
     (credential) => credential.object === "k8s_credential",
   );
 
-  const users: Array<
-    { id: string; name: string; is_usable: boolean; cluster: string }
-  > = [];
+  const users: Array<{
+    id: string;
+    name: string;
+    is_usable: boolean;
+    cluster: string;
+  }> = [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
       k.encrypted_token && k.nonce && k.ephemeral_pubkey,
@@ -522,23 +516,24 @@ async function kubeconfigAction({
     namespace?: string;
     cluster_type?: string;
   }> = [];
-  const users: Array<{ name: string; token: string }> = [];
+  const users: Array<{
+    name: string;
+    token?: string;
+    kubeconfig?: string;
+  }> = [];
 
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
     }
 
-    // Handle vcluster with encrypted_kubeconfig
-    const credential = item as K8sCredential;
     if (!item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
 
-    if (
-      credential.cluster_type === "vcluster" &&
-      credential.encrypted_kubeconfig
-    ) {
+    // Handle vcluster with encrypted_kubeconfig
+    const credential = item as K8sCredential;
+    if (isVClusterCredential(credential)) {
       try {
         const decryptedKubeConfig = decryptSecret({
           encrypted: credential.encrypted_kubeconfig,
@@ -557,11 +552,9 @@ async function kubeconfigAction({
           `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
         );
       }
-    } else {
-      let token: string | undefined;
-
+    } else if (item.encrypted_token) {
       try {
-        token = decryptSecret({
+        const decryptedToken = decryptSecret({
           encrypted: item.encrypted_token,
           secretKey: privateKey,
           nonce: item.nonce,
@@ -570,9 +563,12 @@ async function kubeconfigAction({
 
         users.push({
           name: item.username || "",
-          token: token || "",
+          token: decryptedToken || "",
         });
-      } catch {
+      } catch (err) {
+        console.error(
+          `Failed to decrypt token: ${err}, ${credential.username}`,
+        );
         continue;
       }
     }
