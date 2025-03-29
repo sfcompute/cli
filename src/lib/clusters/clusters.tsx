@@ -520,6 +520,7 @@ async function kubeconfigAction({
     certificateAuthorityData: string;
     kubernetesApiUrl: string;
     namespace?: string;
+    cluster_type?: string;
   }> = [];
   const users: Array<{ name: string; token: string }> = [];
 
@@ -530,56 +531,52 @@ async function kubeconfigAction({
 
     // Handle vcluster with encrypted_kubeconfig
     const credential = item as K8sCredential;
+    if (!item.nonce || !item.ephemeral_pubkey) {
+      continue;
+    }
 
     if (
       credential.cluster_type === "vcluster" &&
-      credential.encrypted_kubeconfig &&
-      credential.nonce &&
-      credential.ephemeral_pubkey
+      credential.encrypted_kubeconfig
     ) {
       try {
-        const decryptedKubeconfig = decryptSecret({
+        console.log(credential.encrypted_kubeconfig);
+        kubeconfig = decryptSecret({
           encrypted: credential.encrypted_kubeconfig,
           secretKey: privateKey,
           nonce: credential.nonce,
           ephemeralPublicKey: credential.ephemeral_pubkey,
         });
+        console.log("Decrypted vcluster kubeconfig");
+        console.log(kubeconfig);
 
+        users.push({
+          name: item.username || "",
+          kubeconfig: kubeconfig || "",
+        });
         // Parse the decrypted kubeconfig
-        const parsedKubeconfig = yaml.parse(decryptedKubeconfig) as Kubeconfig;
-
-        // If we're printing, just use the direct kubeconfig
-        if (print) {
-          console.log(decryptedKubeconfig);
-          return;
-        }
-
-        // Otherwise, we'll sync this kubeconfig
-        await syncKubeconfig(parsedKubeconfig);
-        console.log(`Config written to ${KUBECONFIG_PATH}`);
-        return;
       } catch (err) {
-        console.error(`Failed to decrypt kubeconfig: ${err}`);
-        // Continue with regular flow if decryption fails
+        console.error(`Failed to decrypt vcluster kubeconfig: ${err}`);
       }
-    }
+    } else {
+      let token: string | undefined;
 
-    // Regular flow for non-vcluster or if vcluster decryption failed
-    if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
-      continue;
-    }
+      try {
+        console.log("Other Decryption attempt");
+        token = decryptSecret({
+          encrypted: item.encrypted_token,
+          secretKey: privateKey,
+          nonce: item.nonce,
+          ephemeralPublicKey: item.ephemeral_pubkey,
+        });
 
-    let token: string | undefined;
-
-    try {
-      token = decryptSecret({
-        encrypted: item.encrypted_token,
-        secretKey: privateKey,
-        nonce: item.nonce,
-        ephemeralPublicKey: item.ephemeral_pubkey,
-      });
-    } catch {
-      continue;
+        users.push({
+          name: item.username || "",
+          token: token || "",
+        });
+      } catch {
+        continue;
+      }
     }
 
     if (!item.cluster) {
@@ -591,21 +588,16 @@ async function kubeconfigAction({
       kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
       certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
       namespace: item.cluster.kubernetes_namespace || "",
-    });
-
-    users.push({
-      name: item.username || "",
-      token,
+      cluster_type: credential.cluster_type || "",
     });
   }
 
-  // If we didn't find a vcluster with encrypted_kubeconfig, proceed with the regular flow
-  const kubeconfig = createKubeconfig({ clusters, users });
+  const kubeconfigData = createKubeconfig({ clusters, users });
 
   if (print) {
-    console.log(yaml.stringify(kubeconfig));
+    console.log(yaml.stringify(kubeconfigData));
   } else {
-    await syncKubeconfig(kubeconfig);
+    await syncKubeconfig(kubeconfigData);
     console.log(`Config written to ${KUBECONFIG_PATH}`);
   }
 }

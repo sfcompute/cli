@@ -56,7 +56,7 @@ export function decryptSecret(props: {
   );
 
   if (!decrypted) {
-    throw new Error("Failed to decrypt secret");
+    throw new Error("Failed to decrypt secret. Failed inner loop");
   }
   return Buffer.from(decrypted).toString("utf8");
 }
