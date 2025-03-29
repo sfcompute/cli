@@ -540,29 +540,27 @@ async function kubeconfigAction({
       credential.encrypted_kubeconfig
     ) {
       try {
-        console.log(credential.encrypted_kubeconfig);
-        kubeconfig = decryptSecret({
+        const decryptedKubeConfig = decryptSecret({
           encrypted: credential.encrypted_kubeconfig,
           secretKey: privateKey,
           nonce: credential.nonce,
           ephemeralPublicKey: credential.ephemeral_pubkey,
         });
-        console.log("Decrypted vcluster kubeconfig");
-        console.log(kubeconfig);
 
         users.push({
           name: item.username || "",
-          kubeconfig: kubeconfig || "",
+          kubeconfig: decryptedKubeConfig || "",
         });
         // Parse the decrypted kubeconfig
       } catch (err) {
-        console.error(`Failed to decrypt vcluster kubeconfig: ${err}`);
+        console.error(
+          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
+        );
       }
     } else {
       let token: string | undefined;
 
       try {
-        console.log("Other Decryption attempt");
         token = decryptSecret({
           encrypted: item.encrypted_token,
           secretKey: privateKey,
