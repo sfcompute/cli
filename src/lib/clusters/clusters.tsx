@@ -12,9 +12,9 @@ import { Row } from "../Row.tsx";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
+  type Kubeconfig,
   KUBECONFIG_PATH,
   syncKubeconfig,
-  type Kubeconfig,
 } from "./kubeconfig.ts";
 import type { UserFacingCluster } from "./types.ts";
 import { type K8sCredential } from "./credentialTypes.ts";
@@ -279,7 +279,11 @@ async function isCredentialReady(id: string) {
     return false;
   }
 
-  return Boolean(cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey);
+  return Boolean(
+    (cred.encrypted_token &&
+      cred.nonce &&
+      cred.ephemeral_pubkey) || (cred as K8sCredential).encrypted_kubeconfig,
+  );
 }
 
 async function listClusterUsers({ token }: { token?: string }) {
