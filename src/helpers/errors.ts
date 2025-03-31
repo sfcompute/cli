@@ -8,6 +8,17 @@ export function logAndQuit(message: string): never {
   process.exit(1);
 }
 
+const supportCTA =
+  "Need help? Send an email to support@sfcompute.com to talk to an engineer.";
+
+export function logAndQuitWithSupportCTA(message: string): never {
+  logAndQuit(`${message}\n\n${supportCTA}`);
+}
+
+export function logSupportCTAAndQuit(): never {
+  logAndQuit(supportCTA);
+}
+
 const base = getCommandBase();
 const loginCommand = `${base} login`;
 
