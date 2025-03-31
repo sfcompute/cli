@@ -20,7 +20,6 @@ import { registerOrders } from "./lib/orders/index.tsx";
 import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
-import { registerScale } from "./lib/updown.tsx";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm.ts";
 
@@ -42,7 +41,7 @@ registerSell(program);
 registerBalance(program);
 registerTokens(program);
 registerUpgrade(program);
-registerScale(program);
+// registerScale(program);
 registerClusters(program);
 registerMe(program);
 await registerVM(program);
