@@ -9,6 +9,7 @@ import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
+import { isVClusterCredential, type K8sCredential } from "./credentialTypes.ts";
 import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
@@ -102,11 +103,7 @@ export function registerClusters(program: Command) {
     });
 }
 
-function ClusterDisplay({
-  clusters,
-}: {
-  clusters: Array<UserFacingCluster>;
-}) {
+function ClusterDisplay({ clusters }: { clusters: Array<UserFacingCluster> }) {
   return (
     <Box flexDirection="column" gap={2}>
       {clusters.map((cluster, index) => (
@@ -140,11 +137,11 @@ const ClusterRow = ({ cluster }: { cluster: UserFacingCluster }) => {
 
 const COLUMN_WIDTH = 11;
 
-const ClusterRowWithContracts = (
-  { cluster }: {
-    cluster: UserFacingCluster;
-  },
-) => {
+const ClusterRowWithContracts = ({
+  cluster,
+}: {
+  cluster: UserFacingCluster;
+}) => {
   if (!cluster.contract) {
     return null;
   }
@@ -212,15 +209,17 @@ async function listClustersAction({
     render(
       <ClusterDisplay
         clusters={data.data
-          .filter((cluster) =>
-            cluster.contract?.status === "active" || !cluster.contract
+          .filter(
+            (cluster) =>
+              cluster.contract?.status === "active" || !cluster.contract,
           )
-          .map((cluster) =>
-            ({
-              ...cluster,
-              // @ts-expect-error - ignore
-              state: cluster.contract?.state || "Active",
-            }) as UserFacingCluster
+          .map(
+            (cluster) =>
+              ({
+                ...cluster,
+                // @ts-expect-error - ignore
+                state: cluster.contract?.state || "Active",
+              }) as UserFacingCluster,
           )}
       />,
     );
@@ -230,24 +229,19 @@ async function listClustersAction({
 function ClusterUserDisplay({
   users,
 }: {
-  users: Array<
-    { id: string; name: string; is_usable: boolean; cluster: string }
-  >;
+  users: Array<{
+    id: string;
+    name: string;
+    is_usable: boolean;
+    cluster: string;
+  }>;
 }) {
   return (
     <Box flexDirection="column" gap={1}>
       {users.map((user) => (
         <Box key={user.id} flexDirection="column">
-          <Row
-            headWidth={11}
-            head="name"
-            value={user.name}
-          />
-          <Row
-            headWidth={11}
-            head="id"
-            value={user.id}
-          />
+          <Row headWidth={11} head="name" value={user.name} />
+          <Row headWidth={11} head="id" value={user.id} />
           <Row
             headWidth={11}
             head="status"
@@ -277,7 +271,10 @@ async function isCredentialReady(id: string) {
     return false;
   }
 
-  return Boolean(cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey);
+  return Boolean(
+    (cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey) ||
+      (cred as K8sCredential).encrypted_kubeconfig,
+  );
 }
 
 async function listClusterUsers({ token }: { token?: string }) {
@@ -300,9 +297,12 @@ async function listClusterUsers({ token }: { token?: string }) {
     (credential) => credential.object === "k8s_credential",
   );
 
-  const users: Array<
-    { id: string; name: string; is_usable: boolean; cluster: string }
-  > = [];
+  const users: Array<{
+    id: string;
+    name: string;
+    is_usable: boolean;
+    cluster: string;
+  }> = [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
       k.encrypted_token && k.nonce && k.ephemeral_pubkey,
@@ -514,27 +514,63 @@ async function kubeconfigAction({
     certificateAuthorityData: string;
     kubernetesApiUrl: string;
     namespace?: string;
+    cluster_type?: string;
   }> = [];
-  const users: Array<{ name: string; token: string }> = [];
+  const users: Array<{
+    name: string;
+    token?: string;
+    kubeconfig?: string;
+  }> = [];
+
   for (const item of data.data) {
     if (item.object !== "k8s_credential") {
       continue;
     }
-    if (!item.encrypted_token || !item.nonce || !item.ephemeral_pubkey) {
+
+    if (!item.nonce || !item.ephemeral_pubkey) {
       continue;
     }
 
-    let token: string | undefined;
+    // Handle vcluster with encrypted_kubeconfig
+    const credential = item as K8sCredential;
+    if (isVClusterCredential(credential)) {
+      try {
+        const decryptedKubeConfig = decryptSecret({
+          encrypted: credential.encrypted_kubeconfig,
+          secretKey: privateKey,
+          nonce: credential.nonce,
+          ephemeralPublicKey: credential.ephemeral_pubkey,
+        });
 
-    try {
-      token = decryptSecret({
-        encrypted: item.encrypted_token,
-        secretKey: privateKey,
-        nonce: item.nonce,
-        ephemeralPublicKey: item.ephemeral_pubkey,
-      });
-    } catch {
-      continue;
+        users.push({
+          name: item.username || "",
+          kubeconfig: decryptedKubeConfig || "",
+        });
+        // Parse the decrypted kubeconfig
+      } catch (err) {
+        console.error(
+          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
+        );
+      }
+    } else if (item.encrypted_token) {
+      try {
+        const decryptedToken = decryptSecret({
+          encrypted: item.encrypted_token,
+          secretKey: privateKey,
+          nonce: item.nonce,
+          ephemeralPublicKey: item.ephemeral_pubkey,
+        });
+
+        users.push({
+          name: item.username || "",
+          token: decryptedToken || "",
+        });
+      } catch (err) {
+        console.error(
+          `Failed to decrypt token: ${err}, ${credential.username}`,
+        );
+        continue;
+      }
     }
 
     if (!item.cluster) {
@@ -546,20 +582,16 @@ async function kubeconfigAction({
       kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
       certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
       namespace: item.cluster.kubernetes_namespace || "",
-    });
-
-    users.push({
-      name: item.username || "",
-      token,
+      cluster_type: credential.cluster_type || "",
     });
   }
 
-  const kubeconfig = createKubeconfig({ clusters, users });
+  const kubeconfigData = createKubeconfig({ clusters, users });
 
   if (print) {
-    console.log(yaml.stringify(kubeconfig));
+    console.log(yaml.stringify(kubeconfigData));
   } else {
-    await syncKubeconfig(kubeconfig);
+    await syncKubeconfig(kubeconfigData);
     console.log(`Config written to ${KUBECONFIG_PATH}`);
   }
 }

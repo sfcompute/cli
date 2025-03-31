@@ -1,8 +1,8 @@
+import { Buffer } from "node:buffer";
+import * as os from "node:os";
+import * as path from "node:path";
 import * as nacl from "npm:tweetnacl";
 import util from "npm:tweetnacl-util";
-import * as path from "node:path";
-import * as os from "node:os";
-import { Buffer } from "node:buffer";
 
 export async function getKeys(): Promise<{
   publicKey: string;
@@ -56,7 +56,7 @@ export function decryptSecret(props: {
   );
 
   if (!decrypted) {
-    throw new Error("Failed to decrypt secret");
+    throw new Error("Failed to decrypt secret.");
   }
   return Buffer.from(decrypted).toString("utf8");
 }
