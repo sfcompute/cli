@@ -620,7 +620,11 @@ export async function placeBuyOrder(options: {
       case 500:
         return logAndQuit(`Failed to place order: ${error?.message}`);
       default:
-        return logAndQuit(`Failed to place order: ${response.statusText}`);
+        return logAndQuit(
+          `Failed to place order: ${response.status} ${response.statusText} - ${
+            error?.code ? `[${error.code}] ` : ""
+          }${error?.message || "Unknown error"}`,
+        );
     }
   }
 
