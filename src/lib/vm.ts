@@ -148,12 +148,6 @@ export async function registerVM(program: Command) {
       if (options.limit) {
         params.append("limit", options.limit);
       }
-      if (options.before) {
-        params.append("before", options.before);
-      }
-      if (options.since) {
-        params.append("since", options.since);
-      }
 
       // Function to fetch logs with given parameters
       async function fetchLogs(urlParams: URLSearchParams) {
