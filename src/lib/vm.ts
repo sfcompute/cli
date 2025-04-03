@@ -271,9 +271,6 @@ export async function registerVM(program: Command) {
           ? formatTimestampToISO(options.since)
           : "";
 
-        // Set ascending order for tailing
-        params.append("order", "asc");
-
         // Initial fetch (if --since not provided, we get the latest logs)
         if (!sinceTimestamp) {
           const data = await fetchLogs(params);
