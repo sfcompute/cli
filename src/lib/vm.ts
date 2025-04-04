@@ -148,12 +148,6 @@ export async function registerVM(program: Command) {
       if (options.limit) {
         params.append("limit", options.limit);
       }
-      if (options.before) {
-        params.append("before", options.before);
-      }
-      if (options.since) {
-        params.append("since", options.since);
-      }
 
       // Function to fetch logs with given parameters
       async function fetchLogs(urlParams: URLSearchParams) {
@@ -270,9 +264,6 @@ export async function registerVM(program: Command) {
         let sinceTimestamp = options.since
           ? formatTimestampToISO(options.since)
           : "";
-
-        // Set ascending order for tailing
-        params.append("order", "asc");
 
         // Initial fetch (if --since not provided, we get the latest logs)
         if (!sinceTimestamp) {
