@@ -14,6 +14,7 @@ import { getWebAppUrl } from "../helpers/urls.ts";
 import axios from "axios";
 import { clearFeatureFlags } from "../helpers/feature-flags.ts";
 import { getLoggedInAccountId } from "./me.ts";
+import { randomInt } from "node:crypto";
 
 export function registerLogin(program: Command) {
   program
@@ -108,6 +109,6 @@ async function getSession({ token }: { token: string }) {
 }
 
 function generateValidationString() {
-  const getRandomNumber = () => Math.floor(Math.random() * 100);
+  const getRandomNumber = () => randomInt(0, 100);
   return `${getRandomNumber()} ${getRandomNumber()} ${getRandomNumber()}`;
 }
