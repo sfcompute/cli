@@ -187,7 +187,13 @@ async function listClustersAction({
   const { data, error, response } = await api.GET("/v0/clusters");
 
   if (!response.ok) {
-    return logAndQuit(`Failed to get clusters: ${response.statusText}`);
+    return logAndQuit(
+      `Failed to get clusters: HTTP ${response.status} - ${
+        error?.code || ""
+      }: ${error?.message || response.statusText} ${
+        error?.details || ""
+      } (${response.url})`,
+    );
   }
 
   if (!data) {
@@ -428,7 +434,11 @@ async function addClusterUserAction({
   });
 
   if (!response.ok) {
-    return logAndQuit(`Failed to add user to cluster: ${response.statusText}`);
+    return logAndQuit(
+      `Failed to add user to cluster: HTTP ${response.status} - ${
+        error?.code || ""
+      }: ${error?.message || response.statusText} ${error?.details || ""}`,
+    );
   }
 
   if (!data) {
