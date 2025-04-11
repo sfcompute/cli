@@ -93,6 +93,11 @@ async function checkProductionCLIVersion() {
 }
 
 export async function checkVersion() {
+  // Disable auto-upgrade if env var is set
+  if (process.env.SF_CLI_DISABLE_AUTO_UPGRADE) {
+    return;
+  }
+
   // Skip version check if running upgrade command
   const args = process.argv.slice(2);
   if (args[0] === "upgrade") return;
@@ -108,6 +113,9 @@ export async function checkVersion() {
   const currentIsStable = !semver.prerelease(version);
   const latestIsPrerelease = semver.prerelease(latestVersion);
   if (currentIsStable && latestIsPrerelease) return;
+
+  // Don't upgrade automatically if on prerelease
+  if (semver.prerelease(version)) return;
 
   const isOutdated = semver.lt(version, latestVersion);
   if (!isOutdated) return;

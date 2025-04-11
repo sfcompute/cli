@@ -1,6 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
-import process from "node:process";
 import * as console from "node:console";
+import process from "node:process";
 import ora from "ora";
 
 /**
@@ -30,8 +30,9 @@ export function registerUpgrade(program: Command) {
   return program
     .command("upgrade")
     .argument("[version]", "The version to upgrade to")
+    .option("-f, --force", "Force upgrade even if already on specified version")
     .description("Upgrade to the latest version or a specific version")
-    .action(async (version) => {
+    .action(async (version, options) => {
       const spinner = ora();
       const currentVersion = program.version();
 
@@ -49,13 +50,13 @@ export function registerUpgrade(program: Command) {
       }
 
       // Check if user has already installed latest version.
-      if (version === currentVersion) {
+      if (version === currentVersion && !options.force) {
         spinner.succeed(`You are already on version ${currentVersion}.`);
         return;
       }
 
       const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
-      if (isOnLatestVersion) {
+      if (isOnLatestVersion && !version && !options.force) {
         spinner.succeed(
           `You are already on the latest version (${currentVersion}).`,
         );
