@@ -71,7 +71,7 @@ export function sanitizeToRFC1123Subdomain(input: string): string {
   // Remove leading and trailing hyphens from each label
   result = result
     .split(".")
-    .map(label => {
+    .map((label) => {
       // If the label consists only of hyphens, replace with "x"
       if (/^-+$/.test(label)) {
         return "x";
@@ -105,7 +105,7 @@ export function sanitizeToRFC1123Subdomain(input: string): string {
 
   // Truncate if necessary (253 chars max, each label 63 chars max)
   const labels = result.split(".");
-  const truncatedLabels = labels.map(label => label.substring(0, 63));
+  const truncatedLabels = labels.map((label) => label.substring(0, 63));
   result = truncatedLabels.join(".");
 
   return result.substring(0, 253);

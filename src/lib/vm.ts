@@ -70,7 +70,7 @@ export async function registerVM(program: Command) {
           instance_group_id: instance.instance_group_id,
           status: instance.current_status,
           last_updated_at: instance.last_updated_at,
-        })
+        }),
       );
 
       const table = new Table({
@@ -92,7 +92,7 @@ export async function registerVM(program: Command) {
   vm.command("script")
     .description("Push a startup script to VMs")
     .requiredOption("-f, --file <file>", "Path to startup script file")
-    .action(async options => {
+    .action(async (options) => {
       let script: string;
       try {
         script = readFileSync(options.file, "utf-8");
@@ -126,14 +126,14 @@ export async function registerVM(program: Command) {
     .option("-l, --limit <number>", "Number of log lines to fetch", "50")
     .option(
       "--before <timestamp>",
-      "Get logs older than this timestamp (descending)"
+      "Get logs older than this timestamp (descending)",
     )
     .option(
       "--since <timestamp>",
-      "Get logs newer than this timestamp (ascending)"
+      "Get logs newer than this timestamp (ascending)",
     )
     .option("-f, --follow", "Continue polling newer logs (like tail -f)")
-    .action(async options => {
+    .action(async (options) => {
       const baseUrl = await getApiUrl("vms_logs_list");
       const params = new URLSearchParams();
 
@@ -170,7 +170,7 @@ export async function registerVM(program: Command) {
           }
 
           logAndQuit(
-            `Failed to fetch logs: ${response.status} ${response.statusText}\nResponse details: ${errorDetails}`
+            `Failed to fetch logs: ${response.status} ${response.statusText}\nResponse details: ${errorDetails}`,
           );
         }
 
@@ -194,14 +194,14 @@ export async function registerVM(program: Command) {
 
         if (log.message.includes("\n")) {
           const prefix = `(instance ${log.instance_id}) [${formattedTime}] `;
-          const lines = log.message.split("\n").filter(line => line !== "");
+          const lines = log.message.split("\n").filter((line) => line !== "");
           console.log(prefix + lines[0]);
           for (let i = 1; i < lines.length; i++) {
             console.log(lines[i]);
           }
         } else {
           console.log(
-            `(instance ${log.instance_id}) [${formattedTime}] ${log.message}`
+            `(instance ${log.instance_id}) [${formattedTime}] ${log.message}`,
           );
         }
       }
@@ -216,7 +216,7 @@ export async function registerVM(program: Command) {
           return date.toISOString();
         } catch {
           logAndQuit(
-            `Invalid timestamp format: ${timestamp}. Please use ISO format (e.g., 2023-01-01T00:00:00Z)`
+            `Invalid timestamp format: ${timestamp}. Please use ISO format (e.g., 2023-01-01T00:00:00Z)`,
           );
         }
       }
@@ -268,7 +268,7 @@ export async function registerVM(program: Command) {
             // The last log's timestamp is our new "since"
             // Ensure the timestamp is in ISO format
             const lastLogTime = new Date(
-              data[data.length - 1].timestamp
+              data[data.length - 1].timestamp,
             ).getTime();
             sinceTimestamp = new Date(lastLogTime + 1).toISOString();
           }
@@ -294,13 +294,13 @@ export async function registerVM(program: Command) {
             }
             // Bump the last timestamp by 1ms before next request
             const lastLogTime = new Date(
-              newData[newData.length - 1].timestamp
+              newData[newData.length - 1].timestamp,
             ).getTime();
             sinceTimestamp = new Date(lastLogTime + 1).toISOString();
           }
 
           // Sleep for 2 seconds
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       } catch (err: unknown) {
         // Gracefully handle broken pipe errors
@@ -317,10 +317,11 @@ export async function registerVM(program: Command) {
   vm.command("replace")
     .description("Replace a virtual machine")
     .requiredOption("-i, --id <id>", "ID of the VM to replace")
-    .action(async options => {
+    .action(async (options) => {
       // Replace is a destructive action - get confirmation
       const replaceConfirmed = await confirm({
-        message: `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
+        message:
+          `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
         default: false,
       });
       if (!replaceConfirmed) {
@@ -366,7 +367,7 @@ export async function registerVM(program: Command) {
         logSupportCTAAndQuit();
       }
       loadingSpinner.succeed(
-        `Replaced VM instance ${replaced} with VM ${replaced_by}`
+        `Replaced VM instance ${replaced} with VM ${replaced_by}`,
       );
       process.exit(0);
     });

@@ -13,7 +13,7 @@ const postHogClient = new PostHog(
     host: "https://us.posthog.com",
     flushAt: 1,
     flushInterval: 0,
-  }
+  },
 );
 // Uncomment this out to see Posthog debugging logs.
 // postHogClient.debug();
@@ -89,7 +89,7 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
   // If not in cache or expired, fetch from PostHog
   const result = await postHogClient.isFeatureEnabled(
     feature,
-    exchangeAccountId
+    exchangeAccountId,
   );
 
   // Cache the result (PostHog returns undefined if there's an error, default to false)

@@ -30,15 +30,15 @@ export function registerSell(program: Command) {
     .option(
       "-n, --accelerators <quantity>",
       "Specify the number of GPUs",
-      val => parseAccelerators(val, "sell"),
-      8
+      (val) => parseAccelerators(val, "sell"),
+      8,
     )
     .option("-s, --start <start>", "Specify the start time (ISO 8601 format)")
     .option("-d, --duration <duration>", "Specify the duration, like '1h'")
     .option(
       "-f, --flags <flags>",
       "Specify additional flags as JSON",
-      JSON.parse
+      JSON.parse,
     )
     .action(async function placeSellOrder(options) {
       const loggedIn = await isLoggedIn();
@@ -58,14 +58,15 @@ export function registerSell(program: Command) {
 
       if (contract?.status === "pending") {
         return logAndQuit(
-          `Contract ${options.contractId} is currently pending. Please try again in a few seconds.`
+          `Contract ${options.contractId} is currently pending. Please try again in a few seconds.`,
         );
       }
 
       if (options.accelerators % GPUS_PER_NODE !== 0) {
-        const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
+        const exampleCommand =
+          `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
         return logAndQuit(
-          `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`
+          `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
         );
       }
 
@@ -93,7 +94,7 @@ export function registerSell(program: Command) {
           return logAndQuit("Invalid duration");
         }
         endDate = dayjs(
-          roundedStartDate === "NOW" ? new Date() : roundedStartDate
+          roundedStartDate === "NOW" ? new Date() : roundedStartDate,
         )
           .add(durationSecs, "s")
           .toDate();
@@ -111,7 +112,7 @@ export function registerSell(program: Command) {
         priceCents,
         totalDurationSecs,
         nodes,
-        GPUS_PER_NODE
+        GPUS_PER_NODE,
       );
 
       const params: PlaceSellOrderParameters = {
@@ -119,8 +120,9 @@ export function registerSell(program: Command) {
         quantity: forceAsNumber(options.accelerators) / GPUS_PER_NODE,
         price: totalPrice,
         contract_id: options.contractId,
-        start_at:
-          roundedStartDate === "NOW" ? "NOW" : roundedStartDate.toISOString(),
+        start_at: roundedStartDate === "NOW"
+          ? "NOW"
+          : roundedStartDate.toISOString(),
         end_at: endDate.toISOString(),
       };
 
@@ -133,22 +135,24 @@ export function registerSell(program: Command) {
         switch (response.status) {
           case 400:
             return logAndQuit(
-              `Bad Request: ${error?.message}: ${JSON.stringify(
-                error?.details,
-                null,
-                2
-              )}`
+              `Bad Request: ${error?.message}: ${
+                JSON.stringify(
+                  error?.details,
+                  null,
+                  2,
+                )
+              }`,
             );
           // return logAndQuit(`Bad Request: ${error?.message}`);
           case 401:
             return await logSessionTokenExpiredAndQuit();
           case 403:
             return logAndQuit(
-              "Selling is not enabled on your account yet. Contact us at contact@sfcompute.com if you are interested."
+              "Selling is not enabled on your account yet. Contact us at contact@sfcompute.com if you are interested.",
             );
           default:
             return logAndQuit(
-              `Failed to place sell order: ${response.statusText}`
+              `Failed to place sell order: ${response.statusText}`,
             );
         }
       }
@@ -177,7 +181,7 @@ function contractStartAndEnd(contract: {
 }) {
   const startDate = dayjs(contract.shape.intervals[0]).toDate();
   const endDate = dayjs(
-    contract.shape.intervals[contract.shape.intervals.length - 1]
+    contract.shape.intervals[contract.shape.intervals.length - 1],
   ).toDate();
 
   return { startDate, endDate };

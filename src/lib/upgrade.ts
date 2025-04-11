@@ -31,13 +31,14 @@ export function registerUpgrade(program: Command) {
     .command("upgrade")
     .argument("[version]", "The version to upgrade to")
     .description("Upgrade to the latest version or a specific version")
-    .action(async version => {
+    .action(async (version) => {
       const spinner = ora();
       const currentVersion = program.version();
 
       if (version) {
         spinner.start(`Checking if version ${version} exists`);
-        const url = `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
+        const url =
+          `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
         const response = await fetch(url, { method: "HEAD" });
 
         if (response.status === 404) {
@@ -56,7 +57,7 @@ export function registerUpgrade(program: Command) {
       const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
       if (isOnLatestVersion) {
         spinner.succeed(
-          `You are already on the latest version (${currentVersion}).`
+          `You are already on the latest version (${currentVersion}).`,
         );
         process.exit(0);
         return;
@@ -65,7 +66,7 @@ export function registerUpgrade(program: Command) {
       // Fetch the install script
       spinner.start("Downloading install script");
       const scriptResponse = await fetch(
-        "https://www.sfcompute.com/cli/install"
+        "https://www.sfcompute.com/cli/install",
       );
 
       if (!scriptResponse.ok) {

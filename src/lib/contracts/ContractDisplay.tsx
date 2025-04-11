@@ -33,7 +33,7 @@ interface IntervalData {
 
 export function createIntervalData(
   shape: ActiveContract["shape"],
-  instanceType: string
+  instanceType: string,
 ): IntervalData[] {
   return shape.intervals.slice(0, -1).map((interval, index) => {
     const start = new Date(interval);
@@ -86,7 +86,7 @@ export function ContractDisplay(props: { contract: Contract }) {
 
   const intervalData = createIntervalData(
     props.contract.shape,
-    props.contract.instance_type
+    props.contract.instance_type,
   );
 
   return (
@@ -156,7 +156,7 @@ export function ContractList(props: { contracts: Contract[] }) {
 
   return (
     <Box flexDirection="column" gap={2} paddingBottom={1}>
-      {props.contracts.map(contract => (
+      {props.contracts.map((contract) => (
         <ContractDisplay contract={contract} key={contract.id} />
       ))}
     </Box>

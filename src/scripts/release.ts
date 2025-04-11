@@ -11,12 +11,12 @@ function logAndError(msg: string) {
 
 function bumpVersion(
   version: string,
-  type: "major" | "minor" | "patch" | "prerelease"
+  type: "major" | "minor" | "patch" | "prerelease",
 ) {
-  const [major, minor, patch] = version.split(".").map(v =>
+  const [major, minor, patch] = version.split(".").map((v) =>
     Number.parseInt(
       // Remove everything after the - if there is one
-      v.includes("-") ? v.split("-")[0] : v
+      v.includes("-") ? v.split("-")[0] : v,
     )
   );
   switch (type) {
@@ -45,7 +45,7 @@ async function saveVersion(version: string) {
   // Ensure exactly one newline at the end of the file
   await Deno.writeTextFile(
     "package.json",
-    `${JSON.stringify(packageObj, null, 2)}\n`
+    `${JSON.stringify(packageObj, null, 2)}\n`,
   );
 }
 
@@ -103,9 +103,9 @@ async function createRelease(version: string) {
   // Verify zip files are valid before creating release
   const distFiles = Array.from(Deno.readDirSync("./dist"));
   const zipFiles = distFiles
-    .filter(entry => entry.isFile)
-    .filter(entry => entry.name.endsWith(".zip"))
-    .map(entry => `./dist/${entry.name}`);
+    .filter((entry) => entry.isFile)
+    .filter((entry) => entry.name.endsWith(".zip"))
+    .map((entry) => `./dist/${entry.name}`);
 
   console.log(zipFiles);
 
@@ -134,7 +134,7 @@ async function createRelease(version: string) {
   if (result.exitCode !== 0) {
     console.log(
       "GitHub release creation failed with exit code:",
-      result.exitCode
+      result.exitCode,
     );
     console.log("Common failure reasons:");
     console.log("- GitHub CLI not installed or not authenticated");
@@ -182,17 +182,19 @@ async function cleanDist() {
 program
   .name("release")
   .description(
-    "A github release tool for the project. Valid types are: major, minor, patch, prerelease"
+    "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices([
-      "major",
-      "minor",
-      "patch",
-      "prerelease",
-    ] as const)
+    new Argument("type").choices(
+      [
+        "major",
+        "minor",
+        "patch",
+        "prerelease",
+      ] as const,
+    ),
   )
-  .action(async type => {
+  .action(async (type) => {
     try {
       const ghCheckResult = await new Deno.Command("which", {
         args: ["gh"],
@@ -204,14 +206,14 @@ program
 
   $ brew install gh
 
-  `
+  `,
         );
         process.exit(1);
       }
 
       process.on("SIGINT", () => {
         console.log(
-          "\nRelease process interrupted. Please confirm to exit (ctrl-c again to confirm)."
+          "\nRelease process interrupted. Please confirm to exit (ctrl-c again to confirm).",
         );
         process.once("SIGINT", () => {
           console.log("Exiting...");

@@ -4,7 +4,7 @@ export function pricePerGPUHourToTotalPriceCents(
   pricePerGPUHourCents: Cents,
   durationSeconds: number,
   nodes: number,
-  gpusPerNode: number
+  gpusPerNode: number,
 ): Cents {
   const totalGPUs = nodes * gpusPerNode;
   const totalHours = durationSeconds / 3600;
@@ -16,7 +16,7 @@ export function totalPriceToPricePerGPUHour(
   priceCents: number,
   durationSeconds: number,
   nodes: number,
-  gpusPerNode: number
+  gpusPerNode: number,
 ): Cents {
   const totalGPUs = nodes * gpusPerNode;
   const totalHours = durationSeconds / 3600;

@@ -42,30 +42,30 @@ function _registerBuy(program: Command) {
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
-      val => parseAccelerators(val, "buy"),
-      8
+      (val) => parseAccelerators(val, "buy"),
+      8,
     )
     .option(
       "-d, --duration <duration>",
       "Duration of reservation (rounded up to the nearest hour)",
-      parseDuration
+      parseDuration,
     )
     .option("-p, --price <price>", "Price in dollars per GPU hour")
     .option(
       "-s, --start <start>",
       "Start time (date, relative time like '+1d', or 'NOW')",
       parseStartDateOrNow,
-      "NOW"
+      "NOW",
     )
     .addOption(
       new Option(
         "-e, --end <end>",
-        "End time (date or relative time like '+1d', rounded up to nearest hour)"
+        "End time (date or relative time like '+1d', rounded up to nearest hour)",
       )
         .argParser(parseEnd)
-        .conflicts("duration")
+        .conflicts("duration"),
     )
-    .hook("preAction", command => {
+    .hook("preAction", (command) => {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
         logAndQuit("Specify either --duration or --end, but not both");
@@ -75,19 +75,19 @@ function _registerBuy(program: Command) {
     .option(
       "-colo, --colocate <contract_id>",
       "Colocate with existing contracts",
-      value => value.split(",")
+      (value) => value.split(","),
     )
     .option(
       "-q, --quote",
-      "Get a price quote without placing an order. Useful for scripting."
+      "Get a price quote without placing an order. Useful for scripting.",
     )
     .option(
       "--standing",
-      "Places a standing order. Default behavior is to place a market order."
+      "Places a standing order. Default behavior is to place a market order.",
     )
     .option("-c, --cluster <cluster>", "Send into a specific cluster")
     .configureHelp({
-      optionDescription: option => {
+      optionDescription: (option) => {
         if (option.flags === "-h, --help") {
           return "Display help for buy";
         }
@@ -112,7 +112,7 @@ Examples:
 
   \x1b[2m# Place a standing order at a specific price\x1b[0m
   $ sf buy -n 16 -d 24h -p 1.50 --standing
-`
+`,
     )
     .action(function buyOrderAction(options) {
       /*
@@ -181,16 +181,16 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
     })();
   }, [props.options]);
 
-  return isLoading ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return isLoading
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : (
-    <QuoteDisplay quote={quote} />
-  );
+    )
+    : <QuoteDisplay quote={quote} />;
 }
 
 function QuoteAndBuy(props: { options: SfBuyOptions }) {
@@ -208,13 +208,13 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (duration) {
         // If duration is set, calculate end from start + duration
         endsAt = roundEndDate(
-          dayjs(coercedStart).add(duration, "seconds").toDate()
+          dayjs(coercedStart).add(duration, "seconds").toDate(),
         );
       } else if (end) {
         endsAt = end;
         props.options.duration = dayjs(endsAt).diff(
           dayjs(coercedStart),
-          "seconds"
+          "seconds",
         );
       } else {
         throw new Error("Either duration or end must be set");
@@ -224,7 +224,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
           return logAndQuit(
-            "No quote found for the desired order. Try with a different start date, duration, or price."
+            "No quote found for the desired order. Try with a different start date, duration, or price.",
           );
         }
 
@@ -251,22 +251,22 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
     })();
   }, [props.options]);
 
-  return orderProps === null ? (
-    <Box gap={1}>
-      <Spinner type="dots" />
+  return orderProps === null
+    ? (
       <Box gap={1}>
-        <Text>Getting quote...</Text>
+        <Spinner type="dots" />
+        <Box gap={1}>
+          <Text>Getting quote...</Text>
+        </Box>
       </Box>
-    </Box>
-  ) : (
-    <BuyOrder {...orderProps} />
-  );
+    )
+    : <BuyOrder {...orderProps} />;
 }
 
 export function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
-  durationInHours: number
+  durationInHours: number,
 ) {
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
@@ -292,8 +292,8 @@ function BuyOrderPreview(props: {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice =
-    getTotalPrice(props.price, props.size, realDurationHours) / 100;
+  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
+    100;
 
   return (
     <Box flexDirection="column">
@@ -359,7 +359,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [loadingMsg, setLoadingMsg] = useState<string | null>(
-    "Placing order..."
+    "Placing order...",
   );
 
   const submitOrder = useCallback(async () => {
@@ -373,7 +373,7 @@ function BuyOrder(props: BuyOrderProps) {
       totalPriceInCents: getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours
+        realDurationInHours,
       ),
       startsAt: props.startAt,
       endsAt,
@@ -389,12 +389,12 @@ function BuyOrder(props: BuyOrderProps) {
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       const { startAt, endsAt } = props;
-      const realDurationInHours =
-        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
+      const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
+        3600;
       const totalPriceInCents = getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours
+        realDurationInHours,
       );
 
       analytics.track({
@@ -441,7 +441,7 @@ function BuyOrder(props: BuyOrderProps) {
       });
       submitOrder();
     },
-    [props, exit, submitOrder]
+    [props, exit, submitOrder],
   );
 
   useEffect(() => {
@@ -454,7 +454,7 @@ function BuyOrder(props: BuyOrderProps) {
         const o = await getOrder(order.id);
         if (!o) {
           setLoadingMsg(
-            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed."
+            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
           );
           return;
         }
@@ -558,12 +558,12 @@ export async function placeBuyOrder(options: {
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
-    "totalPriceInCents must be a whole number"
+    "totalPriceInCents must be a whole number",
   );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
   invariant(
     options.numberNodes === Math.ceil(options.numberNodes),
-    "numberNodes must be a whole number"
+    "numberNodes must be a whole number",
   );
 
   const api = await apiClient();
@@ -603,12 +603,12 @@ export async function placeBuyOrder(options: {
       case 400: {
         if (error?.message === "Insufficient balance") {
           return logAndQuit(
-            "Order not placed. You don't have enough funds. Add funds with\n\t🏦 Bank transfer: https://sfcompute.com/dashboard?bankTransferDialogOpen=true\n\t💳 Credit card: https://sfcompute.com/dashboard?payWithCardDialogOpen=true"
+            "Order not placed. You don't have enough funds. Add funds with\n\t🏦 Bank transfer: https://sfcompute.com/dashboard?bankTransferDialogOpen=true\n\t💳 Credit card: https://sfcompute.com/dashboard?payWithCardDialogOpen=true",
           );
         }
 
         return logAndQuit(
-          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`
+          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`,
         );
       }
       case 401:
@@ -619,14 +619,14 @@ export async function placeBuyOrder(options: {
         return logAndQuit(
           `Failed to place order: ${response.status} ${response.statusText} - ${
             error?.code ? `[${error.code}] ` : ""
-          }${error?.message || "Unknown error"}`
+          }${error?.message || "Unknown error"}`,
         );
     }
   }
 
   if (!data) {
     return logAndQuit(
-      `Failed to place order: Unexpected response from server: ${response}`
+      `Failed to place order: Unexpected response from server: ${response}`,
     );
   }
 
@@ -635,7 +635,7 @@ export async function placeBuyOrder(options: {
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartDate(quote.start_at)
+    parseStartDate(quote.start_at),
   );
   const durationHours = durationSeconds / 3600 / 1000;
 
@@ -643,10 +643,9 @@ export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt =
-    options.start === "NOW"
-      ? "NOW"
-      : roundStartDate(parseStartDate(options.start));
+  const startsAt = options.start === "NOW"
+    ? "NOW"
+    : roundStartDate(parseStartDate(options.start));
   const durationSeconds = options.duration
     ? options.duration
     : dayjs(options.end).diff(dayjs(parseStartDate(startsAt)), "seconds");
@@ -654,11 +653,11 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
 
   const minDurationSeconds = Math.max(
     1,
-    durationSeconds - Math.ceil(durationSeconds * 0.1)
+    durationSeconds - Math.ceil(durationSeconds * 0.1),
   );
   const maxDurationSeconds = Math.max(
     durationSeconds + 3600,
-    durationSeconds + Math.ceil(durationSeconds * 0.1)
+    durationSeconds + Math.ceil(durationSeconds * 0.1),
   );
 
   return await getQuote({
@@ -689,14 +688,12 @@ export async function getQuote(options: QuoteOptions) {
       side: "buy",
       instance_type: options.instanceType,
       quantity: options.quantity,
-      min_start_date:
-        options.minStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.minStartTime.toISOString(),
-      max_start_date:
-        options.maxStartTime === "NOW"
-          ? ("NOW" as const)
-          : options.maxStartTime.toISOString(),
+      min_start_date: options.minStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.minStartTime.toISOString(),
+      max_start_date: options.maxStartTime === "NOW"
+        ? ("NOW" as const)
+        : options.maxStartTime.toISOString(),
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
       cluster: options.cluster,
@@ -725,7 +722,7 @@ export async function getQuote(options: QuoteOptions) {
 
   if (!data) {
     return logAndQuit(
-      `Failed to get quote: Unexpected response from server: ${response}`
+      `Failed to get quote: Unexpected response from server: ${response}`,
     );
   }
 

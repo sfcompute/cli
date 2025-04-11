@@ -5,8 +5,8 @@ import React from "react";
 
 const noop = () => {};
 
-interface ConfirmInputProps
-  extends Omit<
+interface ConfirmInputProps extends
+  Omit<
     ComponentProps<typeof TextInput>,
     "value" | "onChange" | "onSubmit"
   > {
@@ -29,7 +29,7 @@ const ConfirmInput = ({
     (newValue: string) => {
       onSubmit(yn(newValue, { default: isChecked }));
     },
-    [isChecked, onSubmit]
+    [isChecked, onSubmit],
   );
 
   return (
