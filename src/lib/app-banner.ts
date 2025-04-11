@@ -12,7 +12,7 @@ export const getAppBanner = async () => {
     const response = await fetch("https://sfcompute.com/api/banner", {
       signal: AbortSignal.timeout(300),
     });
-    const data = await response.json() as AppBanner;
+    const data = (await response.json()) as AppBanner;
 
     if (data.type === "warning" && data.content) {
       const message = `${data.content}`;

@@ -235,7 +235,9 @@ async function listTokensAction() {
     const base = getCommandBase();
     console.log(
       `${chalk.gray("Generate your first token with: ")}${
-        chalk.magenta(`${base} tokens create`)
+        chalk.magenta(
+          `${base} tokens create`,
+        )
       }`,
     );
 
@@ -302,7 +304,9 @@ async function deleteTokenAction({
   } else {
     const verySureConfirmed = await confirm({
       message: `${chalk.red("Very sure?")} ${
-        chalk.gray("(just double-checking)")
+        chalk.gray(
+          "(just double-checking)",
+        )
       }`,
       default: false,
     });

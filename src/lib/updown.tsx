@@ -72,10 +72,9 @@ function ScaleCommand(props: {
   const [balanceLowMessage, setBalanceLowMessage] = useState<React.ReactNode>(
     null,
   );
-  const [
-    procurementResult,
-    setProcurementResult,
-  ] = useState<true | Procurement | Procurement[] | null>(null);
+  const [procurementResult, setProcurementResult] = useState<
+    true | Procurement | Procurement[] | null
+  >(null);
   const [
     displayedPricePerNodeHourInCents,
     setDisplayedPricePerNodeHourInCents,
@@ -256,9 +255,7 @@ function ScaleCommand(props: {
 function ShowCommand(props: { type: string }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [info, setInfo] = useState<
-    Procurement | null
-  >(null);
+  const [info, setInfo] = useState<Procurement | null>(null);
 
   useEffect(() => {
     async function fetchInfo() {
@@ -379,7 +376,9 @@ function ConfirmationMessage(props: {
         headWidth={15}
         head="initial total"
         value={`$${(props.totalPriceInCents / 100).toFixed(2)} for ${
-          formatDuration(durationInMilliseconds)
+          formatDuration(
+            durationInMilliseconds,
+          )
         }`}
       />
     </Box>

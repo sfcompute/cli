@@ -51,65 +51,63 @@ export function registerSell(program: Command) {
       JSON.parse,
     )
     .option("-y, --yes", "Automatically confirm the order")
-    .action(
-      async function sellOrderAction(options) {
-        if (!(await isLoggedIn())) {
-          return logLoginMessageAndQuit();
-        }
+    .action(async function sellOrderAction(options) {
+      if (!(await isLoggedIn())) {
+        return logLoginMessageAndQuit();
+      }
 
-        const pricePerGpuHour = parsePricePerGpuHour(options.price);
-        if (!pricePerGpuHour) {
-          return logAndQuit(`Invalid price: ${options.price}`);
-        }
+      const pricePerGpuHour = parsePricePerGpuHour(options.price);
+      if (!pricePerGpuHour) {
+        return logAndQuit(`Invalid price: ${options.price}`);
+      }
 
-        const contractId = options.contractId;
+      const contractId = options.contractId;
 
-        if (!contractId || !contractId.startsWith("cont_")) {
-          return logAndQuit(`Invalid contract ID: ${contractId}`);
-        }
+      if (!contractId || !contractId.startsWith("cont_")) {
+        return logAndQuit(`Invalid contract ID: ${contractId}`);
+      }
 
-        const size = parseAccelerators(options.accelerators);
-        if (isNaN(size) || size <= 0) {
-          return logAndQuit(
-            `Invalid number of accelerators: ${options.accelerators}`,
-          );
-        }
+      const size = parseAccelerators(options.accelerators);
+      if (isNaN(size) || size <= 0) {
+        return logAndQuit(
+          `Invalid number of accelerators: ${options.accelerators}`,
+        );
+      }
 
-        const durationSeconds = parseDuration(options.duration);
-        if (!durationSeconds || durationSeconds <= 0) {
-          return logAndQuit(`Invalid duration: ${options.duration}`);
-        }
+      const durationSeconds = parseDuration(options.duration);
+      if (!durationSeconds || durationSeconds <= 0) {
+        return logAndQuit(`Invalid duration: ${options.duration}`);
+      }
 
-        const startDate = parseStartDate(options.start);
-        if (!startDate) {
-          return logAndQuit(`Invalid start date: ${options.start}`);
-        }
+      const startDate = parseStartDate(options.start);
+      if (!startDate) {
+        return logAndQuit(`Invalid start date: ${options.start}`);
+      }
 
-        const endDate = roundEndDate(
-          dayjs(startDate).add(durationSeconds, "seconds").toDate(),
-        ).toDate();
+      const endDate = roundEndDate(
+        dayjs(startDate).add(durationSeconds, "seconds").toDate(),
+      ).toDate();
 
-        // Fetch contract details
-        const contract = await getContract(contractId);
-        if (!contract) {
-          return logAndQuit(`Contract not found: ${contractId}`);
-        }
+      // Fetch contract details
+      const contract = await getContract(contractId);
+      if (!contract) {
+        return logAndQuit(`Contract not found: ${contractId}`);
+      }
 
-        // Prepare order details
-        const orderDetails = {
-          price: pricePerGpuHour,
-          contractId: contractId,
-          size: size,
-          startAt: startDate,
-          endsAt: endDate,
-          flags: options.flags as SellOrderFlags, // TODO: explicitly parse and validate this
-          autoConfirm: options.yes || false,
-        };
+      // Prepare order details
+      const orderDetails = {
+        price: pricePerGpuHour,
+        contractId: contractId,
+        size: size,
+        startAt: startDate,
+        endsAt: endDate,
+        flags: options.flags as SellOrderFlags, // TODO: explicitly parse and validate this
+        autoConfirm: options.yes || false,
+      };
 
-        // Render the SellOrder component
-        render(<SellOrder {...orderDetails} />);
-      },
-    );
+      // Render the SellOrder component
+      render(<SellOrder {...orderDetails} />);
+    });
 }
 
 function parseAccelerators(accelerators?: string) {

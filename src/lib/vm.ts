@@ -74,12 +74,7 @@ export async function registerVM(program: Command) {
       );
 
       const table = new Table({
-        head: [
-          "ID",
-          "Instance group ID",
-          "Status",
-          "Last updated at",
-        ],
+        head: ["ID", "Instance group ID", "Status", "Last updated at"],
       });
 
       formattedData.forEach((instance: VMInstance) => {
@@ -360,7 +355,10 @@ export async function registerVM(program: Command) {
         logSupportCTAAndQuit();
       }
 
-      const { replaced, replaced_by }: {
+      const {
+        replaced,
+        replaced_by,
+      }: {
         replaced: string;
         replaced_by: string;
       } = await response.json();

@@ -45,7 +45,7 @@ const trackEvent = ({
         },
       });
       // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       if (data.id) {
         exchangeAccountId = data.id;
         saveConfig({ ...config, account_id: data.id });

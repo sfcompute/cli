@@ -97,10 +97,7 @@ function OrderMinimal(props: {
               pricePerGPUHour.toFixed(2)
           ? (
             <>
-              <Text
-                strikethrough
-                dimColor
-              >
+              <Text strikethrough dimColor>
                 ${pricePerGPUHour.toFixed(2)}
                 <Text dimColor>/gpu/hr</Text>
               </Text>

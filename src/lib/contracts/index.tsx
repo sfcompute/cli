@@ -34,15 +34,14 @@ export function registerContracts(program: Command) {
             if (!validStates.includes(value.toLowerCase())) {
               throw new Error(
                 `Invalid state: ${value}. Valid states are: ${
-                  validStates.join(", ")
+                  validStates.join(
+                    ", ",
+                  )
                 }`,
               );
             }
             // Convert lowercase input to title case for internal use
-            return value.toLowerCase().replace(
-              /^\w/,
-              (c) => c.toUpperCase(),
-            );
+            return value.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
           },
         )
         .description("List all contracts")

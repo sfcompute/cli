@@ -5,9 +5,11 @@ import React from "react";
 
 const noop = () => {};
 
-interface ConfirmInputProps
-  extends
-    Omit<ComponentProps<typeof TextInput>, "value" | "onChange" | "onSubmit"> {
+interface ConfirmInputProps extends
+  Omit<
+    ComponentProps<typeof TextInput>,
+    "value" | "onChange" | "onSubmit"
+  > {
   isChecked?: boolean;
   onChange?: (value: string) => void;
   onSubmit?: (value: boolean) => void;

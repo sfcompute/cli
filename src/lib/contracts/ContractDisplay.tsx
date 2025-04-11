@@ -125,9 +125,7 @@ export function ContractDisplay(props: { contract: Contract }) {
                     <Text dimColor>Orders</Text>
                   </Box>
                 )}
-                <IntervalDisplay
-                  data={data}
-                />
+                <IntervalDisplay data={data} />
               </Box>
             );
           })}
@@ -159,10 +157,7 @@ export function ContractList(props: { contracts: Contract[] }) {
   return (
     <Box flexDirection="column" gap={2} paddingBottom={1}>
       {props.contracts.map((contract) => (
-        <ContractDisplay
-          contract={contract}
-          key={contract.id}
-        />
+        <ContractDisplay contract={contract} key={contract.id} />
       ))}
     </Box>
   );

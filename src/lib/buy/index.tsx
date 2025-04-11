@@ -85,6 +85,7 @@ function _registerBuy(program: Command) {
       "--standing",
       "Places a standing order. Default behavior is to place a market order.",
     )
+    .option("-c, --cluster <cluster>", "Send into a specific cluster")
     .configureHelp({
       optionDescription: (option) => {
         if (option.flags === "-h, --help") {
@@ -200,9 +201,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
     (async () => {
       const { start, duration, end } = props.options;
       // Grab the price per GPU hour, either
-      let pricePerGpuHour = parsePricePerGpuHour(
-        props.options.price,
-      );
+      let pricePerGpuHour = parsePricePerGpuHour(props.options.price);
       let startAt = start;
       let endsAt: Date;
       const coercedStart = parseStartDate(start);
@@ -236,13 +235,8 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         endsAt = dayjs(quote.end_at).toDate();
       }
 
-      const {
-        type,
-        accelerators,
-        colocate,
-        yes,
-        standing,
-      } = props.options;
+      const { type, accelerators, colocate, yes, standing, cluster } =
+        props.options;
 
       setOrderProps({
         type,
@@ -253,6 +247,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         colocate,
         yes,
         standing,
+        cluster,
       });
     })();
   }, [props.options]);
@@ -355,6 +350,7 @@ type BuyOrderProps = {
   colocate?: Array<string>;
   yes?: boolean;
   standing?: boolean;
+  cluster?: string;
 };
 
 function BuyOrder(props: BuyOrderProps) {
@@ -385,6 +381,7 @@ function BuyOrder(props: BuyOrderProps) {
       colocateWith: props.colocate || [],
       numberNodes: props.size,
       standing: props.standing,
+      cluster: props.cluster,
     });
     setOrder(order);
   }, [props]);
@@ -535,9 +532,7 @@ function BuyOrder(props: BuyOrderProps) {
 
       {order && order.status === "open" && (
         <Box paddingY={1} paddingX={2} flexDirection="column" gap={1}>
-          <Text>
-            Order is open but not yet filled. Check status with:
-          </Text>
+          <Text>Order is open but not yet filled. Check status with:</Text>
           <Box paddingLeft={2}>
             <Text color="green">sf orders ls</Text>
           </Box>
@@ -560,6 +555,7 @@ export async function placeBuyOrder(options: {
   colocateWith: Array<string>;
   numberNodes: number;
   standing?: boolean;
+  cluster?: string;
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
@@ -597,6 +593,7 @@ export async function placeBuyOrder(options: {
     flags: {
       ioc: !options.standing,
     },
+    cluster: options.cluster,
   } as const;
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
@@ -681,6 +678,8 @@ type QuoteOptions = {
   maxStartTime: Date | "NOW";
   minDurationSeconds: number;
   maxDurationSeconds: number;
+  cluster?: string;
+  colocateWith?: Array<string>;
 };
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
@@ -698,6 +697,8 @@ export async function getQuote(options: QuoteOptions) {
         : options.maxStartTime.toISOString(),
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
+      cluster: options.cluster,
+      colocate_with: options.colocateWith,
     },
   } as const;
 
