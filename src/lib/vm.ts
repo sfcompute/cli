@@ -14,6 +14,7 @@ import {
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 import { isFeatureEnabled } from "./posthog.ts";
+import { registerSsh } from "./ssh.ts";
 
 type VMInstance = {
   id: string;
@@ -33,6 +34,8 @@ export async function registerVM(program: Command) {
     .command("vm")
     .aliases(["v", "vms"])
     .description("Manage virtual machines");
+
+  registerSsh(vm);
 
   vm.command("list")
     .description("List all virtual machines")
