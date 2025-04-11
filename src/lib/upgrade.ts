@@ -1,6 +1,6 @@
 import type { Command } from "@commander-js/extra-typings";
-import process from "node:process";
 import * as console from "node:console";
+import process from "node:process";
 import ora from "ora";
 
 /**
@@ -46,21 +46,14 @@ export function registerUpgrade(program: Command) {
           process.exit(1);
         }
         spinner.succeed();
-      }
-
-      // Check if user has already installed latest version.
-      if (version === currentVersion) {
-        spinner.succeed(`You are already on version ${currentVersion}.`);
-        return;
-      }
-
-      const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
-      if (isOnLatestVersion) {
-        spinner.succeed(
-          `You are already on the latest version (${currentVersion}).`,
-        );
-        process.exit(0);
-        return;
+      } else {
+        const isOnLatestVersion = await getIsOnLatestVersion(currentVersion);
+        if (isOnLatestVersion) {
+          spinner.succeed(
+            `You are already on the latest version (${currentVersion}).`,
+          );
+          process.exit(0);
+        }
       }
 
       // Fetch the install script
@@ -102,6 +95,5 @@ export function registerUpgrade(program: Command) {
 
       spinner.succeed("Upgrade completed successfully");
       process.exit(0);
-      return;
     });
 }

@@ -126,7 +126,7 @@ export async function checkVersion() {
     );
     try {
       execSync("sf upgrade", { stdio: "inherit" });
-      console.log(chalk.gray("\n☁☁☁️\n"));
+      console.log(chalk.gray("\n☁️☁️☁️\n"));
 
       // Re-run the original command
       const args = process.argv.slice(2);
