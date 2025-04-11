@@ -52,7 +52,7 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
 
 export async function getWebAppUrl<T extends TokenParams | never>(
   key: keyof typeof webPaths,
-  params?: T,
+  params?: T
 ): Promise<string> {
   const config = await loadConfig();
   const path = webPaths[key];
@@ -64,7 +64,7 @@ export async function getWebAppUrl<T extends TokenParams | never>(
 
 export async function getApiUrl<T extends IdParams | never>(
   key: keyof typeof apiPaths,
-  params?: T,
+  params?: T
 ): Promise<string> {
   const config = await loadConfig();
   const path = apiPaths[key];

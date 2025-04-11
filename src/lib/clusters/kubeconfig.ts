@@ -109,7 +109,7 @@ export function createKubeconfig(props: {
       } catch (error) {
         console.error(
           `Failed to parse kubeconfig for user ${user.name}:`,
-          error,
+          error
         );
       }
     }
@@ -148,14 +148,12 @@ export function createKubeconfig(props: {
   // Generate contexts for any remaining clusters and users
   for (const cluster of clusters) {
     // Skip if we already have contexts for this cluster from user kubeconfigs
-    if (
-      kubeconfig.contexts.some((ctx) => ctx.context.cluster === cluster.name)
-    ) {
+    if (kubeconfig.contexts.some(ctx => ctx.context.cluster === cluster.name)) {
       continue;
     }
 
     // Try to find a user with the same name as the cluster
-    let user = users.find((u) => u.name === cluster.name);
+    let user = users.find(u => u.name === cluster.name);
 
     // If no matching user, default to the first user
     if (!user) {
@@ -163,7 +161,7 @@ export function createKubeconfig(props: {
     }
 
     // Skip if the user doesn't exist in the kubeconfig
-    if (!kubeconfig.users.some((u) => u.name === user?.name)) {
+    if (!kubeconfig.users.some(u => u.name === user?.name)) {
       continue;
     }
 
@@ -181,8 +179,7 @@ export function createKubeconfig(props: {
 
   // Set current context based on provided cluster and user names
   if (currentContext) {
-    const contextName =
-      `${currentContext.clusterName}@${currentContext.userName}`;
+    const contextName = `${currentContext.clusterName}@${currentContext.userName}`;
     kubeconfig["current-context"] = contextName;
   } else if (kubeconfig.contexts.length > 0 && !kubeconfig["current-context"]) {
     kubeconfig["current-context"] = kubeconfig.contexts[0].name;
@@ -193,7 +190,7 @@ export function createKubeconfig(props: {
 
 export function mergeNamedItems<T extends { name: string }>(
   items1: T[],
-  items2: T[],
+  items2: T[]
 ): T[] {
   const map = new Map<string, T>();
   for (const item of items1) {
@@ -207,7 +204,7 @@ export function mergeNamedItems<T extends { name: string }>(
 
 export function mergeKubeconfigs(
   oldConfig: Kubeconfig,
-  newConfig?: Kubeconfig,
+  newConfig?: Kubeconfig
 ): Kubeconfig {
   if (!newConfig) {
     return oldConfig;
@@ -217,15 +214,15 @@ export function mergeKubeconfigs(
     apiVersion: newConfig.apiVersion || oldConfig.apiVersion,
     clusters: mergeNamedItems(
       oldConfig.clusters || [],
-      newConfig.clusters || [],
+      newConfig.clusters || []
     ),
     contexts: mergeNamedItems(
       oldConfig.contexts || [],
-      newConfig.contexts || [],
+      newConfig.contexts || []
     ),
     users: mergeNamedItems(oldConfig.users || [], newConfig.users || []),
-    "current-context": newConfig["current-context"] ||
-      oldConfig["current-context"],
+    "current-context":
+      newConfig["current-context"] || oldConfig["current-context"],
     kind: newConfig.kind || oldConfig.kind,
     preferences: { ...oldConfig.preferences, ...newConfig.preferences },
   };

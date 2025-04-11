@@ -1,9 +1,7 @@
 import type { operations } from "../../schema.ts";
 
 type CredentialsResponse =
-  operations["getV0Credentials"]["responses"][200]["content"][
-    "application/json"
-  ];
+  operations["getV0Credentials"]["responses"][200]["content"]["application/json"];
 type CredentialsList = CredentialsResponse["data"];
 type BaseK8sCredential = Extract<
   CredentialsList[number],
@@ -21,7 +19,7 @@ export interface K8sCredential extends BaseK8sCredential {
  * @returns True if the credential is a vcluster credential, false otherwise
  */
 export const isVClusterCredential = (
-  cred: CredentialsList[number],
+  cred: CredentialsList[number]
 ): cred is K8sCredential & {
   encrypted_kubeconfig: string;
   nonce: string;

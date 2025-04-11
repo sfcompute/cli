@@ -36,7 +36,7 @@ export function registerClusters(program: Command) {
     .description("List clusters")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
-    .action(async (options) => {
+    .action(async options => {
       await listClustersAction({
         returnJson: options.json,
         token: options.token,
@@ -54,12 +54,12 @@ export function registerClusters(program: Command) {
     .requiredOption("--cluster <cluster>", "name of the cluster")
     .requiredOption(
       "--user <username>",
-      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized.",
+      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized."
     )
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
-    .action(async (options) => {
+    .action(async options => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
@@ -86,7 +86,7 @@ export function registerClusters(program: Command) {
     .alias("ls")
     .description("List users in a cluster")
     .option("--token <token>", "API token")
-    .action(async (options) => {
+    .action(async options => {
       await listClusterUsers({ token: options.token });
     });
 
@@ -95,7 +95,7 @@ export function registerClusters(program: Command) {
     .description("Generate or sync kubeconfig")
     .option("--token <token>", "API token")
     .option("--print", "Print the config instead of syncing to file")
-    .action(async (options) => {
+    .action(async options => {
       await kubeconfigAction({
         token: options.token,
         print: options.print,
@@ -192,14 +192,14 @@ async function listClustersAction({
         error?.code || ""
       }: ${error?.message || response.statusText} ${
         error?.details || ""
-      } (${response.url})`,
+      } (${response.url})`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get clusters: Unexpected response from server: ${response}`,
+      `Failed to get clusters: Unexpected response from server: ${response}`
     );
   }
 
@@ -216,18 +216,18 @@ async function listClustersAction({
       <ClusterDisplay
         clusters={data.data
           .filter(
-            (cluster) =>
-              cluster.contract?.status === "active" || !cluster.contract,
+            cluster =>
+              cluster.contract?.status === "active" || !cluster.contract
           )
           .map(
-            (cluster) =>
+            cluster =>
               ({
                 ...cluster,
                 // @ts-expect-error - ignore
                 state: cluster.contract?.state || "Active",
-              }) as UserFacingCluster,
+              }) as UserFacingCluster
           )}
-      />,
+      />
     );
   }
 }
@@ -244,7 +244,7 @@ function ClusterUserDisplay({
 }) {
   return (
     <Box flexDirection="column" gap={1}>
-      {users.map((user) => (
+      {users.map(user => (
         <Box key={user.id} flexDirection="column">
           <Row headWidth={11} head="name" value={user.name} />
           <Row headWidth={11} head="id" value={user.id} />
@@ -265,8 +265,7 @@ async function isCredentialReady(id: string) {
   const { data } = await api.GET("/v0/credentials");
 
   const cred = data?.data.find(
-    (credential) =>
-      credential.id === id && credential.object === "k8s_credential",
+    credential => credential.id === id && credential.object === "k8s_credential"
   );
 
   if (!cred) {
@@ -279,7 +278,7 @@ async function isCredentialReady(id: string) {
 
   return Boolean(
     (cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey) ||
-      (cred as K8sCredential).encrypted_kubeconfig,
+      (cred as K8sCredential).encrypted_kubeconfig
   );
 }
 
@@ -295,12 +294,12 @@ async function listClusterUsers({ token }: { token?: string }) {
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get users in cluster: Unexpected response from server: ${response}`,
+      `Failed to get users in cluster: Unexpected response from server: ${response}`
     );
   }
 
   const k8s = data.data.filter(
-    (credential) => credential.object === "k8s_credential",
+    credential => credential.object === "k8s_credential"
   );
 
   const users: Array<{
@@ -311,7 +310,7 @@ async function listClusterUsers({ token }: { token?: string }) {
   }> = [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
-      k.encrypted_token && k.nonce && k.ephemeral_pubkey,
+      k.encrypted_token && k.nonce && k.ephemeral_pubkey
     );
     users.push({
       id: k.id,
@@ -437,14 +436,14 @@ async function addClusterUserAction({
     return logAndQuit(
       `Failed to add user to cluster: HTTP ${response.status} - ${
         error?.code || ""
-      }: ${error?.message || response.statusText} ${error?.details || ""}`,
+      }: ${error?.message || response.statusText} ${error?.details || ""}`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to add user to cluster: Unexpected response from server: ${response}`,
+      `Failed to add user to cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -470,19 +469,19 @@ async function removeClusterUserAction({
           id,
         },
       },
-    },
+    }
   );
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to remove user from cluster: ${response.statusText}`,
+      `Failed to remove user from cluster: ${response.statusText}`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to remove user from cluster: Unexpected response from server: ${response}`,
+      `Failed to remove user from cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -502,14 +501,14 @@ async function kubeconfigAction({
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to list users in cluster: ${response.statusText}`,
+      `Failed to list users in cluster: ${response.statusText}`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to list users in cluster: Unexpected response from server: ${response}`,
+      `Failed to list users in cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -559,7 +558,7 @@ async function kubeconfigAction({
         // Parse the decrypted kubeconfig
       } catch (err) {
         console.error(
-          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
+          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`
         );
       }
     } else if (item.encrypted_token) {
@@ -577,7 +576,7 @@ async function kubeconfigAction({
         });
       } catch (err) {
         console.error(
-          `Failed to decrypt token: ${err}, ${credential.username}`,
+          `Failed to decrypt token: ${err}, ${credential.username}`
         );
         continue;
       }

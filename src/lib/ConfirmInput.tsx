@@ -6,8 +6,10 @@ import React from "react";
 const noop = () => {};
 
 interface ConfirmInputProps
-  extends
-    Omit<ComponentProps<typeof TextInput>, "value" | "onChange" | "onSubmit"> {
+  extends Omit<
+    ComponentProps<typeof TextInput>,
+    "value" | "onChange" | "onSubmit"
+  > {
   isChecked?: boolean;
   onChange?: (value: string) => void;
   onSubmit?: (value: boolean) => void;
@@ -27,7 +29,7 @@ const ConfirmInput = ({
     (newValue: string) => {
       onSubmit(yn(newValue, { default: isChecked }));
     },
-    [isChecked, onSubmit],
+    [isChecked, onSubmit]
   );
 
   return (

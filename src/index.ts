@@ -73,7 +73,7 @@ const main = async () => {
       }
     }
 
-    program.exitOverride((error) => {
+    program.exitOverride(error => {
       let isError = true;
 
       switch (error.code) {
@@ -93,8 +93,8 @@ const main = async () => {
           const nextArg = arr[i + 1];
           if (nextArg && !nextArg.startsWith("-")) {
             (acc as Record<string, string | number | boolean>)[key] = isNaN(
-                Number(nextArg),
-              )
+              Number(nextArg)
+            )
               ? nextArg
               : Number(nextArg);
           } else {
