@@ -247,6 +247,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         colocate,
         yes,
         standing,
+        cluster,
       });
     })();
   }, [props.options]);
