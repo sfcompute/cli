@@ -87,7 +87,7 @@ function _registerBuy(program: Command) {
     )
     .option(
       "-c, --cluster <cluster>",
-      "Send into a specific cluster"
+      "Send into a specific cluster",
     )
     .configureHelp({
       optionDescription: (option) => {
