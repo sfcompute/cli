@@ -85,6 +85,10 @@ function _registerBuy(program: Command) {
       "--standing",
       "Places a standing order. Default behavior is to place a market order.",
     )
+    .option(
+      "-c, --cluster <cluster>",
+      "Send into a specific cluster"
+    )
     .configureHelp({
       optionDescription: (option) => {
         if (option.flags === "-h, --help") {
@@ -242,6 +246,7 @@ function QuoteAndBuy(props: { options: SfBuyOptions }) {
         colocate,
         yes,
         standing,
+        cluster,
       } = props.options;
 
       setOrderProps({
@@ -355,6 +360,7 @@ type BuyOrderProps = {
   colocate?: Array<string>;
   yes?: boolean;
   standing?: boolean;
+  cluster?: string;
 };
 
 function BuyOrder(props: BuyOrderProps) {
@@ -385,6 +391,7 @@ function BuyOrder(props: BuyOrderProps) {
       colocateWith: props.colocate || [],
       numberNodes: props.size,
       standing: props.standing,
+      cluster: props.cluster,
     });
     setOrder(order);
   }, [props]);
@@ -560,6 +567,7 @@ export async function placeBuyOrder(options: {
   colocateWith: Array<string>;
   numberNodes: number;
   standing?: boolean;
+  cluster?: string;
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
@@ -597,6 +605,7 @@ export async function placeBuyOrder(options: {
     flags: {
       ioc: !options.standing,
     },
+    cluster: options.cluster,
   } as const;
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
@@ -681,6 +690,8 @@ type QuoteOptions = {
   maxStartTime: Date | "NOW";
   minDurationSeconds: number;
   maxDurationSeconds: number;
+  cluster?: string;
+  colocateWith?: Array<string>;
 };
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
@@ -698,6 +709,8 @@ export async function getQuote(options: QuoteOptions) {
         : options.maxStartTime.toISOString(),
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
+      cluster: options.cluster,
+      colocate_with: options.colocateWith,
     },
   } as const;
 
