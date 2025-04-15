@@ -103,6 +103,7 @@ export function registerSsh(program: Command) {
         cmd = cmd.concat(["-o", `KnownHostsCommand=${knownHostsCommand_str}`]);
       }
 
+      cmd = cmd.concat(["-o", `HostKeyAlias=${vmId}.vms.sfcompute.dev`]);
       cmd = cmd.concat([sshDestination]);
 
       let shescape: undefined | Shescape = undefined;
