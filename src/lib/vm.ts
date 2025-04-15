@@ -126,7 +126,7 @@ export async function registerVM(program: Command) {
   vm.command("logs")
     .description("View or tail VM logs")
     .option("-i, --instance <id>", "Filter logs by instance ID")
-    .option("-l, --limit <number>", "Number of log lines to fetch", "50")
+    .option("-l, --limit <number>", "Number of log lines to fetch", "100")
     .option(
       "--before <timestamp>",
       "Get logs older than this timestamp (descending)",
@@ -136,6 +136,27 @@ export async function registerVM(program: Command) {
       "Get logs newer than this timestamp (ascending)",
     )
     .option("-f, --follow", "Continue polling newer logs (like tail -f)")
+    .addHelpText(
+      "after",
+      `
+Examples:
+
+  \x1b[2m# Get logs for all my vms \x1b[0m
+  $ sf vm logs
+
+  \x1b[2m# Get logs for a vm \x1b[0m
+  $ sf vm logs --instance <instance_id>
+
+  \x1b[2m# Get last 200 log lines for a vm  \x1b[0m
+  $ sf vm logs --instance <instance_id> --limit 200
+
+  \x1b[2m# Get logs before a given timestamp  \x1b[0m
+  $ sf vm logs -i <instance_id> --before "2025-01-01"
+
+  \x1b[2m# Get upto 300 logs between a 3 hour duration  \x1b[0m
+  $ sf vm logs -i <instance_id> --since "2025-01-01:17:30:00" --before "2025-01-01:20:30:00" -l 300
+`,
+    )
     .action(async (options) => {
       const baseUrl = await getApiUrl("vms_logs_list");
       const params = new URLSearchParams();
@@ -143,6 +164,7 @@ export async function registerVM(program: Command) {
       if (options.instance) {
         params.append("instance_id", options.instance);
       }
+
       if (options.limit) {
         params.append("limit", options.limit);
       }
