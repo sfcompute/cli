@@ -126,7 +126,21 @@ export async function registerVM(program: Command) {
   vm.command("logs")
     .description("View or tail VM logs")
     .option("-i, --instance <id>", "Filter logs by instance ID")
-    .option("-l, --limit <number>", "Number of log lines to fetch", "100")
+    .option(
+      "-l, --limit <number>",
+      "Number of log lines to fetch",
+      (val) => {
+        const parsedValue = Number(val);
+        if (
+          Number.isNaN(parsedValue) || !Number.isInteger(parsedValue) ||
+          parsedValue <= 0
+        ) {
+          logAndQuit("Limit must be a positive integer");
+        }
+        return parsedValue;
+      },
+      100,
+    )
     .option(
       "--before <timestamp>",
       "Get logs older than this timestamp (descending)",
@@ -153,7 +167,7 @@ Examples:
   \x1b[2m# Get logs before a given timestamp  \x1b[0m
   $ sf vm logs -i <instance_id> --before "2025-01-01"
 
-  \x1b[2m# Get upto 300 logs between a 3 hour duration  \x1b[0m
+  \x1b[2m# Get up to 300 logs between a 3 hour duration  \x1b[0m
   $ sf vm logs -i <instance_id> --since "2025-01-01:17:30:00" --before "2025-01-01:20:30:00" -l 300
 `,
     )
@@ -166,7 +180,7 @@ Examples:
       }
 
       if (options.limit) {
-        params.append("limit", options.limit);
+        params.append("limit", options.limit.toString());
       }
 
       // Function to fetch logs with given parameters
