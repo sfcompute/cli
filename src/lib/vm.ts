@@ -168,7 +168,7 @@ Examples:
   $ sf vm logs -i <instance_id> --before "2025-01-01"
 
   \x1b[2m# Get up to 300 logs between a 3 hour duration  \x1b[0m
-  $ sf vm logs -i <instance_id> --since "2025-01-01:17:30:00" --before "2025-01-01:20:30:00" -l 300
+  $ sf vm logs -i <instance_id> --since "2025-01-01T17:30:00" --before "2025-01-01T20:30:00" -l 300
 `,
     )
     .action(async (options) => {
