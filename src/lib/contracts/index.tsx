@@ -11,6 +11,7 @@ import {
 } from "../../helpers/errors.ts";
 import { ContractList } from "./ContractDisplay.tsx";
 import type { ActiveContract, Contract } from "./types.ts";
+import type { ContractState } from "./utils.ts";
 
 export function registerContracts(program: Command) {
   program
@@ -67,10 +68,8 @@ async function listContracts(
 
   const api = await apiClient();
 
-  const state = showAll
-    ? "all"
-    : (stateFilter?.toLowerCase() as "expired" | "active" | "upcoming") ||
-      undefined;
+  const state = showAll ? "All" : (stateFilter as ContractState) ||
+    undefined;
 
   const { data, error, response } = await api.GET("/v0/contracts", {
     params: {
