@@ -67,7 +67,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags = "vms";
+type FeatureFlags = "";
 
 /**
  * Checks if a feature is enabled for the current user.

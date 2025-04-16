@@ -1,19 +1,18 @@
 import type { Command } from "@commander-js/extra-typings";
-import console from "node:console";
 import { confirm } from "@inquirer/prompts";
-import ora from "ora";
-import { readFileSync } from "node:fs";
-import { setTimeout } from "node:timers";
 import Table from "cli-table3";
-import { getAuthToken } from "../helpers/config.ts";
+import console from "node:console";
+import { readFileSync } from "node:fs";
 import process from "node:process";
+import { setTimeout } from "node:timers";
+import ora from "ora";
+import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
   logSupportCTAAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
-import { isFeatureEnabled } from "./posthog.ts";
 import { registerSsh } from "./ssh.ts";
 
 type VMInstance = {
@@ -23,13 +22,7 @@ type VMInstance = {
   last_updated_at: string;
 };
 
-export async function registerVM(program: Command) {
-  const isEnabled = await isFeatureEnabled("vms");
-
-  if (!isEnabled) {
-    return;
-  }
-
+export function registerVM(program: Command) {
   const vm = program
     .command("vm")
     .aliases(["v", "vms"])
@@ -132,7 +125,8 @@ export async function registerVM(program: Command) {
       (val) => {
         const parsedValue = Number(val);
         if (
-          Number.isNaN(parsedValue) || !Number.isInteger(parsedValue) ||
+          Number.isNaN(parsedValue) ||
+          !Number.isInteger(parsedValue) ||
           parsedValue <= 0
         ) {
           logAndQuit("Limit must be a positive integer");
