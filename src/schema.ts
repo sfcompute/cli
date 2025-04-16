@@ -4,3996 +4,6265 @@
  */
 
 export interface paths {
-  "/v0/quote": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of refund requests and their statuses for the account */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountRefunds"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Quote"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/grids": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The balance of the account. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountBalance"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Grids"];
-    put?: never;
-    post: operations["postV0Grids"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/grids/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of Kubernetes clusters */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["KubernetesCluster"][];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0GridsById"];
-    put?: never;
-    post?: never;
-    delete: operations["deleteV0GridsById"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/grids/{id}/disable": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/contracts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Contract details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
+                    };
+                };
+                /** @description Contract not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations["patchV0GridsByIdDisable"];
-    trace?: never;
-  };
-  "/v0/grids/{id}/enable": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    instance_type?: string;
+                    active_within_interval_start?: string;
+                    active_within_interval_end?: string;
+                    state?: "All" | "Upcoming" | "Expired" | "Active";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of contracts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: (components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"])[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch: operations["patchV0GridsByIdEnable"];
-    trace?: never;
-  };
-  "/v0/procurements/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/grids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of grids */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            grids: {
+                                /** @enum {string} */
+                                object: "grid";
+                                /** @example grid_abc123 */
+                                id: string;
+                                /**
+                                 * @description The ID of the account that owns the grid.
+                                 * @example sfcompute-com-seb
+                                 */
+                                owner: string;
+                                /**
+                                 * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
+                                 * @example 10
+                                 */
+                                num_copies: number;
+                                /**
+                                 * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
+                                 * @example 10
+                                 */
+                                num_orders: number;
+                                /**
+                                 * Format: date-time
+                                 * @description The start time of the first order in the grid.
+                                 * @example 2025-04-16T09:00:00.000Z
+                                 */
+                                grid_front: string;
+                                /**
+                                 * Format: date-time
+                                 * @description Earliest time of any order in the grid.
+                                 * @example 2025-04-16T09:00:00.000Z
+                                 */
+                                start_at: string;
+                                /**
+                                 * Format: date-time
+                                 * @description The time at which the grid should stop placing new orders automatically.
+                                 * @example 2025-04-16T10:00:00.000Z
+                                 */
+                                end_at: string;
+                                order: {
+                                    /** @enum {string} */
+                                    side: "buy";
+                                    /** @description The instance type. */
+                                    instance_type: ("h100i" | "h100v") | string;
+                                    /** @description Price in cents (1 = $0.01) */
+                                    price: number | null;
+                                    /**
+                                     * @description The number of nodes to buy in each order.
+                                     * @example 10
+                                     */
+                                    quantity: number;
+                                    /**
+                                     * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                                     * @example 3600
+                                     */
+                                    duration: number;
+                                    reprice?: {
+                                        /**
+                                         * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                         * @example grid_linear
+                                         * @enum {string}
+                                         */
+                                        strategy: "grid_linear";
+                                        /** @description Price in cents (1 = $0.01) */
+                                        start_price: number | null;
+                                        /** @description Price in cents (1 = $0.01) */
+                                        end_price: number | null;
+                                        /**
+                                         * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                         * @example 3600
+                                         */
+                                        relative_window_start: number;
+                                        /**
+                                         * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                         * @example 18000
+                                         */
+                                        relative_window_end: number;
+                                    };
+                                } | {
+                                    /** @enum {string} */
+                                    side: "sell";
+                                    /** @description The instance type. */
+                                    instance_type: ("h100i" | "h100v") | string;
+                                    /** @description Price in cents (1 = $0.01) */
+                                    price: number | null;
+                                    /**
+                                     * @description The number of nodes to sell in each order.
+                                     * @example 10
+                                     */
+                                    quantity: number;
+                                    /**
+                                     * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                                     * @example 3600
+                                     */
+                                    duration: number;
+                                    /** @description An external ID with prefix and alphanumeric string with underscores */
+                                    backing_contract_id: unknown;
+                                    reprice?: {
+                                        /**
+                                         * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                         * @example grid_linear
+                                         * @enum {string}
+                                         */
+                                        strategy: "grid_linear";
+                                        /** @description Price in cents (1 = $0.01) */
+                                        start_price: number | null;
+                                        /** @description Price in cents (1 = $0.01) */
+                                        end_price: number | null;
+                                        /**
+                                         * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                         * @example 3600
+                                         */
+                                        relative_window_start: number;
+                                        /**
+                                         * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                         * @example 18000
+                                         */
+                                        relative_window_end: number;
+                                    };
+                                };
+                                /** @enum {string} */
+                                status: "active" | "disabled" | "destroyed" | "completed";
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
+                         * @example 10
+                         */
+                        num_copies: number;
+                        /**
+                         * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
+                         * @example 10
+                         */
+                        num_orders: number;
+                        /**
+                         * Format: date-time
+                         * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
+                         */
+                        grid_front?: string;
+                        /**
+                         * Format: date-time
+                         * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
+                         * @example 2025-04-16T09:00:00.000Z
+                         */
+                        start_at: string;
+                        /**
+                         * Format: date-time
+                         * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
+                         * @example 2025-04-16T10:00:00.000Z
+                         */
+                        end_at?: string;
+                        order: {
+                            /** @enum {string} */
+                            side: "buy";
+                            /** @description The instance type. */
+                            instance_type: ("h100i" | "h100v") | string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number | null;
+                            /**
+                             * @description The number of nodes to buy in each order.
+                             * @example 10
+                             */
+                            quantity: number;
+                            /**
+                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                             * @example 3600
+                             */
+                            duration: number;
+                            reprice?: {
+                                /**
+                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                 * @example grid_linear
+                                 * @enum {string}
+                                 */
+                                strategy: "grid_linear";
+                                /** @description Price in cents (1 = $0.01) */
+                                start_price: number | null;
+                                /** @description Price in cents (1 = $0.01) */
+                                end_price: number | null;
+                                /**
+                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 3600
+                                 */
+                                relative_window_start: number;
+                                /**
+                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 18000
+                                 */
+                                relative_window_end: number;
+                            };
+                        } | {
+                            /** @enum {string} */
+                            side: "sell";
+                            /** @description The instance type. */
+                            instance_type: ("h100i" | "h100v") | string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number | null;
+                            /**
+                             * @description The number of nodes to sell in each order.
+                             * @example 10
+                             */
+                            quantity: number;
+                            /**
+                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                             * @example 3600
+                             */
+                            duration: number;
+                            /** @description An external ID with prefix and alphanumeric string with underscores */
+                            backing_contract_id: unknown;
+                            reprice?: {
+                                /**
+                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                 * @example grid_linear
+                                 * @enum {string}
+                                 */
+                                strategy: "grid_linear";
+                                /** @description Price in cents (1 = $0.01) */
+                                start_price: number | null;
+                                /** @description Price in cents (1 = $0.01) */
+                                end_price: number | null;
+                                /**
+                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 3600
+                                 */
+                                relative_window_start: number;
+                                /**
+                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 18000
+                                 */
+                                relative_window_end: number;
+                            };
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Grid created successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            /** @example grid_abc123 */
+                            id: string;
+                            /** @enum {string} */
+                            status: "active";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized to create grids */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0ProcurementsById"];
-    put: operations["putV0ProcurementsById"];
-    post: operations["postV0ProcurementsById"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/procurements": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/grids/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Grid details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            /** @example grid_abc123 */
+                            id: string;
+                            /**
+                             * @description The ID of the account that owns the grid.
+                             * @example sfcompute-com-seb
+                             */
+                            owner: string;
+                            /**
+                             * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
+                             * @example 10
+                             */
+                            num_copies: number;
+                            /**
+                             * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
+                             * @example 10
+                             */
+                            num_orders: number;
+                            /**
+                             * Format: date-time
+                             * @description The start time of the first order in the grid.
+                             * @example 2025-04-16T09:00:00.000Z
+                             */
+                            grid_front: string;
+                            /**
+                             * Format: date-time
+                             * @description Earliest time of any order in the grid.
+                             * @example 2025-04-16T09:00:00.000Z
+                             */
+                            start_at: string;
+                            /**
+                             * Format: date-time
+                             * @description The time at which the grid should stop placing new orders automatically.
+                             * @example 2025-04-16T10:00:00.000Z
+                             */
+                            end_at: string;
+                            order: {
+                                /** @enum {string} */
+                                side: "buy";
+                                /** @description The instance type. */
+                                instance_type: ("h100i" | "h100v") | string;
+                                /** @description Price in cents (1 = $0.01) */
+                                price: number | null;
+                                /**
+                                 * @description The number of nodes to buy in each order.
+                                 * @example 10
+                                 */
+                                quantity: number;
+                                /**
+                                 * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                                 * @example 3600
+                                 */
+                                duration: number;
+                                reprice?: {
+                                    /**
+                                     * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                     * @example grid_linear
+                                     * @enum {string}
+                                     */
+                                    strategy: "grid_linear";
+                                    /** @description Price in cents (1 = $0.01) */
+                                    start_price: number | null;
+                                    /** @description Price in cents (1 = $0.01) */
+                                    end_price: number | null;
+                                    /**
+                                     * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                     * @example 3600
+                                     */
+                                    relative_window_start: number;
+                                    /**
+                                     * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                     * @example 18000
+                                     */
+                                    relative_window_end: number;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                side: "sell";
+                                /** @description The instance type. */
+                                instance_type: ("h100i" | "h100v") | string;
+                                /** @description Price in cents (1 = $0.01) */
+                                price: number | null;
+                                /**
+                                 * @description The number of nodes to sell in each order.
+                                 * @example 10
+                                 */
+                                quantity: number;
+                                /**
+                                 * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                                 * @example 3600
+                                 */
+                                duration: number;
+                                /** @description An external ID with prefix and alphanumeric string with underscores */
+                                backing_contract_id: unknown;
+                                reprice?: {
+                                    /**
+                                     * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                     * @example grid_linear
+                                     * @enum {string}
+                                     */
+                                    strategy: "grid_linear";
+                                    /** @description Price in cents (1 = $0.01) */
+                                    start_price: number | null;
+                                    /** @description Price in cents (1 = $0.01) */
+                                    end_price: number | null;
+                                    /**
+                                     * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                     * @example 3600
+                                     */
+                                    relative_window_start: number;
+                                    /**
+                                     * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                     * @example 18000
+                                     */
+                                    relative_window_end: number;
+                                };
+                            };
+                            /** @enum {string} */
+                            status: "active" | "disabled" | "destroyed" | "completed";
+                            orders: (string | unknown | unknown)[][];
+                        };
+                    };
+                };
+                /** @description Grid not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Grid destroyed */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            /** @example grid_abc123 */
+                            id: string;
+                            /** @enum {string} */
+                            status: "destroyed";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Grid not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Procurements"];
-    put?: never;
-    post: operations["postV0Procurements"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/vms/script": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/grids/{id}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Grid disabled */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            /** @example grid_abc123 */
+                            id: string;
+                            /** @enum {string} */
+                            status: "disabled";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Grid not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
     };
-    get: operations["getV0VmsScript"];
-    put?: never;
-    post: operations["postV0VmsScript"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/vms/logs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/grids/{id}/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Grid enabled */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            /** @example grid_abc123 */
+                            id: string;
+                            /** @enum {string} */
+                            status: "active";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Grid not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
     };
-    get: operations["getV0VmsLogs"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/vms/instances": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The authenticated account */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Account"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0VmsInstances"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/prices": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get historical prices for a given instance type */
+        get: {
+            parameters: {
+                query?: {
+                    instance_type?: ("h100i" | "h100v") | string;
+                    min_quantity?: number;
+                    max_quantity?: number;
+                    min_duration?: number | null;
+                    max_duration?: number | null;
+                    since_n_days_ago?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The historical prices for the given instance type */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["PriceHistoryItem"][];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description The request is too far in past */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PriceRequestTooFarInPastError"] | components["schemas"]["InvalidRequestError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Prices"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/orders": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/procurements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved procurement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Procurement"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+                    };
+                };
+                /** @description Procurement not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementNotFoundError"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProcurementCreation"];
+                };
+            };
+            responses: {
+                /** @description Successfully updated procurement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Procurement"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Orders"];
-    put?: never;
-    post: operations["postV0Orders"];
-    delete: operations["deleteV0Orders"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/orders/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/procurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved procurements */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Procurement"][];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProcurementCreation"];
+                };
+            };
+            responses: {
+                /** @description Successfully created procurement */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Procurement"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0OrdersById"];
-    put?: never;
-    post?: never;
-    delete: operations["deleteV0OrdersById"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/orders/{id}/clusters": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    include_system?: boolean;
+                    origin_client?: "cli" | "web" | "manual";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List tokens */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListTokenResponse"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @description Number of seconds until token expires. */
+                        expires_in_seconds: number;
+                        /** @description Name of the token. */
+                        name?: string;
+                        /** @description Description of the token. */
+                        description?: string;
+                        /** @enum {string} */
+                        origin_client: "cli";
+                    };
+                };
+            };
+            responses: {
+                /** @description Token created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Token"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidTokenExpirationDuration"] | components["schemas"]["MaxTokenLimitReached"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+                /** @description Account is frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"];
+                    };
+                };
+                /** @description Token not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["InvalidTokenCreateOriginClient"];
+                    };
+                };
+                /** @description Token generation rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MaxTokenLimitReached"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0OrdersByIdClusters"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/clusters": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Token deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Token or account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["TokenNotFound"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Clusters"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/credentials": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/vms/script": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved VM script */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "script";
+                            script: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Script not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @description The startup script for the VM as a raw string */
+                        script: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successfully updated VM script */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "script";
+                            script: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Credentials"];
-    put?: never;
-    post: operations["postV0Credentials"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/contracts": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/vms/replace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        vm_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successfully replaced VM instance */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "vm";
+                            replaced: string;
+                            replaced_by: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description VM instance not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Contracts"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/contracts/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/vms/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    instance_id?: string;
+                    before?: string;
+                    since?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved VM logs */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            data: {
+                                /**
+                                 * Format: date-time
+                                 * @description ISO timestamp of the log line
+                                 */
+                                timestamp: string;
+                                message: string;
+                                instance_id: string;
+                            }[];
+                        } | {
+                            data: {
+                                /**
+                                 * Format: date-time
+                                 * @description ISO timestamp of the log line
+                                 */
+                                timestamp: string;
+                                message: string;
+                                instance_id: string;
+                            }[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0ContractsById"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/balance": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/v0/vms/instances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successfully retrieved VM instances */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                id: string;
+                                instance_group_id: string;
+                                current_status: string;
+                                last_updated_at: string;
+                            }[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getV0Balance"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/v0/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    side?: "buy" | "sell";
+                    min_start_date?: "NOW" | string;
+                    max_start_date?: "NOW" | string;
+                    quantity: number;
+                    instance_type?: ("h100i" | "h100v") | string;
+                    contract_id?: unknown;
+                    colocate_with?: unknown[];
+                    duration?: number;
+                    min_duration?: number;
+                    max_duration?: number;
+                    cluster?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Quote response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "quote";
+                            /** @enum {string} */
+                            side: "buy";
+                            quote: {
+                                /** @description Price in cents (1 = $0.01) */
+                                price: number | null;
+                                /**
+                                 * @description The number of nodes.
+                                 * @example 3
+                                 */
+                                quantity: number;
+                                /**
+                                 * Format: date-time
+                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+                                 * @example 2025-04-16T07:19:30.213Z
+                                 */
+                                start_at: string;
+                                /**
+                                 * Format: date-time
+                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+                                 */
+                                end_at: string;
+                                /** @description The instance type. */
+                                instance_type: ("h100i" | "h100v") | string;
+                            } | null;
+                        } | {
+                            /** @enum {string} */
+                            object: "quote";
+                            /** @enum {string} */
+                            side: "sell";
+                            quote: {
+                                /** @description Price in cents (1 = $0.01) */
+                                price: number | null;
+                                /**
+                                 * @description The number of nodes.
+                                 * @example 3
+                                 */
+                                quantity: number;
+                                /**
+                                 * Format: date-time
+                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+                                 * @example 2025-04-16T07:19:30.213Z
+                                 */
+                                start_at: string;
+                                /**
+                                 * Format: date-time
+                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+                                 */
+                                end_at: string;
+                                /** @description An external ID with prefix and alphanumeric string with underscores */
+                                contract_id: unknown;
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidDateRange"] | components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List orders */
+        get: {
+            parameters: {
+                query?: {
+                    side?: "buy" | "sell";
+                    instance_type?: ("h100i" | "h100v") | string;
+                    min_price?: number | null;
+                    max_price?: number | null;
+                    min_start_date?: string;
+                    max_start_date?: string;
+                    min_duration?: number | null;
+                    max_duration?: number | null;
+                    min_quantity?: number | null;
+                    max_quantity?: number | null;
+                    contract_id?: string;
+                    only_open?: boolean | null;
+                    exclude_filled?: boolean | null;
+                    only_filled?: boolean | null;
+                    min_filled_at?: string | null;
+                    max_filled_at?: string | null;
+                    min_fill_price?: number | null;
+                    max_fill_price?: number | null;
+                    exclude_cancelled?: boolean | null;
+                    only_cancelled?: boolean | null;
+                    min_cancelled_at?: string | null;
+                    max_cancelled_at?: string | null;
+                    min_placed_at?: string | null;
+                    max_placed_at?: string | null;
+                    limit?: number | null;
+                    offset?: number | null;
+                    sort_by?: "created_at" | "start_time";
+                    sort_direction?: "ASC" | "DESC";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of orders */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrderResponse"][];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** @description Create a new order */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "Idempotency-Key"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PostOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description Order created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderPendingResponse"];
+                    };
+                };
+                /** @description Invalid request parameters */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"] | components["schemas"]["ContractNotFound"] | components["schemas"]["InvalidInstanceType"];
+                    };
+                };
+                /** @description Account is unauthorized to place orders */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"] | {
+                            /**
+                             * @example error
+                             * @enum {string}
+                             */
+                            object: "error";
+                            /**
+                             * @example market.is_halted
+                             * @enum {string}
+                             */
+                            code: "market.is_halted";
+                            /** @example Market is halted */
+                            message?: string;
+                            /** @example {} */
+                            details?: {
+                                [key: string]: unknown;
+                            };
+                        } | components["schemas"]["UnauthorizedSeller"];
+                    };
+                };
+                /** @description Contract, Cluster, or Market not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContractNotFound"] | {
+                            /**
+                             * @example error
+                             * @enum {string}
+                             */
+                            object: "error";
+                            /**
+                             * @example market.not_found
+                             * @enum {string}
+                             */
+                            code: "market.not_found";
+                            /** @example Market not found */
+                            message?: string;
+                            /** @example {} */
+                            details?: {
+                                [key: string]: unknown;
+                            };
+                        } | components["schemas"]["ClusterNotFound"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        /** @description Cancel all orders */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description All orders cancelled successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "pending";
+                        };
+                    };
+                };
+                /** @description Account is frozen or unauthorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get order details */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Order details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Unauthorized seller */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedSeller"];
+                    };
+                };
+                /** @description Order not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderNotFound"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** @description Cancel an order */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Order cancelled successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "pending";
+                        };
+                    };
+                };
+                /** @description Order already cancelled */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AlreadyCancelled"];
+                    };
+                };
+                /** @description Account is frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"] | {
+                            /**
+                             * @example error
+                             * @enum {string}
+                             */
+                            object: "error";
+                            /**
+                             * @example market.is_halted
+                             * @enum {string}
+                             */
+                            code: "market.is_halted";
+                            /** @example Market is halted */
+                            message?: string;
+                            /** @example {} */
+                            details?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description Order not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderNotFound"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders/{id}/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get all clusters associated with an order through contracts */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of clusters associated with the order */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** @enum {string} */
+                                object: "kubernetes_cluster";
+                                kubernetes_api_url: string;
+                                kubernetes_ca_cert: string;
+                                kubernetes_namespace: string;
+                                name: string;
+                                contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
+                            }[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Unauthorized seller */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedSeller"];
+                    };
+                };
+                /** @description Order not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderNotFound"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/broker/contract/shape": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get the shape of a contract */
+        get: {
+            parameters: {
+                query: {
+                    market: string;
+                    backing_contract_id: unknown;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Shape of the contract */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "shape";
+                            shape: components["schemas"]["Shape"];
+                        };
+                    };
+                };
+                /** @description Invalid contract */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidContractError"];
+                    };
+                };
+                /** @description Contract not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/broker/split": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Split a contract and transfer a portion to a new owner */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        contract_id: string;
+                        /** Format: date-time */
+                        start_time: string;
+                        /** Format: date-time */
+                        end_time: string;
+                        quantity: number;
+                        new_owner: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Contract split successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "contract";
+                            new_contract_id: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"] | components["schemas"]["InvalidContractError"] | components["schemas"]["InvalidDateRangeError"] | components["schemas"]["InvalidOwnerError"] | components["schemas"]["InvalidQuantityError"] | components["schemas"]["InvalidShapeError"];
+                    };
+                };
+                /** @description Unauthorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Contract not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["AccountBalance"];
+                            instant_deposit_limit?: number;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The account balance */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountBalance"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number | null;
+                    fuzzy_id?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The list of accounts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            data: {
+                                /** @enum {string} */
+                                object: "account";
+                                id: string;
+                                /** @enum {string} */
+                                role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                                kyc: components["schemas"]["AccountKycLevel"];
+                                can_buy?: boolean;
+                                can_sell?: boolean;
+                                balance?: components["schemas"]["AccountBalance"];
+                                instant_deposit_limit?: number;
+                                users?: {
+                                    clerk_id: string;
+                                    full_name?: string;
+                                    avatar?: string;
+                                    emails: string[];
+                                }[];
+                            }[];
+                            has_more: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        clerk_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["AccountBalance"];
+                            instant_deposit_limit?: number;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description The account details */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["AccountBalance"];
+                            instant_deposit_limit?: number;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        kyc_level: components["schemas"]["AccountKycLevel"];
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["AccountBalance"];
+                            instant_deposit_limit?: number;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/orgs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description The organization details */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "organization";
+                            name: string;
+                            slug: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposit-limit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        amount: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["AccountBalance"];
+                            instant_deposit_limit?: number;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts/has-connected": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check if the account has connected bank accounts */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            hasConnected: boolean;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            accounts: {
+                                /** @enum {string} */
+                                object: "bank_account";
+                                id: string;
+                                accountName: string;
+                                last4Digits: string;
+                                institutionPrimaryColor?: string;
+                                institutionLogoBase64?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        plaidAccessToken: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            success: boolean;
+                            created: {
+                                /** @enum {string} */
+                                object: "bank_account";
+                                id: string;
+                                accountName: string;
+                                last4Digits: string;
+                                institutionPrimaryColor?: string;
+                                institutionLogoBase64?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts/debit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        bankAccountId: string;
+                        amountCents: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            /** @enum {boolean} */
+                            success: true;
+                            initiated: boolean;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/transfers/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ach: {
+                                incoming: {
+                                    volumeCents: number;
+                                    count: number;
+                                };
+                                outgoing: {
+                                    volumeCents: number;
+                                    count: number;
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    windowSize?: number;
+                    intervalSize?: number;
+                    capacityType?: ("h100i" | "h100v") | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of capacity measurements */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /**
+                                 * Format: date-time
+                                 * @description Timestamp for the capacity measurement
+                                 * @example 2024-01-01T00:00:00Z
+                                 */
+                                timestamp: string;
+                                /**
+                                 * @description Maximum capacity available at this timestamp
+                                 * @example 1000
+                                 */
+                                max_capacity: number;
+                            }[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List all clusters */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Cluster"][];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateCluster"];
+                };
+            };
+            responses: {
+                /** @description Created cluster */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PendingCluster"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/clusters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Get cluster by ID */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Cluster"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Cluster not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/clusterConfig/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Get cluster configuration */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ClusterConfig"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Cluster not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ClusterConfig"];
+                };
+            };
+            responses: {
+                /** @description Update cluster configuration */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ClusterConfig"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Account instant deposit limits */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "instant_deposit_limits";
+                            volume_used: number;
+                            volume_remaining: number;
+                            volume_per_period: number;
+                            period_duration: number;
+                            period_unit: string;
+                            limits_refresh_on: string;
+                        };
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/checkout-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    amount_cents: string | number;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Stripe checkout session URL */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "url";
+                            checkoutUrl: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/{instantDepositId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    instantDepositId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Instant deposit status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            success: boolean;
+                            completed: boolean;
+                            amount: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountFrozenError"];
+                    };
+                };
+                /** @description Account or deposit not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        is_paused: boolean;
+                        /** @description The instance type. */
+                        instance_type: ("h100i" | "h100v") | string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successfully paused/unpaused trading platform */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessObject"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/fee": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        delivery_fee: number;
+                        /** @description The instance type. */
+                        instance_type: ("h100i" | "h100v") | string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successfully updated trading platform fee */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessObject"];
+                    };
+                };
+                /** @description Invalid fee value */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            error: "invalid_request";
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/tokens/cli": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description CLI token created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Token"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        account: string;
+                        name: string;
+                        description?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Token created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Token"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Token details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Token"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Token not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/transfers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of transfers */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: ({
+                                issuer: string;
+                                sender_id: string;
+                                recipient_id: string;
+                                memo?: string;
+                                amount: number;
+                            } & ({
+                                /** @enum {string} */
+                                kind: "PROMOTIONAL_CREDIT";
+                                /** @enum {string} */
+                                sender_id: "sfc_operating";
+                                amount: number;
+                            } | {
+                                /** @enum {string} */
+                                kind: "OTHER";
+                                amount: number;
+                            }))[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        issuer: string;
+                        sender_id: string;
+                        recipient_id: string;
+                        memo?: string;
+                        amount: number;
+                    } & ({
+                        /** @enum {string} */
+                        kind: "PROMOTIONAL_CREDIT";
+                        /** @enum {string} */
+                        sender_id: "sfc_operating";
+                        amount: number;
+                    } | {
+                        /** @enum {string} */
+                        kind: "OTHER";
+                        amount: number;
+                    });
+                };
+            };
+            responses: {
+                /** @description Transfer completed successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessObject"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of contracts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: (components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"])[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PostContractRequest"];
+                };
+            };
+            responses: {
+                /** @description Contract created */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PostContractResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/contracts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: unknown;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Contract deleted */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeleteContractResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/contracts/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["TransferContractRequest"];
+                };
+            };
+            responses: {
+                /** @description Contract transferred */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Contract not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/withdrawals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    sender_account_id?: string;
+                    status?: "pending" | "rejected" | "awaiting_approval" | "denied" | "awaiting_settlement" | "failed" | "settled";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of withdrawals */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** @enum {string} */
+                                object: "withdrawal";
+                                id: string;
+                                status: "pending" | "rejected" | "awaiting_approval" | "denied" | "awaiting_settlement" | "failed" | "settled";
+                                amount: number;
+                                bank_account_id: string;
+                                status_reason?: string;
+                            }[];
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        bank_account_id: string;
+                        amount: number;
+                        account_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Withdrawal created */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "withdrawal";
+                            id: string;
+                            status: "pending" | "rejected" | "awaiting_approval" | "denied" | "awaiting_settlement" | "failed" | "settled";
+                            amount: number;
+                            bank_account_id: string;
+                            status_reason?: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/withdrawals/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        withdrawal_ids: string[];
+                        approved_by: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Withdrawals approved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/withdrawals/deny": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        withdrawal_ids: string[];
+                        denied_by: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Withdrawals denied */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User metadata */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            account_id: string;
+                            primary_email: string;
+                            avatar?: string | null;
+                            created_at?: string;
+                            primary_phone?: string | null;
+                            first_name?: string | null;
+                            last_name?: string | null;
+                            date_of_birth?: string | null;
+                            ip_address?: string | null;
+                            primary_address_street_1?: string | null;
+                            primary_address_street_2?: string | null;
+                            primary_address_region?: string | null;
+                            primary_address_postal_code?: string | null;
+                            primary_address_city?: string | null;
+                            primary_address_country?: string | null;
+                            business_name?: string | null;
+                            business_address_street_1?: string | null;
+                            business_address_street_2?: string | null;
+                            business_address_region?: string | null;
+                            business_address_postal_code?: string | null;
+                            business_address_city?: string | null;
+                            business_address_country?: string | null;
+                            compute_usage_statement?: string | null;
+                            business_primary_contact_id?: string | null;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kyc/basic": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        account_id: string;
+                        primary_email: string;
+                        avatar?: string | null;
+                        created_at?: string;
+                        primary_phone?: string | null;
+                        first_name?: string | null;
+                        last_name?: string | null;
+                        date_of_birth?: string | null;
+                        ip_address?: string | null;
+                        primary_address_street_1?: string | null;
+                        primary_address_street_2?: string | null;
+                        primary_address_region?: string | null;
+                        primary_address_postal_code?: string | null;
+                        primary_address_city?: string | null;
+                        primary_address_country?: string | null;
+                        business_name?: string | null;
+                        business_address_street_1?: string | null;
+                        business_address_street_2?: string | null;
+                        business_address_region?: string | null;
+                        business_address_postal_code?: string | null;
+                        business_address_city?: string | null;
+                        business_address_country?: string | null;
+                        compute_usage_statement?: string | null;
+                        business_primary_contact_id?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYC verification result */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            status: string;
+                            complete_outcome?: string;
+                            is_archived: boolean;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kyb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        account_id: string;
+                        primary_email: string;
+                        avatar?: string | null;
+                        created_at?: string;
+                        primary_phone?: string | null;
+                        first_name?: string | null;
+                        last_name?: string | null;
+                        date_of_birth?: string | null;
+                        ip_address?: string | null;
+                        primary_address_street_1?: string | null;
+                        primary_address_street_2?: string | null;
+                        primary_address_region?: string | null;
+                        primary_address_postal_code?: string | null;
+                        primary_address_city?: string | null;
+                        primary_address_country?: string | null;
+                        business_name: string;
+                        business_address_street_1: string;
+                        business_address_street_2?: string;
+                        business_address_region: string;
+                        business_address_postal_code: string;
+                        business_address_city: string;
+                        business_address_country: string;
+                        compute_usage_statement?: string | null;
+                        business_primary_contact_id: string;
+                        business_primary_contact_account_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYB verification result */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            user: string;
+                            business: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/downtime_reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a downtime report */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        affected_account_id: string;
+                        start_time: string | null;
+                        end_time: string | null;
+                        nodes_affected: number;
+                        instance_type: string;
+                        affected_cluster_name: string;
+                        memo: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Downtime report created successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "downtime_report";
+                            id: string;
+                        };
+                    };
+                };
+                /** @description Market not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/downtime_reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a downtime report */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Downtime report retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "downtime_report";
+                            id: string;
+                            /** Format: date-time */
+                            start_time: string;
+                            /** Format: date-time */
+                            end_time: string;
+                            nodes_affected: number;
+                            instance_type: string;
+                            affected_cluster_id: string;
+                            memo: string;
+                            created_by: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            is_approved: boolean;
+                            approved_by?: string;
+                            /** Format: date-time */
+                            approved_at?: string;
+                            is_denied: boolean;
+                            denied_by?: string;
+                            /** Format: date-time */
+                            denied_at?: string;
+                            amendments: {
+                                /** @enum {string} */
+                                object: "downtime_report_amendment";
+                                id: string;
+                                report_id: string;
+                                amended_by: string;
+                                /** Format: date-time */
+                                amended_at: string;
+                                /** Format: date-time */
+                                previous_start_time?: string;
+                                /** Format: date-time */
+                                previous_end_time?: string;
+                                previous_nodes_affected?: number;
+                                previous_instance_type?: string;
+                                previous_affected_cluster_id?: string;
+                                previous_memo?: string;
+                                /** Format: date-time */
+                                amended_start_time?: string;
+                                /** Format: date-time */
+                                amended_end_time?: string;
+                                amended_nodes_affected?: number;
+                                amended_instance_type?: string;
+                                amended_affected_cluster_id?: string;
+                                amended_memo?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description You need to be logged in to get a downtime report */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Downtime report not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/grids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
+                         * @example 10
+                         */
+                        num_copies: number;
+                        /**
+                         * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
+                         * @example 10
+                         */
+                        num_orders: number;
+                        /**
+                         * Format: date-time
+                         * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
+                         */
+                        grid_front?: string;
+                        /**
+                         * Format: date-time
+                         * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
+                         * @example 2025-04-16T09:00:00.000Z
+                         */
+                        start_at: string;
+                        /**
+                         * Format: date-time
+                         * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
+                         * @example 2025-04-16T10:00:00.000Z
+                         */
+                        end_at?: string;
+                        order: {
+                            /** @enum {string} */
+                            side: "buy";
+                            /** @description The instance type. */
+                            instance_type: ("h100i" | "h100v") | string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number | null;
+                            /**
+                             * @description The number of nodes to buy in each order.
+                             * @example 10
+                             */
+                            quantity: number;
+                            /**
+                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                             * @example 3600
+                             */
+                            duration: number;
+                            reprice?: {
+                                /**
+                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                 * @example grid_linear
+                                 * @enum {string}
+                                 */
+                                strategy: "grid_linear";
+                                /** @description Price in cents (1 = $0.01) */
+                                start_price: number | null;
+                                /** @description Price in cents (1 = $0.01) */
+                                end_price: number | null;
+                                /**
+                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 3600
+                                 */
+                                relative_window_start: number;
+                                /**
+                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 18000
+                                 */
+                                relative_window_end: number;
+                            };
+                        } | {
+                            /** @enum {string} */
+                            side: "sell";
+                            /** @description The instance type. */
+                            instance_type: ("h100i" | "h100v") | string;
+                            /** @description Price in cents (1 = $0.01) */
+                            price: number | null;
+                            /**
+                             * @description The number of nodes to sell in each order.
+                             * @example 10
+                             */
+                            quantity: number;
+                            /**
+                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
+                             * @example 3600
+                             */
+                            duration: number;
+                            /** @description An external ID with prefix and alphanumeric string with underscores */
+                            backing_contract_id: unknown;
+                            reprice?: {
+                                /**
+                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
+                                 * @example grid_linear
+                                 * @enum {string}
+                                 */
+                                strategy: "grid_linear";
+                                /** @description Price in cents (1 = $0.01) */
+                                start_price: number | null;
+                                /** @description Price in cents (1 = $0.01) */
+                                end_price: number | null;
+                                /**
+                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 3600
+                                 */
+                                relative_window_start: number;
+                                /**
+                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
+                                 * @example 18000
+                                 */
+                                relative_window_end: number;
+                            };
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Grid created successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "grid";
+                            id: string;
+                            /** @enum {string} */
+                            status: "active";
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotAuthenticatedError"];
+                    };
+                };
+                /** @description Not authorized to create grids */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnauthorizedError"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFoundError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    schemas: {
+        /**
+         * @description The current status of a refund request
+         * @enum {string}
+         */
+        RefundStatus: "in_review" | "approved" | "refunded" | "denied";
+        /** @description A refund request for downtime compensation */
+        Refund: {
+            /**
+             * @description Unique identifier of the downtime report
+             * @example 12345
+             */
+            report_id: number;
+            /**
+             * @description Start time of the downtime period
+             * @example 2024-03-15T00:00:00Z
+             */
+            report_start_time: string;
+            /**
+             * @description End time of the downtime period
+             * @example 2024-03-15T02:00:00Z
+             */
+            report_end_time: string;
+            /**
+             * @description Number of nodes affected by the downtime
+             * @example 4
+             */
+            report_nodes_affected: number;
+            /**
+             * @description Identifier of the affected cluster
+             * @example cluster_us_west_1
+             */
+            report_cluster_id: string;
+            /**
+             * @description Type of instance affected
+             * @example h100
+             */
+            report_instance_type: string;
+            /**
+             * @description Description of the downtime incident
+             * @example Network connectivity issues in US-West-1
+             */
+            report_memo: string;
+            /**
+             * @description When the downtime report was created
+             * @example 2024-03-15T00:30:00Z
+             */
+            report_created_at: string;
+            /**
+             * @description Amount of the credit memo in dollars, if approved
+             * @example 500.00
+             */
+            memo_amount: string | null;
+            /**
+             * @description When the refund was processed, if completed
+             * @example 2024-03-16T00:00:00Z
+             */
+            refund_timestamp: string | null;
+            status: components["schemas"]["RefundStatus"];
+        };
+        /**
+         * @description List of refund requests for an account
+         * @example {
+         *       "object": "refunds",
+         *       "refunds": [
+         *         {
+         *           "report_id": 12345,
+         *           "report_start_time": "2024-03-15T00:00:00.000Z",
+         *           "report_end_time": "2024-03-15T02:00:00.000Z",
+         *           "report_nodes_affected": 4,
+         *           "report_cluster_id": "cluster_us_west_1",
+         *           "report_instance_type": "h100",
+         *           "report_memo": "Network connectivity issues in US-West-1",
+         *           "report_created_at": "2024-03-15T00:30:00.000Z",
+         *           "memo_amount": "500.00",
+         *           "refund_timestamp": "2024-03-16T00:00:00.000Z",
+         *           "status": "refunded"
+         *         }
+         *       ]
+         *     }
+         */
+        AccountRefunds: {
+            /**
+             * @description The type of the response object
+             * @example refunds
+             * @enum {string}
+             */
+            object: "refunds";
+            refunds: components["schemas"]["Refund"][];
+        };
+        AccountBalance: {
+            /**
+             * @example balance
+             * @enum {string}
+             */
+            object: "balance";
+            available: {
+                /**
+                 * @description Funds available to spend or withdraw.
+                 * @example 1000000
+                 */
+                amount: number;
+                /**
+                 * @example usd
+                 * @enum {string}
+                 */
+                currency: "usd";
+            };
+            reserved: {
+                /**
+                 * @description Funds held in reserve for pending withdrawals & open buy orders.
+                 * @example 1000000
+                 */
+                amount: number;
+                /**
+                 * @example usd
+                 * @enum {string}
+                 */
+                currency: "usd";
+            };
+        };
+        /** @description A shape that describes the distribution of the contract's size over time. */
+        Shape: {
+            intervals: (string)[];
+            /** @example [
+             *       10,
+             *       20,
+             *       0
+             *     ] */
+            quantities: number[];
+        };
+        /** @example {
+         *       "object": "contract",
+         *       "status": "active",
+         *       "id": "cont_122",
+         *       "created_at": "2024-07-15T22:30:17.426Z",
+         *       "instance_type": "h100i",
+         *       "shape": {
+         *         "intervals": [
+         *           "Tue, 16 Jul 2024 22:30:16 GMT",
+         *           "Wed, 17 Jul 2024 22:30:16 GMT",
+         *           "Thu, 18 Jul 2024 22:30:16 GMT"
+         *         ],
+         *         "quantities": [
+         *           10,
+         *           20,
+         *           0
+         *         ]
+         *       },
+         *       "colocate_with": [
+         *         "cont_123"
+         *       ],
+         *       "cluster_id": "clus_123",
+         *       "state": "Active"
+         *     } */
+        ActiveContract: {
+            /** @enum {string} */
+            object: "contract";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "active";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+            /** Format: date-time */
+            created_at: string;
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            shape: components["schemas"]["Shape"];
+            colocate_with?: unknown[];
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            cluster_id?: unknown;
+            /** @enum {string} */
+            state: "Upcoming" | "Expired" | "Active";
+        };
+        /** @example {
+         *       "object": "contract",
+         *       "status": "pending",
+         *       "id": "cont_1234"
+         *     } */
+        PendingContract: {
+            /** @enum {string} */
+            object: "contract";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "pending";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+        };
+        KubernetesCluster: {
+            /**
+             * @example kubernetes_cluster
+             * @enum {string}
+             */
+            object: "kubernetes_cluster";
+            /** @description The Kubernetes API URL for the cluster */
+            kubernetes_api_url?: string;
+            /** @description Unique name of the cluster */
+            name: string;
+            /** @description Namespace in format sf-<account_id> */
+            kubernetes_namespace: string;
+            /** @description The CA certificate for the cluster */
+            kubernetes_ca_cert?: string;
+            contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
+        };
+        NotFoundError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example not_found
+             * @enum {string}
+             */
+            code: "not_found";
+            /** @example Not found. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidRequestError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example invalid_request
+             * @enum {string}
+             */
+            code: "invalid_request";
+            /** @example Invalid request */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        NotAuthenticatedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example not_authenticated
+             * @enum {string}
+             */
+            code: "not_authenticated";
+            /** @example Not authenticated, did you pass an auth token? */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InternalServerError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example internal_server
+             * @enum {string}
+             */
+            code: "internal_server";
+            /** @example An unknown error has occurred. Our engineers have been notified. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        UnauthorizedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example unauthorized
+             * @enum {string}
+             */
+            code: "unauthorized";
+            /** @example Unauthorized. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        Account: {
+            /**
+             * @example account
+             * @enum {string}
+             */
+            object: "account";
+            /** @example acc_123 */
+            id: string;
+            /**
+             * @example user
+             * @enum {string}
+             */
+            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+            /** @example true */
+            can_buy: boolean;
+            /** @example false */
+            can_sell: boolean;
+        };
+        AccountNotFoundError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example account.not_found
+             * @enum {string}
+             */
+            code: "account.not_found";
+            /** @example Account not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        PriceHistoryItem: {
+            /** @enum {string} */
+            object: "price-history-item";
+            /**
+             * @description ISO 8601 datetime marking the start of the period.
+             * @example 2025-03-17T00:00:00.000Z
+             */
+            period_start: string;
+            /**
+             * @description ISO 8601 datetime marking the end of the period.
+             * @example 2025-03-17T23:59:59.999Z
+             */
+            period_end: string;
+            /** @enum {boolean} */
+            no_data: false;
+            gpu_hour: {
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+                min: number;
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+                max: number;
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+                avg: number;
+            };
+        } | {
+            /** @enum {string} */
+            object: "price-history-item";
+            /**
+             * @description ISO 8601 datetime marking the start of the period.
+             * @example 2025-03-17T00:00:00.000Z
+             */
+            period_start: string;
+            /**
+             * @description ISO 8601 datetime marking the end of the period.
+             * @example 2025-03-17T23:59:59.999Z
+             */
+            period_end: string;
+            /** @enum {boolean} */
+            no_data: true;
+        };
+        PriceRequestTooFarInPastError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example price.historical_price_request_too_far_in_past
+             * @enum {string}
+             */
+            code: "price.historical_price_request_too_far_in_past";
+            /** @example Historical price request too far in past */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        Procurement: {
+            id: string;
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            /** @description The quantity of the procurement */
+            quantity: number;
+            /** @description The price per hour per node in cents */
+            max_price_per_node_hour: number;
+            /** @description The block duration of the procurement in hours */
+            min_duration_in_hours: number;
+        };
+        ProcurementNotAuthenticatedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example procurement.not_authenticated
+             * @enum {string}
+             */
+            code: "procurement.not_authenticated";
+            /** @example Authorization is needed to access procurements */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        ProcurementCreation: {
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            quantity: number;
+            max_price_per_node_hour: number;
+            min_duration_in_hours: number;
+        };
+        ProcurementNotFoundError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example procurement.not_found
+             * @enum {string}
+             */
+            code: "procurement.not_found";
+            /** @example Procurement not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        Token: {
+            /**
+             * @description The type of object
+             * @enum {string}
+             */
+            object: "token";
+            id: string;
+            /** @description Only available after creation */
+            token?: string;
+            /** @description Name of the token. */
+            name: string | null;
+            /** @description Description of the token. */
+            description: string | null;
+            is_sandbox: boolean;
+            /** @description ISO 8601 date string of when token expires (in UTC). */
+            last_active_at: string | null;
+            /** @description ISO 8601 date string of when token expires (in UTC). */
+            expires_at: string;
+            /** @description ISO 8601 date string of when token was created (in UTC). */
+            created_at: string;
+            /** @enum {string|null} */
+            origin_client: "cli" | "web" | "manual" | null;
+            /** @description Whether the token was generated by the system & is being used in the background, or whether a user explicitly created it for their own use. */
+            is_system: boolean;
+        };
+        ListTokenResponse: {
+            data: components["schemas"]["Token"][];
+            has_more: boolean;
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
+        };
+        InvalidTokenExpirationDuration: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example token.invalid_token_expiration_duration
+             * @enum {string}
+             */
+            code: "token.invalid_token_expiration_duration";
+            /** @example Invalid token expiration duration */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        MaxTokenLimitReached: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example token.max_token_limit_reached
+             * @enum {string}
+             */
+            code: "token.max_token_limit_reached";
+            /** @example Max token limit reached */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        AccountFrozenError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example account.frozen
+             * @enum {string}
+             */
+            code: "account.frozen";
+            /** @example Account is frozen */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidTokenCreateOriginClient: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example token.invalid_token_create_origin_client
+             * @enum {string}
+             */
+            code: "token.invalid_token_create_origin_client";
+            /** @example Invalid token create origin client */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        TokenNotFound: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example token.not_found
+             * @enum {string}
+             */
+            code: "token.not_found";
+            /** @example Token not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidDateRange: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example quote.invalid_date_range
+             * @enum {string}
+             */
+            code: "quote.invalid_date_range";
+            /** @example Invalid date range */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        OrderResponse: {
+            /** @enum {string} */
+            object: "order";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+            /**
+             * @description Side of the order (buy/sell)
+             * @enum {string}
+             */
+            side: "buy" | "sell";
+            /**
+             * @description Current status of the order
+             * @enum {string}
+             */
+            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired" | "partially_filled";
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            /**
+             * @description The number of nodes.
+             * @example 3
+             */
+            quantity: number;
+            /**
+             * Format: date-time
+             * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+             * @example 2025-04-16T07:19:30.213Z
+             */
+            start_at: string;
+            /**
+             * Format: date-time
+             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number | null;
+            flags: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+            };
+            executed: boolean;
+            executed_at?: string;
+            /** @description Execution price in cents (1 = $0.01) */
+            execution_price?: number | null;
+            cancelled: boolean;
+            cancelled_at?: string;
+            colocate_with?: unknown[];
+            created_at: string;
+            rejected: boolean;
+            rejected_reason?: string;
+            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
+            idempotency_key?: string;
+            cluster?: string;
+        };
+        UnauthorizedSeller: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.unauthorized_seller
+             * @enum {string}
+             */
+            code: "order.unauthorized_seller";
+            /** @example Account unauthorized to place sell orders */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        OrderNotFound: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.not_found
+             * @enum {string}
+             */
+            code: "order.not_found";
+            /** @example Order not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        AlreadyCancelled: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.already_cancelled
+             * @enum {string}
+             */
+            code: "order.already_cancelled";
+            /** @example Order already cancelled */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        OrderPendingResponse: {
+            /** @enum {string} */
+            object: "order";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+            /** @enum {string} */
+            status: "pending";
+            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
+            idempotency_key?: string;
+        };
+        ContractNotFound: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.contract_not_found
+             * @enum {string}
+             */
+            code: "order.contract_not_found";
+            /** @example Contract not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidInstanceType: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.invalid_instance_type
+             * @enum {string}
+             */
+            code: "order.invalid_instance_type";
+            /** @example Invalid instance type */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        ClusterNotFound: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example order.cluster_not_found
+             * @enum {string}
+             */
+            code: "order.cluster_not_found";
+            /** @example Cluster not found */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        PostOrderRequest: {
+            /** @enum {string} */
+            side: "buy";
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            /**
+             * @description The number of nodes.
+             * @example 3
+             */
+            quantity: number;
+            start_at: string | "NOW";
+            /**
+             * Format: date-time
+             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number | null;
+            flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+            };
+            colocate_with?: unknown[];
+            /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
+            cluster?: string;
+        } | {
+            /** @enum {string} */
+            side: "sell";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            contract_id: unknown;
+            /**
+             * @description The number of nodes.
+             * @example 3
+             */
+            quantity: number;
+            start_at: string | "NOW";
+            /**
+             * Format: date-time
+             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             */
+            end_at: string;
+            /** @description Price in cents (1 = $0.01) */
+            price: number | null;
+            flags?: {
+                /** @description If true, this will be a market order. */
+                market?: boolean;
+                /** @description If true, this is a post-only order. */
+                post_only?: boolean;
+                /** @description If true, this is an immediate-or-cancel order. */
+                ioc?: boolean;
+            };
+            reprice?: {
+                /**
+                 * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
+                 * @enum {string}
+                 */
+                strategy: "linear";
+                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
+                limit: number;
+                /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
+                start_at?: string;
+                /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
+                end_at?: string;
+            } | {
+                /**
+                 * @description Adjust this order's price linearly across a given window of time.
+                 * @enum {string}
+                 */
+                strategy: "linear_v2";
+                /** @description The desired order limit price at the beginning of the repricing window, in cents. */
+                start_price: number;
+                /** @description The desired order limit price at the end of the repricing window, in cents. */
+                end_price: number;
+                /**
+                 * Format: date-time
+                 * @description The start time of the repricing window. Must be at or before the window end time. If this date is in the past, it will be clamped such that window starts immediately.
+                 */
+                window_start: string;
+                /**
+                 * Format: date-time
+                 * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
+                 */
+                window_end: string;
+            };
+        };
+        InvalidContractError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example split.invalid_contract
+             * @enum {string}
+             */
+            code: "split.invalid_contract";
+            /** @example Invalid contract */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidDateRangeError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example split.invalid_date_range
+             * @enum {string}
+             */
+            code: "split.invalid_date_range";
+            /** @example Invalid date range */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidOwnerError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example split.invalid_owner
+             * @enum {string}
+             */
+            code: "split.invalid_owner";
+            /** @example Invalid owner */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidQuantityError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example split.invalid_quantity
+             * @enum {string}
+             */
+            code: "split.invalid_quantity";
+            /** @example Invalid quantity */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        InvalidShapeError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example split.invalid_shape
+             * @enum {string}
+             */
+            code: "split.invalid_shape";
+            /** @example Invalid shape */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        AccountKycLevel: "none" | "basic" | "core";
+        PendingCluster: {
+            /** @enum {string} */
+            object: "cluster";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "pending";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+        };
+        CreateCluster: {
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            contract?: {
+                /**
+                 * Format: date-time
+                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+                 * @example 2025-04-16T07:19:30.213Z
+                 */
+                starts_at: string;
+                /**
+                 * @description The duration, in seconds. Duration will be rounded such that the contract ends on the hour. For example if `start_time` is 17:10 and you put in 30m, the duration will be rounded up to 50m. Similarly, if `start_time` is 18:00 and you put 50m, the duration will be rounded up to 1h.
+                 * @example 3600
+                 */
+                duration: number;
+                quantity: number;
+            };
+            owner: string;
+            owner_clerk_id?: string;
+            k8s?: {
+                kubernetes_api_url: string;
+                kubernetes_ca_cert: string;
+                name: string;
+            };
+            idempotency_key?: string;
+        };
+        ActiveCluster: {
+            /** @enum {string} */
+            object: "cluster";
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            id: unknown;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            status: "active";
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            created_at: string;
+            created_by: string;
+        };
+        Cluster: components["schemas"]["ActiveCluster"] | components["schemas"]["PendingCluster"];
+        ClusterConfig: {
+            etcd_ip: string;
+        };
+        /** @description Represents a successful operation status */
+        SuccessObject: {
+            /**
+             * @example success
+             * @enum {string}
+             */
+            object: "success";
+            /**
+             * @example true
+             * @enum {boolean}
+             */
+            success: true;
+            /**
+             * @description Optional success message
+             * @example Contract created successfully
+             */
+            message?: string;
+        };
+        PostContractResponse: {
+            /** @enum {string} */
+            object: "contract";
+            /** @enum {string} */
+            status: "pending";
+        };
+        PostContractRequest: {
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            cluster: unknown;
+            /** @description The instance type. */
+            instance_type: ("h100i" | "h100v") | string;
+            /**
+             * Format: date-time
+             * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+             * @example 2025-04-16T07:19:30.213Z
+             */
+            starts_at: string;
+            duration: number;
+            quantity: number;
+            owner: string;
+            idempotency_key?: string;
+        };
+        DeleteContractResponse: {
+            /** @enum {string} */
+            object: "contract";
+            /** @enum {string} */
+            status: "deleted";
+        };
+        TransferContractRequest: {
+            /** @description An external ID with prefix and alphanumeric string with underscores */
+            contract_id: unknown;
+            owner: string;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
-export interface operations {
-  getV0Quote: {
-    parameters: {
-      query: {
-        side: "buy" | "sell";
-        /** @description Inclusive lower bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times at or after this time. */
-        min_start_date: "NOW" | string;
-        /** @description Inclusive upper bound for the start time. Can either be the literal string "NOW" or an ISO 8601 string. The query will consider all valid start times on or before this time. */
-        max_start_date: "NOW" | string;
-        /** @description desired duration, in seconds. Since contracts must end on the hour, the actual duration returned by the quote may be longer than the requested duration by up to 59 minutes. If `min_duration` and `max_duration` are provided, this value is ignored. If this is not provided, `min_duration` and `max_duration` must be provided. */
-        duration?: string | (number | string);
-        /** @description Inclusive lower bound for the duration, in seconds. If provided, `duration` is ignored and `max_duration` must be set. */
-        min_duration?: string | (number | string);
-        /** @description Inclusive upper bound for the duration, in seconds. If provided, `duration` is ignored and `min_duration` must be set. */
-        max_duration?: string | (number | string);
-        /** @description The number of nodes. */
-        quantity: number | string;
-        /** @description The instance type. */
-        instance_type?: string;
-        contract_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json":
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "buy";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                } | null;
-              }
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "sell";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  contract_id: string;
-                } | null;
-              };
-          "multipart/form-data":
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "buy";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                } | null;
-              }
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "sell";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  contract_id: string;
-                } | null;
-              };
-          "text/plain":
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "buy";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                } | null;
-              }
-            | {
-                /** @constant */
-                object: "quote";
-                /** @constant */
-                side: "sell";
-                quote: {
-                  /** @description Price in cents (1 = $0.01) */
-                  price: number | string;
-                  /** @description The number of nodes. */
-                  quantity: number | string;
-                  /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-                  start_at: string;
-                  /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-                  end_at: string;
-                  contract_id: string;
-                } | null;
-              };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Grids: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  postV0Grids: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid. */
-          num_copies: number | string;
-          /** @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid. */
-          num_orders: number | string;
-          /**
-           * Format: date-time
-           * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
-           */
-          grid_front?: string;
-          /**
-           * Format: date-time
-           * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-           */
-          start_at: string;
-          /**
-           * Format: date-time
-           * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-           */
-          end_at?: string;
-          order:
-            | {
-                /** @constant */
-                side: "buy";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to buy in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              }
-            | {
-                /** @constant */
-                side: "sell";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to sell in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                backing_contract_id: string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              };
-        };
-        "multipart/form-data": {
-          /** @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid. */
-          num_copies: number | string;
-          /** @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid. */
-          num_orders: number | string;
-          /**
-           * Format: date-time
-           * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
-           */
-          grid_front?: string;
-          /**
-           * Format: date-time
-           * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-           */
-          start_at: string;
-          /**
-           * Format: date-time
-           * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-           */
-          end_at?: string;
-          order:
-            | {
-                /** @constant */
-                side: "buy";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to buy in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              }
-            | {
-                /** @constant */
-                side: "sell";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to sell in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                backing_contract_id: string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              };
-        };
-        "text/plain": {
-          /** @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid. */
-          num_copies: number | string;
-          /** @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid. */
-          num_orders: number | string;
-          /**
-           * Format: date-time
-           * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
-           */
-          grid_front?: string;
-          /**
-           * Format: date-time
-           * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-           */
-          start_at: string;
-          /**
-           * Format: date-time
-           * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-           */
-          end_at?: string;
-          order:
-            | {
-                /** @constant */
-                side: "buy";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to buy in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              }
-            | {
-                /** @constant */
-                side: "sell";
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description Price in cents (1 = $0.01) */
-                price: number | string;
-                /** @description The number of nodes to sell in each order. */
-                quantity: number | string;
-                /** @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600. */
-                duration: number | string;
-                backing_contract_id: string;
-                reprice?: {
-                  /**
-                   * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                   * @constant
-                   */
-                  strategy: "grid_linear";
-                  /** @description Price in cents (1 = $0.01) */
-                  start_price: number | string;
-                  /** @description Price in cents (1 = $0.01) */
-                  end_price: number | string;
-                  /** @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_start: number | string;
-                  /** @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 1 hour before the order start time, you'd set this to `5 * 3600`. */
-                  relative_window_end: number | string;
-                };
-              };
-        };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getV0GridsById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  deleteV0GridsById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  patchV0GridsByIdDisable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  patchV0GridsByIdEnable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getV0ProcurementsById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "multipart/form-data": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "text/plain": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  putV0ProcurementsById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "multipart/form-data": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "text/plain": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "multipart/form-data": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "text/plain": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  postV0ProcurementsById: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "multipart/form-data": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "text/plain": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "multipart/form-data": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "text/plain": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Procurements: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              id: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The quantity of the procurement */
-              quantity: number;
-              /** @description The price per hour per node in cents */
-              max_price_per_node_hour: number;
-              /** @description The block duration of the procurement in hours */
-              min_duration_in_hours: number;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: {
-              id: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The quantity of the procurement */
-              quantity: number;
-              /** @description The price per hour per node in cents */
-              max_price_per_node_hour: number;
-              /** @description The block duration of the procurement in hours */
-              min_duration_in_hours: number;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: {
-              id: string;
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The quantity of the procurement */
-              quantity: number;
-              /** @description The price per hour per node in cents */
-              max_price_per_node_hour: number;
-              /** @description The block duration of the procurement in hours */
-              min_duration_in_hours: number;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  postV0Procurements: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "multipart/form-data": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-        "text/plain": {
-          /** @description The instance type. */
-          instance_type: string;
-          quantity: number;
-          max_price_per_node_hour: number;
-          min_duration_in_hours: number;
-        };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "multipart/form-data": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-          "text/plain": {
-            id: string;
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The quantity of the procurement */
-            quantity: number;
-            /** @description The price per hour per node in cents */
-            max_price_per_node_hour: number;
-            /** @description The block duration of the procurement in hours */
-            min_duration_in_hours: number;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0VmsScript: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  postV0VmsScript: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          script: string;
-        };
-        "multipart/form-data": {
-          script: string;
-        };
-        "text/plain": {
-          script: string;
-        };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getV0VmsLogs: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getV0VmsInstances: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getV0Prices: {
-    parameters: {
-      query?: {
-        /** @description The instance type. */
-        instance_type?: string;
-        /** @description The minimum quantity of nodes filled blocks included in the price calculation contain. */
-        min_quantity?: string | (number | string);
-        /** @description The maximum quantity of nodes filled blocks included in the price calculation contain. */
-        max_quantity?: string | (number | string);
-        /** @description The minimum duration, in seconds, of filled blocks. */
-        min_duration?: string | (number | string);
-        /** @description The maximum duration, in seconds, of filled blocks. */
-        max_duration?: string | (number | string);
-        /** @description The number of days to go back, starting from today. If you provide 0, you will only see prices for today. If you provide 1, you will see prices over all of yesterday, and today. */
-        since_n_days_ago?: string | (number | string);
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /** @constant */
-              object: "price-history-item";
-              gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                min: number;
-                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                max: number;
-                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                avg: number;
-              };
-              /** @description ISO 8601 datetime marking the start of the period. */
-              period_start: string;
-              /** @description ISO 8601 datetime marking the end of the period. */
-              period_end: string;
-              /** @description Whether there was no price data for this period. */
-              no_data: boolean;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: {
-              /** @constant */
-              object: "price-history-item";
-              gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                min: number;
-                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                max: number;
-                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                avg: number;
-              };
-              /** @description ISO 8601 datetime marking the start of the period. */
-              period_start: string;
-              /** @description ISO 8601 datetime marking the end of the period. */
-              period_end: string;
-              /** @description Whether there was no price data for this period. */
-              no_data: boolean;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: {
-              /** @constant */
-              object: "price-history-item";
-              gpu_hour?: {
-                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                min: number;
-                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                max: number;
-                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                avg: number;
-              };
-              /** @description ISO 8601 datetime marking the start of the period. */
-              period_start: string;
-              /** @description ISO 8601 datetime marking the end of the period. */
-              period_end: string;
-              /** @description Whether there was no price data for this period. */
-              no_data: boolean;
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Orders: {
-    parameters: {
-      query?: {
-        side?: "buy" | "sell";
-        /** @description The instance type. */
-        instance_type?: string;
-        include_public?: boolean | string;
-        min_price?: string | number;
-        max_price?: string | number;
-        min_start_date?: string;
-        max_start_date?: string;
-        min_duration?: string | number;
-        max_duration?: string | number;
-        min_quantity?: string | number;
-        max_quantity?: string | number;
-        contract_id?: string;
-        only_open?: boolean | string;
-        exclude_filled?: boolean | string;
-        only_filled?: boolean | string;
-        min_filled_at?: string;
-        max_filled_at?: string;
-        min_fill_price?: string | number;
-        max_fill_price?: string | number;
-        exclude_cancelled?: boolean | string;
-        only_cancelled?: boolean | string;
-        min_cancelled_at?: string;
-        max_cancelled_at?: string;
-        min_placed_at?: string;
-        max_placed_at?: string;
-        limit?: string | number;
-        offset?: string | number;
-        sort_by?: "created_at" | "start_time";
-        sort_direction?: "ASC" | "DESC";
-      };
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  postV0Orders: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json":
-          | {
-              /** @constant */
-              side: "buy";
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              colocate_with?: string[];
-            }
-          | {
-              /** @constant */
-              side: "sell";
-              contract_id: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              reprice?:
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
-                     * @constant
-                     */
-                    strategy: "linear";
-                    /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                    limit: number;
-                    /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                    start_at?: string;
-                    /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
-                    end_at?: string;
-                  }
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment a given window of time.
-                     * @constant
-                     */
-                    strategy: "linear_v2";
-                    /** @description The desired order limit price at the beginning of the repricing window. */
-                    start_price: number | string;
-                    /** @description The desired order limit price at the end of the repricing window, in cents. */
-                    end_price: number | string;
-                    /**
-                     * Format: date-time
-                     * @description The start time of the repricing window. Must be at or before the window end time. If this date is in the past, it will be clamped such that window starts immediately.
-                     */
-                    window_start: string;
-                    /**
-                     * Format: date-time
-                     * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
-                     */
-                    window_end: string;
-                  };
-            };
-        "multipart/form-data":
-          | {
-              /** @constant */
-              side: "buy";
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              colocate_with?: string[];
-            }
-          | {
-              /** @constant */
-              side: "sell";
-              contract_id: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              reprice?:
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
-                     * @constant
-                     */
-                    strategy: "linear";
-                    /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                    limit: number;
-                    /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                    start_at?: string;
-                    /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
-                    end_at?: string;
-                  }
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment a given window of time.
-                     * @constant
-                     */
-                    strategy: "linear_v2";
-                    /** @description The desired order limit price at the beginning of the repricing window. */
-                    start_price: number | string;
-                    /** @description The desired order limit price at the end of the repricing window, in cents. */
-                    end_price: number | string;
-                    /**
-                     * Format: date-time
-                     * @description The start time of the repricing window. Must be at or before the window end time. If this date is in the past, it will be clamped such that window starts immediately.
-                     */
-                    window_start: string;
-                    /**
-                     * Format: date-time
-                     * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
-                     */
-                    window_end: string;
-                  };
-            };
-        "text/plain":
-          | {
-              /** @constant */
-              side: "buy";
-              /** @description The instance type. */
-              instance_type: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              colocate_with?: string[];
-            }
-          | {
-              /** @constant */
-              side: "sell";
-              contract_id: string;
-              /** @description The number of nodes. */
-              quantity: number | string;
-              start_at: string | "NOW";
-              /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-              end_at: string;
-              /** @description Price in cents (1 = $0.01) */
-              price: number | string;
-              flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-              };
-              reprice?:
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
-                     * @constant
-                     */
-                    strategy: "linear";
-                    /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                    limit: number;
-                    /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                    start_at?: string;
-                    /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
-                    end_at?: string;
-                  }
-                | {
-                    /**
-                     * @description Adjust this order's price linearly from adjustment a given window of time.
-                     * @constant
-                     */
-                    strategy: "linear_v2";
-                    /** @description The desired order limit price at the beginning of the repricing window. */
-                    start_price: number | string;
-                    /** @description The desired order limit price at the end of the repricing window, in cents. */
-                    end_price: number | string;
-                    /**
-                     * Format: date-time
-                     * @description The start time of the repricing window. Must be at or before the window end time. If this date is in the past, it will be clamped such that window starts immediately.
-                     */
-                    window_start: string;
-                    /**
-                     * Format: date-time
-                     * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
-                     */
-                    window_end: string;
-                  };
-            };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "order";
-            id: string;
-            /** @constant */
-            status: "pending";
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "order";
-            id: string;
-            /** @constant */
-            status: "pending";
-          };
-          "text/plain": {
-            /** @constant */
-            object: "order";
-            id: string;
-            /** @constant */
-            status: "pending";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json":
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              }
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "order.unauthorized_seller";
-                message: string;
-                details?: Record<string, never>;
-              };
-          "multipart/form-data":
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              }
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "order.unauthorized_seller";
-                message: string;
-                details?: Record<string, never>;
-              };
-          "text/plain":
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              }
-            | {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "order.unauthorized_seller";
-                message: string;
-                details?: Record<string, never>;
-              };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  deleteV0Orders: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "pending";
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "pending";
-          };
-          "text/plain": {
-            /** @constant */
-            object: "pending";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0OrdersById: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "order";
-            id: string;
-            side: "buy" | "sell";
-            status:
-              | "pending"
-              | "rejected"
-              | "open"
-              | "cancelled"
-              | "filled"
-              | "expired";
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The number of nodes. */
-            quantity: number | string;
-            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-            start_at: string;
-            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | string;
-            flags: {
-              /** @description If true, this will be a market order. */
-              market?: boolean;
-              /** @description If true, this is a post-only order. */
-              post_only?: boolean;
-              /** @description If true, this is an immediate-or-cancel order. */
-              ioc?: boolean;
-            };
-            executed: boolean;
-            executed_at?: string;
-            /** @description Execution price in cents (1 = $0.01) */
-            execution_price?: number | string;
-            cancelled: boolean;
-            cancelled_at?: string;
-            colocate_with?: string[];
-            created_at: string;
-            rejected: boolean;
-            rejected_reason?: string;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "order";
-            id: string;
-            side: "buy" | "sell";
-            status:
-              | "pending"
-              | "rejected"
-              | "open"
-              | "cancelled"
-              | "filled"
-              | "expired";
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The number of nodes. */
-            quantity: number | string;
-            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-            start_at: string;
-            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | string;
-            flags: {
-              /** @description If true, this will be a market order. */
-              market?: boolean;
-              /** @description If true, this is a post-only order. */
-              post_only?: boolean;
-              /** @description If true, this is an immediate-or-cancel order. */
-              ioc?: boolean;
-            };
-            executed: boolean;
-            executed_at?: string;
-            /** @description Execution price in cents (1 = $0.01) */
-            execution_price?: number | string;
-            cancelled: boolean;
-            cancelled_at?: string;
-            colocate_with?: string[];
-            created_at: string;
-            rejected: boolean;
-            rejected_reason?: string;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "order";
-            id: string;
-            side: "buy" | "sell";
-            status:
-              | "pending"
-              | "rejected"
-              | "open"
-              | "cancelled"
-              | "filled"
-              | "expired";
-            /** @description The instance type. */
-            instance_type: string;
-            /** @description The number of nodes. */
-            quantity: number | string;
-            /** @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute. */
-            start_at: string;
-            /** @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute. */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | string;
-            flags: {
-              /** @description If true, this will be a market order. */
-              market?: boolean;
-              /** @description If true, this is a post-only order. */
-              post_only?: boolean;
-              /** @description If true, this is an immediate-or-cancel order. */
-              ioc?: boolean;
-            };
-            executed: boolean;
-            executed_at?: string;
-            /** @description Execution price in cents (1 = $0.01) */
-            execution_price?: number | string;
-            cancelled: boolean;
-            cancelled_at?: string;
-            colocate_with?: string[];
-            created_at: string;
-            rejected: boolean;
-            rejected_reason?: string;
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  deleteV0OrdersById: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "pending";
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "pending";
-          };
-          "text/plain": {
-            /** @constant */
-            object: "pending";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0OrdersByIdClusters: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Clusters: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: {
-              /** @constant */
-              object: "kubernetes_cluster";
-              kubernetes_api_url?: string;
-              name: string;
-              kubernetes_namespace: string;
-              kubernetes_ca_cert?: string;
-              contract?:
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "active";
-                    id: string;
-                    /** Format: date-time */
-                    created_at: string;
-                    /** @description The instance type. */
-                    instance_type: string;
-                    /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                    shape: {
-                      intervals: string[];
-                      quantities: number[];
-                    };
-                    colocate_with?: string[];
-                    cluster_id?: string;
-                    state: "Upcoming" | "Expired" | "Active";
-                  }
-                | {
-                    /** @constant */
-                    object: "contract";
-                    /** @constant */
-                    status: "pending";
-                    id: string;
-                  };
-            }[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Credentials: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "ssh_credential";
-                  id: string;
-                  pubkey: string;
-                  username: string;
-                }
-              | {
-                  /** @constant */
-                  object: "k8s_credential";
-                  id: string;
-                  username?: string;
-                  label?: string;
-                  pubkey: string;
-                  cluster?: {
-                    /** @constant */
-                    object: "kubernetes_cluster";
-                    kubernetes_api_url?: string;
-                    name: string;
-                    kubernetes_namespace: string;
-                    kubernetes_ca_cert?: string;
-                    contract?:
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        };
-                  };
-                  encrypted_token?: string;
-                  nonce?: string;
-                  ephemeral_pubkey?: string;
-                  contracts?: (
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      }
-                  )[];
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "ssh_credential";
-                  id: string;
-                  pubkey: string;
-                  username: string;
-                }
-              | {
-                  /** @constant */
-                  object: "k8s_credential";
-                  id: string;
-                  username?: string;
-                  label?: string;
-                  pubkey: string;
-                  cluster?: {
-                    /** @constant */
-                    object: "kubernetes_cluster";
-                    kubernetes_api_url?: string;
-                    name: string;
-                    kubernetes_namespace: string;
-                    kubernetes_ca_cert?: string;
-                    contract?:
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        };
-                  };
-                  encrypted_token?: string;
-                  nonce?: string;
-                  ephemeral_pubkey?: string;
-                  contracts?: (
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      }
-                  )[];
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "ssh_credential";
-                  id: string;
-                  pubkey: string;
-                  username: string;
-                }
-              | {
-                  /** @constant */
-                  object: "k8s_credential";
-                  id: string;
-                  username?: string;
-                  label?: string;
-                  pubkey: string;
-                  cluster?: {
-                    /** @constant */
-                    object: "kubernetes_cluster";
-                    kubernetes_api_url?: string;
-                    name: string;
-                    kubernetes_namespace: string;
-                    kubernetes_ca_cert?: string;
-                    contract?:
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        };
-                  };
-                  encrypted_token?: string;
-                  nonce?: string;
-                  ephemeral_pubkey?: string;
-                  contracts?: (
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      }
-                  )[];
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  postV0Credentials: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json":
-          | {
-              pubkey: string;
-              username: string;
-              /** @constant */
-              object?: "ssh_credential";
-            }
-          | {
-              username: string;
-              label?: string;
-              cluster: string;
-              /** @constant */
-              object: "k8s_credential";
-              pubkey: string;
-            };
-        "multipart/form-data":
-          | {
-              pubkey: string;
-              username: string;
-              /** @constant */
-              object?: "ssh_credential";
-            }
-          | {
-              username: string;
-              label?: string;
-              cluster: string;
-              /** @constant */
-              object: "k8s_credential";
-              pubkey: string;
-            };
-        "text/plain":
-          | {
-              pubkey: string;
-              username: string;
-              /** @constant */
-              object?: "ssh_credential";
-            }
-          | {
-              username: string;
-              label?: string;
-              cluster: string;
-              /** @constant */
-              object: "k8s_credential";
-              pubkey: string;
-            };
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json":
-            | {
-                /** @constant */
-                object: "ssh_credential";
-                id: string;
-                pubkey: string;
-                username: string;
-              }
-            | {
-                /** @constant */
-                object: "k8s_credential";
-                id: string;
-                username?: string;
-                label?: string;
-                pubkey: string;
-                cluster?: {
-                  /** @constant */
-                  object: "kubernetes_cluster";
-                  kubernetes_api_url?: string;
-                  name: string;
-                  kubernetes_namespace: string;
-                  kubernetes_ca_cert?: string;
-                  contract?:
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      };
-                };
-                encrypted_token?: string;
-                nonce?: string;
-                ephemeral_pubkey?: string;
-                contracts?: (
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "active";
-                      id: string;
-                      /** Format: date-time */
-                      created_at: string;
-                      /** @description The instance type. */
-                      instance_type: string;
-                      /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                      shape: {
-                        intervals: string[];
-                        quantities: number[];
-                      };
-                      colocate_with?: string[];
-                      cluster_id?: string;
-                      state: "Upcoming" | "Expired" | "Active";
-                    }
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "pending";
-                      id: string;
-                    }
-                )[];
-              };
-          "multipart/form-data":
-            | {
-                /** @constant */
-                object: "ssh_credential";
-                id: string;
-                pubkey: string;
-                username: string;
-              }
-            | {
-                /** @constant */
-                object: "k8s_credential";
-                id: string;
-                username?: string;
-                label?: string;
-                pubkey: string;
-                cluster?: {
-                  /** @constant */
-                  object: "kubernetes_cluster";
-                  kubernetes_api_url?: string;
-                  name: string;
-                  kubernetes_namespace: string;
-                  kubernetes_ca_cert?: string;
-                  contract?:
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      };
-                };
-                encrypted_token?: string;
-                nonce?: string;
-                ephemeral_pubkey?: string;
-                contracts?: (
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "active";
-                      id: string;
-                      /** Format: date-time */
-                      created_at: string;
-                      /** @description The instance type. */
-                      instance_type: string;
-                      /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                      shape: {
-                        intervals: string[];
-                        quantities: number[];
-                      };
-                      colocate_with?: string[];
-                      cluster_id?: string;
-                      state: "Upcoming" | "Expired" | "Active";
-                    }
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "pending";
-                      id: string;
-                    }
-                )[];
-              };
-          "text/plain":
-            | {
-                /** @constant */
-                object: "ssh_credential";
-                id: string;
-                pubkey: string;
-                username: string;
-              }
-            | {
-                /** @constant */
-                object: "k8s_credential";
-                id: string;
-                username?: string;
-                label?: string;
-                pubkey: string;
-                cluster?: {
-                  /** @constant */
-                  object: "kubernetes_cluster";
-                  kubernetes_api_url?: string;
-                  name: string;
-                  kubernetes_namespace: string;
-                  kubernetes_ca_cert?: string;
-                  contract?:
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "active";
-                        id: string;
-                        /** Format: date-time */
-                        created_at: string;
-                        /** @description The instance type. */
-                        instance_type: string;
-                        /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                        shape: {
-                          intervals: string[];
-                          quantities: number[];
-                        };
-                        colocate_with?: string[];
-                        cluster_id?: string;
-                        state: "Upcoming" | "Expired" | "Active";
-                      }
-                    | {
-                        /** @constant */
-                        object: "contract";
-                        /** @constant */
-                        status: "pending";
-                        id: string;
-                      };
-                };
-                encrypted_token?: string;
-                nonce?: string;
-                ephemeral_pubkey?: string;
-                contracts?: (
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "active";
-                      id: string;
-                      /** Format: date-time */
-                      created_at: string;
-                      /** @description The instance type. */
-                      instance_type: string;
-                      /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                      shape: {
-                        intervals: string[];
-                        quantities: number[];
-                      };
-                      colocate_with?: string[];
-                      cluster_id?: string;
-                      state: "Upcoming" | "Expired" | "Active";
-                    }
-                  | {
-                      /** @constant */
-                      object: "contract";
-                      /** @constant */
-                      status: "pending";
-                      id: string;
-                    }
-                )[];
-              };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Contracts: {
-    parameters: {
-      query?: {
-        active_within_interval_start?: string;
-        active_within_interval_end?: string;
-        instance_type?: string;
-        state?: "All" | "Active" | "Upcoming" | "Expired";
-      };
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "active";
-                  id: string;
-                  /** Format: date-time */
-                  created_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                  shape: {
-                    intervals: string[];
-                    quantities: number[];
-                  };
-                  colocate_with?: string[];
-                  cluster_id?: string;
-                  state: "Upcoming" | "Expired" | "Active";
-                }
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "pending";
-                  id: string;
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "multipart/form-data": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "active";
-                  id: string;
-                  /** Format: date-time */
-                  created_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                  shape: {
-                    intervals: string[];
-                    quantities: number[];
-                  };
-                  colocate_with?: string[];
-                  cluster_id?: string;
-                  state: "Upcoming" | "Expired" | "Active";
-                }
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "pending";
-                  id: string;
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-          "text/plain": {
-            data: (
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "active";
-                  id: string;
-                  /** Format: date-time */
-                  created_at: string;
-                  /** @description The instance type. */
-                  instance_type: string;
-                  /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                  shape: {
-                    intervals: string[];
-                    quantities: number[];
-                  };
-                  colocate_with?: string[];
-                  cluster_id?: string;
-                  state: "Upcoming" | "Expired" | "Active";
-                }
-              | {
-                  /** @constant */
-                  object: "contract";
-                  /** @constant */
-                  status: "pending";
-                  id: string;
-                }
-            )[];
-            has_more: boolean;
-            /** @constant */
-            object: "list";
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0ContractsById: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json":
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "active";
-                id: string;
-                /** Format: date-time */
-                created_at: string;
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                shape: {
-                  intervals: string[];
-                  quantities: number[];
-                };
-                colocate_with?: string[];
-                cluster_id?: string;
-                state: "Upcoming" | "Expired" | "Active";
-              }
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "pending";
-                id: string;
-              };
-          "multipart/form-data":
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "active";
-                id: string;
-                /** Format: date-time */
-                created_at: string;
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                shape: {
-                  intervals: string[];
-                  quantities: number[];
-                };
-                colocate_with?: string[];
-                cluster_id?: string;
-                state: "Upcoming" | "Expired" | "Active";
-              }
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "pending";
-                id: string;
-              };
-          "text/plain":
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "active";
-                id: string;
-                /** Format: date-time */
-                created_at: string;
-                /** @description The instance type. */
-                instance_type: string;
-                /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                shape: {
-                  intervals: string[];
-                  quantities: number[];
-                };
-                colocate_with?: string[];
-                cluster_id?: string;
-                state: "Upcoming" | "Expired" | "Active";
-              }
-            | {
-                /** @constant */
-                object: "contract";
-                /** @constant */
-                status: "pending";
-                id: string;
-              };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-  getV0Balance: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Generate a bearer token with `$ sf tokens create`. */
-        authorization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "balance";
-            available: {
-              /** @description Funds available to spend or withdraw. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-            reserved: {
-              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "balance";
-            available: {
-              /** @description Funds available to spend or withdraw. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-            reserved: {
-              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-          };
-          "text/plain": {
-            /** @constant */
-            object: "balance";
-            available: {
-              /** @description Funds available to spend or withdraw. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-            reserved: {
-              /** @description Funds held in reserve for pending withdrawals & open buy orders. */
-              amount: number;
-              /** @constant */
-              currency: "usd";
-            };
-          };
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "not_authenticated";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "multipart/form-data": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-          "text/plain": {
-            /** @constant */
-            object: "error";
-            /** @constant */
-            code: "internal_server";
-            message: string;
-            details?: Record<string, never>;
-          };
-        };
-      };
-    };
-  };
-}
+export type operations = Record<string, never>;
