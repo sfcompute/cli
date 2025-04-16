@@ -32,9 +32,9 @@ import { analytics } from "../posthog.ts";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-type SfBuyOptions = ReturnType<ReturnType<typeof _registerBuy>["opts"]>;
+export type SfBuyOptions = ReturnType<ReturnType<typeof _registerBuy>["opts"]>;
 
-function _registerBuy(program: Command) {
+export function _registerBuy(program: Command) {
   return program
     .command("buy")
     .description("Place a buy order")
@@ -141,7 +141,7 @@ function parseEnd(value: string) {
   return roundEndDate(parsed);
 }
 
-function parseDuration(duration?: string) {
+export function parseDuration(duration?: string) {
   if (!duration) {
     return 1 * 60 * 60; // 1 hour
   }
@@ -159,7 +159,7 @@ function parseDuration(duration?: string) {
   return parsed / 1000;
 }
 
-function parsePricePerGpuHour(price?: string) {
+export function parsePricePerGpuHour(price?: string) {
   if (!price) {
     return null;
   }
@@ -169,7 +169,7 @@ function parsePricePerGpuHour(price?: string) {
   return Number.parseFloat(priceWithoutDollar) * 100;
 }
 
-function QuoteComponent(props: { options: SfBuyOptions }) {
+export function QuoteComponent(props: { options: SfBuyOptions }) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -193,7 +193,7 @@ function QuoteComponent(props: { options: SfBuyOptions }) {
     : <QuoteDisplay quote={quote} />;
 }
 
-function QuoteAndBuy(props: { options: SfBuyOptions }) {
+export function QuoteAndBuy(props: { options: SfBuyOptions }) {
   const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
 
   // submit a quote request, handle loading state
