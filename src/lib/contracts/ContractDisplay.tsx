@@ -112,6 +112,13 @@ export function ContractDisplay(props: { contract: Contract }) {
             value={props.contract.colocate_with.join(", ")}
           />
         )}
+        {state === "Active" && (
+          <Row
+            headWidth={COLUMN_WIDTH}
+            head="Extend"
+            value={`sf extend --contract ${props.contract.id} --duration 1h`}
+          />
+        )}
 
         <Box flexDirection="column">
           {intervalData.map((data, index) => {
