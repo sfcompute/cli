@@ -44,7 +44,7 @@ registerUpgrade(program);
 // registerScale(program);
 registerClusters(program);
 registerMe(program);
-await registerVM(program);
+registerVM(program);
 
 // (development commands)
 registerDev(program);
