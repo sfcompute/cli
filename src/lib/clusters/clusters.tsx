@@ -1,5 +1,4 @@
 import type { Command } from "@commander-js/extra-typings";
-import { Badge } from "@inkjs/ui";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import * as console from "node:console";
@@ -149,7 +148,11 @@ const ClusterRowWithContracts = ({
   return (
     <Box flexDirection="column" gap={1}>
       <Box>
-        <Badge color="cyan">{cluster.contract.id}</Badge>
+        <Text color="black" backgroundColor="cyan">
+          {" "}
+          {cluster.contract.id}
+          {" "}
+        </Text>
       </Box>
 
       <Box flexDirection="column">
