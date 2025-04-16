@@ -3518,7 +3518,7 @@ export interface operations {
         active_within_interval_start?: string;
         active_within_interval_end?: string;
         instance_type?: string;
-        state?: "all" | "active" | "upcoming" | "expired";
+        state?: "All" | "Active" | "Upcoming" | "Expired";
       };
       header?: {
         /** @description Generate a bearer token with `$ sf tokens create`. */
