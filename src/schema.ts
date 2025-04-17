@@ -129,7 +129,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -286,19 +286,19 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time of the first order in the grid.
-                                 * @example 2025-04-16T09:00:00.000Z
+                                 * @example 2025-04-17T22:00:00.000Z
                                  */
                                 grid_front: string;
                                 /**
                                  * Format: date-time
                                  * @description Earliest time of any order in the grid.
-                                 * @example 2025-04-16T09:00:00.000Z
+                                 * @example 2025-04-17T22:00:00.000Z
                                  */
                                 start_at: string;
                                 /**
                                  * Format: date-time
                                  * @description The time at which the grid should stop placing new orders automatically.
-                                 * @example 2025-04-16T10:00:00.000Z
+                                 * @example 2025-04-17T23:00:00.000Z
                                  */
                                 end_at: string;
                                 order: {
@@ -358,7 +358,7 @@ export interface paths {
                                      */
                                     duration: number;
                                     /** @description An external ID with prefix and alphanumeric string with underscores */
-                                    backing_contract_id: unknown;
+                                    backing_contract_id: string;
                                     reprice?: {
                                         /**
                                          * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
@@ -419,13 +419,13 @@ export interface paths {
                         /**
                          * Format: date-time
                          * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-                         * @example 2025-04-16T09:00:00.000Z
+                         * @example 2025-04-17T22:00:00.000Z
                          */
                         start_at: string;
                         /**
                          * Format: date-time
                          * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-                         * @example 2025-04-16T10:00:00.000Z
+                         * @example 2025-04-17T23:00:00.000Z
                          */
                         end_at?: string;
                         order: {
@@ -485,7 +485,7 @@ export interface paths {
                              */
                             duration: number;
                             /** @description An external ID with prefix and alphanumeric string with underscores */
-                            backing_contract_id: unknown;
+                            backing_contract_id: string;
                             reprice?: {
                                 /**
                                  * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
@@ -620,19 +620,19 @@ export interface paths {
                             /**
                              * Format: date-time
                              * @description The start time of the first order in the grid.
-                             * @example 2025-04-16T09:00:00.000Z
+                             * @example 2025-04-17T22:00:00.000Z
                              */
                             grid_front: string;
                             /**
                              * Format: date-time
                              * @description Earliest time of any order in the grid.
-                             * @example 2025-04-16T09:00:00.000Z
+                             * @example 2025-04-17T22:00:00.000Z
                              */
                             start_at: string;
                             /**
                              * Format: date-time
                              * @description The time at which the grid should stop placing new orders automatically.
-                             * @example 2025-04-16T10:00:00.000Z
+                             * @example 2025-04-17T23:00:00.000Z
                              */
                             end_at: string;
                             order: {
@@ -692,7 +692,7 @@ export interface paths {
                                  */
                                 duration: number;
                                 /** @description An external ID with prefix and alphanumeric string with underscores */
-                                backing_contract_id: unknown;
+                                backing_contract_id: string;
                                 reprice?: {
                                     /**
                                      * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
@@ -1027,7 +1027,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -1067,7 +1067,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -1714,8 +1714,8 @@ export interface paths {
                     max_start_date?: "NOW" | string;
                     quantity: number;
                     instance_type?: ("h100i" | "h100v") | string;
-                    contract_id?: unknown;
-                    colocate_with?: unknown[];
+                    contract_id?: string;
+                    colocate_with?: string[];
                     duration?: number;
                     min_duration?: number;
                     max_duration?: number;
@@ -1749,7 +1749,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-16T07:19:30.213Z
+                                 * @example 2025-04-17T20:37:58.169Z
                                  */
                                 start_at: string;
                                 /**
@@ -1776,7 +1776,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-16T07:19:30.213Z
+                                 * @example 2025-04-17T20:37:58.169Z
                                  */
                                 start_at: string;
                                 /**
@@ -1785,7 +1785,7 @@ export interface paths {
                                  */
                                 end_at: string;
                                 /** @description An external ID with prefix and alphanumeric string with underscores */
-                                contract_id: unknown;
+                                contract_id: string;
                             } | null;
                         };
                     };
@@ -1951,24 +1951,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | {
-                            /**
-                             * @example error
-                             * @enum {string}
-                             */
-                            object: "error";
-                            /**
-                             * @example market.is_halted
-                             * @enum {string}
-                             */
-                            code: "market.is_halted";
-                            /** @example Market is halted */
-                            message?: string;
-                            /** @example {} */
-                            details?: {
-                                [key: string]: unknown;
-                            };
-                        } | components["schemas"]["UnauthorizedSeller"];
+                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"] | components["schemas"]["UnauthorizedSeller"];
                     };
                 };
                 /** @description Contract, Cluster, or Market not found */
@@ -1977,24 +1960,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ContractNotFound"] | {
-                            /**
-                             * @example error
-                             * @enum {string}
-                             */
-                            object: "error";
-                            /**
-                             * @example market.not_found
-                             * @enum {string}
-                             */
-                            code: "market.not_found";
-                            /** @example Market not found */
-                            message?: string;
-                            /** @example {} */
-                            details?: {
-                                [key: string]: unknown;
-                            };
-                        } | components["schemas"]["ClusterNotFound"];
+                        "application/json": components["schemas"]["ContractNotFound"] | components["schemas"]["ClusterNotFound"];
                     };
                 };
                 /** @description Internal server error */
@@ -2135,24 +2101,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | {
-                            /**
-                             * @example error
-                             * @enum {string}
-                             */
-                            object: "error";
-                            /**
-                             * @example market.is_halted
-                             * @enum {string}
-                             */
-                            code: "market.is_halted";
-                            /** @example Market is halted */
-                            message?: string;
-                            /** @example {} */
-                            details?: {
-                                [key: string]: unknown;
-                            };
-                        };
+                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"];
                     };
                 };
                 /** @description Order not found */
@@ -2263,8 +2212,7 @@ export interface paths {
         get: {
             parameters: {
                 query: {
-                    market: string;
-                    backing_contract_id: unknown;
+                    backing_contract_id: string;
                 };
                 header?: never;
                 path?: never;
@@ -2332,15 +2280,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": {
-                        contract_id: string;
-                        /** Format: date-time */
-                        start_time: string;
-                        /** Format: date-time */
-                        end_time: string;
-                        quantity: number;
-                        new_owner: string;
-                    };
+                    "application/json": components["schemas"]["SplitContractBody"];
                 };
             };
             responses: {
@@ -3386,7 +3326,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -3468,7 +3408,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -3535,7 +3475,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -3875,8 +3815,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         delivery_fee: number;
-                        /** @description The instance type. */
-                        instance_type: ("h100i" | "h100v") | string;
+                        cluster_id: string;
                     };
                 };
             };
@@ -4268,7 +4207,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -4617,28 +4556,28 @@ export interface paths {
                             id: string;
                             account_id: string;
                             primary_email: string;
-                            avatar?: string | null;
-                            created_at?: string;
-                            primary_phone?: string | null;
-                            first_name?: string | null;
-                            last_name?: string | null;
-                            date_of_birth?: string | null;
-                            ip_address?: string | null;
-                            primary_address_street_1?: string | null;
-                            primary_address_street_2?: string | null;
-                            primary_address_region?: string | null;
-                            primary_address_postal_code?: string | null;
-                            primary_address_city?: string | null;
-                            primary_address_country?: string | null;
-                            business_name?: string | null;
-                            business_address_street_1?: string | null;
-                            business_address_street_2?: string | null;
-                            business_address_region?: string | null;
-                            business_address_postal_code?: string | null;
-                            business_address_city?: string | null;
-                            business_address_country?: string | null;
-                            compute_usage_statement?: string | null;
-                            business_primary_contact_id?: string | null;
+                            avatar: string | null;
+                            created_at: string;
+                            primary_phone: string | null;
+                            first_name: string | null;
+                            last_name: string | null;
+                            date_of_birth: string | null;
+                            ip_address: string | null;
+                            primary_address_street_1: string | null;
+                            primary_address_street_2: string | null;
+                            primary_address_region: string | null;
+                            primary_address_postal_code: string | null;
+                            primary_address_city: string | null;
+                            primary_address_country: string | null;
+                            business_name: string | null;
+                            business_address_street_1: string | null;
+                            business_address_street_2: string | null;
+                            business_address_region: string | null;
+                            business_address_postal_code: string | null;
+                            business_address_city: string | null;
+                            business_address_country: string | null;
+                            compute_usage_statement: string | null;
+                            business_primary_contact_id: string | null;
                         };
                     };
                 };
@@ -4661,7 +4600,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v0/admin/accounts/{id}/compliance/kyc/basic": {
+    "/v0/admin/accounts/{id}/compliance/kyc": {
         parameters: {
             query?: never;
             header?: never;
@@ -4706,11 +4645,26 @@ export interface paths {
                         business_address_country?: string | null;
                         compute_usage_statement?: string | null;
                         business_primary_contact_id?: string | null;
+                        id_number?: string;
                     };
                 };
             };
             responses: {
-                /** @description KYC verification result */
+                /** @description Existing KYC verification result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            status: string;
+                            kyc_level: components["schemas"]["AccountKycLevel"];
+                            complete_outcome?: string;
+                            is_archived: boolean;
+                        };
+                    };
+                };
+                /** @description New KYC verification result */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -4718,6 +4672,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             status: string;
+                            kyc_level: components["schemas"]["AccountKycLevel"];
                             complete_outcome?: string;
                             is_archived: boolean;
                         };
@@ -4748,6 +4703,97 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kyc/core": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id?: string;
+                        account_id?: string;
+                        primary_email?: string;
+                        avatar?: string | null;
+                        created_at?: string;
+                        primary_phone?: string | null;
+                        first_name?: string | null;
+                        last_name?: string | null;
+                        date_of_birth?: string | null;
+                        ip_address?: string | null;
+                        primary_address_street_1?: string | null;
+                        primary_address_street_2?: string | null;
+                        primary_address_region?: string | null;
+                        primary_address_postal_code?: string | null;
+                        primary_address_city?: string | null;
+                        primary_address_country?: string | null;
+                        business_name?: string | null;
+                        business_address_street_1?: string | null;
+                        business_address_street_2?: string | null;
+                        business_address_region?: string | null;
+                        business_address_postal_code?: string | null;
+                        business_address_city?: string | null;
+                        business_address_country?: string | null;
+                        compute_usage_statement?: string | null;
+                        business_primary_contact_id?: string | null;
+                        id_number?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYC verification result */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            status: string;
+                            kyc_level: components["schemas"]["AccountKycLevel"];
+                            complete_outcome?: string;
+                            is_archived: boolean;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccountNotFoundError"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/v0/admin/accounts/{id}/compliance/kyb": {
@@ -4863,7 +4909,6 @@ export interface paths {
                         start_time: string | null;
                         end_time: string | null;
                         nodes_affected: number;
-                        instance_type: string;
                         affected_cluster_name: string;
                         memo: string;
                     };
@@ -4934,7 +4979,6 @@ export interface paths {
                             /** Format: date-time */
                             end_time: string;
                             nodes_affected: number;
-                            instance_type: string;
                             affected_cluster_id: string;
                             memo: string;
                             created_by: string;
@@ -4961,7 +5005,6 @@ export interface paths {
                                 /** Format: date-time */
                                 previous_end_time?: string;
                                 previous_nodes_affected?: number;
-                                previous_instance_type?: string;
                                 previous_affected_cluster_id?: string;
                                 previous_memo?: string;
                                 /** Format: date-time */
@@ -4969,7 +5012,6 @@ export interface paths {
                                 /** Format: date-time */
                                 amended_end_time?: string;
                                 amended_nodes_affected?: number;
-                                amended_instance_type?: string;
                                 amended_affected_cluster_id?: string;
                                 amended_memo?: string;
                             }[];
@@ -5050,13 +5092,13 @@ export interface paths {
                         /**
                          * Format: date-time
                          * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-                         * @example 2025-04-16T09:00:00.000Z
+                         * @example 2025-04-17T22:00:00.000Z
                          */
                         start_at: string;
                         /**
                          * Format: date-time
                          * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-                         * @example 2025-04-16T10:00:00.000Z
+                         * @example 2025-04-17T23:00:00.000Z
                          */
                         end_at?: string;
                         order: {
@@ -5116,7 +5158,7 @@ export interface paths {
                              */
                             duration: number;
                             /** @description An external ID with prefix and alphanumeric string with underscores */
-                            backing_contract_id: unknown;
+                            backing_contract_id: string;
                             reprice?: {
                                 /**
                                  * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
@@ -5240,11 +5282,6 @@ export interface components {
              */
             report_cluster_id: string;
             /**
-             * @description Type of instance affected
-             * @example h100
-             */
-            report_instance_type: string;
-            /**
              * @description Description of the downtime incident
              * @example Network connectivity issues in US-West-1
              */
@@ -5277,7 +5314,6 @@ export interface components {
          *           "report_end_time": "2024-03-15T02:00:00.000Z",
          *           "report_nodes_affected": 4,
          *           "report_cluster_id": "cluster_us_west_1",
-         *           "report_instance_type": "h100",
          *           "report_memo": "Network connectivity issues in US-West-1",
          *           "report_created_at": "2024-03-15T00:30:00.000Z",
          *           "memo_amount": "500.00",
@@ -5370,15 +5406,15 @@ export interface components {
              */
             status: "active";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /** Format: date-time */
             created_at: string;
             /** @description The instance type. */
             instance_type: ("h100i" | "h100v") | string;
             shape: components["schemas"]["Shape"];
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            cluster_id?: unknown;
+            cluster_id?: string;
             /** @enum {string} */
             state: "Upcoming" | "Expired" | "Active";
         };
@@ -5396,7 +5432,7 @@ export interface components {
              */
             status: "pending";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
         };
         KubernetesCluster: {
             /**
@@ -5545,12 +5581,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-03-17T00:00:00.000Z
+             * @example 2025-03-18T00:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-03-17T23:59:59.999Z
+             * @example 2025-03-18T23:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -5568,12 +5604,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-03-17T00:00:00.000Z
+             * @example 2025-03-18T00:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-03-17T23:59:59.999Z
+             * @example 2025-03-18T23:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -5797,7 +5833,7 @@ export interface components {
             /** @enum {string} */
             object: "order";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /**
              * @description Side of the order (buy/sell)
              * @enum {string}
@@ -5818,7 +5854,7 @@ export interface components {
             /**
              * Format: date-time
              * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-04-16T07:19:30.213Z
+             * @example 2025-04-17T20:37:58.169Z
              */
             start_at: string;
             /**
@@ -5842,7 +5878,7 @@ export interface components {
             execution_price?: number | null;
             cancelled: boolean;
             cancelled_at?: string;
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             created_at: string;
             rejected: boolean;
             rejected_reason?: string;
@@ -5904,11 +5940,29 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        TradingEngineIsHaltedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example trading_engine.is_halted
+             * @enum {string}
+             */
+            code: "trading_engine.is_halted";
+            /** @example Trading engine is halted */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
         OrderPendingResponse: {
             /** @enum {string} */
             object: "order";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /** @enum {string} */
             status: "pending";
             /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
@@ -5994,14 +6048,14 @@ export interface components {
                 /** @description If true, this is an immediate-or-cancel order. */
                 ioc?: boolean;
             };
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
             cluster?: string;
         } | {
             /** @enum {string} */
             side: "sell";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            contract_id: unknown;
+            contract_id: string;
             /**
              * @description The number of nodes.
              * @example 3
@@ -6147,6 +6201,15 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        SplitContractBody: {
+            contract_id: string;
+            /** Format: date-time */
+            start_time: string;
+            /** Format: date-time */
+            end_time: string;
+            quantity: number;
+            new_owner: string;
+        };
         AccountKycLevel: "none" | "basic" | "core";
         PendingCluster: {
             /** @enum {string} */
@@ -6157,9 +6220,7 @@ export interface components {
              */
             status: "pending";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            id: string;
         };
         CreateCluster: {
             /** @description The instance type. */
@@ -6168,7 +6229,7 @@ export interface components {
                 /**
                  * Format: date-time
                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                 * @example 2025-04-16T07:19:30.213Z
+                 * @example 2025-04-17T20:37:58.169Z
                  */
                 starts_at: string;
                 /**
@@ -6191,7 +6252,7 @@ export interface components {
             /** @enum {string} */
             object: "cluster";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
@@ -6232,13 +6293,13 @@ export interface components {
         };
         PostContractRequest: {
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            cluster: unknown;
+            cluster: string;
             /** @description The instance type. */
             instance_type: ("h100i" | "h100v") | string;
             /**
              * Format: date-time
              * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-04-16T07:19:30.213Z
+             * @example 2025-04-17T20:37:58.169Z
              */
             starts_at: string;
             duration: number;
@@ -6254,7 +6315,7 @@ export interface components {
         };
         TransferContractRequest: {
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            contract_id: unknown;
+            contract_id: string;
             owner: string;
         };
     };
