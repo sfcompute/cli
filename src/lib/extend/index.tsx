@@ -49,13 +49,13 @@ function _registerExtend(program: Command) {
       "after",
       `
 Examples:
-  \x1b[2m# Get a Quote to extend a contract for 1 hour\x1b[0m]
+  \x1b[2m# Get a Quote to extend a contract for 1 hour\x1b[0m
   $ sf extend --contract <contract_id> --duration 1h --quote
 
-  \x1b[2m# Auto confirm extending a contract by 1 hour at market price\x1b[0m]
+  \x1b[2m# Auto confirm extending a contract by 1 hour at market price\x1b[0m
   $ sf extend -c <contract_id> -d 1h --yes
 
-  \x1b[2m# Extend a contract for 2 hours at a specific price\x1b[0m]
+  \x1b[2m# Extend a contract for 2 hours at a specific price\x1b[0m
   $ sf extend -c <contract_id> -d 2h --price 1.50
 `,
     )
