@@ -47,11 +47,11 @@ export function registerContracts(program: Command) {
         )
         .description("List all contracts")
         .action(async (options) => {
+          const contracts = await listContracts(options.all, options.state);
           if (options.json) {
-            console.log(await listContracts(options.all, options.state));
+            console.log(JSON.stringify(contracts, null, 2));
           } else {
-            const data = await listContracts(options.all, options.state);
-            render(<ContractList contracts={data} />);
+            render(<ContractList contracts={contracts} />);
           }
         }),
     );

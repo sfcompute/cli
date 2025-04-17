@@ -26,7 +26,9 @@ import { registerVM } from "./lib/vm.ts";
 
 const program = new Command();
 
-await Promise.all([checkVersion(), getAppBanner()]);
+if (!process.argv.includes("--json")) {
+  await Promise.all([checkVersion(), getAppBanner()]);
+}
 
 program
   .name("sf")
