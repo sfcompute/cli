@@ -173,6 +173,11 @@ const ClusterRowWithContracts = ({
           head="Add User"
           value={`sf clusters users add --cluster ${cluster.name} --user myuser`}
         />
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Extend"
+          value={`sf extend --contract ${cluster.contract.id} --duration 1h`}
+        />
       </Box>
     </Box>
   );
