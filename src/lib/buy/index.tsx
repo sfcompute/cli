@@ -768,7 +768,7 @@ export async function getMostRecentIndexAvgPrice(instanceType: string) {
     return dayjs(b.period_start).diff(dayjs(a.period_start));
   });
 
-  return data.data[0].gpu_hour;
+  return data.data[0].no_data ? null : data.data[0].gpu_hour;
 }
 
 export async function getAggressivePricePerHour(instanceType: string) {
