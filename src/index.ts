@@ -11,6 +11,7 @@ import { getApiUrl } from "./helpers/urls.ts";
 import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
+import { registerExtend } from "./lib/extend/index.tsx";
 import { registerClusters } from "./lib/clusters/clusters.tsx";
 import { registerContracts } from "./lib/contracts/index.tsx";
 import { registerDev } from "./lib/dev.ts";
@@ -35,6 +36,7 @@ program
 // commands
 registerLogin(program);
 registerBuy(program);
+registerExtend(program);
 registerOrders(program);
 registerContracts(program);
 registerSell(program);
