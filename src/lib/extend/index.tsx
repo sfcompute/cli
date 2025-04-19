@@ -88,8 +88,9 @@ Examples:
 
       if (options.quote) {
         render(<QuoteComponent options={quoteOptions} />);
+      } else {
+        render(<QuoteAndBuy options={quoteOptions} />);
       }
-      render(<QuoteAndBuy options={quoteOptions} />);
     });
 }
 
