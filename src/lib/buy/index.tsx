@@ -176,8 +176,8 @@ export function QuoteComponent(props: { options: SfBuyOptions }) {
   useEffect(() => {
     (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
-      setIsLoading(false);
       if (quote) setQuote(quote);
+      setIsLoading(false);
     })();
   }, [props.options]);
 
