@@ -16,6 +16,7 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import {
+  centsToDollarsFormatted,
   parseStartDate,
   parseStartDateOrNow,
   roundEndDate,
@@ -506,7 +507,7 @@ function BuyOrder(props: BuyOrderProps) {
       )}
 
       {isLoading && (
-        <Box gap={1}>
+        <Box gap={1} flexDirection="column">
           {(!order || order.status === "pending") && <Spinner type="dots" />}
           {!order && <Text>{loadingMsg}</Text>}
           {order && order.status === "open" && <Text color="yellow">•</Text>}
@@ -523,6 +524,56 @@ function BuyOrder(props: BuyOrderProps) {
             <Box gap={1}>
               <Text>Order placed: {order.id}</Text>
               <Text>- ({order.status})</Text>
+            </Box>
+          )}
+
+          {order &&
+            order.status === "filled" &&
+            (order as Awaited<ReturnType<typeof getOrder>>) &&
+            order.execution_price && (
+            <Box flexDirection="column">
+              {order.start_at && order.end_at &&
+                order.start_at !== order.end_at && (
+                <Row
+                  headWidth={16}
+                  head="executed rate"
+                  value={`~${
+                    centsToDollarsFormatted(
+                      Number(order.execution_price) /
+                        ((Number(order.quantity)) *
+                          GPUS_PER_NODE) /
+                        dayjs(order.end_at).diff(
+                          dayjs(order.start_at),
+                          "hours",
+                          true,
+                        ),
+                    )
+                  }/gpu/hr`}
+                />
+              )}
+              <Row
+                headWidth={16}
+                head="executed total"
+                value={`~${
+                  centsToDollarsFormatted(
+                    Number(order.execution_price),
+                  )
+                }`}
+              />
+              {order.execution_price &&
+                Number(order.execution_price) < Number(order.price) && (
+                <Row
+                  headWidth={16}
+                  head="saved"
+                  value={`~${
+                    (
+                      ((Number(order.price) - Number(order.execution_price)) *
+                        100) /
+                      Number(order.price)
+                    ).toFixed(2)
+                  }%`}
+                />
+              )}
             </Box>
           )}
         </Box>
