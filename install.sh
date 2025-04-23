@@ -158,7 +158,7 @@ if [ -f "${TARGET_FILE}" ]; then
     printf "After running the appropriate command, you can use '%s'.\033[0m\\n" "${BINARY_NAME}"
     printf "\033[0;32m\\n"
     printf "To get started, run: 'sf login'\033[0m\\n"
-    printf "\033[0;32m\\n"
+    printf "\033[0m\\n"
 
 else
     echo "Installation failed. '${BINARY_NAME}' CLI could not be installed."
