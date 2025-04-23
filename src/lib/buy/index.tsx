@@ -83,7 +83,7 @@ export function _registerBuy(program: Command) {
     )
     .option(
       "--standing",
-      "Places a standing order. Default behavior is to place a market order.",
+      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately.",
     )
     .option("-c, --cluster <cluster>", "Send into a specific cluster")
     .configureHelp({
