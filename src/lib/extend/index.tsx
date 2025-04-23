@@ -37,6 +37,10 @@ function _registerExtend(program: Command) {
       "-q, --quote",
       "Get a price quote without placing an extension order",
     )
+    .option(
+      "--standing",
+      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately.",
+    )
     .configureHelp({
       optionDescription: (option) => {
         if (option.flags === "-h, --help") {
@@ -84,6 +88,7 @@ Examples:
         start: activeContractRange.endsAt,
         quote: options.quote,
         yes: options.yes,
+        standing: options.standing,
       };
 
       if (options.quote) {
