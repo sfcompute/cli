@@ -3,7 +3,9 @@ import { parseDate } from "chrono-node";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
+import * as console from "node:console";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
+import chalk from "npm:chalk@^5.3.0";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
@@ -11,6 +13,7 @@ import parseDurationFromLibrary from "parse-duration";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
+import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
@@ -21,6 +24,7 @@ import {
   roundEndDate,
   roundStartDate,
 } from "../../helpers/units.ts";
+import { getApiUrl } from "../../helpers/urls.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import type { Quote } from "../Quote.tsx";
 import QuoteDisplay from "../Quote.tsx";
@@ -364,6 +368,45 @@ function BuyOrder(props: BuyOrderProps) {
   );
 
   const submitOrder = useCallback(async () => {
+    // If buying a VM, check to see if the user has a start up script before allowing them to buy the VM. We prevent them from buying because buying a VM before a startup script is setup is painful. In this scenario
+    // 1. Buy the VM
+    // 2. Add a startup script to the VM
+    // 3. Restart the VM (Takes around 10 minutes)
+    // 4. SSH into the VM
+    // This burns through 10 minutes of compute time so we want to prevent this scenario.
+    if (props.type === "h100v") {
+      const response = await fetch(await getApiUrl("vms_script_get"), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getAuthToken()}`,
+        },
+      });
+
+      // TODO: endpoint will set the error message.
+      if (!response.ok && response.status === 404) {
+        console.log(
+          chalk.yellow(
+            "Warning: You are about to buy a virtual machine without the prerequisites.\n",
+          ),
+        );
+        console.log(
+          "A startup script is required to connect to your virtual machine. You can set a startup script after buying, but you will waste compute time waiting for the startup script to be applied.",
+        );
+        console.log("\nSet a startup script:");
+        console.log(
+          chalk.gray("\n  $ sf vm script --file <path_to_startup_script>"),
+        );
+        console.log(
+          "\nDocs https://docs.sfcompute.com/docs/virtual-machines#quickstart",
+        );
+        logAndQuit("");
+      }
+
+      // If the response is ok, then assume the user has a startup script and we can proceed.
+      // If it's not ok but not a 404, no-op.
+    }
+
     const { startAt, endsAt } = props;
     const realDurationInHours =
       dayjs(endsAt).diff(dayjs(parseStartDate(startAt))) / 1000 / 3600;
