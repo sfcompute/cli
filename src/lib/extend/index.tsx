@@ -31,7 +31,10 @@ function _registerExtend(program: Command) {
       "Extension duration (rounded up to the nearest hour)",
       parseDuration,
     )
-    .option("-p, --price <price>", "Price in dollars per GPU hour")
+    .option(
+      "-p, --price <price>",
+      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate",
+    )
     .option("-y, --yes", "Automatically confirm the extension")
     .option(
       "-q, --quote",
