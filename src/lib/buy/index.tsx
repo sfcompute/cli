@@ -51,7 +51,10 @@ export function _registerBuy(program: Command) {
       "Duration of reservation (rounded up to the nearest hour)",
       parseDuration,
     )
-    .option("-p, --price <price>", "Price in dollars per GPU hour")
+    .option(
+      "-p, --price <price>",
+      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate",
+    )
     .option(
       "-s, --start <start>",
       "Start time (date, relative time like '+1d', or 'NOW')",
@@ -560,7 +563,8 @@ function BuyOrder(props: BuyOrderProps) {
                   )
                 }`}
               />
-              {order.execution_price &&
+              {order.execution_price && Number(order.price) > 0 &&
+                Number(order.execution_price) > 0 &&
                 Number(order.execution_price) < Number(order.price) && (
                 <Row
                   headWidth={16}
