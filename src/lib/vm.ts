@@ -17,7 +17,6 @@ import { registerSsh } from "./ssh.ts";
 
 type VMInstance = {
   id: string;
-  instance_group_id: string;
   status: string;
   last_updated_at: string;
 };
@@ -58,12 +57,10 @@ export function registerVM(program: Command) {
       const formattedData = data.map(
         (instance: {
           id: string;
-          instance_group_id: string;
           current_status: string;
           last_updated_at: string;
         }): VMInstance => ({
           id: instance.id,
-          instance_group_id: instance.instance_group_id,
           status: instance.current_status,
           last_updated_at: instance.last_updated_at,
         }),
@@ -76,7 +73,6 @@ export function registerVM(program: Command) {
       formattedData.forEach((instance: VMInstance) => {
         table.push([
           instance.id,
-          instance.instance_group_id,
           instance.status,
           instance.last_updated_at,
         ]);
