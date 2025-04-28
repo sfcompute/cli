@@ -1,7 +1,6 @@
 {
   "scripts": {
     "devv": "IS_DEVELOPMENT_CLI_ENV=true deno run --allow-all src/index.ts",
-    "release": "deno run --allow-all src/scripts/release.ts",
     "prod": "deno run --allow-all src/index.ts",
     "schema": "npx openapi-typescript https://api.sfcompute.com/docs/json -o src/schema.ts",
     "lint": "prettier --write .",
