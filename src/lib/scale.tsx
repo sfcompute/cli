@@ -13,6 +13,7 @@ import Spinner from "ink-spinner";
 import { GPUS_PER_NODE } from "./constants.ts";
 import { Row } from "./Row.tsx";
 import { Command } from "@commander-js/extra-typings";
+import { Badge } from "@inkjs/ui";
 
 type Procurement =
   paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
@@ -29,6 +30,7 @@ export function registerScale(program: Command) {
 
   // Main scale command as a default subcommand
   const scaleDefault = new Command("create")
+    .alias("update")
     .alias("default")
     .description("Scale GPUs up or down (default command)")
     .requiredOption(
@@ -41,13 +43,13 @@ export function registerScale(program: Command) {
       "Send/colocate into a specific cluster. If provided, the instance type will be ignored.",
     )
     .option(
-      "-h, --horizon <horizon>",
-      "The minimum amount of time to reserve in minutes. The procurement will buy more compute if the remaining contract time is less than this threshold.",
+      "-d, --horizon <horizon>",
+      "The minimum amount of time to reserve. The procurement will buy more compute if the remaining contract time is less than this threshold.",
       "60m",
     )
     .option("-p, --price <price>", "Max price per GPU hour, in dollars")
     .option("-y, --yes", "Automatically confirm the order")
-    .option("--id <id>", "Specify a procurement ID to scale directly")
+    .option("-i, --id <id>", "Specify a procurement ID to scale directly")
     .action((options) => {
       render(<ScaleCommand {...options} />);
     });
@@ -57,7 +59,7 @@ export function registerScale(program: Command) {
     .alias("list")
     .alias("ls")
     .description("Show current procurement details")
-    .option("-t, --type <type>", "Specify node type", "h100i")
+    .option("-t, --type <type>", "Specify node type")
     .option("--id <id>", "Specify a procurement ID to show directly")
     .action((options) => {
       render(<ProcurementsList {...options} />);
@@ -80,6 +82,7 @@ function ScaleCommand(props: {
 }) {
   const { exit } = useApp();
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuoting, setIsQuoting] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [confirmationMessage, setConfirmationMessage] = useState<
@@ -92,10 +95,9 @@ function ScaleCommand(props: {
     true | Procurement | Procurement[] | null
   >(null);
   const [
-    displayedPricePerNodeHourInCents,
-    setDisplayedPricePerNodeHourInCents,
+    displayedPricePerGpuHourInCents,
+    setDisplayedPricePerGpuHourInCents,
   ] = useState<number | undefined>(undefined);
-
   const isDown = Number(props.accelerators) === 0;
 
   useEffect(() => {
@@ -113,42 +115,43 @@ function ScaleCommand(props: {
         const { horizonMinutes, accelerators, type, nodesRequired, cluster } =
           convertProcurementParams(props);
 
-        let pricePerNodeHourInCents: number;
+        // Always get market quote to show accurate initial total
+        const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
+        setIsQuoting(true);
+        const quote = await getQuote({
+          instanceType: type,
+          quantity: nodesRequired,
+          minStartTime: new Date(),
+          maxStartTime: new Date(),
+          minDurationSeconds: quoteMinutes * 60,
+          maxDurationSeconds: quoteMinutes * 60 + 3600,
+          cluster,
+        });
+        setIsQuoting(false);
+
+        // Calculate market price from quote
+        let marketPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+        if (quote) {
+          marketPricePerGpuHourInCents = Math.ceil(
+            quote.price / ((quoteMinutes / 60) * accelerators),
+          );
+        }
+
+        // Set the limit price (if provided) or use market price
+        let limitPricePerGpuHourInCents = marketPricePerGpuHourInCents;
         if (props.price) {
           const price = Number.parseFloat(props.price);
           if (Number.isNaN(price)) {
             logAndQuit(`Failed to parse price: ${props.price}`);
           }
-          pricePerNodeHourInCents = GPUS_PER_NODE * dollarsToCents(price);
-        } else {
-          const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
-          const quote = await getQuote({
-            instanceType: type,
-            quantity: nodesRequired,
-            minStartTime: new Date(),
-            maxStartTime: new Date(),
-            minDurationSeconds: quoteMinutes * 60,
-            maxDurationSeconds: quoteMinutes * 60 + 3600,
-            cluster,
-          });
-
-          let quotePricePerNodeHourInCents: number;
-          if (quote) {
-            quotePricePerNodeHourInCents = Math.ceil(
-              quote.price / ((quoteMinutes / 60) * nodesRequired),
-            );
-          } else {
-            quotePricePerNodeHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-          }
-          pricePerNodeHourInCents = quotePricePerNodeHourInCents;
+          limitPricePerGpuHourInCents = dollarsToCents(price);
         }
 
-        const totalPriceInCents = pricePerNodeHourInCents * nodesRequired *
+        // Always calculate total based on market price
+        const totalPriceInCents = marketPricePerGpuHourInCents * accelerators *
           (horizonMinutes / 60);
 
-        setDisplayedPricePerNodeHourInCents(pricePerNodeHourInCents);
-        const pricePerGpuHourInCents = Math.ceil(pricePerNodeHourInCents) /
-          GPUS_PER_NODE;
+        setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
 
         if (horizonMinutes < 1) {
           setError("Minimum horizon is 1 minute");
@@ -169,8 +172,9 @@ function ScaleCommand(props: {
 
         setConfirmationMessage(
           <ConfirmationMessage
+            quote={props.price === undefined}
             horizonMinutes={horizonMinutes}
-            pricePerGpuHourInCents={pricePerGpuHourInCents}
+            pricePerGpuHourInCents={limitPricePerGpuHourInCents}
             accelerators={accelerators}
             totalPriceInCents={totalPriceInCents}
             type={type}
@@ -182,11 +186,12 @@ function ScaleCommand(props: {
             horizonMinutes,
             nodesRequired,
             type,
-            pricePerNodeHourInCents,
+            pricePerGpuHourInCents: limitPricePerGpuHourInCents,
             cluster,
           });
         }
       } catch (err: unknown) {
+        setIsQuoting(false);
         if (err instanceof Error) {
           setError(err.message);
         } else {
@@ -203,13 +208,13 @@ function ScaleCommand(props: {
       horizonMinutes,
       nodesRequired,
       type,
-      pricePerNodeHourInCents,
+      pricePerGpuHourInCents,
       cluster,
     }: {
       horizonMinutes: number;
       nodesRequired: number;
       type: string;
-      pricePerNodeHourInCents: number;
+      pricePerGpuHourInCents: number;
       cluster?: string;
     }) => {
       try {
@@ -219,7 +224,7 @@ function ScaleCommand(props: {
           nodesRequired,
           type,
           cluster,
-          pricePerNodeHourInCents,
+          pricePerGpuHourInCents,
           id: props.id,
         });
         setProcurementResult(result);
@@ -248,26 +253,35 @@ function ScaleCommand(props: {
         props,
       );
 
-      if (!displayedPricePerNodeHourInCents) {
-        throw new Error("Price per node hour not set.");
+      if (!displayedPricePerGpuHourInCents) {
+        throw new Error("Price per GPU hour not set.");
       }
 
       submitProcurement({
         horizonMinutes,
         nodesRequired,
         type,
+        pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
         cluster: props.cluster,
-        pricePerNodeHourInCents: displayedPricePerNodeHourInCents,
       });
     },
-    [submitProcurement, props.cluster, displayedPricePerNodeHourInCents, exit],
+    [submitProcurement, props.cluster, displayedPricePerGpuHourInCents, exit],
   );
 
   return (
     <Box flexDirection="column">
       {error && <Text color="red">Error: {error}</Text>}
       {balanceLowMessage && <Box>{balanceLowMessage}</Box>}
-      {!error && confirmationMessage && !props.yes && !isLoading && (
+      {isQuoting && (
+        <Box gap={1}>
+          <Spinner type="dots" />
+          <Box gap={1}>
+            <Text>Getting quote...</Text>
+          </Box>
+        </Box>
+      )}
+      {!error && confirmationMessage && !props.yes && !isLoading &&
+        !isQuoting && (
         <Box flexDirection="column">
           {confirmationMessage}
           <Box>
@@ -301,38 +315,92 @@ function ScaleCommand(props: {
   );
 }
 
-function ProcurementsList(props: { type: string; id?: string }) {
+function ProcurementDisplay(props: { procurement: Procurement }) {
+  const horizonMinutes = props.procurement.horizon;
+  const quantity = props.procurement.desired_quantity * GPUS_PER_NODE;
+  const pricePerGpuHourInCents = props.procurement.buy_limit_price_per_gpu_hour;
+
+  return (
+    <Box flexDirection="column">
+      <Box gap={1}>
+        <Box width={11}>
+          {quantity > 0
+            ? <Badge color="cyan">Active</Badge>
+            : <Badge color="gray">Disabled</Badge>}
+        </Box>
+        <Box paddingLeft={0.1}>
+          <Text color={quantity > 0 ? "cyan" : "gray"}>
+            {props.procurement.id}
+          </Text>
+        </Box>
+      </Box>
+      <Box flexDirection="column" paddingTop={0.5}>
+        <Row
+          headWidth={15}
+          head="Type"
+          value={props.procurement.instance_type}
+        />
+        <Row headWidth={15} head="GPUs" value={String(quantity)} />
+        <Row
+          headWidth={15}
+          head="Limit Price"
+          value={`$${(pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
+        />
+        <Row
+          headWidth={15}
+          head="Horizon"
+          value={formatDuration(horizonMinutes * 60 * 1000)}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+function ProcurementsList(props: { type?: string; id?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [info, setInfo] = useState<Procurement | null>(null);
+  const [procurements, setProcurements] = useState<Procurement[]>([]);
 
   useEffect(() => {
     async function fetchInfo() {
       try {
         const client = await apiClient();
-        const procurements = await client.GET("/v0/procurements");
+        let response;
 
-        if (!procurements.response.ok) {
-          throw new Error(
-            procurements.error?.message || "Failed to list procurements",
-          );
-        }
-
-        let current: Procurement | undefined;
-
-        // Find procurement by ID if provided, otherwise find by type
         if (props.id) {
-          current = procurements.data?.data.find((p) => p.id === props.id);
-          if (!current) {
-            throw new Error(`No procurement found with ID ${props.id}`);
-          }
-        } else {
-          current = procurements.data?.data.find((p) =>
-            p.instance_type === props.type
-          );
-        }
+          // If ID provided, get specific procurement
+          response = await client.GET("/v0/procurements/{id}", {
+            params: { path: { id: props.id } },
+          });
 
-        setInfo(current ?? null);
+          if (!response.response.ok) {
+            throw new Error(
+              response.error?.message ||
+                `Failed to get procurement ${props.id}`,
+            );
+          }
+
+          setProcurements(response.data ? [response.data] : []);
+        } else {
+          // Otherwise list all and filter by type if provided
+          response = await client.GET("/v0/procurements");
+
+          if (!response.response.ok) {
+            throw new Error(
+              response.error?.message || "Failed to list procurements",
+            );
+          }
+
+          let procurements = response.data?.data || [];
+
+          if (props.type) {
+            procurements = procurements.filter(
+              (p) => p.instance_type === props.type,
+            );
+          }
+
+          setProcurements(procurements);
+        }
       } catch (err: unknown) {
         setError(
           err instanceof Error ? err.message : "An unknown error occurred",
@@ -361,46 +429,24 @@ function ProcurementsList(props: { type: string; id?: string }) {
     );
   }
 
-  if (!info) {
-    if (props.id) {
-      return (
-        <Box>
-          <Text>No procurement found with ID {props.id}</Text>
-        </Box>
-      );
-    }
+  if (procurements.length === 0) {
     return (
-      <Box>
-        <Text>No procurement found for {props.type}</Text>
+      <Box flexDirection="column" gap={1} paddingBottom={1}>
+        <Text>No procurements found.</Text>
+
+        <Box paddingLeft={4} flexDirection="column">
+          <Text dimColor># To create a procurement</Text>
+          <Text color="yellow">sf scale -n 8</Text>
+        </Box>
       </Box>
     );
   }
 
-  const horizonMinutes = info.horizon;
-  const quantity = info.desired_quantity * GPUS_PER_NODE;
-  const pricePerNodeHourInCents = info.buy_limit_price_per_node_hour;
-  const pricePerGpuHourInCents = Math.ceil(
-    pricePerNodeHourInCents / GPUS_PER_NODE,
-  );
-
   return (
-    <Box flexDirection="column">
-      <Row headWidth={15} head="ID" value={info.id} />
-      <Row headWidth={15} head="Type" value={info.instance_type} />
-      <Row headWidth={15} head="GPUs" value={String(quantity)} />
-      <Row
-        headWidth={15}
-        head="LimitPrice"
-        value={`$${(pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
-      />
-      <Row
-        headWidth={15}
-        head="Horizon (Min Duration)"
-        value={formatDuration(horizonMinutes * 60 * 1000)}
-      />
-      <Text color="green">
-        Current procurement details fetched successfully.
-      </Text>
+    <Box flexDirection="column" gap={2} paddingBottom={1}>
+      {procurements.map((procurement) => (
+        <ProcurementDisplay procurement={procurement} key={procurement.id} />
+      ))}
     </Box>
   );
 }
@@ -411,8 +457,10 @@ function ConfirmationMessage(props: {
   accelerators: number;
   totalPriceInCents: number;
   type: string;
+  quote: boolean;
 }) {
-  const horizonInMilliseconds = props.horizonMinutes * 60 * 1000;
+  const horizonInMilliseconds =
+    Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000;
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box gap={1}>
@@ -426,12 +474,12 @@ function ConfirmationMessage(props: {
       />
       <Row
         headWidth={15}
-        head="price"
+        head={props.quote ? "current price" : "limit price"}
         value={`$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
       />
       <Row
         headWidth={15}
-        head="min time"
+        head="horizon time"
         value={formatDuration(horizonInMilliseconds)}
       />
       <Row
@@ -484,14 +532,14 @@ async function scaleToCount({
   nodesRequired,
   type,
   cluster,
-  pricePerNodeHourInCents,
+  pricePerGpuHourInCents,
   id,
 }: {
   horizonMinutes: number;
   nodesRequired: number;
   type: string;
   cluster?: string;
-  pricePerNodeHourInCents: number;
+  pricePerGpuHourInCents: number;
   id?: string;
 }) {
   const client = await apiClient();
@@ -523,8 +571,7 @@ async function scaleToCount({
       body: {
         instance_type: type,
         desired_quantity: nodesRequired,
-        buy_limit_price_per_node_hour: pricePerNodeHourInCents,
-        sell_limit_price_per_node_hour: 25, // TODO: Make this configurable
+        buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
         horizon: horizonMinutes,
         colocate_on_cluster: cluster,
       },
@@ -538,15 +585,13 @@ async function scaleToCount({
       body: {
         instance_type: type,
         desired_quantity: nodesRequired,
-        buy_limit_price_per_node_hour: pricePerNodeHourInCents,
+        buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
+        sell_limit_price_per_gpu_hour: 25,
         horizon: Math.max(horizonMinutes, 1),
-
-        // Defaults I'm not going to change
         status: "active",
-        sell_limit_price_per_node_hour: 25,
-        colocate: true,
-        colocate_on_restart: true,
-        colocate_on_cluster: cluster,
+        colocation_strategy: cluster
+          ? { type: "pinned", cluster_name: cluster }
+          : { type: "colocate-pinned" },
       },
     });
     if (!res.response.ok) {
