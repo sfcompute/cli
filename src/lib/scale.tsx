@@ -259,7 +259,7 @@ function ScaleCommand(props: {
         exit();
       }
     },
-    [props.horizon, props.price, props.id, exit],
+    [props.horizon, props.price, props.id, props.cluster, exit],
   );
 
   const handleSubmit = useCallback(
