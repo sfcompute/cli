@@ -115,73 +115,92 @@ function ScaleCommand(props: {
         const { horizonMinutes, accelerators, type, nodesRequired, cluster } =
           convertProcurementParams(props);
 
-        // Always get market quote to show accurate initial total
-        const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
-        setIsQuoting(true);
-        const quote = await getQuote({
-          instanceType: type,
-          quantity: nodesRequired,
-          minStartTime: new Date(),
-          maxStartTime: new Date(),
-          minDurationSeconds: quoteMinutes * 60,
-          maxDurationSeconds: quoteMinutes * 60 + 3600,
-          cluster,
-        });
-        setIsQuoting(false);
+        // Skip quoting if -y flag is specified
+        if (!props.yes) {
+          // Get market quote to show accurate initial total
+          const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
+          setIsQuoting(true);
+          const quote = await getQuote({
+            instanceType: type,
+            quantity: nodesRequired,
+            minStartTime: new Date(),
+            maxStartTime: new Date(),
+            minDurationSeconds: quoteMinutes * 60,
+            maxDurationSeconds: quoteMinutes * 60 + 3600,
+            cluster,
+          });
+          setIsQuoting(false);
 
-        // Calculate market price from quote
-        let marketPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-        if (quote) {
-          marketPricePerGpuHourInCents = Math.ceil(
-            quote.price / ((quoteMinutes / 60) * accelerators),
-          );
-        }
-
-        // Set the limit price (if provided) or use market price
-        let limitPricePerGpuHourInCents = marketPricePerGpuHourInCents;
-        if (props.price) {
-          const price = Number.parseFloat(props.price);
-          if (Number.isNaN(price)) {
-            logAndQuit(`Failed to parse price: ${props.price}`);
+          // Calculate market price from quote
+          let marketPricePerGpuHourInCents =
+            DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+          if (quote) {
+            marketPricePerGpuHourInCents = Math.ceil(
+              quote.price / ((quoteMinutes / 60) * accelerators),
+            );
           }
-          limitPricePerGpuHourInCents = dollarsToCents(price);
-        }
 
-        // Always calculate total based on market price
-        const totalPriceInCents = marketPricePerGpuHourInCents * accelerators *
-          (horizonMinutes / 60);
+          // Set the limit price (if provided) or use market price
+          let limitPricePerGpuHourInCents = marketPricePerGpuHourInCents;
+          if (props.price) {
+            const price = Number.parseFloat(props.price);
+            if (Number.isNaN(price)) {
+              logAndQuit(`Failed to parse price: ${props.price}`);
+            }
+            limitPricePerGpuHourInCents = dollarsToCents(price);
+          }
 
-        setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
+          // Always calculate total based on market price
+          const totalPriceInCents = marketPricePerGpuHourInCents *
+            accelerators *
+            (horizonMinutes / 60);
 
-        if (horizonMinutes < 1) {
-          setError("Minimum horizon is 1 minute");
-          return;
-        }
+          setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
 
-        const balance = await getBalance();
-        if (balance.available.cents < totalPriceInCents) {
-          setBalanceLowMessage(
-            <Text>
-              You can't afford this. Available: $
-              {(balance.available.cents / 100).toFixed(2)}, Needed: $
-              {(totalPriceInCents / 100).toFixed(2)}
-            </Text>,
+          if (horizonMinutes < 1) {
+            setError("Minimum horizon is 1 minute");
+            return;
+          }
+
+          const balance = await getBalance();
+          if (balance.available.cents < totalPriceInCents) {
+            setBalanceLowMessage(
+              <Text>
+                You can't afford this. Available: $
+                {(balance.available.cents / 100).toFixed(2)}, Needed: $
+                {(totalPriceInCents / 100).toFixed(2)}
+              </Text>,
+            );
+            return;
+          }
+
+          setConfirmationMessage(
+            <ConfirmationMessage
+              quote={props.price === undefined}
+              horizonMinutes={horizonMinutes}
+              pricePerGpuHourInCents={limitPricePerGpuHourInCents}
+              accelerators={accelerators}
+              totalPriceInCents={totalPriceInCents}
+              type={type}
+            />,
           );
-          return;
-        }
+        } else {
+          // Direct submission with -y flag
+          let limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+          if (props.price) {
+            const price = Number.parseFloat(props.price);
+            if (Number.isNaN(price)) {
+              logAndQuit(`Failed to parse price: ${props.price}`);
+            }
+            limitPricePerGpuHourInCents = dollarsToCents(price);
+          }
 
-        setConfirmationMessage(
-          <ConfirmationMessage
-            quote={props.price === undefined}
-            horizonMinutes={horizonMinutes}
-            pricePerGpuHourInCents={limitPricePerGpuHourInCents}
-            accelerators={accelerators}
-            totalPriceInCents={totalPriceInCents}
-            type={type}
-          />,
-        );
+          if (horizonMinutes < 1) {
+            setError("Minimum horizon is 1 minute");
+            return;
+          }
 
-        if (props.yes) {
+          setIsLoading(true);
           await submitProcurement({
             horizonMinutes,
             nodesRequired,
@@ -192,6 +211,7 @@ function ScaleCommand(props: {
         }
       } catch (err: unknown) {
         setIsQuoting(false);
+        setIsLoading(false);
         if (err instanceof Error) {
           setError(err.message);
         } else {
