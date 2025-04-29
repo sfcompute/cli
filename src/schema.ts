@@ -286,19 +286,19 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time of the first order in the grid.
-                                 * @example 2025-04-29T21:00:00.000Z
+                                 * @example 2025-04-30T00:00:00.000Z
                                  */
                                 grid_front: string;
                                 /**
                                  * Format: date-time
                                  * @description Earliest time of any order in the grid.
-                                 * @example 2025-04-29T21:00:00.000Z
+                                 * @example 2025-04-30T00:00:00.000Z
                                  */
                                 start_at: string;
                                 /**
                                  * Format: date-time
                                  * @description The time at which the grid should stop placing new orders automatically.
-                                 * @example 2025-04-29T22:00:00.000Z
+                                 * @example 2025-04-30T01:00:00.000Z
                                  */
                                 end_at: string;
                                 order: {
@@ -419,13 +419,13 @@ export interface paths {
                         /**
                          * Format: date-time
                          * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-                         * @example 2025-04-29T21:00:00.000Z
+                         * @example 2025-04-30T00:00:00.000Z
                          */
                         start_at: string;
                         /**
                          * Format: date-time
                          * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-                         * @example 2025-04-29T22:00:00.000Z
+                         * @example 2025-04-30T01:00:00.000Z
                          */
                         end_at?: string;
                         order: {
@@ -620,19 +620,19 @@ export interface paths {
                             /**
                              * Format: date-time
                              * @description The start time of the first order in the grid.
-                             * @example 2025-04-29T21:00:00.000Z
+                             * @example 2025-04-30T00:00:00.000Z
                              */
                             grid_front: string;
                             /**
                              * Format: date-time
                              * @description Earliest time of any order in the grid.
-                             * @example 2025-04-29T21:00:00.000Z
+                             * @example 2025-04-30T00:00:00.000Z
                              */
                             start_at: string;
                             /**
                              * Format: date-time
                              * @description The time at which the grid should stop placing new orders automatically.
-                             * @example 2025-04-29T22:00:00.000Z
+                             * @example 2025-04-30T01:00:00.000Z
                              */
                             end_at: string;
                             order: {
@@ -1596,7 +1596,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-29T19:27:37.522Z
+                                 * @example 2025-04-29T22:17:46.294Z
                                  */
                                 start_at: string;
                                 /**
@@ -1623,7 +1623,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-29T19:27:37.522Z
+                                 * @example 2025-04-29T22:17:46.294Z
                                  */
                                 start_at: string;
                                 /**
@@ -2467,6 +2467,39 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** @description In this strategy, the procurement will buy compute on any cluster, with no guarantees about colocation whatsoever. */
+        AnywhereColocationStrategy: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "anywhere";
+        };
+        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. If you scale the procurement down to 0, and then scale back up, the procurement is not guaranteed to land on the same cluster it was on before. */
+        ColocateColocationStrategy: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "colocate";
+        };
+        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. However, once the first reservation begins, the procurement will always land on that specific cluster, even if you scale down to 0 and back up again. */
+        ColocatePinnedColocationStrategy: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "colocate-pinned";
+        };
+        /** @description In this strategy, the procurement will always buy compute on the given cluster. */
+        PinnedColocationStrategy: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "pinned";
+            cluster_name: string;
+        };
         Procurement: {
             /** @enum {string} */
             object: "procurement";
@@ -2481,32 +2514,21 @@ export interface components {
             /** @description The desired number of nodes the procurement will buy or sell */
             desired_quantity: number;
             /**
-             * @description The maximum price, in cents per node per hour that the procurement will buy at when extending or scaling up. If the market price goes higher than this, the procurement will not buy compute. Note that this is a *maximum* - the procurement will always try to buy at the lowest price available.
+             * @description The maximum price, in cents per GPU per hour that the procurement will buy at when extending or scaling up. If the market price goes higher than this, the procurement will not buy compute. Note that this is a *maximum* - the procurement will always try to buy at the lowest price available.
              * @default 250
              */
-            buy_limit_price_per_node_hour: number;
+            buy_limit_price_per_gpu_hour: number;
             /**
-             * @description The minimum price, in cents per node per hour that the procurement will sell at when scaling down. If the market price dips below this price, the procurement will not sell compute when scaling down.
+             * @description The minimum price, in cents per GPU per hour that the procurement will sell at when scaling down. If the market price dips below this price, the procurement will not sell compute when scaling down.
              * @default 25
              */
-            sell_limit_price_per_node_hour: number;
+            sell_limit_price_per_gpu_hour: number;
             /**
              * @description The minimum amount of time, in minutes, that the procurement should reserve up-front at any point in time. The procurement will buy more compute if the remaining time is less than this threshold.
              * @default 60
              */
             horizon: number;
-            /**
-             * @description Whether or not the procurement should ensure that all compute it buys is colocated in the same cluster.
-             * @default true
-             */
-            colocate: boolean;
-            /**
-             * @description Whether or not the procurement should land on the same cluster it was on before when is scales down to zero and back up again. If this is `true`, `colocate` cannot be `false`.
-             * @default true
-             */
-            colocate_on_restart: boolean;
-            /** @description Require the procurement to always land on a specific cluster. If this is specified, neither `colocate` nor `colocate_on_restart` can be `false`. */
-            colocate_on_cluster?: string;
+            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
         };
         ProcurementNotAuthenticatedError: {
             /**
@@ -2553,8 +2575,8 @@ export interface components {
             /** @description The instance type. */
             instance_type?: ("h100i" | "h100v") | string;
             desired_quantity?: number;
-            buy_limit_price_per_node_hour?: number;
-            sell_limit_price_per_node_hour?: number;
+            buy_limit_price_per_gpu_hour?: number;
+            sell_limit_price_per_gpu_hour?: number;
             horizon?: number;
         };
         ProcurementInvalidColocateOnRestartError: {
@@ -2622,16 +2644,15 @@ export interface components {
             instance_type: ("h100i" | "h100v") | string;
             desired_quantity: number;
             /** @default 250 */
-            buy_limit_price_per_node_hour: number;
+            buy_limit_price_per_gpu_hour: number;
             /** @default 25 */
-            sell_limit_price_per_node_hour: number;
+            sell_limit_price_per_gpu_hour: number;
             /** @default 60 */
             horizon: number;
-            /** @default true */
-            colocate: boolean;
-            /** @default true */
-            colocate_on_restart: boolean;
-            colocate_on_cluster?: string;
+            /** @default {
+             *       "type": "colocate-pinned"
+             *     } */
+            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
         };
         Token: {
             /**
@@ -2790,8 +2811,8 @@ export interface components {
          *       "balance_before": 70000,
          *       "balance_after": 20000,
          *       "metadata": {
-         *         "start_time": "2025-04-29T21:27:37.557Z",
-         *         "end_time": "2025-04-30T00:27:37.557Z",
+         *         "start_time": "2025-04-30T00:17:46.323Z",
+         *         "end_time": "2025-04-30T03:17:46.323Z",
          *         "quantity": 5,
          *         "instance_type_requirements": {
          *           "accelerator_type": "H100",
@@ -2976,7 +2997,7 @@ export interface components {
             /**
              * Format: date-time
              * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-04-29T19:27:37.522Z
+             * @example 2025-04-29T22:17:46.294Z
              */
             start_at: string;
             /**
