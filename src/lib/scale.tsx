@@ -14,6 +14,7 @@ import { GPUS_PER_NODE } from "./constants.ts";
 import { Row } from "./Row.tsx";
 import { Command } from "@commander-js/extra-typings";
 import { Badge } from "@inkjs/ui";
+import { isFeatureEnabled } from "./posthog.ts";
 
 type Procurement =
   paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
@@ -24,7 +25,17 @@ const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Example default price
 const MIN_CONTRACT_MINUTES = 60; // Minimum contract size is 1 hour
 const DEFAULT_LIMIT_PRICE_MULTIPLIER = 1.5;
 
-export function registerScale(program: Command) {
+export async function registerScale(program: Command) {
+  const isEnabled = await isFeatureEnabled("procurements");
+
+  if (!isEnabled) {
+    return;
+  }
+
+  registerScaleInner(program);
+}
+
+function registerScaleInner(program: Command) {
   const scale = program
     .command("scale")
     .description("Scale GPUs or show current procurement details");
@@ -48,7 +59,10 @@ export function registerScale(program: Command) {
       "The minimum amount of time to reserve. The procurement will buy more compute if the remaining contract time is less than this threshold.",
       "60m",
     )
-    .option("-p, --price <price>", "Max price per GPU hour, in dollars. Defaults to the current market price times 1.5, or $2.65 if there is no market price.")
+    .option(
+      "-p, --price <price>",
+      "Max price per GPU hour, in dollars. Defaults to the current market price times 1.5, or $2.65 if there is no market price.",
+    )
     .option("-y, --yes", "Automatically confirm the order")
     .option("-i, --id <id>", "Specify a procurement ID to scale directly")
     .action((options) => {
@@ -143,7 +157,8 @@ function ScaleCommand(props: {
             const quoteEnd = new Date(quote.end_at).getTime();
             const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
             marketPricePerGpuHourInCents = Math.ceil(
-              DEFAULT_LIMIT_PRICE_MULTIPLIER * (quote.price / (quoteDurationHours * accelerators)),
+              DEFAULT_LIMIT_PRICE_MULTIPLIER *
+                (quote.price / (quoteDurationHours * accelerators)),
             );
           }
 

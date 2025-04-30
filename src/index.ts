@@ -46,7 +46,7 @@ registerSell(program);
 registerBalance(program);
 registerTokens(program);
 registerUpgrade(program);
-registerScale(program);
+await registerScale(program);
 registerClusters(program);
 registerMe(program);
 registerVM(program);

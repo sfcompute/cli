@@ -67,7 +67,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags = "";
+type FeatureFlags = "procurements";
 
 /**
  * Checks if a feature is enabled for the current user.
