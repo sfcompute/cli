@@ -2079,6 +2079,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v0/credentials": {
+        parameters: {
+          query?: never;
+          header?: never;
+          path?: never;
+          cookie?: never;
+        };
+        get: operations["getV0Credentials"];
+        put?: never;
+        post: operations["postV0Credentials"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3262,4 +3278,729 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export type operations = {
+    getV0Credentials: {
+        parameters: {
+          query?: never;
+          header?: {
+            /** @description Generate a bearer token with `$ sf tokens create`. */
+            authorization?: string;
+          };
+          path?: never;
+          cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+          200: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json": {
+                data: (
+                  | {
+                      /** @constant */
+                      object: "ssh_credential";
+                      id: string;
+                      pubkey: string;
+                      username: string;
+                    }
+                  | {
+                      /** @constant */
+                      object: "k8s_credential";
+                      id: string;
+                      username?: string;
+                      label?: string;
+                      pubkey: string;
+                      cluster?: {
+                        /** @constant */
+                        object: "kubernetes_cluster";
+                        kubernetes_api_url?: string;
+                        name: string;
+                        kubernetes_namespace: string;
+                        kubernetes_ca_cert?: string;
+                        contract?:
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "active";
+                              id: string;
+                              /** Format: date-time */
+                              created_at: string;
+                              /** @description The instance type. */
+                              instance_type: string;
+                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                              shape: {
+                                intervals: string[];
+                                quantities: number[];
+                              };
+                              colocate_with?: string[];
+                              cluster_id?: string;
+                              state: "Upcoming" | "Expired" | "Active";
+                            }
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "pending";
+                              id: string;
+                            };
+                      };
+                      encrypted_token?: string;
+                      nonce?: string;
+                      ephemeral_pubkey?: string;
+                      contracts?: (
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          }
+                      )[];
+                    }
+                )[];
+                has_more: boolean;
+                /** @constant */
+                object: "list";
+              };
+              "multipart/form-data": {
+                data: (
+                  | {
+                      /** @constant */
+                      object: "ssh_credential";
+                      id: string;
+                      pubkey: string;
+                      username: string;
+                    }
+                  | {
+                      /** @constant */
+                      object: "k8s_credential";
+                      id: string;
+                      username?: string;
+                      label?: string;
+                      pubkey: string;
+                      cluster?: {
+                        /** @constant */
+                        object: "kubernetes_cluster";
+                        kubernetes_api_url?: string;
+                        name: string;
+                        kubernetes_namespace: string;
+                        kubernetes_ca_cert?: string;
+                        contract?:
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "active";
+                              id: string;
+                              /** Format: date-time */
+                              created_at: string;
+                              /** @description The instance type. */
+                              instance_type: string;
+                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                              shape: {
+                                intervals: string[];
+                                quantities: number[];
+                              };
+                              colocate_with?: string[];
+                              cluster_id?: string;
+                              state: "Upcoming" | "Expired" | "Active";
+                            }
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "pending";
+                              id: string;
+                            };
+                      };
+                      encrypted_token?: string;
+                      nonce?: string;
+                      ephemeral_pubkey?: string;
+                      contracts?: (
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          }
+                      )[];
+                    }
+                )[];
+                has_more: boolean;
+                /** @constant */
+                object: "list";
+              };
+              "text/plain": {
+                data: (
+                  | {
+                      /** @constant */
+                      object: "ssh_credential";
+                      id: string;
+                      pubkey: string;
+                      username: string;
+                    }
+                  | {
+                      /** @constant */
+                      object: "k8s_credential";
+                      id: string;
+                      username?: string;
+                      label?: string;
+                      pubkey: string;
+                      cluster?: {
+                        /** @constant */
+                        object: "kubernetes_cluster";
+                        kubernetes_api_url?: string;
+                        name: string;
+                        kubernetes_namespace: string;
+                        kubernetes_ca_cert?: string;
+                        contract?:
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "active";
+                              id: string;
+                              /** Format: date-time */
+                              created_at: string;
+                              /** @description The instance type. */
+                              instance_type: string;
+                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                              shape: {
+                                intervals: string[];
+                                quantities: number[];
+                              };
+                              colocate_with?: string[];
+                              cluster_id?: string;
+                              state: "Upcoming" | "Expired" | "Active";
+                            }
+                          | {
+                              /** @constant */
+                              object: "contract";
+                              /** @constant */
+                              status: "pending";
+                              id: string;
+                            };
+                      };
+                      encrypted_token?: string;
+                      nonce?: string;
+                      ephemeral_pubkey?: string;
+                      contracts?: (
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          }
+                      )[];
+                    }
+                )[];
+                has_more: boolean;
+                /** @constant */
+                object: "list";
+              };
+            };
+          };
+          401: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "multipart/form-data": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "text/plain": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+            };
+          };
+          500: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "multipart/form-data": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "text/plain": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+            };
+          };
+        };
+      };
+      postV0Credentials: {
+        parameters: {
+          query?: never;
+          header?: {
+            /** @description Generate a bearer token with `$ sf tokens create`. */
+            authorization?: string;
+          };
+          path?: never;
+          cookie?: never;
+        };
+        requestBody: {
+          content: {
+            "application/json":
+              | {
+                  pubkey: string;
+                  username: string;
+                  /** @constant */
+                  object?: "ssh_credential";
+                }
+              | {
+                  username: string;
+                  label?: string;
+                  cluster: string;
+                  /** @constant */
+                  object: "k8s_credential";
+                  pubkey: string;
+                };
+            "multipart/form-data":
+              | {
+                  pubkey: string;
+                  username: string;
+                  /** @constant */
+                  object?: "ssh_credential";
+                }
+              | {
+                  username: string;
+                  label?: string;
+                  cluster: string;
+                  /** @constant */
+                  object: "k8s_credential";
+                  pubkey: string;
+                };
+            "text/plain":
+              | {
+                  pubkey: string;
+                  username: string;
+                  /** @constant */
+                  object?: "ssh_credential";
+                }
+              | {
+                  username: string;
+                  label?: string;
+                  cluster: string;
+                  /** @constant */
+                  object: "k8s_credential";
+                  pubkey: string;
+                };
+          };
+        };
+        responses: {
+          200: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json":
+                | {
+                    /** @constant */
+                    object: "ssh_credential";
+                    id: string;
+                    pubkey: string;
+                    username: string;
+                  }
+                | {
+                    /** @constant */
+                    object: "k8s_credential";
+                    id: string;
+                    username?: string;
+                    label?: string;
+                    pubkey: string;
+                    cluster?: {
+                      /** @constant */
+                      object: "kubernetes_cluster";
+                      kubernetes_api_url?: string;
+                      name: string;
+                      kubernetes_namespace: string;
+                      kubernetes_ca_cert?: string;
+                      contract?:
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          };
+                    };
+                    encrypted_token?: string;
+                    nonce?: string;
+                    ephemeral_pubkey?: string;
+                    contracts?: (
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "active";
+                          id: string;
+                          /** Format: date-time */
+                          created_at: string;
+                          /** @description The instance type. */
+                          instance_type: string;
+                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                          shape: {
+                            intervals: string[];
+                            quantities: number[];
+                          };
+                          colocate_with?: string[];
+                          cluster_id?: string;
+                          state: "Upcoming" | "Expired" | "Active";
+                        }
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "pending";
+                          id: string;
+                        }
+                    )[];
+                  };
+              "multipart/form-data":
+                | {
+                    /** @constant */
+                    object: "ssh_credential";
+                    id: string;
+                    pubkey: string;
+                    username: string;
+                  }
+                | {
+                    /** @constant */
+                    object: "k8s_credential";
+                    id: string;
+                    username?: string;
+                    label?: string;
+                    pubkey: string;
+                    cluster?: {
+                      /** @constant */
+                      object: "kubernetes_cluster";
+                      kubernetes_api_url?: string;
+                      name: string;
+                      kubernetes_namespace: string;
+                      kubernetes_ca_cert?: string;
+                      contract?:
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          };
+                    };
+                    encrypted_token?: string;
+                    nonce?: string;
+                    ephemeral_pubkey?: string;
+                    contracts?: (
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "active";
+                          id: string;
+                          /** Format: date-time */
+                          created_at: string;
+                          /** @description The instance type. */
+                          instance_type: string;
+                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                          shape: {
+                            intervals: string[];
+                            quantities: number[];
+                          };
+                          colocate_with?: string[];
+                          cluster_id?: string;
+                          state: "Upcoming" | "Expired" | "Active";
+                        }
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "pending";
+                          id: string;
+                        }
+                    )[];
+                  };
+              "text/plain":
+                | {
+                    /** @constant */
+                    object: "ssh_credential";
+                    id: string;
+                    pubkey: string;
+                    username: string;
+                  }
+                | {
+                    /** @constant */
+                    object: "k8s_credential";
+                    id: string;
+                    username?: string;
+                    label?: string;
+                    pubkey: string;
+                    cluster?: {
+                      /** @constant */
+                      object: "kubernetes_cluster";
+                      kubernetes_api_url?: string;
+                      name: string;
+                      kubernetes_namespace: string;
+                      kubernetes_ca_cert?: string;
+                      contract?:
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "active";
+                            id: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** @description The instance type. */
+                            instance_type: string;
+                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                            shape: {
+                              intervals: string[];
+                              quantities: number[];
+                            };
+                            colocate_with?: string[];
+                            cluster_id?: string;
+                            state: "Upcoming" | "Expired" | "Active";
+                          }
+                        | {
+                            /** @constant */
+                            object: "contract";
+                            /** @constant */
+                            status: "pending";
+                            id: string;
+                          };
+                    };
+                    encrypted_token?: string;
+                    nonce?: string;
+                    ephemeral_pubkey?: string;
+                    contracts?: (
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "active";
+                          id: string;
+                          /** Format: date-time */
+                          created_at: string;
+                          /** @description The instance type. */
+                          instance_type: string;
+                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
+                          shape: {
+                            intervals: string[];
+                            quantities: number[];
+                          };
+                          colocate_with?: string[];
+                          cluster_id?: string;
+                          state: "Upcoming" | "Expired" | "Active";
+                        }
+                      | {
+                          /** @constant */
+                          object: "contract";
+                          /** @constant */
+                          status: "pending";
+                          id: string;
+                        }
+                    )[];
+                  };
+            };
+          };
+          401: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "multipart/form-data": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "text/plain": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "not_authenticated";
+                message: string;
+                details?: Record<string, never>;
+              };
+            };
+          };
+          500: {
+            headers: {
+              [name: string]: unknown;
+            };
+            content: {
+              "application/json": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "multipart/form-data": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+              "text/plain": {
+                /** @constant */
+                object: "error";
+                /** @constant */
+                code: "internal_server";
+                message: string;
+                details?: Record<string, never>;
+              };
+            };
+          };
+        };
+      };
+};
