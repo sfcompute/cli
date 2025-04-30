@@ -22,6 +22,7 @@ type Procurement =
 
 const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265; // Example default price
 const MIN_CONTRACT_MINUTES = 60; // Minimum contract size is 1 hour
+const DEFAULT_LIMIT_PRICE_MULTIPLIER = 1.5;
 
 export function registerScale(program: Command) {
   const scale = program
@@ -47,7 +48,7 @@ export function registerScale(program: Command) {
       "The minimum amount of time to reserve. The procurement will buy more compute if the remaining contract time is less than this threshold.",
       "60m",
     )
-    .option("-p, --price <price>", "Max price per GPU hour, in dollars")
+    .option("-p, --price <price>", "Max price per GPU hour, in dollars. Defaults to the current market price times 1.5, or $2.65 if there is no market price.")
     .option("-y, --yes", "Automatically confirm the order")
     .option("-i, --id <id>", "Specify a procurement ID to scale directly")
     .action((options) => {
@@ -142,7 +143,7 @@ function ScaleCommand(props: {
             const quoteEnd = new Date(quote.end_at).getTime();
             const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
             marketPricePerGpuHourInCents = Math.ceil(
-              quote.price / (quoteDurationHours * accelerators),
+              DEFAULT_LIMIT_PRICE_MULTIPLIER * (quote.price / (quoteDurationHours * accelerators)),
             );
           }
 
@@ -500,22 +501,13 @@ function ConfirmationMessage(props: {
       />
       <Row
         headWidth={15}
-        head={props.quote ? "current price" : "limit price"}
+        head={`Max price${props.quote ? "" : " (1.5 x market price)"}`}
         value={`$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
       />
       <Row
         headWidth={15}
         head="horizon time"
         value={formatDuration(horizonInMilliseconds)}
-      />
-      <Row
-        headWidth={15}
-        head="initial total"
-        value={`$${(props.totalPriceInCents / 100).toFixed(2)} for ${
-          formatDuration(
-            horizonInMilliseconds,
-          )
-        }`}
       />
     </Box>
   );
