@@ -1027,7 +1027,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -1555,7 +1555,7 @@ export interface paths {
                     max_start_date?: "NOW" | string;
                     quantity: number;
                     instance_type?: ("h100i" | "h100v") | string;
-                    contract_id?: unknown;
+                    contract_id?: string;
                     colocate_with?: unknown[];
                     duration?: number;
                     min_duration?: number;
@@ -1632,7 +1632,7 @@ export interface paths {
                                  */
                                 end_at: string;
                                 /** @description An external ID with prefix and alphanumeric string with underscores */
-                                contract_id: unknown;
+                                contract_id: string;
                             } | null;
                         };
                     };
@@ -2992,7 +2992,7 @@ export interface components {
             /** @enum {string} */
             object: "order";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /**
              * @description Side of the order (buy/sell)
              * @enum {string}
@@ -3121,7 +3121,7 @@ export interface components {
             /** @enum {string} */
             object: "order";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /** @enum {string} */
             status: "pending";
             /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
@@ -3214,7 +3214,7 @@ export interface components {
             /** @enum {string} */
             side: "sell";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            contract_id: unknown;
+            contract_id: string;
             /**
              * @description The number of nodes.
              * @example 3
