@@ -120,11 +120,12 @@ function ScaleCommand(props: {
           // Get market quote to show accurate initial total
           const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
           setIsQuoting(true);
+
           const quote = await getQuote({
             instanceType: type,
             quantity: nodesRequired,
-            minStartTime: new Date(),
-            maxStartTime: new Date(),
+            minStartTime: "NOW",
+            maxStartTime: "NOW",
             minDurationSeconds: quoteMinutes * 60,
             maxDurationSeconds: quoteMinutes * 60 + 3600,
             cluster,
@@ -135,8 +136,13 @@ function ScaleCommand(props: {
           let marketPricePerGpuHourInCents =
             DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
           if (quote) {
+            const quoteStart =
+              (quote.start_at === "NOW" ? new Date() : new Date(quote.start_at))
+                .getTime();
+            const quoteEnd = new Date(quote.end_at).getTime();
+            const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
             marketPricePerGpuHourInCents = Math.ceil(
-              quote.price / ((quoteMinutes / 60) * accelerators),
+              quote.price / (quoteDurationHours * accelerators),
             );
           }
 
