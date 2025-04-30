@@ -819,11 +819,11 @@ export async function getMostRecentIndexAvgPrice(instanceType: string) {
     return logAndQuit("Failed to get prices: Unexpected response from server");
   }
 
-  data.data.sort((a, b) => {
+  const sortedData = data.data.filter((item) => !item.no_data).sort((a, b) => {
     return dayjs(b.period_start).diff(dayjs(a.period_start));
   });
 
-  return data.data[0].gpu_hour;
+  return sortedData[0].gpu_hour;
 }
 
 export async function getAggressivePricePerHour(instanceType: string) {
