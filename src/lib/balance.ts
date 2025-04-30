@@ -77,14 +77,12 @@ export async function getBalance(): Promise<BalanceUsdCents> {
   }
   const client = await apiClient();
 
-  const { data, error, response } = await client.GET("/v0/balance");
+  const { data, response } = await client.GET("/v0/balance");
 
   if (!response.ok) {
     switch (response.status) {
       case 401:
         return await logSessionTokenExpiredAndQuit();
-      case 500:
-        return logAndQuit(`Failed to get balance: ${error?.message}`);
       default:
         return logAndQuit(`Failed to get balance: ${response.statusText}`);
     }

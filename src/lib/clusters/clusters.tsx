@@ -195,11 +195,17 @@ async function listClustersAction({
   const { data, error, response } = await api.GET("/v0/clusters");
 
   if (!response.ok) {
+    // FIXME: This is a hack to get the error code and message, fix OpenAPI schema to include this
+    const rawError = error as {
+      code?: string;
+      message?: string;
+      details?: unknown;
+    } | undefined;
     return logAndQuit(
       `Failed to get clusters: HTTP ${response.status} - ${
-        error?.code || ""
-      }: ${error?.message || response.statusText} ${
-        error?.details || ""
+        rawError?.code || ""
+      }: ${rawError?.message || response.statusText} ${
+        rawError?.details || ""
       } (${response.url})`,
     );
   }
