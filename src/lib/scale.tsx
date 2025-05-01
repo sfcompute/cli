@@ -37,64 +37,117 @@ export async function registerScale(program: Command) {
 
 function registerScaleInner(program: Command) {
   const scale = program
-    .command("scale")
-    .description("Scale GPUs or show current procurement details");
+    .command("procurements")
+    .alias("procurement")
+    .alias("scale")
+    .description(
+      "Create and manage procurements that purchase a desired number of GPUs on a rolling basis.",
+    )
+    .addHelpText(
+      "after",
+      `
+A procurement is an automated purchasing strategy that will attempt to constantly maintain a desired number of GPUs by buying and selling spot reservations.
 
-  // Main scale command as a default subcommand
-  const scaleDefault = new Command("create")
-    .alias("update")
-    .alias("default")
-    .description("Scale GPUs up or down (default command)")
+See https://docs.sfcompute.com/using-sf-scale for more information.
+    `,
+    )
+    .showHelpAfterError();
+
+  // "create" command
+  const create = new Command("create")
+    .description("Create a procurement to purchase the desired number of GPUs.")
     .requiredOption(
       "-n, --accelerators <accelerators>",
-      "Set number of GPUs (0 to turn off)",
+      "Desired number of GPUs (0 to turn off)",
     )
     .option("-t, --type <type>", "Specify node type", "h100i")
     .option(
       "-c, --cluster <cluster>",
-      "Send/colocate into a specific cluster. If provided, the instance type will be ignored.",
+      "Only buy on the specified cluster. If provided, `-t`/`--type` will be ignored.",
     )
     .option(
       "-d, --horizon <horizon>",
-      "The minimum amount of time to reserve. The procurement will buy more compute if the remaining contract time is less than this threshold.",
+      "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
       "60m",
     )
     .option(
       "-p, --price <price>",
-      "Max price per GPU hour, in dollars. Defaults to the current market price times 1.5, or $2.65 if there is no market price.",
+      "Ceiling price per GPU hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
     )
-    .option("-y, --yes", "Automatically confirm the order")
-    .option("-i, --id <id>", "Specify a procurement ID to scale directly")
+    .option("-y, --yes", "Automatically confirm the command.")
     .action((options) => {
-      render(<ScaleCommand {...options} />);
+      render(
+        <CreateOrUpdateProcurementCommand {...options} command="create" />,
+      );
+    });
+
+  // "update" command
+  const update = new Command("update")
+    .description("Update a procurement.")
+    .argument("<ID>", "ID of the procurement to update")
+    .requiredOption(
+      "-n, --accelerators <accelerators>",
+      "Desired number of GPUs (0 to turn off)",
+    )
+    .option(
+      "-d, --horizon <horizon>",
+      "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
+      "60m",
+    )
+    .option(
+      "-p, --price <price>",
+      "Ceiling price per GPU hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+    )
+    .option("-y, --yes", "Automatically confirm the command.")
+    .action((id, options) => {
+      render(
+        <CreateOrUpdateProcurementCommand
+          {...options}
+          id={id}
+          command="update"
+        />,
+      );
     });
 
   // Show subcommand
-  const showCommand = new Command("show")
+  const show = new Command("show")
     .alias("list")
     .alias("ls")
-    .description("Show current procurement details")
-    .option("-t, --type <type>", "Specify node type")
-    .option("--id <id>", "Specify a procurement ID to show directly")
+    .description("Show current scale details")
+    .option("-i, --id <id>", "Show a specific procurement by ID")
+    .option("-t, --type <type>", "Show procurements of a specific node type")
     .action((options) => {
+      // TODO handle id
       render(<ProcurementsList {...options} />);
     });
 
   // Add both commands
   scale
-    .addCommand(scaleDefault, { isDefault: true }) // Make it the default command
-    .addCommand(showCommand);
+    .addCommand(create)
+    .addCommand(update)
+    .addCommand(show);
 }
 
-function ScaleCommand(props: {
+type CreateProcurementCommandProps = {
+  command: "create";
   accelerators: string;
   type: string;
   horizon: string;
   cluster?: string;
   price?: string;
   yes?: boolean;
-  id?: string;
-}) {
+} | {
+  command: "update";
+  id: string;
+  accelerators: string;
+  horizon: string;
+  price?: string;
+  yes?: boolean;
+};
+
+function CreateOrUpdateProcurementCommand(
+  props: CreateProcurementCommandProps,
+) {
   const { exit } = useApp();
   const [isLoading, setIsLoading] = useState(false);
   const [isQuoting, setIsQuoting] = useState(false);
@@ -113,123 +166,137 @@ function ScaleCommand(props: {
     displayedPricePerGpuHourInCents,
     setDisplayedPricePerGpuHourInCents,
   ] = useState<number | undefined>(undefined);
-  const isDown = Number(props.accelerators) === 0;
 
   useEffect(() => {
     async function init() {
       try {
-        if (isDown) {
-          // Scale down (0 GPUs)
-          await scaleDown(props);
-          setProcurementResult(true);
-          exit();
-          return;
-        }
-
-        // Scale up logic
-        const { horizonMinutes, accelerators, type, nodesRequired, cluster } =
-          convertProcurementParams(props);
-
-        // Skip quoting if -y flag is specified
-        if (!props.yes) {
-          // Get market quote to show accurate initial total
-          const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
-          setIsQuoting(true);
-
-          const quote = await getQuote({
-            instanceType: type,
-            quantity: nodesRequired,
-            minStartTime: "NOW",
-            maxStartTime: "NOW",
-            minDurationSeconds: quoteMinutes * 60,
-            maxDurationSeconds: quoteMinutes * 60 + 3600,
-            cluster,
+        if (props.command === "update") {
+          const horizonMinutes = parseHorizonToMinutes(props.horizon);
+          const accelerators = parseAccelerators(props.accelerators);
+          const nodesRequired = acceleratorsToNodes(accelerators);
+          const procurement = await getProcurement({
+            id: props.id,
           });
-          setIsQuoting(false);
 
-          // Calculate market price from quote
-          let marketPricePerGpuHourInCents =
-            DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-          if (quote) {
-            const quoteStart =
-              (quote.start_at === "NOW" ? new Date() : new Date(quote.start_at))
-                .getTime();
-            const quoteEnd = new Date(quote.end_at).getTime();
-            const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
-            marketPricePerGpuHourInCents = Math.ceil(
-              DEFAULT_LIMIT_PRICE_MULTIPLIER *
-                (quote.price / (quoteDurationHours * accelerators)),
-            );
-          }
-
-          // Set the limit price (if provided) or use market price
-          let limitPricePerGpuHourInCents = marketPricePerGpuHourInCents;
+          let limitPricePerGpuHourInCents: number | undefined;
           if (props.price) {
             const price = Number.parseFloat(props.price);
             if (Number.isNaN(price)) {
               logAndQuit(`Failed to parse price: ${props.price}`);
             }
             limitPricePerGpuHourInCents = dollarsToCents(price);
+            setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
           }
 
-          // Always calculate total based on market price
-          const totalPriceInCents = marketPricePerGpuHourInCents *
-            accelerators *
-            (horizonMinutes / 60);
-
-          setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
-
-          if (horizonMinutes < 1) {
-            setError("Minimum horizon is 1 minute");
-            return;
-          }
-
-          const balance = await getBalance();
-          if (balance.available.cents < totalPriceInCents) {
-            setBalanceLowMessage(
-              <Text>
-                You can't afford this. Available: $
-                {(balance.available.cents / 100).toFixed(2)}, Needed: $
-                {(totalPriceInCents / 100).toFixed(2)}
-              </Text>,
+          if (props.yes) {
+            setConfirmationMessage(
+              <ConfirmationMessage
+                quote={props.price === undefined}
+                horizonMinutes={horizonMinutes}
+                pricePerGpuHourInCents={limitPricePerGpuHourInCents}
+                accelerators={accelerators}
+              />,
             );
-            return;
+          } else {
+            setIsLoading(true);
+            await submitUpdateProcurement({
+              procurement,
+              horizonMinutes,
+              nodesRequired,
+              pricePerGpuHourInCents: props.price,
+            });
           }
-
-          setConfirmationMessage(
-            <ConfirmationMessage
-              quote={props.price === undefined}
-              horizonMinutes={horizonMinutes}
-              pricePerGpuHourInCents={limitPricePerGpuHourInCents}
-              accelerators={accelerators}
-              totalPriceInCents={totalPriceInCents}
-              type={type}
-            />,
-          );
         } else {
-          // Direct submission with -y flag
-          let limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-          if (props.price) {
-            const price = Number.parseFloat(props.price);
-            if (Number.isNaN(price)) {
-              logAndQuit(`Failed to parse price: ${props.price}`);
-            }
-            limitPricePerGpuHourInCents = dollarsToCents(price);
-          }
+          const horizonMinutes = parseHorizonToMinutes(props.horizon);
+          const accelerators = parseAccelerators(props.accelerators);
+          const nodesRequired = acceleratorsToNodes(accelerators);
+          const { type, cluster } = props;
 
           if (horizonMinutes < 1) {
             setError("Minimum horizon is 1 minute");
             return;
           }
 
-          setIsLoading(true);
-          await submitProcurement({
-            horizonMinutes,
-            nodesRequired,
-            type,
-            pricePerGpuHourInCents: limitPricePerGpuHourInCents,
-            cluster,
-          });
+          let limitPricePerGpuHourInCents;
+          if (props.price) {
+            const price = Number.parseFloat(props.price);
+            if (Number.isNaN(price)) {
+              logAndQuit(`Failed to parse price: ${props.price}`);
+            }
+            limitPricePerGpuHourInCents = dollarsToCents(price);
+            setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
+          } else if (!props.yes) {
+            // skip quoting and use the default
+            // Get market quote to show accurate initial total
+            const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
+            setIsQuoting(true);
+
+            const quote = await getQuote({
+              instanceType: type,
+              quantity: nodesRequired == 0 ? 1 : nodesRequired,
+              minStartTime: "NOW",
+              maxStartTime: "NOW",
+              minDurationSeconds: quoteMinutes * 60,
+              maxDurationSeconds: quoteMinutes * 60 + 3600,
+              cluster,
+            });
+            setIsQuoting(false);
+
+            // Calculate market price from quote
+            limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+            if (quote) {
+              const quoteStart = (quote.start_at === "NOW"
+                ? new Date()
+                : new Date(quote.start_at))
+                .getTime();
+              const quoteEnd = new Date(quote.end_at).getTime();
+              const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 /
+                60;
+              limitPricePerGpuHourInCents = Math.ceil(
+                DEFAULT_LIMIT_PRICE_MULTIPLIER *
+                  (quote.price / (quoteDurationHours * accelerators)),
+              );
+            }
+
+            setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
+          }
+
+          if (props.yes) {
+            // Direct submission with -y flag
+            let limitPricePerGpuHourInCents =
+              DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+            if (props.price) {
+              const price = Number.parseFloat(props.price);
+              if (Number.isNaN(price)) {
+                logAndQuit(`Failed to parse price: ${props.price}`);
+              }
+              limitPricePerGpuHourInCents = dollarsToCents(price);
+            }
+
+            if (horizonMinutes < 1) {
+              setError("Minimum horizon is 1 minute");
+              return;
+            }
+
+            setIsLoading(true);
+            await submitCreateProcurement({
+              horizonMinutes,
+              nodesRequired,
+              type,
+              pricePerGpuHourInCents: limitPricePerGpuHourInCents,
+              cluster,
+            });
+          } else {
+            setConfirmationMessage(
+              <ConfirmationMessage
+                quote={props.price === undefined}
+                horizonMinutes={horizonMinutes}
+                pricePerGpuHourInCents={limitPricePerGpuHourInCents}
+                accelerators={accelerators}
+                type={type}
+              />,
+            );
+          }
         }
       } catch (err: unknown) {
         setIsQuoting(false);
@@ -245,7 +312,7 @@ function ScaleCommand(props: {
     init();
   }, []);
 
-  const submitProcurement = useCallback(
+  const submitCreateProcurement = useCallback(
     async ({
       horizonMinutes,
       nodesRequired,
@@ -261,13 +328,12 @@ function ScaleCommand(props: {
     }) => {
       try {
         setIsLoading(true);
-        const result = await scaleToCount({
+        const result = await createProcurement({
           horizonMinutes,
           nodesRequired,
           type,
           cluster,
           pricePerGpuHourInCents,
-          id: props.id,
         });
         setProcurementResult(result);
       } catch (err: unknown) {
@@ -281,7 +347,37 @@ function ScaleCommand(props: {
         exit();
       }
     },
-    [props.horizon, props.price, props.id, props.cluster, exit],
+    [props.horizon, props.price, exit],
+  );
+
+  const submitUpdateProcurement = useCallback(
+    async ({
+      procurement,
+      horizonMinutes,
+      nodesRequired,
+      pricePerGpuHourInCents,
+    }) => {
+      try {
+        setIsLoading(true);
+        const result = await updateProcurement({
+          procurement,
+          horizonMinutes,
+          nodesRequired,
+          pricePerGpuHourInCents,
+        });
+        setProcurementResult(result);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      } finally {
+        setIsLoading(false);
+        exit();
+      }
+    },
+    [props.horizon, props.price, exit],
   );
 
   const handleSubmit = useCallback(
@@ -291,23 +387,42 @@ function ScaleCommand(props: {
         return;
       }
 
-      const { horizonMinutes, nodesRequired, type } = convertProcurementParams(
-        props,
-      );
+      if (props.command === "create") {
+        const horizonMinutes = parseHorizonToMinutes(props.horizon);
+        const accelerators = parseAccelerators(props.accelerators);
+        const nodesRequired = acceleratorsToNodes(accelerators);
+        const { type, cluster } = props;
 
-      if (!displayedPricePerGpuHourInCents) {
-        throw new Error("Price per GPU hour not set.");
+        if (!displayedPricePerGpuHourInCents) {
+          throw new Error("Price per GPU hour not set.");
+        }
+
+        submitCreateProcurement({
+          horizonMinutes,
+          nodesRequired,
+          type,
+          pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
+          cluster,
+        });
+      } else {
+        const horizonMinutes = parseHorizonToMinutes(props.horizon);
+        const accelerators = parseAccelerators(props.accelerators);
+        const nodesRequired = acceleratorsToNodes(accelerators);
+
+        submitUpdateProcurement({
+          procurement: props.id,
+          horizonMinutes,
+          nodesRequired,
+          pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
+        });
       }
-
-      submitProcurement({
-        horizonMinutes,
-        nodesRequired,
-        type,
-        pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
-        cluster: props.cluster,
-      });
     },
-    [submitProcurement, props.cluster, displayedPricePerGpuHourInCents, exit],
+    [
+      submitCreateProcurement,
+      submitUpdateProcurement,
+      displayedPricePerGpuHourInCents,
+      exit,
+    ],
   );
 
   return (
@@ -322,12 +437,17 @@ function ScaleCommand(props: {
           </Box>
         </Box>
       )}
-      {!error && confirmationMessage && !props.yes && !isLoading &&
+      {!error && confirmationMessage && props.command === "create" &&
+        !props.yes && !isLoading &&
         !isQuoting && (
         <Box flexDirection="column">
           {confirmationMessage}
           <Box>
-            <Text>Start GPUs? (y/N)</Text>
+            <Text>
+              {props.command === "create"
+                ? "Create procurement?"
+                : "Update procurement?"} (y/N)
+            </Text>
             <ConfirmInput
               isChecked={false}
               value={value}
@@ -343,14 +463,18 @@ function ScaleCommand(props: {
           <Text>Placing procurement...</Text>
         </Box>
       )}
-      {procurementResult && !isDown && (
+      {procurementResult && props.command === "create" && (
         <Box>
-          <Text color="green">Procurement successful!</Text>
+          <Text color="green">
+            Successfully created procurement for {props.accelerators} GPUs!
+          </Text>
         </Box>
       )}
-      {procurementResult && isDown && (
+      {procurementResult && props.command === "update" && (
         <Box>
-          <Text color="green">Nodes turned off successfully!</Text>
+          <Text color="green">
+            Successfully updated procurement to {props.accelerators} GPUs!
+          </Text>
         </Box>
       )}
     </Box>
@@ -406,42 +530,19 @@ function ProcurementsList(props: { type?: string; id?: string }) {
   useEffect(() => {
     async function fetchInfo() {
       try {
-        const client = await apiClient();
-        let response;
-
         if (props.id) {
-          // If ID provided, get specific procurement
-          response = await client.GET("/v0/procurements/{id}", {
-            params: { path: { id: props.id } },
-          });
-
-          if (!response.response.ok) {
-            throw new Error(
-              response.error?.message ||
-                `Failed to get procurement ${props.id}`,
-            );
-          }
-
-          setProcurements(response.data ? [response.data] : []);
+          const procurement = await getProcurement({ id: props.id });
+          setProcurements(procurement ? [procurement] : []);
         } else {
-          // Otherwise list all and filter by type if provided
-          response = await client.GET("/v0/procurements");
-
-          if (!response.response.ok) {
-            throw new Error(
-              response.error?.message || "Failed to list procurements",
-            );
-          }
-
-          let procurements = response.data?.data || [];
-
           if (props.type) {
-            procurements = procurements.filter(
-              (p) => p.instance_type === props.type,
+            const procurements = await listProcurements((p) =>
+              p.instance_type === props.type
             );
+            setProcurements(procurements);
+          } else {
+            const procurements = await listProcurements();
+            setProcurements(procurements);
           }
-
-          setProcurements(procurements);
         }
       } catch (err: unknown) {
         setError(
@@ -494,15 +595,16 @@ function ProcurementsList(props: { type?: string; id?: string }) {
 }
 
 function ConfirmationMessage(props: {
-  horizonMinutes: number;
-  pricePerGpuHourInCents: number;
-  accelerators: number;
-  totalPriceInCents: number;
-  type: string;
+  horizonMinutes?: number;
+  pricePerGpuHourInCents?: number;
+  accelerators?: number;
+  type?: string;
   quote: boolean;
 }) {
-  const horizonInMilliseconds =
-    Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000;
+  const horizonInMilliseconds = props.horizonMinutes
+    ? Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000
+    : undefined;
+
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box gap={1}>
@@ -512,199 +614,146 @@ function ConfirmationMessage(props: {
       <Row
         headWidth={15}
         head="GPUs"
-        value={`${props.accelerators} x ${props.type}`}
+        value={props.accelerators
+          ? `${props.accelerators} x ${props.type}`
+          : "unchanged"}
       />
       <Row
         headWidth={15}
-        head={`Max price${props.quote ? "" : " (1.5 x market price)"}`}
-        value={`$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
+        head={`Max price${
+          (props.quote && props.pricePerGpuHourInCents)
+            ? " (1.5 x market price)"
+            : ""
+        }`}
+        value={props.pricePerGpuHourInCents
+          ? `$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`
+          : "unchanged"}
       />
       <Row
         headWidth={15}
         head="horizon time"
-        value={formatDuration(horizonInMilliseconds)}
+        value={horizonInMilliseconds
+          ? formatDuration(horizonInMilliseconds)
+          : "unchanged"}
       />
     </Box>
   );
 }
 
-function convertProcurementParams({
-  horizon,
-  accelerators: acceleratorsString,
-  type,
-  cluster,
-}: {
-  horizon: string;
-  accelerators: string;
-  type: string;
-  cluster?: string;
-}) {
+function parseHorizonToMinutes(horizon: string) {
   const parsedHorizon = parseDuration(horizon, "m");
   if (!parsedHorizon) {
     logAndQuit(`Failed to parse horizon: ${horizon}`);
   }
-  const horizonMinutes = Math.ceil(parsedHorizon);
+  return Math.ceil(parsedHorizon);
+}
 
-  const accelerators = Number.parseInt(acceleratorsString);
-  if (accelerators % GPUS_PER_NODE !== 0) {
+function parseAccelerators(accelerators: string) {
+  const parsedAccelerators = Number.parseInt(accelerators);
+  if (parsedAccelerators % GPUS_PER_NODE !== 0) {
     logAndQuit(`Only multiples of ${GPUS_PER_NODE} GPUs are allowed.`);
   }
-  const nodesRequired = accelerators / GPUS_PER_NODE;
 
-  return {
-    horizonMinutes,
-    accelerators,
-    nodesRequired,
-    type,
-    cluster,
-  };
+  return parsedAccelerators;
 }
 
-async function scaleToCount({
+function acceleratorsToNodes(accelerators: number) {
+  return Math.floor(accelerators / GPUS_PER_NODE);
+}
+
+async function getProcurement({
+  id,
+}: {
+  id: string;
+}) {
+  const client = await apiClient();
+  const res = await client.GET("/v0/procurements/{id}", {
+    params: { path: { id: id } },
+  });
+
+  if (!res.response.ok) {
+    throw new Error(
+      res.error?.message || "Failed to get procurement",
+    );
+  }
+
+  return res.data ?? null;
+}
+
+async function listProcurements(
+  filter?: (procurement: Procurement) => boolean,
+) {
+  const client = await apiClient();
+  const procurements: Procurement[] = [];
+  let hasMore = true;
+  while (hasMore) {
+    const res = await client.GET("/v0/procurements", {
+      query: {
+        limit: 100,
+      },
+    });
+
+    if (!res.response.ok) {
+      throw new Error(res.error?.message || "Failed to list procurements");
+    }
+
+    const data = res.data?.data ?? [];
+    if (filter) {
+      procurements.push(...data.filter(filter));
+    } else {
+      procurements.push(...data);
+    }
+    hasMore = res.data?.has_more ?? false;
+  }
+
+  return procurements;
+}
+
+async function updateProcurement({
+  procurement,
   horizonMinutes,
   nodesRequired,
-  type,
-  cluster,
   pricePerGpuHourInCents,
-  id,
-}: {
-  horizonMinutes: number;
-  nodesRequired: number;
-  type: string;
-  cluster?: string;
-  pricePerGpuHourInCents: number;
-  id?: string;
 }) {
   const client = await apiClient();
-  const procurements = await client.GET("/v0/procurements");
-
-  if (!procurements.response.ok) {
-    throw new Error(
-      procurements.error?.message || "Failed to list procurements",
-    );
+  const res = await client.PATCH("/v0/procurements/{id}", {
+    params: { path: { id: procurement.id } },
+    body: {
+      instance_type: procurement.instance_type,
+      desired_quantity: nodesRequired,
+      buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
+      horizon: horizonMinutes,
+    },
+  });
+  if (!res.response.ok) {
+    throw new Error(res.error?.message || "Failed to update procurement");
   }
-
-  let existingProcurement: Procurement | undefined;
-
-  // Find procurement by ID if provided, otherwise find by type
-  if (id) {
-    existingProcurement = procurements.data?.data.find((p) => p.id === id);
-    if (!existingProcurement) {
-      throw new Error(`No procurement found with ID ${id}`);
-    }
-  } else {
-    existingProcurement = procurements.data?.data.find((p) =>
-      p.instance_type === type
-    );
-  }
-
-  if (existingProcurement) {
-    const res = await client.PATCH("/v0/procurements/{id}", {
-      params: { path: { id: existingProcurement.id } },
-      body: {
-        instance_type: type,
-        desired_quantity: nodesRequired,
-        buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
-        horizon: horizonMinutes,
-        colocate_on_cluster: cluster,
-      },
-    });
-    if (!res.response.ok) {
-      throw new Error(res.error?.message || "Failed to update procurement");
-    }
-    return res.data ?? null;
-  } else {
-    const res = await client.POST("/v0/procurements", {
-      body: {
-        instance_type: type,
-        desired_quantity: nodesRequired,
-        buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
-        sell_limit_price_per_gpu_hour: 25,
-        horizon: Math.max(horizonMinutes, 1),
-        status: "active",
-        colocation_strategy: cluster
-          ? { type: "pinned", cluster_name: cluster }
-          : { type: "colocate-pinned" },
-      },
-    });
-    if (!res.response.ok) {
-      throw new Error(res.error?.message || "Failed to create procurement");
-    }
-    return res.data ?? null;
-  }
+  return res.data ?? null;
 }
 
-async function scaleDown({
+async function createProcurement({
   type,
-  id,
-}: {
-  type?: string;
-  id?: string;
+  horizonMinutes,
+  nodesRequired,
+  pricePerGpuHourInCents,
+  cluster,
 }) {
   const client = await apiClient();
-  let found = false;
-  let procurementId: string | undefined;
-
-  if (id) {
-    // If ID provided, get specific procurement
-    const procurement = await client.GET("/v0/procurements/{id}", {
-      params: { path: { id } },
-    });
-
-    if (!procurement.response.ok) {
-      throw new Error(
-        procurement.error?.message || `Failed to get procurement ${id}`,
-      );
-    }
-
-    if (procurement.data) {
-      procurementId = id;
-    }
-  } else {
-    // Otherwise list all and find by type
-    const procurements = await client.GET("/v0/procurements");
-
-    if (!procurements.response.ok) {
-      throw new Error(
-        procurements.error?.message || "Failed to list procurements",
-      );
-    }
-
-    if (procurements.data) {
-      const procurement = procurements.data.data.find(
-        (p) => p.instance_type === type,
-      );
-      if (procurement) {
-        procurementId = procurement.id;
-      }
-    }
+  const res = await client.POST("/v0/procurements", {
+    body: {
+      instance_type: type,
+      desired_quantity: nodesRequired,
+      buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
+      sell_limit_price_per_gpu_hour: 25,
+      horizon: Math.max(horizonMinutes, 1),
+      status: "active",
+      colocation_strategy: cluster
+        ? { type: "pinned", cluster_name: cluster }
+        : { type: "colocate-pinned" },
+    },
+  });
+  if (!res.response.ok) {
+    throw new Error(res.error?.message || "Failed to create procurement");
   }
-
-  if (procurementId) {
-    const res = await client.PATCH("/v0/procurements/{id}", {
-      params: { path: { id: procurementId } },
-      body: {
-        desired_quantity: 0,
-      },
-    });
-
-    if (!res.response.ok) {
-      throw new Error(
-        res.error?.message ||
-          `Failed to turn off nodes for procurement ${procurementId}`,
-      );
-    }
-
-    found = true;
-  }
-
-  if (!found) {
-    if (id) {
-      throw new Error(`No procurement found with ID ${id}`);
-    } else {
-      throw new Error(`No procurement found for ${type}`);
-    }
-  }
-
-  return true;
+  return res.data ?? null;
 }
