@@ -72,7 +72,7 @@ See https://docs.sfcompute.com/using-sf-scale for more information.
     )
     .option(
       "-p, --price <price>",
-      "Ceiling price per GPU hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+      "Ceiling price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
     )
     .option("-y, --yes", "Automatically confirm the command.")
     .action((options) => {
@@ -96,7 +96,7 @@ See https://docs.sfcompute.com/using-sf-scale for more information.
     )
     .option(
       "-p, --price <price>",
-      "Ceiling price per GPU hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+      "Ceiling price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
     )
     .option("-y, --yes", "Automatically confirm the command.")
     .action((id, options) => {
@@ -140,7 +140,7 @@ type CreateProcurementCommandProps = {
   command: "update";
   id: string;
   accelerators: string;
-  horizon: string;
+  horizon?: string;
   price?: string;
   yes?: boolean;
 };
@@ -171,12 +171,17 @@ function CreateOrUpdateProcurementCommand(
     async function init() {
       try {
         if (props.command === "update") {
-          const horizonMinutes = parseHorizonToMinutes(props.horizon);
+          const horizonMinutes = props.horizon ? parseHorizonToMinutes(props.horizon) : undefined;
           const accelerators = parseAccelerators(props.accelerators);
           const nodesRequired = acceleratorsToNodes(accelerators);
           const procurement = await getProcurement({
             id: props.id,
           });
+
+          if (horizonMinutes && horizonMinutes < 1) {
+            setError("Minimum horizon is 1 minute");
+            return;
+          }
 
           let limitPricePerGpuHourInCents: number | undefined;
           if (props.price) {
@@ -189,15 +194,6 @@ function CreateOrUpdateProcurementCommand(
           }
 
           if (props.yes) {
-            setConfirmationMessage(
-              <ConfirmationMessage
-                quote={props.price === undefined}
-                horizonMinutes={horizonMinutes}
-                pricePerGpuHourInCents={limitPricePerGpuHourInCents}
-                accelerators={accelerators}
-              />,
-            );
-          } else {
             setIsLoading(true);
             await submitUpdateProcurement({
               procurement,
@@ -205,6 +201,15 @@ function CreateOrUpdateProcurementCommand(
               nodesRequired,
               pricePerGpuHourInCents: props.price,
             });
+          } else {
+            setConfirmationMessage(
+              <ConfirmationMessage
+                quote={false}
+                horizonMinutes={horizonMinutes}
+                pricePerGpuHourInCents={limitPricePerGpuHourInCents}
+                accelerators={accelerators}
+              />,
+            );
           }
         } else {
           const horizonMinutes = parseHorizonToMinutes(props.horizon);
@@ -224,16 +229,18 @@ function CreateOrUpdateProcurementCommand(
               logAndQuit(`Failed to parse price: ${props.price}`);
             }
             limitPricePerGpuHourInCents = dollarsToCents(price);
-            setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
-          } else if (!props.yes) {
+          }
+
+          if (!props.yes && limitPricePerGpuHourInCents === undefined) {
             // skip quoting and use the default
             // Get market quote to show accurate initial total
             const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, horizonMinutes);
             setIsQuoting(true);
 
+            const quoteQuantity = nodesRequired == 0 ? 1 : nodesRequired;
             const quote = await getQuote({
               instanceType: type,
-              quantity: nodesRequired == 0 ? 1 : nodesRequired,
+              quantity: quoteQuantity,
               minStartTime: "NOW",
               maxStartTime: "NOW",
               minDurationSeconds: quoteMinutes * 60,
@@ -254,30 +261,15 @@ function CreateOrUpdateProcurementCommand(
                 60;
               limitPricePerGpuHourInCents = Math.ceil(
                 DEFAULT_LIMIT_PRICE_MULTIPLIER *
-                  (quote.price / (quoteDurationHours * accelerators)),
+                  (quote.price / (quoteDurationHours * (quoteQuantity * GPUS_PER_NODE))),
               );
             }
-
-            setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
           }
 
+          limitPricePerGpuHourInCents ??= DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+          setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
+
           if (props.yes) {
-            // Direct submission with -y flag
-            let limitPricePerGpuHourInCents =
-              DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-            if (props.price) {
-              const price = Number.parseFloat(props.price);
-              if (Number.isNaN(price)) {
-                logAndQuit(`Failed to parse price: ${props.price}`);
-              }
-              limitPricePerGpuHourInCents = dollarsToCents(price);
-            }
-
-            if (horizonMinutes < 1) {
-              setError("Minimum horizon is 1 minute");
-              return;
-            }
-
             setIsLoading(true);
             await submitCreateProcurement({
               horizonMinutes,
@@ -405,7 +397,7 @@ function CreateOrUpdateProcurementCommand(
           cluster,
         });
       } else {
-        const horizonMinutes = parseHorizonToMinutes(props.horizon);
+        const horizonMinutes = props.horizon ? parseHorizonToMinutes(props.horizon) : undefined;
         const accelerators = parseAccelerators(props.accelerators);
         const nodesRequired = acceleratorsToNodes(accelerators);
 
@@ -614,18 +606,18 @@ function ConfirmationMessage(props: {
       <Row
         headWidth={15}
         head="GPUs"
-        value={props.accelerators
+        value={props.accelerators !== undefined
           ? `${props.accelerators} x ${props.type}`
           : "unchanged"}
       />
       <Row
         headWidth={15}
         head={`Max price${
-          (props.quote && props.pricePerGpuHourInCents)
+          (props.quote && props.pricePerGpuHourInCents !== undefined)
             ? " (1.5 x market price)"
             : ""
         }`}
-        value={props.pricePerGpuHourInCents
+        value={props.pricePerGpuHourInCents !== undefined
           ? `$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`
           : "unchanged"}
       />
