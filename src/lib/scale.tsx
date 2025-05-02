@@ -114,11 +114,10 @@ See https://docs.sfcompute.com/using-sf-scale for more information.
     .alias("list")
     .alias("ls")
     .description("Show current scale details")
-    .option("-i, --id <id>", "Show a specific procurement by ID")
+    .argument("[ID]", "Show a specific procurement by ID")
     .option("-t, --type <type>", "Show procurements of a specific node type")
-    .action((options) => {
-      // TODO handle id
-      render(<ProcurementsList {...options} />);
+    .action((id, options) => {
+      render(<ProcurementsList {...options} id={id} />);
     });
 
   // Add both commands
