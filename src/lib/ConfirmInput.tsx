@@ -1,9 +1,6 @@
-import { ComponentProps, useCallback } from "react";
+import React, { ComponentProps, useCallback, useState } from "react";
 import TextInput from "ink-text-input";
 import yn from "npm:yn";
-import React from "react";
-
-const noop = () => {};
 
 interface ConfirmInputProps extends
   Omit<
@@ -14,22 +11,29 @@ interface ConfirmInputProps extends
   onChange?: (value: string) => void;
   onSubmit?: (value: boolean) => void;
   placeholder?: string;
-  value?: string;
 }
 
 const ConfirmInput = ({
   isChecked = false,
-  onChange = noop,
-  onSubmit = noop,
+  onChange,
+  onSubmit,
   placeholder = "",
-  value = "",
   ...props
 }: ConfirmInputProps) => {
+  const [value, setValue] = useState("");
   const handleSubmit = useCallback(
     (newValue: string) => {
-      onSubmit(yn(newValue, { default: isChecked }));
+      onSubmit?.(yn(newValue, { default: isChecked }));
     },
     [isChecked, onSubmit],
+  );
+
+  const handleChange = useCallback(
+    (newValue: string) => {
+      setValue(newValue);
+      onChange?.(newValue);
+    },
+    [onChange],
   );
 
   return (
@@ -37,7 +41,7 @@ const ConfirmInput = ({
       {...props}
       placeholder={placeholder}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
       onSubmit={handleSubmit}
     />
   );
