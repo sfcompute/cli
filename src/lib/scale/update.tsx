@@ -328,7 +328,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
 
 const update = new Command("update")
   .description("update a procurement.")
-  .argument("<procurement_id...>", "ID of the procurement to update", parseIds)
+  .argument("<procurement_id...>", "ID of the procurement to update")
   .requiredOption(
     "-n, --accelerators <accelerators>",
     "desired number of GPUs (0 to turn off)",
@@ -349,7 +349,7 @@ const update = new Command("update")
     render(
       <UpdateProcurementCommand
         {...options}
-        ids={id}
+        ids={parseIds(id)}
       />,
     );
   });
