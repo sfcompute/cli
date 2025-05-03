@@ -18,6 +18,7 @@ async function listProcurements() {
       {
         query: {
           limit: 100,
+          offset: procurements.length,
         },
       },
     );
