@@ -167,7 +167,6 @@ function SellOrder(props: {
   autoConfirm?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [value, setValue] = useState("");
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
@@ -231,7 +230,7 @@ function SellOrder(props: {
         clearInterval(interval);
       }
     };
-  }, [isLoading, exit, value, order]);
+  }, [isLoading, exit, order]);
 
   return (
     <Box gap={1} flexDirection="column">
@@ -243,8 +242,6 @@ function SellOrder(props: {
 
           <ConfirmInput
             isChecked={false}
-            value={value}
-            onChange={setValue}
             onSubmit={handleSubmit}
           />
         </Box>
