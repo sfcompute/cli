@@ -21,7 +21,7 @@ export async function registerScale(program: Command) {
       `
 A procurement is an automated purchasing strategy that will attempt to constantly maintain a desired number of GPUs by buying and selling spot reservations.
 
-See https://docs.sfcompute.com/using-sf-scale for more information.
+See https://docs.sfcompute.com/docs/using-sf-scale for more information.
     `,
     )
     .showHelpAfterError();
