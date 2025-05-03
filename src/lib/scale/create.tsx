@@ -113,7 +113,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
           const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, props.horizon);
           setIsQuoting(true);
 
-          const quoteQuantity = nodesRequired == 0 ? 1 : nodesRequired;
+          const quoteQuantity = nodesRequired === 0 ? 1 : nodesRequired;
           const quote = await getQuote({
             instanceType: props.type,
             quantity: quoteQuantity,
