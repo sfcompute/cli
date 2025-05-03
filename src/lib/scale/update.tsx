@@ -10,7 +10,7 @@ import Spinner from "ink-spinner";
 import { Command } from "@commander-js/extra-typings";
 
 import { apiClient } from "../../apiClient.ts";
-import { logAndQuit } from ".././../helpers/errors.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import ProcurementDisplay, {
   ProcurementHeader,
