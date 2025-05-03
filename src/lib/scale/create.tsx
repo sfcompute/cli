@@ -277,7 +277,7 @@ const create = new Command("create")
   )
   .option(
     "-p, --price <price>",
-    `ceiling price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or ${
+    `limit price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or ${
       (DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100).toFixed(2)
     } if if we can't get a price estimate.`,
     parsePriceArg,

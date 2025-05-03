@@ -341,7 +341,7 @@ const update = new Command("update")
   )
   .option(
     "-p, --price <price>",
-    "ceiling price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+    "limit price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
     parsePriceArg,
   )
   .option("-y, --yes", "automatically confirm the command.")
