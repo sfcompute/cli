@@ -359,7 +359,6 @@ type BuyOrderProps = {
 
 function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [value, setValue] = useState("");
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -502,8 +501,6 @@ function BuyOrder(props: BuyOrderProps) {
 
           <ConfirmInput
             isChecked={false}
-            value={value}
-            onChange={setValue}
             onSubmit={handleSubmit}
           />
         </Box>
