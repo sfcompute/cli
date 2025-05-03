@@ -23,7 +23,7 @@ import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm.ts";
-import { registerScale } from "./lib/scale.tsx";
+import { registerScale } from "./lib/scale/index.tsx";
 
 const program = new Command();
 
