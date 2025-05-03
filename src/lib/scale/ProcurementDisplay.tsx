@@ -1,0 +1,69 @@
+import React from "react";
+import { Box, Text } from "ink";
+import { Badge } from "@inkjs/ui";
+
+import { Row } from "../Row.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
+import { formatDuration } from "../orders/index.tsx";
+
+import { Procurement } from "./utils.ts";
+
+export function ProcurementHeader({ id, quantity }: {
+  id: string;
+  quantity: number;
+}) {
+  return (
+    <Box gap={1}>
+      <Box width={11}>
+        {quantity > 0
+          ? <Badge color="cyan">Active</Badge>
+          : <Badge color="gray">Disabled</Badge>}
+      </Box>
+      <Box paddingLeft={0.1}>
+        <Text color={quantity > 0 ? "cyan" : "gray"}>
+          {id}
+        </Text>
+      </Box>
+    </Box>
+  );
+}
+
+export default function ProcurementDisplay(
+  {
+    procurement: {
+      id,
+      instance_type,
+      desired_quantity,
+      buy_limit_price_per_gpu_hour,
+      horizon,
+    },
+  }: { procurement: Procurement },
+) {
+  const horizonMinutes = horizon;
+  const quantity = desired_quantity * GPUS_PER_NODE;
+  const pricePerGpuHourInCents = buy_limit_price_per_gpu_hour;
+
+  return (
+    <Box flexDirection="column">
+      <ProcurementHeader id={id} quantity={quantity} />
+      <Box flexDirection="column" paddingTop={0.5}>
+        <Row
+          headWidth={15}
+          head="Type"
+          value={instance_type}
+        />
+        <Row headWidth={15} head="GPUs" value={String(quantity)} />
+        <Row
+          headWidth={15}
+          head="Limit Price"
+          value={`$${(pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
+        />
+        <Row
+          headWidth={15}
+          head="Horizon"
+          value={formatDuration(horizonMinutes * 60 * 1000)}
+        />
+      </Box>
+    </Box>
+  );
+}
