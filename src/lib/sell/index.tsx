@@ -4,7 +4,7 @@ import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import { apiClient } from "../../apiClient.ts";
-import { paths } from "../../schema.ts";
+import { components } from "../../schema.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
@@ -25,10 +25,7 @@ import invariant from "tiny-invariant";
 import { getContract } from "../../helpers/fetchers.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
 
-type SellOrderFlags =
-  paths["/v0/orders"]["post"]["requestBody"]["content"]["application/json"][
-    "flags"
-  ];
+type SellOrderFlags = components["schemas"]["PostOrderRequest"]["flags"];
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
