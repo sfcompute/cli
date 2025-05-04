@@ -339,14 +339,14 @@ const update = new Command("update")
     "after",
     `
 Examples:
-\x1b[2m# Scale a procurement to 16 GPUs\x1b[0m
-$ sf scale update <procurement_id> -n 16
+\x1b[2m# Scale procurements to 16 GPUs\x1b[0m
+$ sf scale update <procurement_id...> -n 16
 
-\x1b[2m# Disable a procurement (scale to 0 GPUs)\x1b[0m
-$ sf scale update <procurement_id> -n 0
+\x1b[2m# Disable procurements (scale to 0 GPUs)\x1b[0m
+$ sf scale update <procurement_id...> -n 0
 
-\x1b[2m# Update the limit price of a procurement to $1.50/GPU/hr\x1b[0m
-$ sf scale update <procurement_id> -p 1.50
+\x1b[2m# Update the limit price of procurements to $1.50/GPU/hr\x1b[0m
+$ sf scale update <procurement_id...> -p 1.50
 `,
   )
   .showHelpAfterError()
