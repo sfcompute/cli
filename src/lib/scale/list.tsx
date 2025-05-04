@@ -49,9 +49,10 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         let fetchedProcurements: Procurement[] = [];
 
         // Fetch procurements either by specific IDs or list all
-        if (props.ids?.length && props.ids.length > 0) {
+        const { ids = [], type } = props;
+        if (ids.length > 0) {
           const settled = await Promise.allSettled(
-            props.ids.map((id) => getProcurement({ id })),
+            ids.map((id) => getProcurement({ id })),
           );
 
           const failed: { id: string; message: string }[] = [];
@@ -61,7 +62,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
               fetchedProcurements.push(result.value);
             } else {
               failed.push({
-                id: props.ids[idx],
+                id: ids[idx],
                 message: result.status === "rejected"
                   ? (result.reason instanceof Error
                     ? result.reason.message
@@ -77,8 +78,8 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         }
 
         // Apply type filter if provided
-        const finalProcurements = props.type
-          ? fetchedProcurements.filter((p) => p.instance_type === props.type)
+        const finalProcurements = type
+          ? fetchedProcurements.filter((p) => p.instance_type === type)
           : fetchedProcurements;
 
         setProcurements(finalProcurements);
