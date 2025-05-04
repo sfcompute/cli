@@ -29,6 +29,9 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
+import console from "node:console";
+import process from "node:process";
+import chalk from "chalk";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -39,6 +42,7 @@ export function _registerBuy(program: Command) {
   return program
     .command("buy")
     .description("Place a buy order")
+    .showHelpAfterError()
     .requiredOption("-t, --type <type>", "Type of GPU", "h100i")
     .option(
       "-n, --accelerators <quantity>",
@@ -72,7 +76,11 @@ export function _registerBuy(program: Command) {
     .hook("preAction", (command) => {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
-        logAndQuit("Specify either --duration or --end, but not both");
+        console.error(
+          chalk.yellow("Specify either --duration or --end, but not both"),
+        );
+        command.help();
+        process.exit(1);
       }
     })
     .option("-y, --yes", "Automatically confirm the order")
