@@ -59,7 +59,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
           settled.forEach((result, idx) => {
             if (result.status === "fulfilled" && result.value !== null) {
               fetchedProcurements.push(result.value);
-            } else if (props.ids) {
+            } else {
               failed.push({
                 id: props.ids[idx],
                 message: result.status === "rejected"
