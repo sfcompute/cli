@@ -113,7 +113,22 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 const show = new Command("show")
   .alias("list")
   .alias("ls")
-  .description("show active and disabled procurements")
+  .addHelpText(
+    "after",
+    `
+Examples:
+\x1b[2m# List all procurements\x1b[0m
+$ sf scale ls
+
+\x1b[2m# Show a specific procurement by ID\x1b[0m
+$ sf scale show <procurement_id>
+
+\x1b[2m# List all procurements of a specific node type\x1b[0m
+$ sf scale list -t h100i
+`,
+  )
+  .showHelpAfterError()
+  .description("Show active and disabled procurements")
   .argument("[ID...]", "show a specific procurement by ID")
   .option("-t, --type <type>", "show procurements of a specific node type")
   .action((ids, options) => {
