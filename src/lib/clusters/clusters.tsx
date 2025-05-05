@@ -555,6 +555,12 @@ async function kubeconfigAction({
       continue;
     }
 
+    // TODO(K8S-33): This credential handling logic needs to be rewritten to support
+    // proper account-to-user associations.
+    // The current implementation doesn't properly disambiguate credentials
+    // when multiple users exist in a team context.
+    // See: https://linear.app/sfcompute/issue/K8S-33
+
     // Handle vcluster with encrypted_kubeconfig
     const credential = item as K8sCredential;
     if (isVClusterCredential(credential)) {
