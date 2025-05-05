@@ -555,6 +555,12 @@ async function kubeconfigAction({
       continue;
     }
 
+    // TODO(K8S-33): This credential handling logic needs to be rewritten to support
+    // proper account-to-user associations.
+    // The current implementation doesn't properly disambiguate credentials
+    // when multiple users exist in a team context.
+    // See: https://linear.app/sfcompute/issue/K8S-33
+
     // Handle vcluster with encrypted_kubeconfig
     const credential = item as K8sCredential;
     if (isVClusterCredential(credential)) {
@@ -570,11 +576,9 @@ async function kubeconfigAction({
           name: item.username || "",
           kubeconfig: decryptedKubeConfig || "",
         });
-        // Parse the decrypted kubeconfig
-      } catch (err) {
-        console.error(
-          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
-        );
+      } catch (_err) {
+        // Silently continue on decryption errors
+        continue;
       }
     } else if (item.encrypted_token) {
       try {
@@ -589,10 +593,8 @@ async function kubeconfigAction({
           name: item.username || "",
           token: decryptedToken || "",
         });
-      } catch (err) {
-        console.error(
-          `Failed to decrypt token: ${err}, ${credential.username}`,
-        );
+      } catch (_err) {
+        // Silently continue on decryption errors
         continue;
       }
     }
@@ -608,6 +610,13 @@ async function kubeconfigAction({
       namespace: item.cluster.kubernetes_namespace || "",
       cluster_type: credential.cluster_type || "",
     });
+  }
+
+  // Add check for successful decryption of at least one credential
+  if (users.length === 0) {
+    return logAndQuit(
+      "Failed to decrypt k8s credentials. Please report this problem at https://sfcompute.com/dashboard",
+    );
   }
 
   const kubeconfigData = createKubeconfig({ clusters, users });
