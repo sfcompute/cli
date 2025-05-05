@@ -587,7 +587,7 @@ async function kubeconfigAction({
           name: item.username || "",
           token: decryptedToken || "",
         });
-      } catch (err) {
+      } catch (_err) {
         // Silently continue on decryption errors
         continue;
       }
