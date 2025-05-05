@@ -371,7 +371,7 @@ $ sf scale update <procurement_id...> -p 1.50
   )
   .option(
     "-p, --price <price>",
-    "Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+    "Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if we can't get a price estimate.",
     parsePriceArg,
   )
   .option("-y, --yes", "Automatically confirm the command.")
