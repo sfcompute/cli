@@ -349,24 +349,32 @@ $ sf scale update <procurement_id...> -n 0
 $ sf scale update <procurement_id...> -p 1.50
 `,
   )
+  .configureHelp({
+    optionDescription: (option) => {
+      if (option.flags === "-h, --help") {
+        return 'Display help for "scale update"';
+      }
+      return option.description;
+    },
+  })
   .showHelpAfterError()
   .argument("<procurement_id...>", "ID of the procurement to update")
   .option(
     "-n, --accelerators <accelerators>",
-    "desired number of GPUs (0 to turn off)",
+    "Desired number of GPUs (0 to turn off)",
     parseAccelerators,
   )
   .option(
     "-d, --horizon <horizon>",
-    "the minimum amount of time to reserve the GPUs for. that is, start buying more compute if the remaining time is less than this threshold.",
+    "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
     parseHorizonArg,
   )
   .option(
     "-p, --price <price>",
-    "limit price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
+    "Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if if we can't get a price estimate.",
     parsePriceArg,
   )
-  .option("-y, --yes", "automatically confirm the command.")
+  .option("-y, --yes", "Automatically confirm the command.")
   .action((id, options) => {
     if (Object.keys(options).length === 0) {
       console.error(

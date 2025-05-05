@@ -13,6 +13,14 @@ export async function registerScale(program: Command) {
     .command("scale")
     .alias("procurements")
     .alias("procurement")
+    .configureHelp({
+      optionDescription: (option) => {
+        if (option.flags === "-h, --help") {
+          return "Display help for scale";
+        }
+        return option.description;
+      },
+    })
     .showHelpAfterError()
     .description(
       "Create and manage procurements that purchase a desired number of GPUs on a rolling basis.",
