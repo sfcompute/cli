@@ -150,6 +150,14 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 const show = new Command("show")
   .alias("list")
   .alias("ls")
+  .configureHelp({
+    optionDescription: (option) => {
+      if (option.flags === "-h, --help") {
+        return 'Display help for "scale list"';
+      }
+      return option.description;
+    },
+  })
   .addHelpText(
     "after",
     `
@@ -166,8 +174,8 @@ $ sf scale list -t h100i
   )
   .showHelpAfterError()
   .description("Show active and disabled procurements")
-  .argument("[ID...]", "show a specific procurement by ID")
-  .option("-t, --type <type>", "show procurements of a specific node type")
+  .argument("[ID...]", "Show a specific procurement by ID")
+  .option("-t, --type <type>", "Show procurements of a specific node type")
   .action((ids, options) => {
     const parsedIds = parseIds(ids);
     render(<ProcurementsList {...options} ids={parsedIds} />);

@@ -273,31 +273,39 @@ $ sf scale create -n 32 -p 1.50
 $ sf scale create -n 8 --horizon '30m'
 `,
   )
+  .configureHelp({
+    optionDescription: (option) => {
+      if (option.flags === "-h, --help") {
+        return 'Display help for "scale create"';
+      }
+      return option.description;
+    },
+  })
   .showHelpAfterError()
   .requiredOption(
     "-n, --accelerators <accelerators>",
-    "desired number of GPUs (0 to turn off)",
+    "Desired number of GPUs (0 to turn off)",
     parseAccelerators,
   )
-  .option("-t, --type <type>", "specify node type", "h100i")
+  .option("-t, --type <type>", "Specify node type", "h100i")
   .option(
     "-c, --cluster <cluster>",
-    "only buy on the specified cluster. if provided, \`-t\`/`--type` will be ignored.",
+    "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
   )
   .option(
     "-d, --horizon <horizon>",
-    "the minimum amount of time to reserve the GPUs for. that is, start buying more compute if the remaining time is less than this threshold.",
+    "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
     parseHorizonArg,
     60,
   )
   .option(
     "-p, --price <price>",
-    `limit price per GPU per hour, in dollars. buy compute only if it's at most this price. defaults to the current market price times 1.5, or ${
+    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${
       (DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100).toFixed(2)
-    } if if we can't get a price estimate.`,
+    } if we can't get a price estimate.`,
     parsePriceArg,
   )
-  .option("-y, --yes", "automatically confirm the command.")
+  .option("-y, --yes", "Automatically confirm the command.")
   .action((options) => {
     render(
       <CreateProcurementCommand {...options} />,
