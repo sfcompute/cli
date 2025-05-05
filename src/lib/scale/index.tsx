@@ -39,7 +39,7 @@ $ sf scale update <procurement-id...> -n 0
 $ sf scale update <procurement-id...> -p 1.50
 
 \x1b[2m# Start reserving more time 30 minutes before GPUs expire\x1b[0m
-$ sf scale update <procurement-id...> -d '30m'
+$ sf scale update <procurement-id...> --horizon '30m'
 
 See https://docs.sfcompute.com/docs/using-sf-scale for more information.
     `,

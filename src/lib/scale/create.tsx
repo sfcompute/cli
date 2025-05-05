@@ -270,7 +270,7 @@ $ sf scale create -n 8
 $ sf scale create -n 32 -p 1.50
 
 \x1b[2m# Maintain 8 GPUs, start buying the next reservation when there's 30 minutes left\x1b[0m
-$ sf scale create -n 8 -d '30m'
+$ sf scale create -n 8 --horizon '30m'
 `,
   )
   .showHelpAfterError()
