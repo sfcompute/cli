@@ -17,5 +17,5 @@ jobs:
       - run: deno install
       - run: deno fmt --check
       - run: deno lint
-      - run: deno check --config deno.json ./src/index.ts
+      - run: deno check --config deno.json .
       - run: deno test --allow-all

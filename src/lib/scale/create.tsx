@@ -258,7 +258,22 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
 }
 
 const create = new Command("create")
-  .description("create a procurement to purchase the desired number of GPUs.")
+  .description("Create a procurement to purchase the desired number of GPUs.")
+  .addHelpText(
+    "after",
+    `
+Examples:
+\x1b[2m# Create a new procurement for 8 GPUs\x1b[0m
+$ sf scale create -n 8
+
+\x1b[2m# Maintain 32 GPUs, but only while the price is <= $1.50/GPU/hr\x1b[0m
+$ sf scale create -n 32 -p 1.50
+
+\x1b[2m# Maintain 8 GPUs, start buying the next reservation when there's 30 minutes left\x1b[0m
+$ sf scale create -n 8 --horizon '30m'
+`,
+  )
+  .showHelpAfterError()
   .requiredOption(
     "-n, --accelerators <accelerators>",
     "desired number of GPUs (0 to turn off)",

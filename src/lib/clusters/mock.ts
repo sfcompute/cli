@@ -9,7 +9,8 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     name: "upcoming-single-cluster",
     kubernetes_namespace: "default",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
-    contract: MOCK_CONTRACTS[0] as UserFacingCluster["contract"], // upcoming-single contract
+    contract: MOCK_CONTRACTS[0] as UserFacingCluster["contract"], // upcoming-single contract,
+    state: "Upcoming",
   },
 
   // 2. Cluster with active multi-order contract
@@ -20,6 +21,7 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     kubernetes_namespace: "prod",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
     contract: MOCK_CONTRACTS[1] as UserFacingCluster["contract"], // active-multi contract
+    state: "Active",
   },
 
   // 3. Cluster with upcoming multi-order contract
@@ -30,6 +32,7 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     kubernetes_namespace: "staging",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
     contract: MOCK_CONTRACTS[2] as UserFacingCluster["contract"], // upcoming-multi contract
+    state: "Upcoming",
   },
 
   // 4. Cluster with expired contract
@@ -40,6 +43,7 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     kubernetes_namespace: "default",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
     contract: MOCK_CONTRACTS[3] as UserFacingCluster["contract"], // expired contract
+    state: "Expired",
   },
 
   // 5. Cluster with mixed state contract
@@ -50,6 +54,7 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     kubernetes_namespace: "mixed",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
     contract: MOCK_CONTRACTS[4] as UserFacingCluster["contract"], // mixed-states contract
+    state: "Active",
   },
 
   // 6. Cluster with colocated contract
@@ -60,6 +65,7 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     kubernetes_namespace: "colocated",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
     contract: MOCK_CONTRACTS[5] as UserFacingCluster["contract"], // colocated contract
+    state: "Active",
   },
 
   // 7. Cluster without contract (for testing non-contract clusters)
@@ -69,5 +75,6 @@ export const MOCK_CLUSTERS: UserFacingCluster[] = [
     name: "no-contract-cluster",
     kubernetes_namespace: "default",
     kubernetes_ca_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t",
+    state: "Active",
   },
 ];

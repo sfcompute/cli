@@ -25,6 +25,8 @@ import {
   parsePriceArg,
   type Procurement,
 } from "./utils.ts";
+import console from "node:console";
+import chalk from "chalk";
 
 async function updateProcurement({
   procurementId,
@@ -110,7 +112,7 @@ function useUpdateProcurements() {
 
 type UpdateProcurementCommandProps = {
   ids: string[];
-  accelerators: number;
+  accelerators?: number;
   horizon?: number;
   price?: number;
   yes?: boolean;
@@ -130,9 +132,15 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
     return { successfulProcurements };
   }, [procurements]);
   const [confirmationMessage, setConfirmationMessage] = useState<ReactNode>();
-  const nodesRequired = useMemo(() => acceleratorsToNodes(props.accelerators), [
-    props.accelerators,
-  ]);
+  const nodesRequired = useMemo(
+    () =>
+      props.accelerators !== undefined
+        ? acceleratorsToNodes(props.accelerators)
+        : undefined,
+    [
+      props.accelerators,
+    ],
+  );
 
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
@@ -199,10 +207,11 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                           p.buy_limit_price_per_gpu_hour
                         ? undefined
                         : props.price}
-                      accelerators={acceleratorsToNodes(props.accelerators) ===
-                          p.desired_quantity
-                        ? undefined
-                        : props.accelerators}
+                      accelerators={props.accelerators !== undefined &&
+                          acceleratorsToNodes(props.accelerators) !==
+                            p.desired_quantity
+                        ? props.accelerators
+                        : undefined}
                       update
                     />
                   </Box>
@@ -215,7 +224,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                   {failedToFetch.map(([message, id]) => (
                     <Box key={id} flexDirection="column">
                       <Text color="red">
-                        - {message}
+                        - {message} ({id})
                       </Text>
                     </Box>
                   ))}
@@ -240,7 +249,6 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
       exit();
       return;
     }
-
     updateProcurements(
       successfulProcurements.map((p) => p.id),
       {
@@ -284,8 +292,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
       <Box flexDirection="column" gap={1}>
         {successfulProcurements && successfulProcurements.length > 0 && (
           <Text color="green">
-            Successfully updated {successfulProcurements.length}{" "}
-            procurement(s) to {props.accelerators} GPUs.
+            Successfully updated {successfulProcurements.length} procurement(s).
           </Text>
         )}
         {failedProcurements && failedProcurements.length > 0 && (
@@ -327,9 +334,24 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
 }
 
 const update = new Command("update")
-  .description("update a procurement.")
+  .description("Update a procurement.")
+  .addHelpText(
+    "after",
+    `
+Examples:
+\x1b[2m# Scale procurements to 16 GPUs\x1b[0m
+$ sf scale update <procurement_id...> -n 16
+
+\x1b[2m# Disable procurements (scale to 0 GPUs)\x1b[0m
+$ sf scale update <procurement_id...> -n 0
+
+\x1b[2m# Update the limit price of procurements to $1.50/GPU/hr\x1b[0m
+$ sf scale update <procurement_id...> -p 1.50
+`,
+  )
+  .showHelpAfterError()
   .argument("<procurement_id...>", "ID of the procurement to update")
-  .requiredOption(
+  .option(
     "-n, --accelerators <accelerators>",
     "desired number of GPUs (0 to turn off)",
     parseAccelerators,
@@ -346,6 +368,15 @@ const update = new Command("update")
   )
   .option("-y, --yes", "automatically confirm the command.")
   .action((id, options) => {
+    if (Object.keys(options).length === 0) {
+      console.error(
+        chalk.yellow(
+          "No options provided. Please provide at least one option.\n",
+        ),
+      );
+      update.help();
+      return;
+    }
     render(
       <UpdateProcurementCommand
         {...options}

@@ -39,24 +39,47 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [procurements, setProcurements] = useState<Procurement[]>([]);
+  const [failedFetches, setFailedFetches] = useState<
+    { id: string; message: string }[]
+  >([]);
 
   useEffect(() => {
     async function fetchInfo() {
       try {
-        let fetchedProcurements: Procurement[];
+        let fetchedProcurements: Procurement[] = [];
 
         // Fetch procurements either by specific IDs or list all
-        if (props.ids?.length && props.ids.length > 0) {
-          fetchedProcurements = (await Promise.all(
-            props.ids.map((id) => getProcurement({ id })),
-          )).filter((p): p is Procurement => p !== null);
+        const { ids = [], type } = props;
+        if (ids.length > 0) {
+          const settled = await Promise.allSettled(
+            ids.map((id) => getProcurement({ id })),
+          );
+
+          const failed: { id: string; message: string }[] = [];
+
+          settled.forEach((result, idx) => {
+            if (result.status === "fulfilled" && result.value !== null) {
+              fetchedProcurements.push(result.value);
+            } else {
+              failed.push({
+                id: ids[idx],
+                message: result.status === "rejected"
+                  ? (result.reason instanceof Error
+                    ? result.reason.message
+                    : String(result.reason))
+                  : "Unknown error",
+              });
+            }
+          });
+
+          setFailedFetches(failed);
         } else {
           fetchedProcurements = await listProcurements();
         }
 
         // Apply type filter if provided
-        const finalProcurements = props.type
-          ? fetchedProcurements.filter((p) => p.instance_type === props.type)
+        const finalProcurements = type
+          ? fetchedProcurements.filter((p) => p.instance_type === type)
           : fetchedProcurements;
 
         setProcurements(finalProcurements);
@@ -69,7 +92,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
       }
     }
     fetchInfo();
-  }, [props.type, props.ids?.length]);
+  }, [props.type, props.ids]);
 
   if (isLoading) {
     return (
@@ -88,14 +111,16 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
     );
   }
 
-  if (procurements.length === 0) {
+  if (procurements.length === 0 && failedFetches.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
         <Text>No procurements found.</Text>
 
-        <Box paddingLeft={4} flexDirection="column">
+        <Box paddingLeft={2} flexDirection="column">
           <Text dimColor># To create a procurement</Text>
-          <Text color="yellow">sf scale -n 8</Text>
+          <Text color="yellow">
+            sf scale -n 8{props.type ? ` -t ${props.type}` : ""}
+          </Text>
         </Box>
       </Box>
     );
@@ -106,6 +131,18 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
       {procurements.map((procurement) => (
         <ProcurementDisplay procurement={procurement} key={procurement.id} />
       ))}
+      {failedFetches.length > 0 && (
+        <Box flexDirection="column">
+          <Text color="red">
+            Failed to fetch {failedFetches.length} procurement(s):
+          </Text>
+          {failedFetches.map((f) => (
+            <Text key={f.id} color="red">
+              - {f.message} ({f.id})
+            </Text>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -113,7 +150,22 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 const show = new Command("show")
   .alias("list")
   .alias("ls")
-  .description("show active and disabled procurements")
+  .addHelpText(
+    "after",
+    `
+Examples:
+\x1b[2m# List all procurements\x1b[0m
+$ sf scale ls
+
+\x1b[2m# Show a specific procurement by ID\x1b[0m
+$ sf scale show <procurement_id>
+
+\x1b[2m# List all procurements of a specific node type\x1b[0m
+$ sf scale list -t h100i
+`,
+  )
+  .showHelpAfterError()
+  .description("Show active and disabled procurements")
   .argument("[ID...]", "show a specific procurement by ID")
   .option("-t, --type <type>", "show procurements of a specific node type")
   .action((ids, options) => {
