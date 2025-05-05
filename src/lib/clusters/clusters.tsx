@@ -570,11 +570,9 @@ async function kubeconfigAction({
           name: item.username || "",
           kubeconfig: decryptedKubeConfig || "",
         });
-        // Parse the decrypted kubeconfig
-      } catch (err) {
-        console.error(
-          `Failed to decrypt vcluster kubeconfig: ${err}, ${credential.username}`,
-        );
+      } catch (_err) {
+        // Silently continue on decryption errors
+        continue;
       }
     } else if (item.encrypted_token) {
       try {
@@ -590,9 +588,7 @@ async function kubeconfigAction({
           token: decryptedToken || "",
         });
       } catch (err) {
-        console.error(
-          `Failed to decrypt token: ${err}, ${credential.username}`,
-        );
+        // Silently continue on decryption errors
         continue;
       }
     }
@@ -608,6 +604,11 @@ async function kubeconfigAction({
       namespace: item.cluster.kubernetes_namespace || "",
       cluster_type: credential.cluster_type || "",
     });
+  }
+
+  // Add check for successful decryption of at least one credential
+  if (users.length === 0) {
+    return logAndQuit("Failed to decrypt any credentials");
   }
 
   const kubeconfigData = createKubeconfig({ clusters, users });
