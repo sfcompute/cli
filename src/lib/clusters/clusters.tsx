@@ -614,7 +614,9 @@ async function kubeconfigAction({
 
   // Add check for successful decryption of at least one credential
   if (users.length === 0) {
-    return logAndQuit("Failed to decrypt any credentials");
+    return logAndQuit(
+      "Failed to decrypt credentials. Please report this problem at https://sfcompute.com/dashboard",
+    );
   }
 
   const kubeconfigData = createKubeconfig({ clusters, users });
