@@ -80,7 +80,7 @@ export async function getProcurement({
 }
 
 export function formatColocationStrategy(
-  colocationStratgy: Procurement["colocation_strategy"],
+  colocationStrategy: Procurement["colocation_strategy"],
 ) {
   return match(colocationStratgy)
     .with(
