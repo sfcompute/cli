@@ -108,8 +108,6 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   useEffect(() => {
     (async function init() {
       try {
-
-
         let limitPricePerGpuHourInCents = props.price;
         // Get quote if price not specified and not skipping confirmation
         if (!props.yes && limitPricePerGpuHourInCents === undefined) {
@@ -313,7 +311,7 @@ $ sf scale create -n 8 --horizon '30m'
     "-cs, --colocation-strategy <colocation-strategy>",
     `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
     parseColocationStrategy,
-    "colocate-pinned"
+    "colocate-pinned",
   )
   .option(
     "-d, --horizon <horizon>",
@@ -336,11 +334,18 @@ $ sf scale create -n 8 --horizon '30m'
         .with("anywhere", () => ({ type: "anywhere" as const }))
         .with("colocate", () => ({ type: "colocate" as const }))
         .with("colocate-pinned", () => ({ type: "colocate-pinned" as const }))
-        .with("pinned", () => logAndQuit("Invalid colocation strategy: `-c`/`--cluster` not set"))
+        .with(
+          "pinned",
+          () =>
+            logAndQuit("Invalid colocation strategy: `-c`/`--cluster` not set"),
+        )
         .exhaustive();
 
     render(
-      <CreateProcurementCommand {...options} colocationStrategy={colocationStrategy} />,
+      <CreateProcurementCommand
+        {...options}
+        colocationStrategy={colocationStrategy}
+      />,
     );
   });
 

@@ -4,7 +4,11 @@ import { Box, Text } from "ink";
 import { Row } from "../Row.tsx";
 import { formatDuration } from "../orders/index.tsx";
 
-import { formatColocationStrategy, MIN_CONTRACT_MINUTES, Procurement } from "./utils.ts";
+import {
+  formatColocationStrategy,
+  MIN_CONTRACT_MINUTES,
+  Procurement,
+} from "./utils.ts";
 
 export default function ConfirmationMessage(props: {
   horizonMinutes?: number;
@@ -13,7 +17,7 @@ export default function ConfirmationMessage(props: {
   type?: string;
   quote: boolean;
   update?: boolean;
-  colocationStrategy?: Procurement["colocation_strategy"]
+  colocationStrategy?: Procurement["colocation_strategy"];
 }) {
   const horizonInMilliseconds = props.horizonMinutes
     ? Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000
@@ -57,15 +61,13 @@ export default function ConfirmationMessage(props: {
           ? formatDuration(horizonInMilliseconds)
           : "unchanged"}
       />
-      {
-        props.colocationStrategy && (
-          <Row
-            headWidth={30}
-            head="Colocation Strategy"
-            value={formatColocationStrategy(props.colocationStrategy)}
-          />
-        )
-      }
+      {props.colocationStrategy && (
+        <Row
+          headWidth={30}
+          head="Colocation Strategy"
+          value={formatColocationStrategy(props.colocationStrategy)}
+        />
+      )}
     </Box>
   );
 }
