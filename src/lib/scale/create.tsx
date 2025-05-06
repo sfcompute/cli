@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { Command } from "@commander-js/extra-typings";
+import { Command, Option } from "@commander-js/extra-typings";
+import process from "node:process";
+import console from "node:console";
 
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -12,6 +14,7 @@ import { getQuote } from "../buy/index.tsx";
 
 import {
   acceleratorsToNodes,
+  type ColocationStrategyName,
   DEFAULT_LIMIT_PRICE_MULTIPLIER,
   DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS,
   MIN_CONTRACT_MINUTES,
@@ -36,6 +39,7 @@ function useCreateProcurement() {
       nodesRequired: number;
       pricePerGpuHourInCents: number;
       cluster?: string;
+      colocationStrategy: Procurement["colocation_strategy"];
     }) => {
       try {
         setIsLoading(true);
@@ -50,9 +54,7 @@ function useCreateProcurement() {
               sell_limit_price_per_gpu_hour: 25,
               horizon: Math.max(p.horizonMinutes, 1),
               status: "active",
-              colocation_strategy: p.cluster
-                ? { type: "pinned", cluster_name: p.cluster }
-                : { type: "colocate-pinned" },
+              colocation_strategy: p.colocationStrategy,
             },
           },
         );
@@ -81,14 +83,7 @@ function useCreateProcurement() {
   };
 }
 
-type CreateProcurementCommandProps = {
-  accelerators: number;
-  type: string;
-  horizon: number;
-  cluster?: string;
-  price?: number;
-  yes?: boolean;
-};
+type CreateProcurementCommandProps = ReturnType<typeof create.opts>;
 
 function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const { exit } = useApp();
@@ -100,6 +95,18 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     () => acceleratorsToNodes(props.accelerators),
     [props.accelerators],
   );
+
+  const colocationStrategy = useMemo(() => {
+    if (props.cluster && props.colocationStrategy === "pinned") {
+      return { type: "pinned" as const, cluster_name: props.cluster };
+    }
+    return {
+      type: props.colocationStrategy as Exclude<
+        ColocationStrategyName,
+        "pinned"
+      >,
+    };
+  }, [props.cluster, props.colocationStrategy]);
 
   const [isQuoting, setIsQuoting] = useState(false);
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
@@ -152,6 +159,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
             type: props.type,
             pricePerGpuHourInCents: limitPricePerGpuHourInCents,
             cluster: props.cluster,
+            colocationStrategy,
           });
         } else {
           setConfirmationMessage(
@@ -161,6 +169,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
               pricePerGpuHourInCents={limitPricePerGpuHourInCents}
               accelerators={props.accelerators}
               type={props.type}
+              colocationStrategy={colocationStrategy}
             />,
           );
         }
@@ -198,6 +207,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
       type: props.type,
       pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
       cluster: props.cluster,
+      colocationStrategy,
     });
   };
 
@@ -288,9 +298,22 @@ $ sf scale create -n 8 --horizon '30m'
     parseAccelerators,
   )
   .option("-t, --type <type>", "Specify node type", "h100i")
-  .option(
-    "-c, --cluster <cluster>",
-    "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+  .addOption(
+    new Option(
+      "-c, --cluster <cluster>",
+      "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+    ).implies({ colocationStrategy: "pinned" as const }),
+  )
+  .addOption(
+    new Option(
+      "-cs, --colocation-strategy <colocation-strategy>",
+      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
+    ).choices([
+      "anywhere",
+      "colocate",
+      "colocate-pinned",
+      "pinned",
+    ]).default("colocate-pinned"),
   )
   .option(
     "-d, --horizon <horizon>",
@@ -306,9 +329,21 @@ $ sf scale create -n 8 --horizon '30m'
     parsePriceArg,
   )
   .option("-y, --yes", "Automatically confirm the command.")
+  .hook("preAction", (command) => {
+    const { colocationStrategy, cluster } = command.opts();
+    if (colocationStrategy === "pinned" && !cluster) {
+      console.error(
+        "Invalid colocation strategy: `-c`/`--cluster` is required when using `pinned` colocation strategy.",
+      );
+      command.help();
+      process.exit(1);
+    }
+  })
   .action((options) => {
     render(
-      <CreateProcurementCommand {...options} />,
+      <CreateProcurementCommand
+        {...options}
+      />,
     );
   });
 

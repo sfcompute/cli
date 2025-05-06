@@ -10,6 +10,7 @@ export type Procurement =
   paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
     "application/json"
   ]["data"][number];
+export type ColocationStrategyName = Procurement["colocation_strategy"]["type"];
 
 export const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265 as const; // Example default price
 export const MIN_CONTRACT_MINUTES = 60 as const; // Minimum contract size is 1 hour
@@ -76,4 +77,13 @@ export async function getProcurement({
   }
 
   return res.data ?? null;
+}
+
+export function formatColocationStrategy(
+  colocationStrategy: Procurement["colocation_strategy"],
+) {
+  if (colocationStrategy.type === "pinned") {
+    return `pinned (${colocationStrategy.cluster_name})`;
+  }
+  return colocationStrategy.type;
 }
