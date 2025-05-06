@@ -615,7 +615,7 @@ async function kubeconfigAction({
   // Add check for successful decryption of at least one credential
   if (users.length === 0) {
     return logAndQuit(
-      "Failed to decrypt k8s credentials. Please report this problem at https://sfcompute.com/dashboard",
+      "Failed to decrypt k8s credentials. This is unexpected - please report the problem here: https://sfcompute.com/contact",
     );
   }
 
