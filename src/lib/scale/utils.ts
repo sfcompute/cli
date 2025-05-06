@@ -82,13 +82,13 @@ export async function getProcurement({
 export function formatColocationStrategy(
   colocationStrategy: Procurement["colocation_strategy"],
 ) {
-  return match(colocationStratgy)
+  return match(colocationStrategy)
     .with(
       { type: "pinned" },
-      ({ cluster_name }) => `\"pinned\" (${cluster_name})`,
+      ({ cluster_name }) => `"pinned" (${cluster_name})`,
     )
-    .with({ type: "colocate-pinned" }, () => `\"colocate-pinned\"`)
-    .with({ type: "colocate" }, () => `\"colocate\"`)
-    .with({ type: "anywhere" }, () => `\"anywhere\"`)
+    .with({ type: "colocate-pinned" }, () => `"colocate-pinned"`)
+    .with({ type: "colocate" }, () => `"colocate"`)
+    .with({ type: "anywhere" }, () => `"anywhere"`)
     .exhaustive();
 }
