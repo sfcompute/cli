@@ -4,7 +4,6 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { dollarsToCents } from "../../helpers/units.ts";
 import { apiClient } from "../../apiClient.ts";
 import type { paths } from "../../schema.ts";
-import { match } from "ts-pattern";
 
 import { GPUS_PER_NODE } from "../constants.ts";
 export type Procurement =
@@ -82,13 +81,10 @@ export async function getProcurement({
 export function formatColocationStrategy(
   colocationStrategy: Procurement["colocation_strategy"],
 ) {
-  return match(colocationStrategy)
-    .with(
-      { type: "pinned" },
-      ({ cluster_name }) => `"pinned" (${cluster_name})`,
-    )
-    .with({ type: "colocate-pinned" }, () => `"colocate-pinned"`)
-    .with({ type: "colocate" }, () => `"colocate"`)
-    .with({ type: "anywhere" }, () => `"anywhere"`)
-    .exhaustive();
+
+  if (colocationStrategy.type === "pinned") {
+    return `pinned (${colocationStrategy.cluster_name})`;
+  }
+
+  return colocationStrategy.type;
 }

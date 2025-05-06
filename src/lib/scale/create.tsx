@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { Command } from "@commander-js/extra-typings";
+import { Command, Option } from "@commander-js/extra-typings";
 
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -9,7 +9,6 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { getQuote } from "../buy/index.tsx";
-import { match } from "ts-pattern";
 
 import {
   acceleratorsToNodes,
@@ -261,17 +260,6 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   return null;
 }
 
-function parseColocationStrategy(value: string) {
-  return match(value)
-    .with("anywhere", () => "anywhere" as const)
-    .with("colocate", () => "colocate" as const)
-    .with("colocate-pinned", () => "colocate-pinned" as const)
-    .with("pinned", () => "pinned" as const)
-    .otherwise(() => {
-      logAndQuit(`Invalid colocation strategy: ${value}`);
-    });
-}
-
 const create = new Command("create")
   .description("Create a procurement to purchase the desired number of GPUs.")
   .addHelpText(
@@ -303,15 +291,22 @@ $ sf scale create -n 8 --horizon '30m'
     parseAccelerators,
   )
   .option("-t, --type <type>", "Specify node type", "h100i")
-  .option(
-    "-c, --cluster <cluster>",
-    "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+  .addOption(
+    new Option(
+      "-c, --cluster <cluster>",
+      "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+    ).implies({ colocationStrategy: "pinned" as const }),
   )
-  .option(
-    "-cs, --colocation-strategy <colocation-strategy>",
-    `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
-    parseColocationStrategy,
-    "colocate-pinned",
+  .addOption(
+    new Option(
+      "-cs, --colocation-strategy <colocation-strategy>",
+      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
+    ).choices([
+      "anywhere",
+      "colocate",
+      "colocate-pinned",
+      "pinned",
+    ]).default("colocate-pinned"),
   )
   .option(
     "-d, --horizon <horizon>",
@@ -328,18 +323,30 @@ $ sf scale create -n 8 --horizon '30m'
   )
   .option("-y, --yes", "Automatically confirm the command.")
   .action((options) => {
-    const colocationStrategy = options.cluster
-      ? { type: "pinned" as const, cluster_name: options.cluster }
-      : match(options.colocationStrategy)
-        .with("anywhere", () => ({ type: "anywhere" as const }))
-        .with("colocate", () => ({ type: "colocate" as const }))
-        .with("colocate-pinned", () => ({ type: "colocate-pinned" as const }))
-        .with(
-          "pinned",
-          () =>
-            logAndQuit("Invalid colocation strategy: `-c`/`--cluster` not set"),
-        )
-        .exhaustive();
+    let colocationStrategy: Procurement["colocation_strategy"];
+    if (options.cluster) {
+      colocationStrategy = { type: "pinned" as const, cluster_name: options.cluster };
+    } else {
+      const strategyType = options.colocationStrategy as "anywhere" | "colocate" | "colocate-pinned" | "pinned";
+      switch (strategyType) {
+        case "anywhere":
+          colocationStrategy = { type: "anywhere" as const };
+          break;
+        case "colocate":
+          colocationStrategy = { type: "colocate" as const };
+          break;
+        case "colocate-pinned":
+          colocationStrategy = { type: "colocate-pinned" as const };
+          break;
+        case "pinned":
+          if (!options.cluster) {
+            logAndQuit("Invalid colocation strategy: `-c`/`--cluster` is required when using `pinned` colocation strategy.");
+          }
+
+          colocationStrategy = { type: "pinned" as const, cluster_name: options.cluster };
+          break;
+      }
+    }
 
     render(
       <CreateProcurementCommand
