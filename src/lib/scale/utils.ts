@@ -81,7 +81,6 @@ export async function getProcurement({
 export function formatColocationStrategy(
   colocationStrategy: Procurement["colocation_strategy"],
 ) {
-
   if (colocationStrategy.type === "pinned") {
     return `pinned (${colocationStrategy.cluster_name})`;
   }

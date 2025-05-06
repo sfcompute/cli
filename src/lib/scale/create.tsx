@@ -325,9 +325,16 @@ $ sf scale create -n 8 --horizon '30m'
   .action((options) => {
     let colocationStrategy: Procurement["colocation_strategy"];
     if (options.cluster) {
-      colocationStrategy = { type: "pinned" as const, cluster_name: options.cluster };
+      colocationStrategy = {
+        type: "pinned" as const,
+        cluster_name: options.cluster,
+      };
     } else {
-      const strategyType = options.colocationStrategy as "anywhere" | "colocate" | "colocate-pinned" | "pinned";
+      const strategyType = options.colocationStrategy as
+        | "anywhere"
+        | "colocate"
+        | "colocate-pinned"
+        | "pinned";
       switch (strategyType) {
         case "anywhere":
           colocationStrategy = { type: "anywhere" as const };
@@ -340,10 +347,15 @@ $ sf scale create -n 8 --horizon '30m'
           break;
         case "pinned":
           if (!options.cluster) {
-            logAndQuit("Invalid colocation strategy: `-c`/`--cluster` is required when using `pinned` colocation strategy.");
+            logAndQuit(
+              "Invalid colocation strategy: `-c`/`--cluster` is required when using `pinned` colocation strategy.",
+            );
           }
 
-          colocationStrategy = { type: "pinned" as const, cluster_name: options.cluster };
+          colocationStrategy = {
+            type: "pinned" as const,
+            cluster_name: options.cluster,
+          };
           break;
       }
     }
