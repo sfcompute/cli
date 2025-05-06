@@ -110,12 +110,8 @@ function useUpdateProcurements() {
   };
 }
 
-type UpdateProcurementCommandProps = {
+type UpdateProcurementCommandProps = ReturnType<typeof update.opts> & {
   ids: string[];
-  accelerators?: number;
-  horizon?: number;
-  price?: number;
-  yes?: boolean;
 };
 
 function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
