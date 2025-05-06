@@ -88,7 +88,7 @@ type CreateProcurementCommandProps = {
   cluster?: string;
   price?: number;
   yes?: boolean;
-  colocationStrategy?: Procurement["colocation_strategy"];
+  colocationStrategy: Procurement["colocation_strategy"];
 };
 
 function CreateProcurementCommand(props: CreateProcurementCommandProps) {
@@ -155,7 +155,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
             type: props.type,
             pricePerGpuHourInCents: limitPricePerGpuHourInCents,
             cluster: props.cluster,
-            colocationStrategy,
+            colocationStrategy: props.colocationStrategy,
           });
         } else {
           setConfirmationMessage(
@@ -165,7 +165,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
               pricePerGpuHourInCents={limitPricePerGpuHourInCents}
               accelerators={props.accelerators}
               type={props.type}
-              colocationStrategy={colocationStrategy}
+              colocationStrategy={props.colocationStrategy}
             />,
           );
         }
@@ -203,7 +203,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
       type: props.type,
       pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
       cluster: props.cluster,
-      colocationStrategy,
+      colocationStrategy: props.colocationStrategy,
     });
   };
 
@@ -336,7 +336,7 @@ $ sf scale create -n 8 --horizon '30m'
         .with("anywhere", () => ({ type: "anywhere" as const }))
         .with("colocate", () => ({ type: "colocate" as const }))
         .with("colocate-pinned", () => ({ type: "colocate-pinned" as const }))
-        .with("pinned", () => logAndQuit("`Invalid colocation strategy: `-c`/`--cluster` not set"))
+        .with("pinned", () => logAndQuit("Invalid colocation strategy: `-c`/`--cluster` not set"))
         .exhaustive();
 
     render(
