@@ -9,6 +9,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { getQuote } from "../buy/index.tsx";
+import { match } from "ts-pattern";
 
 import {
   acceleratorsToNodes,
@@ -23,6 +24,12 @@ import {
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
 import ConfirmationMessage from "./ConfirmationMessage.tsx";
 
+type ColocationStrategy =
+  | "anywhere"
+  | "colocate"
+  | "colocate-pinned"
+  | "pinned";
+
 // TODO: When Ink supports React 19, use useTransition and startTransition
 function useCreateProcurement() {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +43,7 @@ function useCreateProcurement() {
       nodesRequired: number;
       pricePerGpuHourInCents: number;
       cluster?: string;
+      colocationStrategy?: ColocationStrategy;
     }) => {
       try {
         setIsLoading(true);
@@ -51,8 +59,21 @@ function useCreateProcurement() {
               horizon: Math.max(p.horizonMinutes, 1),
               status: "active",
               colocation_strategy: p.cluster
-                ? { type: "pinned", cluster_name: p.cluster }
-                : { type: "colocate-pinned" },
+                ? { type: "pinned" as const, cluster_name: p.cluster }
+                : match(p.colocationStrategy)
+                  .with(undefined, () => ({ type: "colocate-pinned" as const }))
+                  .with("anywhere", () => ({ type: "anywhere" as const }))
+                  .with("colocate", () => ({ type: "colocate" as const }))
+                  .with(
+                    "colocate-pinned",
+                    () => ({ type: "colocate-pinned" as const }),
+                  )
+                  .with("pinned", () => {
+                    throw new Error(
+                      "Invalid colocation strategy: `-c`/`--cluster` not set",
+                    );
+                  })
+                  .exhaustive(),
             },
           },
         );
@@ -291,6 +312,11 @@ $ sf scale create -n 8 --horizon '30m'
   .option(
     "-c, --cluster <cluster>",
     "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+  )
+  .option(
+    "-cs, --colocation-strategy <colocation-strategy>",
+    `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
+    "colocate-pinned",
   )
   .option(
     "-d, --horizon <horizon>",
