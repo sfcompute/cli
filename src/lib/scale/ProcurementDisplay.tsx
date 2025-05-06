@@ -6,7 +6,7 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "../orders/index.tsx";
 
-import { Procurement } from "./utils.ts";
+import { formatColocationStrategy, Procurement } from "./utils.ts";
 
 export function ProcurementHeader({ id, quantity }: {
   id: string;
@@ -36,6 +36,7 @@ export default function ProcurementDisplay(
       desired_quantity,
       buy_limit_price_per_gpu_hour,
       horizon,
+      colocation_strategy,
     },
   }: { procurement: Procurement },
 ) {
@@ -62,6 +63,11 @@ export default function ProcurementDisplay(
           headWidth={15}
           head="Horizon"
           value={formatDuration(horizonMinutes * 60 * 1000)}
+        />
+        <Row
+          headWidth={15}
+          head="Colocation Strategy"
+          value={formatColocationStrategy(colocation_strategy)}
         />
       </Box>
     </Box>
