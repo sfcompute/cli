@@ -6,7 +6,6 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { getApiUrl } from "../helpers/urls.ts";
 import { apiClient } from "../apiClient.ts";
 
 export function registerMe(program: Command) {
