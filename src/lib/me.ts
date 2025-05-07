@@ -7,6 +7,7 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
+import { apiClient } from "../apiClient.ts";
 
 export function registerMe(program: Command) {
   program.command("me").action(async () => {
@@ -29,13 +30,9 @@ export async function getLoggedInAccountId(tokenOverride?: string) {
     token = config.auth_token;
   }
 
-  const response = await fetch(await getApiUrl("me"), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const client = await apiClient(token);
+
+  const { data, response } = await client.GET("/v0/me", {});
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -51,8 +48,9 @@ export async function getLoggedInAccountId(tokenOverride?: string) {
     logAndQuit("Failed to fetch account info");
   }
 
-  const data = await response.json();
+  if (!data) {
+    logAndQuit("Failed to fetch account info");
+  }
 
-  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   return data.id;
 }

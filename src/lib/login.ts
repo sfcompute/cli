@@ -7,11 +7,6 @@ import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";
 import { getWebAppUrl } from "../helpers/urls.ts";
-
-// We're using Axios here because there's a bug
-// where the fetch API in Bun isn't passing the body
-// through redirects correctly
-import axios from "axios";
 import { clearFeatureFlags } from "../helpers/feature-flags.ts";
 import { getLoggedInAccountId } from "./me.ts";
 import { randomInt } from "node:crypto";
@@ -68,18 +63,20 @@ async function createSession({ validation }: { validation: string }) {
   const url = await getWebAppUrl("cli_session_create");
 
   try {
-    const response = await axios.post(
-      url,
-      { validation },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        maxRedirects: 5,
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ validation }),
+      redirect: "follow",
+    });
 
-    return response.data as {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json() as {
       url: string;
       token: string;
     };
@@ -92,13 +89,18 @@ async function createSession({ validation }: { validation: string }) {
 async function getSession({ token }: { token: string }) {
   try {
     const url = await getWebAppUrl("cli_session_get", { token });
-    const response = await axios.get(url, {
+    const response = await fetch(url, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    return response.data as {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json() as {
       validation?: string;
       token?: string;
     };
