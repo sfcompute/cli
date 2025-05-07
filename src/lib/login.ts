@@ -20,7 +20,14 @@ export function registerLogin(program: Command) {
       "-t, --token <token>",
       "Use a pre-existing access token. Generate a token using `sf tokens create`",
     )
-    .action(async ({ token: cliToken }) => {
+    .action(async ({ token: cliToken }, program) => {
+      if (
+        program.args.length > 0 &&
+        program.args[0].trim().toLowerCase() === "help"
+      ) {
+        program.help();
+      }
+
       if (cliToken) {
         const spinner = ora("Saving token...\n").start();
         const accountId = await getLoggedInAccountId(cliToken).catch(
