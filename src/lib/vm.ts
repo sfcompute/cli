@@ -51,7 +51,9 @@ export function registerVM(program: Command) {
       const { data } = await response.json();
 
       if (!data?.length) {
-        logAndQuit("No VMs found");
+        logAndQuit(
+          "You have no VMs. Buy a VM with: \n  $ sf buy -t h100v -d 1h -n 8",
+        );
       }
 
       const formattedData = data.map(
