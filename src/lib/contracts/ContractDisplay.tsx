@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import { formatDateRange } from "little-date";
 import ms from "ms";
 import * as React from "react";
+import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import type { ActiveContract, Contract } from "./types.ts";
@@ -89,6 +90,11 @@ export function ContractDisplay(props: { contract: Contract }) {
     props.contract.instance_type,
   );
 
+  const isSupportedType = props.contract.instance_type in InstanceTypeMetadata;
+  const typeLabel = isSupportedType
+    ? InstanceTypeMetadata[props.contract.instance_type].displayName
+    : props.contract.instance_type;
+
   return (
     <Box flexDirection="column">
       <Box gap={1}>
@@ -100,11 +106,19 @@ export function ContractDisplay(props: { contract: Contract }) {
         </Box>
       </Box>
       <Box flexDirection="column" paddingTop={0.5}>
-        <Row
-          headWidth={COLUMN_WIDTH}
-          head="Type"
-          value={props.contract.instance_type}
-        />
+        <Box>
+          <Box width={COLUMN_WIDTH}>
+            <Text dimColor>Type</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{typeLabel}</Text>
+            {isSupportedType && (
+              <Text dimColor>
+                ({props.contract.instance_type})
+              </Text>
+            )}
+          </Box>
+        </Box>
         {props.contract.colocate_with.length > 0 && (
           <Row
             headWidth={COLUMN_WIDTH}
