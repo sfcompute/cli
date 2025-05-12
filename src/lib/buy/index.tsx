@@ -1,8 +1,11 @@
 import { type Command, Option } from "@commander-js/extra-typings";
+import chalk from "chalk";
 import { parseDate } from "chrono-node";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
+import console from "node:console";
+import process from "node:process";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
@@ -15,6 +18,7 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
+import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
 import {
   centsToDollarsFormatted,
   parseStartDate,
@@ -29,9 +33,6 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
-import console from "node:console";
-import process from "node:process";
-import chalk from "chalk";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -308,10 +309,13 @@ function BuyOrderPreview(props: {
   const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
     100;
 
+  const isSupportedType = props.type in InstanceTypeMetadata;
+  const typeLabel = isSupportedType
+    ? InstanceTypeMetadata[props.type].displayName
+    : props.type;
+
   return (
     <Box flexDirection="column">
-      <Text color="yellow">Buy Order</Text>
-      <Row headWidth={7} head="type" value={props.type} />
       <Box>
         <Box width={7}>
           <Text dimColor>start</Text>
@@ -338,6 +342,19 @@ function BuyOrderPreview(props: {
         head="size"
         value={`${props.size * GPUS_PER_NODE} gpus`}
       />
+      <Box>
+        <Box width={7}>
+          <Text dimColor>type</Text>
+        </Box>
+        <Box gap={1}>
+          <Text>{typeLabel}</Text>
+          {isSupportedType && (
+            <Text dimColor>
+              ({props.type})
+            </Text>
+          )}
+        </Box>
+      </Box>
       <Row
         headWidth={7}
         head="rate"
