@@ -30,6 +30,7 @@ export function registerVM(program: Command) {
   registerSsh(vm);
 
   vm.command("list")
+    .alias("ls")
     .description("List all virtual machines")
     .action(async () => {
       const url = await getApiUrl("vms_instances_list");
