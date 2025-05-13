@@ -1,19 +1,9 @@
-import type { operations } from "../../schema.ts";
+import type { components } from "../../schema.ts";
 
 type CredentialsResponse =
-  operations["getV0Credentials"]["responses"][200]["content"][
-    "application/json"
-  ];
-type CredentialsList = CredentialsResponse["data"];
-type BaseK8sCredential = Extract<
-  CredentialsList[number],
-  { object: "k8s_credential" }
->;
-
-export interface K8sCredential extends BaseK8sCredential {
-  cluster_type?: string;
-  encrypted_kubeconfig?: string;
-}
+  components["schemas"]["frontend_server.ListResponse"];
+type CredentialsList = NonNullable<CredentialsResponse["data"]>;
+export type K8sCredential = CredentialsList[number];
 
 /**
  * Check if the credential is a vcluster credential
