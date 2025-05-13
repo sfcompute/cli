@@ -49,7 +49,7 @@ export default function ConfirmationMessage(props: {
               </Text>
             </Box>
           )
-          : props.type}
+          : "unchanged"}
       />
       <Row
         headWidth={30}
