@@ -1,17 +1,22 @@
 import { Box, Text } from "ink";
 import React from "react";
 
-export function Row(props: {
+export function Row({
+  head,
+  value,
+  headWidth,
+}: {
   head: string;
-  value: string;
+  value: string | React.ReactNode;
   headWidth?: number;
 }) {
+  const valueIsString = typeof value === "string";
   return (
     <Box>
-      <Box width={props.headWidth}>
-        <Text dimColor>{props.head}</Text>
+      <Box width={headWidth}>
+        <Text dimColor>{head}</Text>
       </Box>
-      <Text>{props.value}</Text>
+      {valueIsString ? <Text>{value}</Text> : value}
     </Box>
   );
 }

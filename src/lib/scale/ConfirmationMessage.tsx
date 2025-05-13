@@ -1,6 +1,8 @@
 import React from "react";
 import { Box, Text } from "ink";
 
+import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
+
 import { Row } from "../Row.tsx";
 import { formatDuration } from "../orders/index.tsx";
 
@@ -22,7 +24,11 @@ export default function ConfirmationMessage(props: {
   const horizonInMilliseconds = props.horizonMinutes
     ? Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000
     : undefined;
-
+  const isSupportedType = typeof props.type === "string" &&
+    props.type in InstanceTypeMetadata;
+  const typeLabel = isSupportedType
+    ? InstanceTypeMetadata[props.type!].displayName
+    : props.type;
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Box gap={1}>
@@ -34,7 +40,16 @@ export default function ConfirmationMessage(props: {
       <Row
         headWidth={30}
         head="Type"
-        value={props.type ?? "unchanged"}
+        value={isSupportedType
+          ? (
+            <Box gap={1}>
+              <Text>{typeLabel}</Text>
+              <Text dimColor>
+                ({props.type})
+              </Text>
+            </Box>
+          )
+          : props.type}
       />
       <Row
         headWidth={30}

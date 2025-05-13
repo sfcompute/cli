@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Text } from "ink";
 import { Badge } from "@inkjs/ui";
 
+import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
+
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "../orders/index.tsx";
@@ -43,7 +45,10 @@ export default function ProcurementDisplay(
   const horizonMinutes = horizon;
   const quantity = desired_quantity * GPUS_PER_NODE;
   const pricePerGpuHourInCents = buy_limit_price_per_gpu_hour;
-
+  const isSupportedType = instance_type in InstanceTypeMetadata;
+  const typeLabel = isSupportedType
+    ? InstanceTypeMetadata[instance_type].displayName
+    : instance_type;
   return (
     <Box flexDirection="column">
       <ProcurementHeader id={id} quantity={quantity} />
@@ -51,7 +56,16 @@ export default function ProcurementDisplay(
         <Row
           headWidth={15}
           head="Type"
-          value={instance_type}
+          value={isSupportedType
+            ? (
+              <Box gap={1}>
+                <Text>{typeLabel}</Text>
+                <Text dimColor>
+                  ({instance_type})
+                </Text>
+              </Box>
+            )
+            : instance_type}
         />
         <Row headWidth={15} head="GPUs" value={String(quantity)} />
         <Row

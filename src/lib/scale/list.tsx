@@ -96,7 +96,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 
   if (isLoading) {
     return (
-      <Box>
+      <Box gap={1}>
         <Spinner type="arc" />
         <Text>Fetching procurement details...</Text>
       </Box>
