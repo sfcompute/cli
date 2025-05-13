@@ -129,7 +129,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -236,679 +236,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/v0/grids": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of grids */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "list";
-                            grids: {
-                                /** @enum {string} */
-                                object: "grid";
-                                /** @example grid_abc123 */
-                                id: string;
-                                /**
-                                 * @description The ID of the account that owns the grid.
-                                 * @example sfcompute-com-seb
-                                 */
-                                owner: string;
-                                /**
-                                 * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
-                                 * @example 10
-                                 */
-                                num_copies: number;
-                                /**
-                                 * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
-                                 * @example 10
-                                 */
-                                num_orders: number;
-                                /**
-                                 * Format: date-time
-                                 * @description The start time of the first order in the grid.
-                                 * @example 2025-04-30T00:00:00.000Z
-                                 */
-                                grid_front: string;
-                                /**
-                                 * Format: date-time
-                                 * @description Earliest time of any order in the grid.
-                                 * @example 2025-04-30T00:00:00.000Z
-                                 */
-                                start_at: string;
-                                /**
-                                 * Format: date-time
-                                 * @description The time at which the grid should stop placing new orders automatically.
-                                 * @example 2025-04-30T01:00:00.000Z
-                                 */
-                                end_at: string;
-                                order: {
-                                    /** @enum {string} */
-                                    side: "buy";
-                                    /** @description The instance type. */
-                                    instance_type: ("h100i" | "h100v") | string;
-                                    /** @description Price in cents (1 = $0.01) */
-                                    price: number | null;
-                                    /**
-                                     * @description The number of nodes to buy in each order.
-                                     * @example 10
-                                     */
-                                    quantity: number;
-                                    /**
-                                     * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                                     * @example 3600
-                                     */
-                                    duration: number;
-                                    reprice?: {
-                                        /**
-                                         * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                         * @example grid_linear
-                                         * @enum {string}
-                                         */
-                                        strategy: "grid_linear";
-                                        /** @description Price in cents (1 = $0.01) */
-                                        start_price: number | null;
-                                        /** @description Price in cents (1 = $0.01) */
-                                        end_price: number | null;
-                                        /**
-                                         * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                         * @example 3600
-                                         */
-                                        relative_window_start: number;
-                                        /**
-                                         * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                         * @example 18000
-                                         */
-                                        relative_window_end: number;
-                                    };
-                                } | {
-                                    /** @enum {string} */
-                                    side: "sell";
-                                    /** @description The instance type. */
-                                    instance_type: ("h100i" | "h100v") | string;
-                                    /** @description Price in cents (1 = $0.01) */
-                                    price: number | null;
-                                    /**
-                                     * @description The number of nodes to sell in each order.
-                                     * @example 10
-                                     */
-                                    quantity: number;
-                                    /**
-                                     * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                                     * @example 3600
-                                     */
-                                    duration: number;
-                                    /** @description An external ID with prefix and alphanumeric string with underscores */
-                                    backing_contract_id: unknown;
-                                    reprice?: {
-                                        /**
-                                         * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                         * @example grid_linear
-                                         * @enum {string}
-                                         */
-                                        strategy: "grid_linear";
-                                        /** @description Price in cents (1 = $0.01) */
-                                        start_price: number | null;
-                                        /** @description Price in cents (1 = $0.01) */
-                                        end_price: number | null;
-                                        /**
-                                         * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                         * @example 3600
-                                         */
-                                        relative_window_start: number;
-                                        /**
-                                         * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                         * @example 18000
-                                         */
-                                        relative_window_end: number;
-                                    };
-                                };
-                                /** @enum {string} */
-                                status: "active" | "disabled" | "destroyed" | "completed";
-                            }[];
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        /**
-                         * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
-                         * @example 10
-                         */
-                        num_copies: number;
-                        /**
-                         * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
-                         * @example 10
-                         */
-                        num_orders: number;
-                        /**
-                         * Format: date-time
-                         * @description The start time of when the first batch of orders are first placed. If this date is in the past, will be clamped such that the orders start immediately. If this date is not provided, it will be set to `start_at`.
-                         */
-                        grid_front?: string;
-                        /**
-                         * Format: date-time
-                         * @description The time at which the compute for the first order on the grid is available. If this date is in the past, it will be clamped such that the first orders are placed immediately.
-                         * @example 2025-04-30T00:00:00.000Z
-                         */
-                        start_at: string;
-                        /**
-                         * Format: date-time
-                         * @description The time at which the grid should stop placing new orders automatically. The grid never places an order whos (compute-available) end time is after this time. For sell grids, will be set to the given time (if any) or the end of the backing contract, whichever is sooner. This is not to be confused for the end time of the last order in the grid, i.e. `grid_front + num_orders * order.duration`.
-                         * @example 2025-04-30T01:00:00.000Z
-                         */
-                        end_at?: string;
-                        order: {
-                            /** @enum {string} */
-                            side: "buy";
-                            /** @description The instance type. */
-                            instance_type: ("h100i" | "h100v") | string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number | null;
-                            /**
-                             * @description The number of nodes to buy in each order.
-                             * @example 10
-                             */
-                            quantity: number;
-                            /**
-                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                             * @example 3600
-                             */
-                            duration: number;
-                            reprice?: {
-                                /**
-                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                 * @example grid_linear
-                                 * @enum {string}
-                                 */
-                                strategy: "grid_linear";
-                                /** @description Price in cents (1 = $0.01) */
-                                start_price: number | null;
-                                /** @description Price in cents (1 = $0.01) */
-                                end_price: number | null;
-                                /**
-                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                 * @example 3600
-                                 */
-                                relative_window_start: number;
-                                /**
-                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                 * @example 18000
-                                 */
-                                relative_window_end: number;
-                            };
-                        } | {
-                            /** @enum {string} */
-                            side: "sell";
-                            /** @description The instance type. */
-                            instance_type: ("h100i" | "h100v") | string;
-                            /** @description Price in cents (1 = $0.01) */
-                            price: number | null;
-                            /**
-                             * @description The number of nodes to sell in each order.
-                             * @example 10
-                             */
-                            quantity: number;
-                            /**
-                             * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                             * @example 3600
-                             */
-                            duration: number;
-                            /** @description An external ID with prefix and alphanumeric string with underscores */
-                            backing_contract_id: unknown;
-                            reprice?: {
-                                /**
-                                 * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                 * @example grid_linear
-                                 * @enum {string}
-                                 */
-                                strategy: "grid_linear";
-                                /** @description Price in cents (1 = $0.01) */
-                                start_price: number | null;
-                                /** @description Price in cents (1 = $0.01) */
-                                end_price: number | null;
-                                /**
-                                 * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                 * @example 3600
-                                 */
-                                relative_window_start: number;
-                                /**
-                                 * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                 * @example 18000
-                                 */
-                                relative_window_end: number;
-                            };
-                        };
-                    };
-                };
-            };
-            responses: {
-                /** @description Grid created successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "grid";
-                            /** @example grid_abc123 */
-                            id: string;
-                            /** @enum {string} */
-                            status: "active";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Not authenticated */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotAuthenticatedError"];
-                    };
-                };
-                /** @description Not authorized to create grids */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedError"];
-                    };
-                };
-                /** @description Not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/grids/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Grid details */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "grid";
-                            /** @example grid_abc123 */
-                            id: string;
-                            /**
-                             * @description The ID of the account that owns the grid.
-                             * @example sfcompute-com-seb
-                             */
-                            owner: string;
-                            /**
-                             * @description Number of parallel copies of each unique order in the grid. This can be thought of as the "height" of the grid, or the number of orders to place in the "nodes" dimension of the grid.
-                             * @example 10
-                             */
-                            num_copies: number;
-                            /**
-                             * @description Number of unique orders in the grid. This can be thought of as the "length" of the grid, or the number of orders to place in the "time" dimension of the grid.
-                             * @example 10
-                             */
-                            num_orders: number;
-                            /**
-                             * Format: date-time
-                             * @description The start time of the first order in the grid.
-                             * @example 2025-04-30T00:00:00.000Z
-                             */
-                            grid_front: string;
-                            /**
-                             * Format: date-time
-                             * @description Earliest time of any order in the grid.
-                             * @example 2025-04-30T00:00:00.000Z
-                             */
-                            start_at: string;
-                            /**
-                             * Format: date-time
-                             * @description The time at which the grid should stop placing new orders automatically.
-                             * @example 2025-04-30T01:00:00.000Z
-                             */
-                            end_at: string;
-                            order: {
-                                /** @enum {string} */
-                                side: "buy";
-                                /** @description The instance type. */
-                                instance_type: ("h100i" | "h100v") | string;
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes to buy in each order.
-                                 * @example 10
-                                 */
-                                quantity: number;
-                                /**
-                                 * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                                 * @example 3600
-                                 */
-                                duration: number;
-                                reprice?: {
-                                    /**
-                                     * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                     * @example grid_linear
-                                     * @enum {string}
-                                     */
-                                    strategy: "grid_linear";
-                                    /** @description Price in cents (1 = $0.01) */
-                                    start_price: number | null;
-                                    /** @description Price in cents (1 = $0.01) */
-                                    end_price: number | null;
-                                    /**
-                                     * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                     * @example 3600
-                                     */
-                                    relative_window_start: number;
-                                    /**
-                                     * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                     * @example 18000
-                                     */
-                                    relative_window_end: number;
-                                };
-                            } | {
-                                /** @enum {string} */
-                                side: "sell";
-                                /** @description The instance type. */
-                                instance_type: ("h100i" | "h100v") | string;
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes to sell in each order.
-                                 * @example 10
-                                 */
-                                quantity: number;
-                                /**
-                                 * @description The duration of for which the nodes will be sold in each order, in seconds. Must be a multiple of 3600.
-                                 * @example 3600
-                                 */
-                                duration: number;
-                                /** @description An external ID with prefix and alphanumeric string with underscores */
-                                backing_contract_id: unknown;
-                                reprice?: {
-                                    /**
-                                     * @description Reprice the order linearly over a given window of time, defined relative to the order's start time.
-                                     * @example grid_linear
-                                     * @enum {string}
-                                     */
-                                    strategy: "grid_linear";
-                                    /** @description Price in cents (1 = $0.01) */
-                                    start_price: number | null;
-                                    /** @description Price in cents (1 = $0.01) */
-                                    end_price: number | null;
-                                    /**
-                                     * @description The start time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to start 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                     * @example 3600
-                                     */
-                                    relative_window_start: number;
-                                    /**
-                                     * @description The end time of the repricing window, relative to the order's start time, in seconds before the order's start time. For instance, if you want repricing to end 5 hours before the order start time, you'd set this to `5 * 3600`.
-                                     * @example 18000
-                                     */
-                                    relative_window_end: number;
-                                };
-                            };
-                            /** @enum {string} */
-                            status: "active" | "disabled" | "destroyed" | "completed";
-                            orders: (string | unknown | unknown)[][];
-                        };
-                    };
-                };
-                /** @description Grid not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Grid destroyed */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "grid";
-                            /** @example grid_abc123 */
-                            id: string;
-                            /** @enum {string} */
-                            status: "destroyed";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Grid not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/grids/{id}/disable": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Grid disabled */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "grid";
-                            /** @example grid_abc123 */
-                            id: string;
-                            /** @enum {string} */
-                            status: "disabled";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Grid not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        trace?: never;
-    };
-    "/v0/grids/{id}/enable": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Grid enabled */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "grid";
-                            /** @example grid_abc123 */
-                            id: string;
-                            /** @enum {string} */
-                            status: "active";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Grid not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
         trace?: never;
     };
     "/v0/me": {
@@ -1081,7 +408,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    id: unknown;
+                    id: string;
                 };
                 cookie?: never;
             };
@@ -1427,7 +754,8 @@ export interface paths {
                     starting_after?: string;
                     ending_before?: string;
                     limit?: string;
-                    transaction_type?: string | string[];
+                    transaction_type?: ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected") | ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected")[];
+                    account_kind?: components["schemas"]["AccountKind"] | components["schemas"]["AccountKind"][];
                 };
                 header?: never;
                 path?: never;
@@ -1556,7 +884,7 @@ export interface paths {
                     quantity: number;
                     instance_type?: ("h100i" | "h100v") | string;
                     contract_id?: string;
-                    colocate_with?: unknown[];
+                    colocate_with?: string[];
                     duration?: number;
                     min_duration?: number;
                     max_duration?: number;
@@ -1596,7 +924,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-29T22:17:46.294Z
+                                 * @example 2025-05-09T23:11:46.684Z
                                  */
                                 start_at: string;
                                 /**
@@ -1623,7 +951,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-04-29T22:17:46.294Z
+                                 * @example 2025-05-09T23:11:46.684Z
                                  */
                                 start_at: string;
                                 /**
@@ -2081,14 +1409,195 @@ export interface paths {
     };
     "/v0/credentials": {
         parameters: {
-          query?: never;
-          header?: never;
-          path?: never;
-          cookie?: never;
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        get: operations["getV0Credentials"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["frontend_server.ListResponse"];
+                    };
+                };
+            };
+        };
         put?: never;
-        post: operations["postV0Credentials"];
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description Credential details */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["types.KubernetesCredentialBody"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["frontend_server.BaseCredentialResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/credentials/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Credential ID (format: cred_<nanoid>) */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["frontend_server.DeleteResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/brew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_vms_brew"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/instances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_vms_instances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/logs2": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_vms_logs2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/replace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_vms_replace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/script": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_vms_user_data"];
+        put?: never;
+        post: operations["post_vms_user_data"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/vms/ssh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_vms_ssh"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2256,15 +1765,15 @@ export interface components {
              */
             status: "active";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
             /** Format: date-time */
             created_at: string;
             /** @description The instance type. */
             instance_type: ("h100i" | "h100v") | string;
             shape: components["schemas"]["Shape"];
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            cluster_id?: unknown;
+            cluster_id?: string;
             /** @enum {string} */
             state: "Upcoming" | "Expired" | "Active";
         };
@@ -2282,7 +1791,7 @@ export interface components {
              */
             status: "pending";
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: unknown;
+            id: string;
         };
         KubernetesCluster: {
             /**
@@ -2372,24 +1881,6 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        UnauthorizedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example unauthorized
-             * @enum {string}
-             */
-            code: "unauthorized";
-            /** @example Unauthorized. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
         Account: {
             /**
              * @example account
@@ -2431,12 +1922,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-03-30T00:00:00.000Z
+             * @example 2025-04-09T07:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-03-30T23:59:59.999Z
+             * @example 2025-04-10T06:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -2454,12 +1945,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-03-30T00:00:00.000Z
+             * @example 2025-04-09T07:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-03-30T23:59:59.999Z
+             * @example 2025-04-10T06:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -2795,45 +2286,47 @@ export interface components {
             };
         };
         /**
-         * @description The type of transaction. Some types will only be seen by providers, others will be seen by all
-         * @enum {string}
-         */
-        TransactionType: "buy" | "sell" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "promotional_credit" | "refund" | "transfer" | "admin_ledger_transfer" | "delivery_fees_collected" | "fulfillment_escrow_release" | "unknown";
-        /**
-         * @description Whether the transaction is incoming or outgoing relative to the account
+         * @description Whether the transaction is incoming to or outgoing from the account.
          * @enum {string}
          */
         TransactionDirection: "incoming" | "outgoing";
         /**
-         * @description The current status of a transaction
+         * @description The current status of a transaction.
          * @enum {string}
          */
         TransactionStatus: "accepted" | "rejected";
         /**
-         * @description The kind of account involved in the transaction
+         * @description The kind of account involved in the transaction. Each user has one account of each account kind. The account "primary" is the main one used for buy/sell on the platform.
          * @enum {string}
          */
         AccountKind: "primary" | "capital" | "withdrawal_reserve" | "fulfillment_escrow" | "delivery_fee_escrow";
         /**
          * @description A transaction representing a movement of funds
          * @example {
-         *       "internal_id": "tx_1234567890-4",
+         *       "id": "tx_1234567890-4",
          *       "timestamp": "2024-03-15T00:30:00.000Z",
-         *       "transaction_type": "buy",
          *       "direction": "outgoing",
          *       "status": "accepted",
-         *       "amount": 50000,
+         *       "amount": 5000,
          *       "account_kind": "primary",
          *       "balance_before": 70000,
-         *       "balance_after": 20000,
+         *       "balance_after": 65000,
          *       "metadata": {
-         *         "start_time": "2025-04-30T00:17:46.323Z",
-         *         "end_time": "2025-04-30T03:17:46.323Z",
-         *         "quantity": 5,
+         *         "type": "buy",
+         *         "start_time": "2025-05-10T01:11:46.819Z",
+         *         "end_time": "2025-05-10T03:11:46.819Z",
+         *         "quantity": 2,
+         *         "order_id": "ordr_34905N",
          *         "instance_type_requirements": {
-         *           "accelerator_type": "H100",
-         *           "interconnect_type": "Infiniband",
-         *           "region": "NorthAmerica",
+         *           "accelerator_types": [
+         *             "H100"
+         *           ],
+         *           "interconnect_types": [
+         *             "Infiniband"
+         *           ],
+         *           "regions": [
+         *             "NorthAmerica"
+         *           ],
          *           "delivery_type": "K8sNamespace"
          *         }
          *       }
@@ -2841,13 +2334,12 @@ export interface components {
          */
         Transaction: {
             /** @description Unique identifier for the transaction */
-            internal_id: string;
+            id: string;
             /**
              * Format: date-time
-             * @description When the transaction occurred
+             * @description When the money movement occurred within SFCs system
              */
             timestamp: string;
-            transaction_type: components["schemas"]["TransactionType"];
             direction: components["schemas"]["TransactionDirection"];
             status: components["schemas"]["TransactionStatus"];
             /** @description Transaction amount in cents */
@@ -2859,56 +2351,150 @@ export interface components {
             balance_after: number;
             /** @description Additional transaction-specific details */
             metadata: {
-                instance_type_requirements?: unknown;
+                /** @enum {string} */
+                type: "buy";
+                /** @description Requirements specified for the buy order */
+                instance_type_requirements: {
+                    /** @description List of allowed accelerator types. */
+                    accelerator_types?: "H100"[];
+                    /** @description List of allowed interconnect types. */
+                    interconnect_types?: ("Infiniband" | "None")[];
+                    /** @description List of allowed regions. */
+                    regions?: ("NorthAmerica" | "AsiaPacific")[];
+                    /**
+                     * @description Delivery method.
+                     * @enum {string}
+                     */
+                    delivery_type: "K8sNamespace" | "VM";
+                };
+                /** @description Quantity requested in the buy order, in number of nodes (8 gpus) */
                 quantity: number;
-                start_time: number;
-                end_time: number;
+                /**
+                 * Format: date-time
+                 * @description The buy orders requested start time of the compute
+                 */
+                start_time: string;
+                /**
+                 * Format: date-time
+                 * @description The buy orders requested end time of compute
+                 */
+                end_time: string;
+                /** @description An external ID with prefix and alphanumeric string with underscores */
                 order_id: string;
             } | {
-                backing_contract_id: number;
+                /** @enum {string} */
+                type: "sell";
+                /** @description Quantity that was requested to sell, In number of nodes (8 gpus) */
                 quantity: number;
-                start_time: number;
-                end_time: number;
+                /**
+                 * Format: date-time
+                 * @description The orders requested start time of the compute to sell
+                 */
+                start_time: string;
+                /**
+                 * Format: date-time
+                 * @description The orders requested end time of compute to sell
+                 */
+                end_time: string;
+                /** @description The sell order that was executed. */
                 order_id: string;
+                /** @description The backing contract that was sold from. */
+                backing_contract_id: string;
             } | {
-                from_account: string;
+                /** @enum {string} */
+                type: "transfer";
             } | {
-                event_str: string;
-            } | Record<string, never> | {
-                internal_transfer_id: string;
-                memo: string | null;
-                refund_start_time: string | null;
-                refund_end_time: string | null;
-                nodes_affected: string[] | null;
+                /** @enum {string} */
+                type: "error";
+                /** @description Best effort type of the transaction without additional metadata, but may be 'unknown' */
+                inner_type: string;
+                /** @description message of what went wrong */
+                message?: unknown;
             } | {
-                stripe_checkout_session_id: string;
+                /** @enum {string} */
+                type: "instant_deposit";
+                /**
+                 * Format: date-time
+                 * @description The time the bank involved marked marked this transaction as completed.
+                 */
                 completed_at: string;
-                card_last4?: string;
-                card_brand?: string;
-                card_funding?: string;
+                /** @description The last 4 digits of the card that was used to perform the payment. */
+                card_last4: string;
+                /** @description Brand of card used for payment. */
+                card_brand: string;
+                /** @description The funding type of the card. */
+                card_funding: string;
             } | {
-                bank_account_id: string;
-                column_transfer_id: string;
+                /** @enum {string} */
+                type: "deposit_ach";
+                /**
+                 * Format: date-time
+                 * @description The date the bank withdrawal was initiated.
+                 */
                 date_initiated: string;
+                /**
+                 * Format: date-time
+                 * @description The date the bank withdrawal was cancelled, if it was cancelled.
+                 */
                 date_cancelled: string | null;
+                /**
+                 * Format: date-time
+                 * @description The date the bank withdrawal settled by the bank, if it was cancelled. This will in most cases be close to the time SFC processed the transaction.
+                 */
                 date_settled: string | null;
-                account_description?: string;
-                bank_account_last4?: string;
+                /** @description A short description of the account. */
+                account_description: string;
+                /** @description The last 4 digits of the bank account number. */
+                bank_account_last4: string;
             } | {
-                bank_account_id: string;
-                column_counterparty_id: string;
-                column_ach_transfer_id: string;
+                /** @enum {string} */
+                type: "withdrawal_bank";
+                /**
+                 * Format: date-time
+                 * @description The date this bank withdrawal was approved.
+                 */
                 approved_at: string;
-                account_description?: string;
-                bank_account_last4?: string;
+                /** @description A short description of the account. */
+                account_description: string;
+                /** @description The last 4 digits of the bank account number. */
+                bank_account_last4: string;
             } | {
-                downtime_refund_rate_per_gpu_hour: number;
-                downtime_quantity: number;
-                downtime_start_time: string;
-                downtime_end_time: string;
-                downtime_report_id: string;
+                /** @enum {string} */
+                type: "refund";
+                /**
+                 * Format: date-time
+                 * @description Start time of experienced downtime.
+                 */
+                start_time: string;
+                /**
+                 * Format: date-time
+                 * @description End time of experienced downtime.
+                 */
+                end_time: string;
+                /** @description In number of nodes (8 gpus) affected during this period. */
+                quantity: number;
+                /** @description The index rate per GPU, in cents, used to calculate the refund amount. */
+                refund_cents_per_gpu_hour: number;
+                /** @description Downtime report ID that resulted in this refund being issued. */
+                report_id: string;
+                /**
+                 * Format: date-time
+                 * @description The time at which SFC approved the refund.
+                 */
                 issue_date: string;
-            } | unknown;
+            } | {
+                /** @enum {string} */
+                type: "admin_ledger_transfer";
+            } | {
+                /** @enum {string} */
+                type: "fulfillment_escrow_release";
+            } | {
+                /** @enum {string} */
+                type: "promotional_credit";
+            } | {
+                /** @enum {string} */
+                type: "delivery_fees_collected";
+            };
         };
         /**
          * @description List of transactions for an account
@@ -2916,16 +2502,33 @@ export interface components {
          *       "object": "transactions",
          *       "transactions": [
          *         {
-         *           "internal_id": "tx_1234567890",
+         *           "id": "tx_1234567890-4",
          *           "timestamp": "2024-03-15T00:30:00.000Z",
-         *           "transaction_type": "buy",
          *           "direction": "outgoing",
          *           "status": "accepted",
-         *           "amount": 50000,
+         *           "amount": 5000,
          *           "account_kind": "primary",
-         *           "balance_before": 100000,
-         *           "balance_after": 50000,
-         *           "metadata": null
+         *           "balance_before": 70000,
+         *           "balance_after": 65000,
+         *           "metadata": {
+         *             "type": "buy",
+         *             "start_time": "2025-05-10T01:11:46.819Z",
+         *             "end_time": "2025-05-10T03:11:46.819Z",
+         *             "quantity": 2,
+         *             "order_id": "ordr_34Az95N",
+         *             "instance_type_requirements": {
+         *               "accelerator_types": [
+         *                 "H100"
+         *               ],
+         *               "interconnect_types": [
+         *                 "Infiniband"
+         *               ],
+         *               "regions": [
+         *                 "NorthAmerica"
+         *               ],
+         *               "delivery_type": "K8sNamespace"
+         *             }
+         *           }
          *         }
          *       ],
          *       "pagination": {
@@ -2943,6 +2546,7 @@ export interface components {
              * @enum {string}
              */
             object: "transactions";
+            /** @description Transactions for all accounts (see account kind) associated with this user. */
             transactions: components["schemas"]["Transaction"][];
             /** @description Pagination information */
             pagination: {
@@ -2968,6 +2572,24 @@ export interface components {
                  * @example 2024-03-15T00:30:00.000Z
                  */
                 newest_timestamp: string | null;
+            };
+        };
+        UnauthorizedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example unauthorized
+             * @enum {string}
+             */
+            code: "unauthorized";
+            /** @example Unauthorized. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
             };
         };
         InvalidDateRange: {
@@ -3013,7 +2635,7 @@ export interface components {
             /**
              * Format: date-time
              * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-04-29T22:17:46.294Z
+             * @example 2025-05-09T23:11:46.684Z
              */
             start_at: string;
             /**
@@ -3037,7 +2659,7 @@ export interface components {
             execution_price?: number | null;
             cancelled: boolean;
             cancelled_at?: string;
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             created_at: string;
             rejected: boolean;
             rejected_reason?: string;
@@ -3207,7 +2829,7 @@ export interface components {
                 /** @description If true, this is an immediate-or-cancel order. */
                 ioc?: boolean;
             };
-            colocate_with?: unknown[];
+            colocate_with?: string[];
             /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
             cluster?: string;
         } | {
@@ -3270,6 +2892,110 @@ export interface components {
                 window_end: string;
             };
         };
+        "frontend_server.BaseCredentialResponse": {
+            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+            id?: string;
+            label?: string;
+            object?: string;
+            pubkey?: string;
+            username?: string;
+        };
+        "frontend_server.ClusterInfo": {
+            id?: string;
+            kubernetes_api_url?: string;
+            kubernetes_ca_cert?: string;
+            kubernetes_namespace?: string;
+            name?: string;
+            object?: string;
+        };
+        "frontend_server.CredentialResponse": {
+            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+            cluster_type?: string;
+            encrypted_kubeconfig?: string;
+            encrypted_token?: string;
+            ephemeral_pubkey?: string;
+            id?: string;
+            label?: string;
+            nonce?: string;
+            object?: string;
+            pubkey?: string;
+            username?: string;
+        };
+        "frontend_server.DeleteResponse": {
+            deleted?: boolean;
+            id?: string;
+            object?: string;
+        };
+        "frontend_server.ListResponse": {
+            data?: components["schemas"]["frontend_server.CredentialResponse"][];
+            has_more?: boolean;
+            object?: string;
+        };
+        /** @description Credential request body */
+        "types.KubernetesCredentialBody": {
+            cluster?: string;
+            label?: string;
+            object?: string;
+            pubkey?: string;
+            username?: string;
+        };
+        BrewRequest: {
+            /** @enum {string} */
+            kind: "coffee" | "tea";
+        };
+        GetInstancesResponse: {
+            data: components["schemas"]["VmInstance"][];
+        };
+        GetSshResponse: {
+            ssh_host_keys?: components["schemas"]["SshHostKeyInfo"][] | null;
+            ssh_hostname: string;
+            /** Format: u-int16 */
+            ssh_port: number;
+        };
+        GetUserDataResponse: {
+            script: components["schemas"]["UserData"];
+        };
+        PostReplaceRequest: {
+            vm_id: string;
+        };
+        PostReplaceResponse: {
+            replaced: string;
+            replaced_by: string;
+        };
+        PostUserDataRequest: {
+            script: components["schemas"]["UserData"];
+        };
+        PostUserDataResponse: {
+            script: components["schemas"]["UserData"];
+        };
+        SshHostKeyInfo: {
+            base64_encoded_key: string;
+            key_type: string;
+        };
+        /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
+        UserData: string | number[];
+        VmInstance: {
+            cluster_id: string;
+            current_status: string;
+            id: string;
+            instance_group_id: string;
+            last_updated_at: string;
+        };
+        VmsLogChunk: {
+            data: number[];
+            instance_id: string;
+            /** Format: u-int32 */
+            monotonic_timestamp_nano_sec: number;
+            /** Format: u-int64 */
+            monotonic_timestamp_sec: number;
+            /** @description In RFC 3339 format */
+            realtime_timestamp: string;
+            /** Format: u-int64 */
+            seqnum: number;
+        };
+        VmsLogsResponse: {
+            data: components["schemas"]["VmsLogChunk"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -3278,729 +3004,272 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = {
-    getV0Credentials: {
+export interface operations {
+    post_vms_brew: {
         parameters: {
-          query?: never;
-          header?: {
-            /** @description Generate a bearer token with `$ sf tokens create`. */
-            authorization?: string;
-          };
-          path?: never;
-          cookie?: never;
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BrewRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_vms_instances: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
         requestBody?: never;
         responses: {
-          200: {
-            headers: {
-              [name: string]: unknown;
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetInstancesResponse"];
+                };
             };
-            content: {
-              "application/json": {
-                data: (
-                  | {
-                      /** @constant */
-                      object: "ssh_credential";
-                      id: string;
-                      pubkey: string;
-                      username: string;
-                    }
-                  | {
-                      /** @constant */
-                      object: "k8s_credential";
-                      id: string;
-                      username?: string;
-                      label?: string;
-                      pubkey: string;
-                      cluster?: {
-                        /** @constant */
-                        object: "kubernetes_cluster";
-                        kubernetes_api_url?: string;
-                        name: string;
-                        kubernetes_namespace: string;
-                        kubernetes_ca_cert?: string;
-                        contract?:
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "active";
-                              id: string;
-                              /** Format: date-time */
-                              created_at: string;
-                              /** @description The instance type. */
-                              instance_type: string;
-                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                              shape: {
-                                intervals: string[];
-                                quantities: number[];
-                              };
-                              colocate_with?: string[];
-                              cluster_id?: string;
-                              state: "Upcoming" | "Expired" | "Active";
-                            }
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "pending";
-                              id: string;
-                            };
-                      };
-                      encrypted_token?: string;
-                      nonce?: string;
-                      ephemeral_pubkey?: string;
-                      contracts?: (
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          }
-                      )[];
-                    }
-                )[];
-                has_more: boolean;
-                /** @constant */
-                object: "list";
-              };
-              "multipart/form-data": {
-                data: (
-                  | {
-                      /** @constant */
-                      object: "ssh_credential";
-                      id: string;
-                      pubkey: string;
-                      username: string;
-                    }
-                  | {
-                      /** @constant */
-                      object: "k8s_credential";
-                      id: string;
-                      username?: string;
-                      label?: string;
-                      pubkey: string;
-                      cluster?: {
-                        /** @constant */
-                        object: "kubernetes_cluster";
-                        kubernetes_api_url?: string;
-                        name: string;
-                        kubernetes_namespace: string;
-                        kubernetes_ca_cert?: string;
-                        contract?:
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "active";
-                              id: string;
-                              /** Format: date-time */
-                              created_at: string;
-                              /** @description The instance type. */
-                              instance_type: string;
-                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                              shape: {
-                                intervals: string[];
-                                quantities: number[];
-                              };
-                              colocate_with?: string[];
-                              cluster_id?: string;
-                              state: "Upcoming" | "Expired" | "Active";
-                            }
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "pending";
-                              id: string;
-                            };
-                      };
-                      encrypted_token?: string;
-                      nonce?: string;
-                      ephemeral_pubkey?: string;
-                      contracts?: (
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          }
-                      )[];
-                    }
-                )[];
-                has_more: boolean;
-                /** @constant */
-                object: "list";
-              };
-              "text/plain": {
-                data: (
-                  | {
-                      /** @constant */
-                      object: "ssh_credential";
-                      id: string;
-                      pubkey: string;
-                      username: string;
-                    }
-                  | {
-                      /** @constant */
-                      object: "k8s_credential";
-                      id: string;
-                      username?: string;
-                      label?: string;
-                      pubkey: string;
-                      cluster?: {
-                        /** @constant */
-                        object: "kubernetes_cluster";
-                        kubernetes_api_url?: string;
-                        name: string;
-                        kubernetes_namespace: string;
-                        kubernetes_ca_cert?: string;
-                        contract?:
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "active";
-                              id: string;
-                              /** Format: date-time */
-                              created_at: string;
-                              /** @description The instance type. */
-                              instance_type: string;
-                              /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                              shape: {
-                                intervals: string[];
-                                quantities: number[];
-                              };
-                              colocate_with?: string[];
-                              cluster_id?: string;
-                              state: "Upcoming" | "Expired" | "Active";
-                            }
-                          | {
-                              /** @constant */
-                              object: "contract";
-                              /** @constant */
-                              status: "pending";
-                              id: string;
-                            };
-                      };
-                      encrypted_token?: string;
-                      nonce?: string;
-                      ephemeral_pubkey?: string;
-                      contracts?: (
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          }
-                      )[];
-                    }
-                )[];
-                has_more: boolean;
-                /** @constant */
-                object: "list";
-              };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-          };
-          401: {
-            headers: {
-              [name: string]: unknown;
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-            content: {
-              "application/json": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "multipart/form-data": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "text/plain": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
-            };
-          };
-          500: {
-            headers: {
-              [name: string]: unknown;
-            };
-            content: {
-              "application/json": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "multipart/form-data": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "text/plain": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-            };
-          };
         };
-      };
-      postV0Credentials: {
+    };
+    get_vms_logs2: {
         parameters: {
-          query?: never;
-          header?: {
-            /** @description Generate a bearer token with `$ sf tokens create`. */
-            authorization?: string;
-          };
-          path?: never;
-          cookie?: never;
+            query: {
+                instance_id: string;
+                before_seqnum?: number;
+                since_seqnum?: number;
+                before_realtime_timestamp?: string;
+                since_realtime_timestamp?: string;
+                order_by: "seqnum_asc" | "seqnum_desc";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VmsLogsResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    post_vms_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
         requestBody: {
-          content: {
-            "application/json":
-              | {
-                  pubkey: string;
-                  username: string;
-                  /** @constant */
-                  object?: "ssh_credential";
-                }
-              | {
-                  username: string;
-                  label?: string;
-                  cluster: string;
-                  /** @constant */
-                  object: "k8s_credential";
-                  pubkey: string;
-                };
-            "multipart/form-data":
-              | {
-                  pubkey: string;
-                  username: string;
-                  /** @constant */
-                  object?: "ssh_credential";
-                }
-              | {
-                  username: string;
-                  label?: string;
-                  cluster: string;
-                  /** @constant */
-                  object: "k8s_credential";
-                  pubkey: string;
-                };
-            "text/plain":
-              | {
-                  pubkey: string;
-                  username: string;
-                  /** @constant */
-                  object?: "ssh_credential";
-                }
-              | {
-                  username: string;
-                  label?: string;
-                  cluster: string;
-                  /** @constant */
-                  object: "k8s_credential";
-                  pubkey: string;
-                };
-          };
+            content: {
+                "application/json": components["schemas"]["PostReplaceRequest"];
+            };
         };
         responses: {
-          200: {
-            headers: {
-              [name: string]: unknown;
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostReplaceResponse"];
+                };
             };
-            content: {
-              "application/json":
-                | {
-                    /** @constant */
-                    object: "ssh_credential";
-                    id: string;
-                    pubkey: string;
-                    username: string;
-                  }
-                | {
-                    /** @constant */
-                    object: "k8s_credential";
-                    id: string;
-                    username?: string;
-                    label?: string;
-                    pubkey: string;
-                    cluster?: {
-                      /** @constant */
-                      object: "kubernetes_cluster";
-                      kubernetes_api_url?: string;
-                      name: string;
-                      kubernetes_namespace: string;
-                      kubernetes_ca_cert?: string;
-                      contract?:
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          };
-                    };
-                    encrypted_token?: string;
-                    nonce?: string;
-                    ephemeral_pubkey?: string;
-                    contracts?: (
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        }
-                    )[];
-                  };
-              "multipart/form-data":
-                | {
-                    /** @constant */
-                    object: "ssh_credential";
-                    id: string;
-                    pubkey: string;
-                    username: string;
-                  }
-                | {
-                    /** @constant */
-                    object: "k8s_credential";
-                    id: string;
-                    username?: string;
-                    label?: string;
-                    pubkey: string;
-                    cluster?: {
-                      /** @constant */
-                      object: "kubernetes_cluster";
-                      kubernetes_api_url?: string;
-                      name: string;
-                      kubernetes_namespace: string;
-                      kubernetes_ca_cert?: string;
-                      contract?:
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          };
-                    };
-                    encrypted_token?: string;
-                    nonce?: string;
-                    ephemeral_pubkey?: string;
-                    contracts?: (
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        }
-                    )[];
-                  };
-              "text/plain":
-                | {
-                    /** @constant */
-                    object: "ssh_credential";
-                    id: string;
-                    pubkey: string;
-                    username: string;
-                  }
-                | {
-                    /** @constant */
-                    object: "k8s_credential";
-                    id: string;
-                    username?: string;
-                    label?: string;
-                    pubkey: string;
-                    cluster?: {
-                      /** @constant */
-                      object: "kubernetes_cluster";
-                      kubernetes_api_url?: string;
-                      name: string;
-                      kubernetes_namespace: string;
-                      kubernetes_ca_cert?: string;
-                      contract?:
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "active";
-                            id: string;
-                            /** Format: date-time */
-                            created_at: string;
-                            /** @description The instance type. */
-                            instance_type: string;
-                            /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                            shape: {
-                              intervals: string[];
-                              quantities: number[];
-                            };
-                            colocate_with?: string[];
-                            cluster_id?: string;
-                            state: "Upcoming" | "Expired" | "Active";
-                          }
-                        | {
-                            /** @constant */
-                            object: "contract";
-                            /** @constant */
-                            status: "pending";
-                            id: string;
-                          };
-                    };
-                    encrypted_token?: string;
-                    nonce?: string;
-                    ephemeral_pubkey?: string;
-                    contracts?: (
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "active";
-                          id: string;
-                          /** Format: date-time */
-                          created_at: string;
-                          /** @description The instance type. */
-                          instance_type: string;
-                          /** @description A shape that describes the distribution of the contract's size over time. Must end with a quantity of 0 if not empty. */
-                          shape: {
-                            intervals: string[];
-                            quantities: number[];
-                          };
-                          colocate_with?: string[];
-                          cluster_id?: string;
-                          state: "Upcoming" | "Expired" | "Active";
-                        }
-                      | {
-                          /** @constant */
-                          object: "contract";
-                          /** @constant */
-                          status: "pending";
-                          id: string;
-                        }
-                    )[];
-                  };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-          };
-          401: {
-            headers: {
-              [name: string]: unknown;
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-            content: {
-              "application/json": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "multipart/form-data": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "text/plain": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "not_authenticated";
-                message: string;
-                details?: Record<string, never>;
-              };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-          };
-          500: {
-            headers: {
-              [name: string]: unknown;
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
-            content: {
-              "application/json": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "multipart/form-data": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-              "text/plain": {
-                /** @constant */
-                object: "error";
-                /** @constant */
-                code: "internal_server";
-                message: string;
-                details?: Record<string, never>;
-              };
-            };
-          };
         };
-      };
-};
+    };
+    get_vms_user_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetUserDataResponse"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    post_vms_user_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostUserDataRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostUserDataResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_vms_ssh: {
+        parameters: {
+            query: {
+                vm_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetSshResponse"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+}

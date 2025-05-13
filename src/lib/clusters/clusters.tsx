@@ -278,7 +278,7 @@ async function isCredentialReady(id: string) {
   const api = await apiClient();
   const { data } = await api.GET("/v0/credentials");
 
-  const cred = data?.data.find(
+  const cred = data?.data?.find?.(
     (credential) =>
       credential.id === id && credential.object === "k8s_credential",
   );
@@ -306,7 +306,7 @@ async function listClusterUsers({ token }: { token?: string }) {
     return logAndQuit(`Failed to get users in cluster: ${response.statusText}`);
   }
 
-  if (!data) {
+  if (!data?.data) {
     console.error(error);
     return logAndQuit(
       `Failed to get users in cluster: Unexpected response from server: ${response}`,
@@ -327,12 +327,14 @@ async function listClusterUsers({ token }: { token?: string }) {
     const is_usable: boolean = Boolean(
       k.encrypted_token && k.nonce && k.ephemeral_pubkey,
     );
-    users.push({
-      id: k.id,
-      name: k.username || "",
-      is_usable,
-      cluster: k.cluster?.name || "",
-    });
+    if (k.id) {
+      users.push({
+        id: k.id,
+        name: k.username || "",
+        is_usable,
+        cluster: k.cluster?.name || "",
+      });
+    }
   }
 
   render(<ClusterUserDisplay users={users} />);
@@ -449,13 +451,11 @@ async function addClusterUserAction({
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to add user to cluster: HTTP ${response.status} - ${
-        error?.code || ""
-      }: ${error?.message || response.statusText} ${error?.details || ""}`,
+      `Failed to add user to cluster: HTTP ${response.status} - ${response.statusText}`,
     );
   }
 
-  if (!data) {
+  if (!data?.id) {
     console.error(error);
     return logAndQuit(
       `Failed to add user to cluster: Unexpected response from server: ${response}`,
@@ -476,7 +476,6 @@ async function removeClusterUserAction({
   const api = await apiClient(token);
 
   const { data, error, response } = await api.DELETE(
-    // @ts-expect-error - TODO: FIXME: include path in OpenAPI schema or rewrite this to use a different route
     "/v0/credentials/{id}",
     {
       params: {
@@ -527,7 +526,7 @@ async function kubeconfigAction({
     );
   }
 
-  if (data.data.length === 0) {
+  if (!data?.data?.length) {
     console.log("No users found");
     return;
   }
@@ -604,7 +603,7 @@ async function kubeconfigAction({
     }
 
     clusters.push({
-      name: item.cluster.name,
+      name: item.cluster.name!,
       kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
       certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
       namespace: item.cluster.kubernetes_namespace || "",
