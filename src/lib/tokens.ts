@@ -249,7 +249,7 @@ async function listTokensAction() {
     head: [
       chalk.gray("Token ID"),
       chalk.gray("Name"),
-      chalk.gray("Last active"),
+      //       chalk.gray("Last active"),
       chalk.gray("Expires"),
     ],
     colWidths: [40, 15, 25, 25],
@@ -258,7 +258,7 @@ async function listTokensAction() {
     tokensTable.push([
       chalk.gray(token.id),
       token.name ? token.name : chalk.gray("(empty)"),
-      chalk.green(formatDate(token.last_active_at)),
+      //       chalk.green(formatDate(token.last_active_at)),
       chalk.white(formatDate(token.expires_at)),
     ]);
   }
