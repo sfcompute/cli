@@ -8,8 +8,12 @@ import yaml from "yaml";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { Row } from "../Row.tsx";
-import { isVClusterCredential, type K8sCredential } from "./credentialTypes.ts";
-import { decryptSecret, getKeys, regenerateKeys } from "./keys.tsx";
+import {
+  type BaseEncryptedCredential,
+  isValidK8sCredential,
+} from "./credentialTypes.ts";
+import { filterAndDecryptCredentials } from "./credentialDecryption.ts";
+import { getKeys, regenerateKeys } from "./keys.tsx";
 import {
   createKubeconfig,
   KUBECONFIG_PATH,
@@ -287,14 +291,8 @@ async function isCredentialReady(id: string) {
     return false;
   }
 
-  if (cred.object !== "k8s_credential") {
-    return false;
-  }
-
-  return Boolean(
-    (cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey) ||
-      (cred as K8sCredential).encrypted_kubeconfig,
-  );
+  // Use our more comprehensive validation
+  return isValidK8sCredential(cred);
 }
 
 async function listClusterUsers({ token }: { token?: string }) {
@@ -313,9 +311,10 @@ async function listClusterUsers({ token }: { token?: string }) {
     );
   }
 
-  const k8s = data.data.filter(
+  // Filter for k8s credentials
+  const k8sCredentials = data.data.filter(
     (credential) => credential.object === "k8s_credential",
-  );
+  ) as BaseEncryptedCredential[];
 
   const users: Array<{
     id: string;
@@ -323,18 +322,21 @@ async function listClusterUsers({ token }: { token?: string }) {
     is_usable: boolean;
     cluster: string;
   }> = [];
-  for (const k of k8s) {
-    const is_usable: boolean = Boolean(
-      k.encrypted_token && k.nonce && k.ephemeral_pubkey,
-    );
-    if (k.id) {
-      users.push({
-        id: k.id,
-        name: k.username || "",
-        is_usable,
-        cluster: k.cluster?.name || "",
-      });
+
+  for (const credential of k8sCredentials) {
+    if (!credential.id) {
+      continue;
     }
+
+    // Check if credential has required fields for decryption
+    const is_usable = isValidK8sCredential(credential);
+
+    users.push({
+      id: credential.id,
+      name: credential.username || "",
+      is_usable,
+      cluster: credential.cluster?.name || "",
+    });
   }
 
   render(<ClusterUserDisplay users={users} />);
@@ -343,6 +345,7 @@ async function listClusterUsers({ token }: { token?: string }) {
 function UserAddedDisplay(props: {
   id: string;
   username: string;
+  clusterName: string; // Add clusterName to props
   print?: boolean;
 }) {
   const [isReady, setIsReady] = useState(false);
@@ -359,14 +362,20 @@ function UserAddedDisplay(props: {
         actionExecutedRef.current = true;
 
         // Once ready, sync or print config before exiting
-        await kubeconfigAction({ print: props.print });
+        // Pass the specific cluster and username to filter only relevant credentials
+        // This is the key change to ensure we only decrypt the needed credential
+        await kubeconfigAction({ 
+          print: props.print,
+          clusterName: props.clusterName,
+          username: props.username
+        });
         setTimeout(() => {
           exit();
         }, 0);
       }
     }, 500);
     return () => clearInterval(interval);
-  }, [props.id, props.print]);
+  }, [props.id, props.print, props.clusterName, props.username]);
 
   if (!isReady) {
     return (
@@ -463,7 +472,7 @@ async function addClusterUserAction({
   }
 
   // Render UI that waits for the user to become ready, then sync/print config
-  render(<UserAddedDisplay id={data.id} username={username} print={print} />);
+  render(<UserAddedDisplay id={data.id} username={username} clusterName={clusterName} print={print} />);
 }
 
 async function removeClusterUserAction({
@@ -505,9 +514,13 @@ async function removeClusterUserAction({
 async function kubeconfigAction({
   token,
   print,
+  clusterName,  // Keep these parameters needed for filtering
+  username,
 }: {
   token?: string;
   print?: boolean;
+  clusterName?: string;  // Keep these parameters
+  username?: string;
 }) {
   const api = await apiClient(token);
 
@@ -531,7 +544,39 @@ async function kubeconfigAction({
     return;
   }
 
+  // Filter for k8s credentials only
+  const k8sCredentials = data.data.filter((item) =>
+    item.object === "k8s_credential"
+  ) as BaseEncryptedCredential[];
+
+  if (k8sCredentials.length === 0) {
+    console.log("No Kubernetes credentials found");
+    return;
+  }
+
   const { privateKey } = await getKeys();
+
+  // Create filter options if cluster name or username was provided
+  const filterOptions = (clusterName || username) ? {
+    clusterName,
+    username
+  } : undefined;
+
+  // Use our filtering and decryption logic with the filter options
+  const decryptedCredentials = filterAndDecryptCredentials(
+    k8sCredentials,
+    privateKey,
+    filterOptions
+  );
+
+  // Add check for successful decryption of at least one credential
+  if (decryptedCredentials.length === 0) {
+    return logAndQuit(
+      "Could not decrypt any k8s credentials. Please try regenerating your keys with 'sf clusters users add' or contact support: https://sfcompute.com/contact",
+    );
+  }
+
+  // Process clusters - get unique clusters from credentials
   const clusters: Array<{
     name: string;
     certificateAuthorityData: string;
@@ -539,84 +584,40 @@ async function kubeconfigAction({
     namespace?: string;
     cluster_type?: string;
   }> = [];
-  const users: Array<{
-    name: string;
-    token?: string;
-    kubeconfig?: string;
-  }> = [];
 
-  for (const item of data.data) {
-    if (item.object !== "k8s_credential") {
+  // Create a Set to track cluster names we've already processed
+  const processedClusterNames = new Set<string>();
+
+  // Extract cluster information from the original credential list
+  for (const credential of k8sCredentials) {
+    if (!credential.cluster || !credential.cluster.name) {
       continue;
     }
 
-    if (!item.nonce || !item.ephemeral_pubkey) {
+    // Skip if we've already processed this cluster
+    if (processedClusterNames.has(credential.cluster.name)) {
       continue;
     }
 
-    // TODO(K8S-33): This credential handling logic needs to be rewritten to support
-    // proper account-to-user associations.
-    // The current implementation doesn't properly disambiguate credentials
-    // when multiple users exist in a team context.
-    // See: https://linear.app/sfcompute/issue/K8S-33
+    // Add to our tracked set
+    processedClusterNames.add(credential.cluster.name);
 
-    // Handle vcluster with encrypted_kubeconfig
-    const credential = item as K8sCredential;
-    if (isVClusterCredential(credential)) {
-      try {
-        const decryptedKubeConfig = decryptSecret({
-          encrypted: credential.encrypted_kubeconfig,
-          secretKey: privateKey,
-          nonce: credential.nonce,
-          ephemeralPublicKey: credential.ephemeral_pubkey,
-        });
-
-        users.push({
-          name: item.username || "",
-          kubeconfig: decryptedKubeConfig || "",
-        });
-      } catch (_err) {
-        // Silently continue on decryption errors
-        continue;
-      }
-    } else if (item.encrypted_token) {
-      try {
-        const decryptedToken = decryptSecret({
-          encrypted: item.encrypted_token,
-          secretKey: privateKey,
-          nonce: item.nonce,
-          ephemeralPublicKey: item.ephemeral_pubkey,
-        });
-
-        users.push({
-          name: item.username || "",
-          token: decryptedToken || "",
-        });
-      } catch (_err) {
-        // Silently continue on decryption errors
-        continue;
-      }
-    }
-
-    if (!item.cluster) {
-      continue;
-    }
-
+    // Add cluster information
     clusters.push({
-      name: item.cluster.name!,
-      kubernetesApiUrl: item.cluster.kubernetes_api_url || "",
-      certificateAuthorityData: item.cluster.kubernetes_ca_cert || "",
-      namespace: item.cluster.kubernetes_namespace || "",
+      name: credential.cluster.name,
+      kubernetesApiUrl: credential.cluster.kubernetes_api_url || "",
+      certificateAuthorityData: credential.cluster.kubernetes_ca_cert || "",
+      namespace: credential.cluster.kubernetes_namespace || "",
       cluster_type: credential.cluster_type || "",
     });
   }
 
-  // Add check for successful decryption of at least one credential
-  if (users.length === 0) {
-    return logAndQuit(
-      "Could not decrypt k8s credentials. Please report this unexpected issue: https://sfcompute.com/contact",
-    );
-  }
+  // Format users for kubeconfig creation
+  const users = decryptedCredentials.map((cred) => ({
+    name: cred.username,
+    token: cred.token,
+    kubeconfig: cred.kubeconfig,
+  }));
 
   const kubeconfigData = createKubeconfig({ clusters, users });
 
