@@ -42,7 +42,11 @@ export default function ConfirmationMessage(props: {
         head="Type"
         value={isSupportedType
           ? (
-            <Box minWidth={30} justifyContent="space-between">
+            <Box
+              gap={1}
+              minWidth={props.quote ? 30 : undefined}
+              justifyContent="space-between"
+            >
               <Text>{typeLabel}</Text>
               <Text dimColor>({props.type})</Text>
             </Box>
@@ -61,7 +65,7 @@ export default function ConfirmationMessage(props: {
         head="Limit Price"
         value={props.pricePerGpuHourInCents !== undefined
           ? (
-            <Box minWidth={30} justifyContent="space-between">
+            <Box gap={1} minWidth={30} justifyContent="space-between">
               <Text>
                 ${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr
               </Text>
