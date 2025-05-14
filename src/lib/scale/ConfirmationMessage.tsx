@@ -60,13 +60,11 @@ export default function ConfirmationMessage(props: {
       />
       <Row
         headWidth={30}
-        head={`Limit Price${
-          (props.quote && props.pricePerGpuHourInCents !== undefined)
-            ? " (1.5 x market)"
-            : ""
-        }`}
+        head="Limit Price"
         value={props.pricePerGpuHourInCents !== undefined
-          ? `$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`
+          ? `$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr${
+            props.quote ? " (1.5x market)" : ""
+          }`
           : "unchanged"}
       />
       <Row
