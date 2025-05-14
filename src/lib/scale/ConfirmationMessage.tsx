@@ -42,11 +42,9 @@ export default function ConfirmationMessage(props: {
         head="Type"
         value={isSupportedType
           ? (
-            <Box gap={1}>
+            <Box minWidth={30} justifyContent="space-between">
               <Text>{typeLabel}</Text>
-              <Text dimColor>
-                ({props.type})
-              </Text>
+              <Text dimColor>({props.type})</Text>
             </Box>
           )
           : "unchanged"}
@@ -62,9 +60,14 @@ export default function ConfirmationMessage(props: {
         headWidth={30}
         head="Limit Price"
         value={props.pricePerGpuHourInCents !== undefined
-          ? `$${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr${
-            props.quote ? " (1.5x market)" : ""
-          }`
+          ? (
+            <Box minWidth={30} justifyContent="space-between">
+              <Text>
+                ${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr
+              </Text>
+              {props.quote && <Text dimColor>(1.5x market)</Text>}
+            </Box>
+          )
           : "unchanged"}
       />
       <Row
