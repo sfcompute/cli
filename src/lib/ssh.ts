@@ -19,6 +19,7 @@ export function registerSsh(program: Command) {
   program
     .command("ssh")
     .option("-q, --quiet", "Quiet mode", false)
+    .option("-e, --echo", "Echo the command without executing it", false)
     .option(
       "--use-host-keys [value]",
       "Use API provided SSH server host keys if known",
@@ -127,6 +128,11 @@ export function registerSsh(program: Command) {
         shell = "/bin/sh";
       }
       const shell_cmd = shescape.quoteAll(cmd).join(" ");
+      if (options.echo) {
+        console.log(shell_cmd.replaceAll("'", ""));
+        process.exit(0);
+      }
+
       if (!options.quiet) {
         console.log(`Executing (${shell} style output): ${shell_cmd}`);
       }
