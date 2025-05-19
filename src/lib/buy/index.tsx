@@ -745,6 +745,7 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
     maxStartTime: startsAt,
     minDurationSeconds,
     maxDurationSeconds,
+    cluster: options.cluster,
   });
 }
 
