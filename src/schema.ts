@@ -293,7 +293,7 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    instance_type?: ("h100i" | "h100v") | string;
+                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
                     min_quantity?: number;
                     max_quantity?: number;
                     min_duration?: number | null;
@@ -882,7 +882,7 @@ export interface paths {
                     min_start_date?: "NOW" | string;
                     max_start_date?: "NOW" | string;
                     quantity: number;
-                    instance_type?: ("h100i" | "h100v") | string;
+                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
                     contract_id?: string;
                     colocate_with?: string[];
                     duration?: number;
@@ -924,7 +924,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-09T23:11:46.684Z
+                                 * @example 2025-05-20T01:26:22.670Z
                                  */
                                 start_at: string;
                                 /**
@@ -933,7 +933,7 @@ export interface paths {
                                  */
                                 end_at: string;
                                 /** @description The instance type. */
-                                instance_type: ("h100i" | "h100v") | string;
+                                instance_type: ("h100i" | "h100v" | "h200ki") | string;
                             } | null;
                         } | {
                             /** @enum {string} */
@@ -951,7 +951,7 @@ export interface paths {
                                 /**
                                  * Format: date-time
                                  * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-09T23:11:46.684Z
+                                 * @example 2025-05-20T01:26:22.670Z
                                  */
                                 start_at: string;
                                 /**
@@ -1045,7 +1045,7 @@ export interface paths {
             parameters: {
                 query?: {
                     side?: "buy" | "sell";
-                    instance_type?: ("h100i" | "h100v") | string;
+                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
                     min_price?: number | null;
                     max_price?: number | null;
                     min_start_date?: string;
@@ -1508,22 +1508,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v0/vms/brew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["post_vms_brew"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v0/vms/instances": {
         parameters: {
             query?: never;
@@ -1737,7 +1721,7 @@ export interface components {
          *       "status": "active",
          *       "id": "cont_122",
          *       "created_at": "2024-07-15T22:30:17.426Z",
-         *       "instance_type": "h100i",
+         *       "instance_type": "h200ki",
          *       "shape": {
          *         "intervals": [
          *           "Tue, 16 Jul 2024 22:30:16 GMT",
@@ -1769,7 +1753,7 @@ export interface components {
             /** Format: date-time */
             created_at: string;
             /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            instance_type: ("h100i" | "h100v" | "h200ki") | string;
             shape: components["schemas"]["Shape"];
             colocate_with?: string[];
             /** @description An external ID with prefix and alphanumeric string with underscores */
@@ -1922,12 +1906,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-09T07:00:00.000Z
+             * @example 2025-04-19T05:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-10T06:59:59.999Z
+             * @example 2025-04-20T04:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -1945,12 +1929,12 @@ export interface components {
             object: "price-history-item";
             /**
              * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-09T07:00:00.000Z
+             * @example 2025-04-19T05:00:00.000Z
              */
             period_start: string;
             /**
              * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-10T06:59:59.999Z
+             * @example 2025-04-20T04:59:59.999Z
              */
             period_end: string;
             /** @enum {boolean} */
@@ -2012,7 +1996,7 @@ export interface components {
             object: "procurement";
             id: string;
             /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            instance_type: ("h100i" | "h100v" | "h200ki") | string;
             /**
              * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
              * @enum {string}
@@ -2080,7 +2064,7 @@ export interface components {
              */
             status?: "active" | "disabled";
             /** @description The instance type. */
-            instance_type?: ("h100i" | "h100v") | string;
+            instance_type?: ("h100i" | "h100v" | "h200ki") | string;
             desired_quantity?: number;
             buy_limit_price_per_gpu_hour?: number;
             sell_limit_price_per_gpu_hour?: number;
@@ -2148,7 +2132,7 @@ export interface components {
              */
             status: "active" | "disabled";
             /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            instance_type: ("h100i" | "h100v" | "h200ki") | string;
             desired_quantity: number;
             /** @default 250 */
             buy_limit_price_per_gpu_hour: number;
@@ -2313,8 +2297,8 @@ export interface components {
          *       "balance_after": 65000,
          *       "metadata": {
          *         "type": "buy",
-         *         "start_time": "2025-05-10T01:11:46.819Z",
-         *         "end_time": "2025-05-10T03:11:46.819Z",
+         *         "start_time": "2025-05-20T03:26:22.796Z",
+         *         "end_time": "2025-05-20T05:26:22.796Z",
          *         "quantity": 2,
          *         "order_id": "ordr_34905N",
          *         "instance_type_requirements": {
@@ -2356,11 +2340,11 @@ export interface components {
                 /** @description Requirements specified for the buy order */
                 instance_type_requirements: {
                     /** @description List of allowed accelerator types. */
-                    accelerator_types?: "H100"[];
+                    accelerator_types?: ("H100" | "H200")[];
                     /** @description List of allowed interconnect types. */
                     interconnect_types?: ("Infiniband" | "None")[];
                     /** @description List of allowed regions. */
-                    regions?: ("NorthAmerica" | "AsiaPacific")[];
+                    regions?: ("NorthAmerica" | "AsiaPacific" | "EuropeMiddleEastAfrica")[];
                     /**
                      * @description Delivery method.
                      * @enum {string}
@@ -2424,6 +2408,12 @@ export interface components {
                 card_brand: string;
                 /** @description The funding type of the card. */
                 card_funding: string;
+                /**
+                 * Format: uri
+                 * @description URL for the receipt if available.
+                 * @example https://dashboard.stripe.com/receipts/payment/...
+                 */
+                receipt_url?: string;
             } | {
                 /** @enum {string} */
                 type: "deposit_ach";
@@ -2512,8 +2502,8 @@ export interface components {
          *           "balance_after": 65000,
          *           "metadata": {
          *             "type": "buy",
-         *             "start_time": "2025-05-10T01:11:46.819Z",
-         *             "end_time": "2025-05-10T03:11:46.819Z",
+         *             "start_time": "2025-05-20T03:26:22.796Z",
+         *             "end_time": "2025-05-20T05:26:22.796Z",
          *             "quantity": 2,
          *             "order_id": "ordr_34Az95N",
          *             "instance_type_requirements": {
@@ -2626,7 +2616,7 @@ export interface components {
              */
             status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired" | "partially_filled";
             /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            instance_type: ("h100i" | "h100v" | "h200ki") | string;
             /**
              * @description The number of nodes.
              * @example 3
@@ -2635,7 +2625,7 @@ export interface components {
             /**
              * Format: date-time
              * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-05-09T23:11:46.684Z
+             * @example 2025-05-20T01:26:22.670Z
              */
             start_at: string;
             /**
@@ -2807,7 +2797,7 @@ export interface components {
             /** @enum {string} */
             side: "buy";
             /** @description The instance type. */
-            instance_type: ("h100i" | "h100v") | string;
+            instance_type: ("h100i" | "h100v" | "h200ki") | string;
             /**
              * @description The number of nodes.
              * @example 3
@@ -2939,10 +2929,6 @@ export interface components {
             pubkey?: string;
             username?: string;
         };
-        BrewRequest: {
-            /** @enum {string} */
-            kind: "coffee" | "tea";
-        };
         GetInstancesResponse: {
             data: components["schemas"]["VmInstance"][];
         };
@@ -3005,27 +2991,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    post_vms_brew: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BrewRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     get_vms_instances: {
         parameters: {
             query?: never;

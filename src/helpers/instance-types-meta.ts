@@ -7,4 +7,7 @@ export const InstanceTypeMetadata: Record<string, {
   "h100v": {
     displayName: "Virtual Machine",
   },
+  "h200ki": {
+    displayName: "Kubernetes",
+  },
 } as const;
