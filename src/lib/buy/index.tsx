@@ -257,9 +257,9 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         size: accelerators / GPUS_PER_NODE,
         startAt,
         endsAt,
-        colocate,
         yes,
         standing,
+        colocate,
         cluster,
       });
     })();
@@ -746,6 +746,7 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
     minDurationSeconds,
     maxDurationSeconds,
     cluster: options.cluster,
+    colocateWith: options.colocate,
   });
 }
 
@@ -759,6 +760,7 @@ type QuoteOptions = {
   cluster?: string;
   colocateWith?: Array<string>;
 };
+
 export async function getQuote(options: QuoteOptions) {
   const api = await apiClient();
 
