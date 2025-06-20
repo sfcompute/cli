@@ -88,7 +88,6 @@ export function _registerBuy(program: Command) {
     .option(
       "-colo, --colocate <contract_id>",
       "Colocate with existing contracts",
-      (value) => value.split(","),
     )
     .option(
       "-q, --quote",
@@ -376,7 +375,7 @@ type BuyOrderProps = {
   startAt: Date | "NOW";
   endsAt: Date;
   type: string;
-  colocate?: Array<string>;
+  colocate?: string;
   yes?: boolean;
   standing?: boolean;
   cluster?: string;
@@ -406,7 +405,7 @@ function BuyOrder(props: BuyOrderProps) {
       ),
       startsAt: props.startAt,
       endsAt,
-      colocateWith: props.colocate || [],
+      colocateWith: props.colocate,
       numberNodes: props.size,
       standing: props.standing,
       cluster: props.cluster,
@@ -629,7 +628,7 @@ export async function placeBuyOrder(options: {
   totalPriceInCents: number;
   startsAt: Date | "NOW";
   endsAt: Date;
-  colocateWith: Array<string>;
+  colocateWith?: string;
   numberNodes: number;
   standing?: boolean;
   cluster?: string;
@@ -666,7 +665,8 @@ export async function placeBuyOrder(options: {
     start_at,
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
-    colocate_with: options.colocateWith,
+    colocate_with:
+      (options.colocateWith ? [options.colocateWith] : []) as string[],
     flags: {
       ioc: !options.standing,
     },
@@ -758,7 +758,7 @@ type QuoteOptions = {
   minDurationSeconds: number;
   maxDurationSeconds: number;
   cluster?: string;
-  colocateWith?: Array<string>;
+  colocateWith?: string;
 };
 
 export async function getQuote(options: QuoteOptions) {
@@ -778,7 +778,8 @@ export async function getQuote(options: QuoteOptions) {
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
       cluster: options.cluster,
-      colocate_with: options.colocateWith,
+      colocate_with:
+        (options.colocateWith ? [options.colocateWith] : []) as string[],
     },
   } as const;
 
