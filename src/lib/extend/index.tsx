@@ -85,7 +85,7 @@ Examples:
         type: activeContract.instance_type,
         accelerators: getContractAcceleratorQuantity(activeContract.shape) *
           GPUS_PER_NODE,
-        colocate: [activeContract.id],
+        colocate: activeContract.id,
         duration: options.duration,
         price: options.price,
         start: activeContractRange.endsAt,
