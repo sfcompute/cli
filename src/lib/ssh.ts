@@ -9,10 +9,19 @@ import {
 import { getApiUrl } from "../helpers/urls.ts";
 import { getAuthToken } from "../helpers/config.ts";
 import child_process from "node:child_process";
+import ora from "ora";
 
 type SshHostKey = {
   keyType: string;
   base64EncodedKey: string;
+};
+
+type VmInstance = {
+  id: string;
+  current_status: string;
+  last_updated_at: string;
+  cluster_id: string;
+  instance_group_id: string;
 };
 
 export function registerSsh(program: Command) {
@@ -42,6 +51,76 @@ export function registerSsh(program: Command) {
       } else {
         logAndQuit(`Invalid SSH destination string: ${destination}`);
       }
+
+      // Check VM status before attempting SSH
+      // This addresses PRODUCT-503: Show friendly error if VM is still spinning up
+      const vmSpinner = ora("Checking VM status...").start();
+      const vmListUrl = await getApiUrl("vms_instances_list");
+      const vmListResponse = await fetch(vmListUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${await getAuthToken()}`,
+        },
+      });
+
+      if (!vmListResponse.ok) {
+        vmSpinner.fail("Failed to check VM status");
+        if (vmListResponse.status === 401) {
+          logSessionTokenExpiredAndQuit();
+        }
+        logAndQuit(
+          `Failed to retrieve VM information: ${vmListResponse.statusText}`,
+        );
+      }
+
+      const vmData = await vmListResponse.json();
+      const vmInstances = vmData.data as VmInstance[];
+      const targetVm = vmInstances.find((vm) => vm.id === vmId);
+
+      if (!targetVm) {
+        vmSpinner.fail("VM not found");
+        logAndQuit(`VM with ID ${vmId} not found`);
+      }
+
+      // Check if VM is in a state that suggests it's still starting up
+      const startupStatuses = [
+        "starting",
+        "booting",
+        "initializing",
+        "provisioning",
+        "pending",
+        "creating",
+      ];
+      
+      const vmStatusLower = targetVm.current_status.toLowerCase();
+      const isStartingUp = startupStatuses.some(status => 
+        vmStatusLower.includes(status)
+      );
+
+      // Check if the VM was recently updated (within last 5 minutes)
+      const lastUpdated = new Date(targetVm.last_updated_at);
+      const now = new Date();
+      const minutesSinceLastUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
+      
+      if (isStartingUp || minutesSinceLastUpdate < 5) {
+        vmSpinner.fail("VM is still starting up");
+        console.log(
+          `\n⚠️  VM ${vmId} appears to be still starting up (status: ${targetVm.current_status}).`
+        );
+        console.log(
+          "Networking might not be fully configured yet. Please wait a few minutes before trying to SSH."
+        );
+        console.log(
+          `\nLast updated: ${minutesSinceLastUpdate.toFixed(1)} minutes ago`
+        );
+        console.log(
+          "\nTip: You can check VM logs with:"
+        );
+        console.log(`  $ sf vm logs --instance ${vmId}`);
+        process.exit(1);
+      }
+
+      vmSpinner.succeed("VM is ready");
 
       const baseUrl = await getApiUrl("vms_ssh_get");
       const params = new URLSearchParams();
