@@ -70,18 +70,44 @@ export function registerVM(program: Command) {
       );
 
       const table = new Table({
-        head: ["ID", "Instance group ID", "Status", "Last updated at"],
+        head: ["ID", "Status", "Last Updated", "Notes"],
       });
 
       formattedData.forEach((instance: VMInstance) => {
+        // Check if VM was updated recently (within last 5 minutes)
+        const lastUpdated = new Date(instance.last_updated_at);
+        const now = new Date();
+        const timeDiff = now.getTime() - lastUpdated.getTime();
+        const minutesSinceUpdate = Math.floor(timeDiff / 1000 / 60);
+        
+        let notes = "";
+        if (minutesSinceUpdate < 5) {
+          notes = `⚠️  Starting up (${minutesSinceUpdate}m ago)`;
+        }
+
         table.push([
           instance.id,
           instance.status,
           instance.last_updated_at,
+          notes,
         ]);
       });
 
       console.log(table.toString());
+      
+      // Add a helpful message if any VMs are starting up
+      const hasStartingVMs = formattedData.some((instance: VMInstance) => {
+        const lastUpdated = new Date(instance.last_updated_at);
+        const now = new Date();
+        const timeDiff = now.getTime() - lastUpdated.getTime();
+        const minutesSinceUpdate = Math.floor(timeDiff / 1000 / 60);
+        return minutesSinceUpdate < 5;
+      });
+      
+      if (hasStartingVMs) {
+        console.log("\n⚠️  VMs marked as 'Starting up' may need a few minutes for networking setup.");
+        console.log("   SSH access typically becomes available within 5 minutes of VM startup.");
+      }
     });
 
   vm.command("script")
