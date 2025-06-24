@@ -6,14 +6,15 @@ import { readFileSync } from "node:fs";
 import process from "node:process";
 import { setTimeout } from "node:timers";
 import ora from "ora";
-import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
   logSupportCTAAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
+import { getAuthToken } from "../helpers/config.ts";
 import { registerSsh } from "./ssh.ts";
+import { apiClient } from "../apiClient.ts";
 
 type VMInstance = {
   id: string;
@@ -33,23 +34,17 @@ export function registerVM(program: Command) {
     .alias("ls")
     .description("List all virtual machines")
     .action(async () => {
-      const url = await getApiUrl("vms_instances_list");
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getAuthToken()}`,
-        },
-      });
+      const api = await apiClient();
+      const response = await api.GET("/v0/vms/instances");
 
-      if (!response.ok) {
-        if (response.status === 401) {
+      if (!response.response.ok) {
+        if (response.response.status === 401) {
           await logSessionTokenExpiredAndQuit();
         }
-        logAndQuit(`Failed to list VMs: ${response.statusText}`);
+        logAndQuit(`Failed to list VMs: ${response.response.statusText}`);
       }
 
-      const { data } = await response.json();
+      const data = response.data?.data;
 
       if (!data?.length) {
         logAndQuit(
@@ -74,14 +69,14 @@ export function registerVM(program: Command) {
       });
 
       formattedData.forEach((instance: VMInstance) => {
-        // Check if VM was updated recently (within last 5 minutes)
+        // Check if VM was updated recently (within last 10 minutes)
         const lastUpdated = new Date(instance.last_updated_at);
         const now = new Date();
         const timeDiff = now.getTime() - lastUpdated.getTime();
         const minutesSinceUpdate = Math.floor(timeDiff / 1000 / 60);
         
         let notes = "";
-        if (minutesSinceUpdate < 5) {
+        if (minutesSinceUpdate < 10) {
           notes = `⚠️  Starting up (${minutesSinceUpdate}m ago)`;
         }
 
@@ -101,12 +96,12 @@ export function registerVM(program: Command) {
         const now = new Date();
         const timeDiff = now.getTime() - lastUpdated.getTime();
         const minutesSinceUpdate = Math.floor(timeDiff / 1000 / 60);
-        return minutesSinceUpdate < 5;
+        return minutesSinceUpdate < 10;
       });
       
       if (hasStartingVMs) {
-        console.log("\n⚠️  VMs marked as 'Starting up' may need a few minutes for networking setup.");
-        console.log("   SSH access typically becomes available within 5 minutes of VM startup.");
+        console.log("\n⚠️  VMs marked as 'Starting up' were recently bought or started.");
+        console.log("   SSH access typically becomes available within 5-10 minutes after VM startup.");
       }
     });
 

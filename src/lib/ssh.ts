@@ -6,14 +6,8 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { getApiUrl } from "../helpers/urls.ts";
-import { getAuthToken } from "../helpers/config.ts";
 import child_process from "node:child_process";
-
-type SshHostKey = {
-  keyType: string;
-  base64EncodedKey: string;
-};
+import { apiClient } from "../apiClient.ts";
 
 export function registerSsh(program: Command) {
   program
@@ -44,50 +38,37 @@ export function registerSsh(program: Command) {
       }
 
       // First, let's get VM instance info to check its status
-      const vmListUrl = await getApiUrl("vms_instances_list");
-      const vmListResponse = await fetch(vmListUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getAuthToken()}`,
-        },
-      });
+      const api = await apiClient();
+      const vmListResponse = await api.GET("/v0/vms/instances");
 
       let vmInfo: any = null;
-      if (vmListResponse.ok) {
-        const { data } = await vmListResponse.json();
-        vmInfo = data?.find((vm: any) => vm.id === vmId);
+      if (vmListResponse.response.ok && vmListResponse.data) {
+        vmInfo = vmListResponse.data.data?.find((vm: any) => vm.id === vmId);
       }
 
-      const baseUrl = await getApiUrl("vms_ssh_get");
-      const params = new URLSearchParams();
-      params.append("vm_id", vmId);
-      const url = `${baseUrl}?${params.toString()}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${await getAuthToken()}`,
+      const sshResponse = await api.GET("/v0/vms/ssh", {
+        params: {
+          query: { vm_id: vmId },
         },
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
+      if (!sshResponse.response.ok) {
+        if (sshResponse.response.status === 401) {
           logSessionTokenExpiredAndQuit();
         }
 
         logAndQuit(
-          `Failed to retrieve ssh information: ${response.statusText}`,
+          `Failed to retrieve ssh information: ${sshResponse.response.statusText}`,
         );
       }
 
-      const data = (await response.json()) as {
-        ssh_hostname: string;
-        ssh_port: number;
-        ssh_host_keys: SshHostKey[] | undefined;
-      };
-      const sshHostname = data.ssh_hostname;
-      const sshPort = data.ssh_port;
-      const sshHostKeys = data.ssh_host_keys || [];
+      if (!sshResponse.data) {
+        logAndQuit("No SSH information returned from server");
+      }
+
+      const sshHostname = sshResponse.data.ssh_hostname;
+      const sshPort = sshResponse.data.ssh_port;
+      const sshHostKeys = sshResponse.data.ssh_host_keys || [];
 
       let sshDestination = sshHostname;
       if (sshUsername !== undefined) {
@@ -105,8 +86,8 @@ export function registerSsh(program: Command) {
         for (const sshHostKey of sshHostKeys) {
           knownHostsCommand = knownHostsCommand.concat([
             sshHostname,
-            sshHostKey.keyType,
-            sshHostKey.base64EncodedKey,
+            sshHostKey.key_type,
+            sshHostKey.base64_encoded_key,
           ]);
         }
         // Escape all characters for proper pass through
@@ -157,18 +138,18 @@ export function registerSsh(program: Command) {
       if (result.status !== 0) {
         console.error("\n");
         
-        // Check if VM was updated recently (within last 5 minutes)
+        // Check if VM was updated recently (within last 10 minutes)
         if (vmInfo && vmInfo.last_updated_at) {
           const lastUpdated = new Date(vmInfo.last_updated_at);
           const now = new Date();
           const timeDiff = now.getTime() - lastUpdated.getTime();
           const minutesSinceUpdate = Math.floor(timeDiff / 1000 / 60);
           
-          if (minutesSinceUpdate < 5) {
+          if (minutesSinceUpdate < 10) {
             console.error(`⚠️  VM ${vmId} was updated ${minutesSinceUpdate} minute${minutesSinceUpdate === 1 ? '' : 's'} ago.`);
             console.error("   Networking might still be setting up. Please wait a few more minutes and try again.");
             console.error("");
-            console.error("   If this issue persists after 5 minutes, check:");
+            console.error("   If this issue persists after 10 minutes, check:");
             console.error("   • Your SSH key is correctly configured with 'sf vm script'");
             console.error("   • VM logs with 'sf vm logs -i " + vmId + "'");
             process.exit(result.status || 255);
