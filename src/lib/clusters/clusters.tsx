@@ -325,7 +325,9 @@ async function listClusterUsers({ token }: { token?: string }) {
   }> = [];
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
-      k.encrypted_token && k.nonce && k.ephemeral_pubkey,
+      (k.encrypted_token && k.nonce && k.ephemeral_pubkey) ||
+        (k.encrypted_kubeconfig && k.nonce && k.ephemeral_pubkey &&
+          k.cluster_type === "vcluster"),
     );
     if (k.id) {
       users.push({
