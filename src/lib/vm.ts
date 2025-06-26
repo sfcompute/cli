@@ -1,4 +1,4 @@
-import type { Command } from "@commander-js/extra-typings";
+import { type Command, CommanderError } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
 import Table from "cli-table3";
 import console from "node:console";
@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import process from "node:process";
 import { setTimeout } from "node:timers";
 import ora from "ora";
+import dayjs from "dayjs";
 import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -14,12 +15,32 @@ import {
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 import { registerSsh } from "./ssh.ts";
+import { apiClient } from "../apiClient.ts";
+import { paths } from "../schema.ts";
 
+type VMLogsParams = paths["/v0/vms/logs2"]["get"]["parameters"]["query"];
+type VMLogsResponse =
+  paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"][
+    "application/json"
+  ]["data"];
 type VMInstance = {
   id: string;
   status: string;
   last_updated_at: string;
 };
+
+// Function to ensure timestamp is in RFC3339 format
+function formatTimestampToISO(timestamp: string): string {
+  const date = dayjs(timestamp);
+  if (!date.isValid()) {
+    throw new CommanderError(
+      1,
+      "INVALID_TIMESTAMP_FORMAT",
+      "Invalid timestamp format: ${timestamp}. Please use RFC3339 format (e.g., 2023-01-01T00:00:00Z)",
+    );
+  }
+  return date.toISOString();
+}
 
 export function registerVM(program: Command) {
   const vm = program
@@ -117,7 +138,7 @@ export function registerVM(program: Command) {
 
   vm.command("logs")
     .description("View or tail VM logs")
-    .option("-i, --instance <id>", "Filter logs by instance ID")
+    .requiredOption("-i, --instance <id>", "VM instance ID")
     .option(
       "-l, --limit <number>",
       "Number of log lines to fetch",
@@ -128,7 +149,11 @@ export function registerVM(program: Command) {
           !Number.isInteger(parsedValue) ||
           parsedValue <= 0
         ) {
-          logAndQuit("Limit must be a positive integer");
+          throw new CommanderError(
+            1,
+            "LIMIT_MUST_BE_A_POSITIVE_INTEGER",
+            "Limit must be a positive integer",
+          );
         }
         return parsedValue;
       },
@@ -137,10 +162,12 @@ export function registerVM(program: Command) {
     .option(
       "--before <timestamp>",
       "Get logs older than this timestamp (descending)",
+      formatTimestampToISO,
     )
     .option(
       "--since <timestamp>",
       "Get logs newer than this timestamp (ascending)",
+      formatTimestampToISO,
     )
     .option("-f, --follow", "Continue polling newer logs (like tail -f)")
     .addHelpText(
@@ -164,186 +191,135 @@ Examples:
   $ sf vm logs -i <instance_id> --since "2025-01-01T17:30:00" --before "2025-01-01T20:30:00" -l 300
 `,
     )
-    .action(async (options) => {
-      const baseUrl = await getApiUrl("vms_logs_list");
-      const params = new URLSearchParams();
-
-      if (options.instance) {
-        params.append("instance_id", options.instance);
-      }
-
-      if (options.limit) {
-        params.append("limit", options.limit.toString());
-      }
+    .action(async (options, cmd) => {
+      const client = await apiClient(await getAuthToken());
 
       // Function to fetch logs with given parameters
-      async function fetchLogs(urlParams: URLSearchParams) {
-        const url = `${baseUrl}?${urlParams.toString()}`;
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${await getAuthToken()}`,
+      async function fetchLogs(query: VMLogsParams) {
+        const { response, data } = await client.GET("/v0/vms/logs2", {
+          params: {
+            query,
           },
         });
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            await logSessionTokenExpiredAndQuit();
-          }
-
-          // Get the full error response
-          let errorDetails = "";
-          try {
-            const errorResponse = await response.json();
-            errorDetails = JSON.stringify(errorResponse, null, 2);
-          } catch {
-            errorDetails = await response.text();
-          }
-
-          logAndQuit(
-            `Failed to fetch logs: ${response.status} ${response.statusText}\nResponse details: ${errorDetails}`,
-          );
+        if (response.status === 401) {
+          await logSessionTokenExpiredAndQuit();
         }
 
-        const { data } = await response.json();
+        if (!response.ok) {
+          // Get the full error response
+          logAndQuit(
+            `Failed to fetch logs: ${response.status} ${response.statusText}`,
+          );
+        }
         return data;
       }
 
-      // Function to print a formatted log line
-      function printLogLine(log: {
-        timestamp: string;
-        instance_id: string;
-        message: string;
-      }) {
-        // Format the timestamp to ISO without milliseconds
-        const timestamp = new Date(log.timestamp);
-        const formattedTime = timestamp
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")
-          .padEnd(19); // YYYY-MM-DD HH:MM:SS
+      // Build initial query parameters
+      const params: VMLogsParams = {
+        instance_id: options.instance,
+        limit: options.limit,
+        since_realtime_timestamp: options.since,
+        before_realtime_timestamp: options.before,
+        order_by: "seqnum_asc",
+      };
 
-        if (log.message.includes("\n")) {
-          const prefix = `(instance ${log.instance_id}) [${formattedTime}] `;
-          const lines = log.message.split("\n").filter((line) => line !== "");
-          console.log(prefix + lines[0]);
-          for (let i = 1; i < lines.length; i++) {
-            console.log(lines[i]);
-          }
-        } else {
-          console.log(
-            `(instance ${log.instance_id}) [${formattedTime}] ${log.message}`,
+      // State for handling incomplete lines across chunks
+      let incompleteLine = "";
+      let lastTimestamp = "";
+      let totalLogs = 0;
+
+      // Function to process and print logs
+      function processLogs(logs: VMLogsResponse) {
+        for (const log of logs) {
+          const timestamp = dayjs(log.realtime_timestamp).format(
+            "YYYY-MM-DD HH:mm:ss",
           );
+          lastTimestamp = timestamp;
+
+          const chunkData = new TextDecoder("utf-8", { fatal: false })
+            .decode(new Uint8Array(log.data));
+
+          // Combine incomplete line from previous chunk with new data
+          const fullData = incompleteLine + chunkData;
+          const lines = fullData.split("\n");
+
+          // Keep the last line as incomplete if it doesn't end with newline
+          incompleteLine = fullData.endsWith("\n") ? "" : lines.pop() || "";
+
+          // Print complete lines
+          const prefix = `(instance ${log.instance_id}) [${timestamp}]`;
+          for (const line of lines) {
+            if (line.length > 0) {
+              console.log(`${prefix} ${line}`);
+            }
+          }
+          totalLogs += logs.length;
         }
       }
 
-      // Function to ensure timestamp is in ISO format
-      function formatTimestampToISO(timestamp: string): string {
-        try {
-          const date = new Date(timestamp);
-          if (Number.isNaN(date.getTime())) {
-            throw new Error("Invalid date");
-          }
-          return date.toISOString();
-        } catch {
-          logAndQuit(
-            `Invalid timestamp format: ${timestamp}. Please use ISO format (e.g., 2023-01-01T00:00:00Z)`,
+      function flushIncompleteLine() {
+        if (incompleteLine.length > 0) {
+          console.log(
+            `(instance ${options.instance}) [${lastTimestamp}] ${incompleteLine}`,
           );
         }
       }
 
       // If we're not following (just a single fetch)
       if (!options.follow) {
-        try {
-          // Format timestamps if provided
-          if (options.since) {
-            params.set("since", formatTimestampToISO(options.since));
-          }
-          if (options.before) {
-            params.set("before", formatTimestampToISO(options.before));
-          }
-
-          const data = await fetchLogs(params);
-          if (data?.length) {
-            for (const log of data) {
-              printLogLine(log);
-            }
-          } else {
-            console.log("No logs found");
-          }
-        } catch (err: unknown) {
-          // Gracefully handle broken pipe errors
-          if (
-            (err as Error).message?.includes("Broken pipe") ||
-            (err as Error).name === "BrokenPipe"
-          ) {
-            return;
-          }
-          throw err;
+        const response = await fetchLogs(params);
+        if (response?.data?.length) {
+          processLogs(response.data);
+        } else {
+          console.log(
+            "No logs found. VMs take up to 10 minutes to spin-up, so it may not have started yet.",
+          );
         }
         return;
       }
 
       // If we are following => do poll-based tailing
-      try {
-        // If user didn't specify --since, we do an initial fetch to get the latest logs
-        let sinceTimestamp = options.since
-          ? formatTimestampToISO(options.since)
-          : "";
-
-        // Initial fetch (if --since not provided, we get the latest logs)
-        if (!sinceTimestamp) {
-          const data = await fetchLogs(params);
-          if (data?.length) {
-            data.forEach(printLogLine);
-            // The last log's timestamp is our new "since"
-            // Ensure the timestamp is in ISO format
-            const lastLogTime = new Date(
-              data[data.length - 1].timestamp,
-            ).getTime();
-            sinceTimestamp = new Date(lastLogTime + 1).toISOString();
-          }
-        }
-
-        // Polling loop
-        while (true) {
-          // Build query for the next fetch
-          const newParams = new URLSearchParams(params);
-          newParams.delete("before"); // Not relevant in tail mode
-
-          // Only set the since parameter if it has a value
-          if (sinceTimestamp) {
-            newParams.set("since", sinceTimestamp);
-          }
-
-          const newData = await fetchLogs(newParams);
-
-          // Print new logs
-          if (newData?.length) {
-            for (const log of newData) {
-              printLogLine(log);
-            }
-            // Bump the last timestamp by 1ms before next request
-            const lastLogTime = new Date(
-              newData[newData.length - 1].timestamp,
-            ).getTime();
-            sinceTimestamp = new Date(lastLogTime + 1).toISOString();
-          }
-
-          // Sleep for 2 seconds
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-      } catch (err: unknown) {
-        // Gracefully handle broken pipe errors
-        if (
-          (err as Error).message?.includes("Broken pipe") ||
-          (err as Error).name === "BrokenPipe"
-        ) {
-          return;
-        }
-        throw err;
+      let sinceSeqnum: number | undefined;
+      // Initial fetch (in the first fetch we don't have a sinceSeqnum)
+      const response = await fetchLogs(params);
+      if (response?.data?.length) {
+        processLogs(response.data);
+        // The last log's seqnum is our new "since"
+        sinceSeqnum = response.data[response.data.length - 1].seqnum;
       }
+
+      // If we get a SIGINT or SIGTERM, flush the incomplete line
+      cmd.hook("postAction", flushIncompleteLine);
+
+      // Polling loop
+      while (totalLogs < options.limit) {
+        // Build query for the next fetch
+        const newParams: VMLogsParams = {
+          instance_id: options.instance,
+          limit: options.limit,
+          order_by: "seqnum_asc",
+        };
+
+        // Only set the since parameter if it has a value
+        if (sinceSeqnum) {
+          newParams.since_seqnum = sinceSeqnum;
+        }
+
+        const newResponse = await fetchLogs(newParams);
+
+        // Print new logs
+        if (newResponse?.data?.length) {
+          processLogs(newResponse.data);
+          // Use the last log's seqnum for next request
+          sinceSeqnum = newResponse.data[newResponse.data.length - 1].seqnum;
+        }
+
+        // Sleep for 2 seconds
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+
+      console.log("Log limit reached. Rerun command to continue tailing.");
     });
 
   vm.command("replace")
