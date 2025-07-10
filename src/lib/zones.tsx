@@ -1,7 +1,7 @@
 import type { Command } from "@commander-js/extra-typings";
 import { Box, render, Text } from "ink";
 import Table from "cli-table3";
-import { cyan, green, red } from "jsr:@std/fmt/colors";
+import { cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import * as console from "node:console";
 import React from "react";
 import { getAuthToken, isLoggedIn } from "../helpers/config.ts";
@@ -192,20 +192,12 @@ function displayZonesTable(zones: ZoneInfo[]) {
   });
 
   console.log(table.toString());
-
-  // Following clig.dev: Actions should recommend a next step
   console.log(
-    "\n\x1b[2mUse zone names when placing orders or configuring nodes.\x1b[0m\n",
+    `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`,
   );
-  console.log(
-    "\x1b[2mExamples:\x1b[0m",
-  );
-  console.log(
-    "  sf buy --zone alamo",
-  );
-  console.log(
-    "  sf scale create -n 16 --zone alamo",
-  );
+  console.log(gray("Examples:"));
+  console.log(`  sf buy --zone ${green("alamo")}`);
+  console.log(`  sf scale create -n 16 --zone ${green("alamo")}`);
 }
 
 function EmptyZonesDisplay() {
