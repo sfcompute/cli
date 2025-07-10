@@ -42,8 +42,8 @@ function formatDeliveryType(deliveryType: string): string {
 
 // Region conversion to short slugs
 const RegionMetadata: Record<string, { slug: string }> = {
-  "NorthAmerica": { slug: "NA" },
-  "AsiaPacific": { slug: "APAC" },
+  "NorthAmerica": { slug: "North America" },
+  "AsiaPacific": { slug: "Asia" },
   "EuropeMiddleEastAfrica": { slug: "EMEA" },
 } as const;
 
