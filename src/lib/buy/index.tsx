@@ -44,7 +44,7 @@ export function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .showHelpAfterError()
-    .requiredOption("-t, --type <type>", "Type of GPU", "h100i")
+    .option("-t, --type <type>", "Type of GPU", "h100i")
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
@@ -97,7 +97,14 @@ export function _registerBuy(program: Command) {
       "--standing",
       "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately.",
     )
-    .option("-c, --cluster <cluster>", "Send into a specific cluster")
+    .option(
+      "-z, --zone <zone>",
+      "Send into a specific zone. If provided, \`-t\`/`--type` will be ignored.",
+    )
+    .option(
+      "-c, --cluster <cluster>",
+      "Send into a specific cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
+    )
     .configureHelp({
       optionDescription: (option) => {
         if (option.flags === "-h, --help") {
@@ -135,10 +142,16 @@ Examples:
        * 4. If --yes isn't provided, ask for confirmation
        * 5. Place order
        */
-      if (options.quote) {
-        render(<QuoteComponent options={options} />);
+      // Normalize zone/cluster: prioritize zone over cluster for backward compatibility
+      const normalizedOptions = {
+        ...options,
+        cluster: options.zone || options.cluster,
+      };
+
+      if (normalizedOptions.quote) {
+        render(<QuoteComponent options={normalizedOptions} />);
       } else {
-        render(<QuoteAndBuy options={options} />);
+        render(<QuoteAndBuy options={normalizedOptions} />);
       }
     });
 }
