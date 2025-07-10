@@ -44,7 +44,15 @@ export function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .showHelpAfterError()
-    .option("-t, --type <type>", "Type of GPU", "h100i")
+    .option("-t, --type <type>", "Type of GPU (ignored if --zone is provided)", "h100i")
+    .hook("preAction", (command) => {
+      const { type, zone, cluster } = command.opts();
+      if (!type && !zone && !cluster) {
+        console.error(chalk.yellow("Must specify either --type or --zone"));
+        command.help();
+        process.exit(1);
+      }
+    })
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
