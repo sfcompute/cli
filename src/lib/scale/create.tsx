@@ -91,14 +91,16 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     React.ReactNode
   >();
 
+  const clusterName = props.zone || props.cluster;
+
   const nodesRequired = useMemo(
     () => acceleratorsToNodes(props.accelerators),
     [props.accelerators],
   );
 
   const colocationStrategy = useMemo(() => {
-    if (props.cluster && props.colocationStrategy === "pinned") {
-      return { type: "pinned" as const, cluster_name: props.cluster };
+    if (clusterName && props.colocationStrategy === "pinned") {
+      return { type: "pinned" as const, cluster_name: clusterName };
     }
     return {
       type: props.colocationStrategy as Exclude<
@@ -106,7 +108,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
         "pinned"
       >,
     };
-  }, [props.cluster, props.colocationStrategy]);
+  }, [clusterName, props.colocationStrategy]);
 
   const [isQuoting, setIsQuoting] = useState(false);
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
@@ -128,7 +130,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
             maxStartTime: "NOW",
             minDurationSeconds: quoteMinutes * 60,
             maxDurationSeconds: quoteMinutes * 60 + 3600,
-            cluster: props.cluster,
+            cluster: clusterName,
           });
           setIsQuoting(false);
 
@@ -158,7 +160,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
             nodesRequired,
             type: props.type,
             pricePerGpuHourInCents: limitPricePerGpuHourInCents,
-            cluster: props.cluster,
+            cluster: clusterName,
             colocationStrategy,
           });
         } else {
@@ -206,7 +208,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
       nodesRequired,
       type: props.type,
       pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
-      cluster: props.cluster,
+      cluster: clusterName,
       colocationStrategy,
     });
   };
@@ -300,8 +302,14 @@ $ sf scale create -n 8 --horizon '30m'
   .option("-t, --type <type>", "Specify node type", "h100i")
   .addOption(
     new Option(
+      "-z, --zone <zone>",
+      "Only buy on the specified zone. If provided, \`-t\`/`--type` will be ignored.",
+    ).implies({ colocationStrategy: "pinned" as const }),
+  )
+  .addOption(
+    new Option(
       "-c, --cluster <cluster>",
-      "Only buy on the specified cluster. If provided, \`-t\`/`--type` will be ignored.",
+      "Only buy on the specified cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
     ).implies({ colocationStrategy: "pinned" as const }),
   )
   .addOption(
@@ -330,10 +338,10 @@ $ sf scale create -n 8 --horizon '30m'
   )
   .option("-y, --yes", "Automatically confirm the command.")
   .hook("preAction", (command) => {
-    const { colocationStrategy, cluster } = command.opts();
-    if (colocationStrategy === "pinned" && !cluster) {
+    const { colocationStrategy, zone, cluster } = command.opts();
+    if (colocationStrategy === "pinned" && !(zone || cluster)) {
       console.error(
-        "Invalid colocation strategy: `-c`/`--cluster` is required when using `pinned` colocation strategy.",
+        "Invalid colocation strategy: `-z`/`--zone` or `-c`/`--cluster` is required when using `pinned` colocation strategy.",
       );
       command.help();
       process.exit(1);

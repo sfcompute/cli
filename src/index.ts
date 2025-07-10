@@ -24,6 +24,7 @@ import { registerTokens } from "./lib/tokens.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm.ts";
 import { registerScale } from "./lib/scale/index.tsx";
+import { registerZones } from "./lib/zones.tsx";
 
 const program = new Command();
 
@@ -50,6 +51,7 @@ await registerScale(program);
 registerClusters(program);
 registerMe(program);
 registerVM(program);
+await registerZones(program);
 
 // (development commands)
 registerDev(program);

@@ -43,6 +43,8 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
   tokens_list: "/v0/tokens",
   tokens_delete_by_id: ({ id }: IdParams): string => `/v0/tokens/${id}`,
 
+  zones_list: "/v0/zones",
+
   vms_instances_list: "/v0/vms/instances",
   vms_logs_list: "/v0/vms/logs",
   vms_replace: "/v0/vms/replace",

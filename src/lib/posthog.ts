@@ -67,7 +67,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags = "procurements";
+type FeatureFlags = "procurements" | "zones";
 
 /**
  * Checks if a feature is enabled for the current user.
