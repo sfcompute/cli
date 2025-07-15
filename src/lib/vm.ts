@@ -228,7 +228,6 @@ Examples:
       // State for handling incomplete lines across chunks
       let incompleteLine = "";
       let lastTimestamp = "";
-      let totalLogs = 0;
 
       // Function to process and print logs
       function processLogs(logs: VMLogsResponse) {
@@ -255,7 +254,6 @@ Examples:
               console.log(`${prefix} ${line}`);
             }
           }
-          totalLogs += logs.length;
         }
       }
 
