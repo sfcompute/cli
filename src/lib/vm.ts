@@ -1,12 +1,15 @@
 import { type Command, CommanderError } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
 import Table from "cli-table3";
+import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import { readFileSync } from "node:fs";
 import process from "node:process";
 import { setTimeout } from "node:timers";
 import ora from "ora";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import boxen from "boxen";
 import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -18,16 +21,13 @@ import { registerSsh } from "./ssh.ts";
 import { apiClient } from "../apiClient.ts";
 import { paths } from "../schema.ts";
 
+dayjs.extend(utc);
+
 type VMLogsParams = paths["/v0/vms/logs2"]["get"]["parameters"]["query"];
 type VMLogsResponse =
   paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"][
     "application/json"
   ]["data"];
-type VMInstance = {
-  id: string;
-  status: string;
-  last_updated_at: string;
-};
 
 // Function to ensure timestamp is in RFC3339 format
 function formatTimestampToISO(timestamp: string): string {
@@ -54,56 +54,150 @@ export function registerVM(program: Command) {
   vm.command("list")
     .alias("ls")
     .description("List all virtual machines")
-    .action(async () => {
-      const url = await getApiUrl("vms_instances_list");
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getAuthToken()}`,
-        },
-      });
+    .option("--json", "Output in JSON format")
+    .action(async (options) => {
+      const client = await apiClient(await getAuthToken());
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          await logSessionTokenExpiredAndQuit();
+      const [vmsListResponse, contractsListResponse] = await Promise.all(
+        [
+          client.GET("/v0/vms/instances"),
+          client.GET("/v0/contracts", {
+            params: {
+              query: {
+                instance_type: "h100v",
+              },
+            },
+          }),
+        ],
+      );
+
+      // Following clig.dev: Handle errors gracefully with actionable messages
+      if (!vmsListResponse.response.ok) {
+        switch (vmsListResponse.response.status) {
+          case 401:
+            return await logSessionTokenExpiredAndQuit();
+          case 403:
+            return logAndQuit(
+              "Access denied. Please check your permissions or contact support.",
+            );
+          case 404:
+            return logAndQuit(
+              "VMs not found. Please wait a few seconds and try again.",
+            );
+          default:
+            return logAndQuit(
+              `Failed to list VMs: ${vmsListResponse.response.status} ${vmsListResponse.response.statusText}`,
+            );
         }
-        logAndQuit(`Failed to list VMs: ${response.statusText}`);
       }
 
-      const { data } = await response.json();
+      const vmsData = vmsListResponse.data?.data ?? [];
 
-      if (!data?.length) {
+      const contractsData = (contractsListResponse.data?.data ?? []).filter(
+        (e) => e.status === "active",
+      );
+
+      const unscheduledVMs = Math.max(
+        0,
+        (contractsData?.length ?? 0) - vmsData.length,
+      );
+
+      const hasRecentlyCreatedVMs = contractsData.some((contract) =>
+        dayjs(contract.shape.intervals[0]).isAfter(
+          dayjs().subtract(10, "minutes"),
+        )
+      );
+
+      if ((!(vmsData.length > 0) && !hasRecentlyCreatedVMs)) {
+        if (options.json) {
+          console.log(JSON.stringify([], null, 2));
+          return;
+        }
         logAndQuit(
           "You have no VMs. Buy a VM with: \n  $ sf buy -t h100v -d 1h -n 8",
         );
       }
 
-      const formattedData = data.map(
-        (instance: {
-          id: string;
-          current_status: string;
-          last_updated_at: string;
-        }): VMInstance => ({
+      const formattedData = vmsData.map(
+        (instance) => ({
           id: instance.id,
           status: instance.current_status,
           last_updated_at: instance.last_updated_at,
         }),
       );
 
+      if (options.json) {
+        console.log(JSON.stringify(vmsData, null, 2));
+        return;
+      }
+
+      if (unscheduledVMs > 0 || hasRecentlyCreatedVMs) {
+        const message = `VMs take 5-10 minutes to spin up and may show as ${
+          green("Running")
+        } before they are ready for ssh.
+
+You can use ${
+          cyan("sf vm logs -f")
+        } to follow your VM's startup script output.`;
+
+        console.error(
+          boxen(message, {
+            padding: 0.75,
+            borderColor: "cyan",
+          }),
+        );
+      }
+
       const table = new Table({
-        head: ["ID", "Instance group ID", "Status", "Last updated at"],
+        head: [
+          cyan("ID"),
+          cyan("Status"),
+          cyan("Last Updated"),
+        ],
+        style: {
+          head: [],
+          border: ["gray"],
+        },
       });
 
-      formattedData.forEach((instance: VMInstance) => {
+      if (unscheduledVMs > 0) {
+        table.push([
+          {
+            colSpan: 3,
+            content: yellow(
+              `${unscheduledVMs} additional VMs awaiting scheduling`,
+            ),
+          },
+        ]);
+      }
+
+      formattedData.forEach((instance) => {
+        const status = instance.status.toLowerCase();
+        const statusText = status === "running"
+          ? green("Running")
+          : status === "dead"
+          ? red("Dead")
+          : status === "off"
+          ? gray("Off")
+          : instance.status;
+
         table.push([
           instance.id,
-          instance.status,
+          statusText,
           instance.last_updated_at,
         ]);
       });
 
+      const exampleId = formattedData[0].id;
+
       console.log(table.toString());
+      console.log(
+        `\n${gray("Use VM IDs to access and replace VMs.")}\n`,
+      );
+      console.log(gray("Examples:"));
+      console.log(`  sf vm ssh ${cyan(exampleId)}`);
+      console.log(`  sf vm logs -i ${cyan(exampleId)} -f`);
+      console.log(`  sf vm replace -i ${cyan(exampleId)}`);
     });
 
   vm.command("script")
