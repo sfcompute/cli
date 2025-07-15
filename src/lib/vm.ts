@@ -195,7 +195,7 @@ You can use ${
         `\n${gray("Use VM IDs to access and replace VMs.")}\n`,
       );
       console.log(gray("Examples:"));
-      console.log(`  sf vm ssh ${cyan(exampleId)}`);
+      console.log(`  sf vm ssh ${cyan(`USERNAME@${exampleId}`)}`);
       console.log(`  sf vm logs -i ${cyan(exampleId)} -f`);
       console.log(`  sf vm replace -i ${cyan(exampleId)}`);
     });
