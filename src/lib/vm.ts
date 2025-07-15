@@ -60,8 +60,8 @@ export function registerVM(program: Command) {
 
       const [vmsListResponse, contractsListResponse] = await Promise.all(
         [
-          await client.GET("/v0/vms/instances"),
-          await client.GET("/v0/contracts", {
+          client.GET("/v0/vms/instances"),
+          client.GET("/v0/contracts", {
             params: {
               query: {
                 instance_type: "h100v",
