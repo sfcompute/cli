@@ -9,6 +9,7 @@ import { setTimeout } from "node:timers";
 import ora from "ora";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import boxen from "boxen";
 import { getAuthToken } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -131,8 +132,19 @@ export function registerVM(program: Command) {
       }
 
       if (unscheduledVMs > 0 || hasRecentlyCreatedVMs) {
+        const message = `VMs take 5-10 minutes to spin up and may show as ${
+          green("Running")
+        } before they are ready for ssh.
+
+You can use ${
+          cyan("sf vm logs -f")
+        } to follow your VM's startup script output.`;
+
         console.error(
-          `\x1b[33mNote: VMs take up to 10 minutes to spin up. You can use \x1b[36msf vm logs -f\x1b[33m to follow along.\x1b[0m\n`,
+          boxen(message, {
+            padding: 0.75,
+            borderColor: "cyan",
+          }),
         );
       }
 
@@ -162,11 +174,11 @@ export function registerVM(program: Command) {
       formattedData.forEach((instance) => {
         const status = instance.status.toLowerCase();
         const statusText = status === "running"
-          ? green(instance.status)
+          ? green("Running")
           : status === "dead"
-          ? red(instance.status)
+          ? red("Dead")
           : status === "off"
-          ? gray(instance.status)
+          ? gray("Off")
           : instance.status;
 
         table.push([
