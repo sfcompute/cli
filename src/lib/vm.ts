@@ -36,7 +36,7 @@ function formatTimestampToISO(timestamp: string): string {
     throw new CommanderError(
       1,
       "INVALID_TIMESTAMP_FORMAT",
-      "Invalid timestamp format: ${timestamp}. Please use RFC3339 format (e.g., 2023-01-01T00:00:00Z)",
+      `Invalid timestamp format: ${timestamp}. Please use RFC3339 format (e.g., 2023-01-01T00:00:00Z)`,
     );
   }
   return date.toISOString();
