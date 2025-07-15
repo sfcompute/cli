@@ -45,6 +45,7 @@ function formatTimestampToISO(timestamp: string): string {
 export function registerVM(program: Command) {
   const vm = program
     .command("vm")
+    .showHelpAfterError()
     .aliases(["v", "vms"])
     .description("Manage virtual machines");
 
@@ -285,19 +286,19 @@ Examples:
       const response = await fetchLogs(params);
       if (response?.data?.length) {
         processLogs(response.data);
-        // The last log's seqnum is our new "since"
-        sinceSeqnum = response.data[response.data.length - 1].seqnum;
+        // The last log's seqnum is our new "since" - add 1 to exclude the last seen log
+        sinceSeqnum = response.data[response.data.length - 1].seqnum + 1;
       }
 
       // If we get a SIGINT or SIGTERM, flush the incomplete line
       cmd.hook("postAction", flushIncompleteLine);
 
-      // Polling loop
-      while (totalLogs < options.limit) {
+      // Polling loop - continue indefinitely when following
+      while (true) {
         // Build query for the next fetch
         const newParams: VMLogsParams = {
           instance_id: options.instance,
-          limit: options.limit,
+          limit: 2500,
           order_by: "seqnum_asc",
         };
 
@@ -311,15 +312,14 @@ Examples:
         // Print new logs
         if (newResponse?.data?.length) {
           processLogs(newResponse.data);
-          // Use the last log's seqnum for next request
-          sinceSeqnum = newResponse.data[newResponse.data.length - 1].seqnum;
+          // Use the last log's seqnum + 1 for next request to avoid duplicates
+          sinceSeqnum = newResponse.data[newResponse.data.length - 1].seqnum +
+            1;
         }
 
         // Sleep for 2 seconds
         await new Promise((resolve) => setTimeout(resolve, 2000));
       }
-
-      console.log("Log limit reached. Rerun command to continue tailing.");
     });
 
   vm.command("replace")
