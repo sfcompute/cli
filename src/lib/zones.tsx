@@ -25,7 +25,7 @@ type ZoneInfo = {
 };
 
 type ZonesListResponse = {
-  object: string;
+  object: "list";
   data: ZoneInfo[];
 };
 
@@ -127,21 +127,13 @@ async function listZonesAction(options: { json?: boolean }) {
       "Failed to fetch zones: Unexpected response format from server",
     );
   }
-
-  // Filter out retired zones
-  // TODO: This is a temporary solution to filter out retired zones.
-  // Remove this once the backend has implemented soft deletion.
-  const retiredZones = ["alamo", "seacliff", "southbeach", "sunset"];
-  const filteredZones = data.data.filter((zone) =>
-    !retiredZones.includes(zone.name)
-  );
+  const filteredZones = data.data;
 
   if (options.json) {
     console.log(JSON.stringify(filteredZones, null, 2));
     return;
   }
 
-  // Following clig.dev: Human-readable by default with clear, informative output
   displayZonesTable(filteredZones);
 }
 
@@ -191,13 +183,15 @@ function displayZonesTable(zones: ZoneInfo[]) {
     ]);
   });
 
+  const availableZones = sortedZones.filter((zone) => zone.available);
+  const availableZoneName = availableZones?.[0]?.name ?? "alamo";
   console.log(table.toString());
   console.log(
     `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`,
   );
   console.log(gray("Examples:"));
-  console.log(`  sf buy --zone ${green("alamo")}`);
-  console.log(`  sf scale create -n 16 --zone ${green("alamo")}`);
+  console.log(`  sf buy --zone ${green(availableZoneName)}`);
+  console.log(`  sf scale create -n 16 --zone ${green(availableZoneName)}`);
 }
 
 function EmptyZonesDisplay() {
