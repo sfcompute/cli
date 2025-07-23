@@ -1,4 +1,4 @@
-import { green, red, yellow, cyan } from "jsr:@std/fmt/colors";
+import { cyan, green, red, yellow } from "jsr:@std/fmt/colors";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
 import dayjs from "dayjs";
