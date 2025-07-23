@@ -101,14 +101,14 @@ async function releaseNodesAction(
     const results: { name: string; status: string }[] = [];
     const errors: { name: string; error: string }[] = [];
 
-    for (const name of nodeNames) {
+    for (const node of nodesToRelease) {
       try {
         // Release node using the actual SDK API call (accepts ID or name)
-        await client.nodes.release(name, { body: {} });
-        results.push({ name, status: "released" });
+        await client.nodes.release(node.id, { body: {} });
+        results.push({ name: node.name, status: "released" });
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Unknown error";
-        errors.push({ name, error: errorMsg });
+        errors.push({ name: node.name, error: errorMsg });
       }
     }
 
