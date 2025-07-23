@@ -18,13 +18,21 @@
     "yn": "https://esm.sh/yn"
   },
   "lint": {
-    "exclude": ["src/schema.ts"]
+    "exclude": [
+      "src/schema.ts"
+    ]
   },
   "fmt": {
-    "exclude": ["src/schema.ts"]
+    "exclude": [
+      "src/schema.ts"
+    ]
   },
   "compilerOptions": {
-    "lib": ["deno.ns", "deno.fetch", "deno.web"]
+    "lib": [
+      "deno.ns",
+      "deno.fetch",
+      "deno.web"
+    ]
   },
   "nodeModulesDir": "auto"
 }

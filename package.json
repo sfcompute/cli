@@ -10,6 +10,7 @@
     "@commander-js/extra-typings": "^12.1.0",
     "@inkjs/ui": "^2.0.0",
     "@inquirer/prompts": "^5.1.2",
+    "@sfcompute/nodes-sdk-alpha": "latest",
     "@types/ms": "^0.7.34",
     "axios": "^1.8.4",
     "boxen": "^8.0.1",
