@@ -7,7 +7,7 @@ import ora from "ora";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { createNodesTable, forceOption } from "./utils.ts";
+import { createNodesTable, forceOption, jsonOption } from "./utils.ts";
 
 async function releaseNodesAction(
   nodeNames: string[],
@@ -34,6 +34,15 @@ async function releaseNodesAction(
     }
 
     if (options.dryRun) {
+      if (options.json) {
+        console.log(JSON.stringify(
+          nodesToRelease,
+          null,
+          2,
+        ));
+        process.exit(0);
+      }
+
       console.log("The following nodes would be released:");
 
       if (nodesToRelease.length > 0) {
@@ -115,10 +124,19 @@ async function releaseNodesAction(
           `Released ${results.length} node(s), but ${errors.length} failed`,
         );
       }
-      console.log(gray("\nFailed to release:"));
+      console.error(gray("\nFailed to release:"));
       for (const error of errors) {
-        console.log(`  • ${error.name}: ${error.error}`);
+        console.error(`  • ${error.name}: ${error.error}`);
       }
+    }
+
+    if (options.json) {
+      console.log(JSON.stringify(
+        results,
+        null,
+        2,
+      ));
+      process.exit(0);
     }
 
     if (results.length === 0 && errors.length === 0) {
@@ -137,6 +155,7 @@ const release = new Command("release")
     "--dry-run",
     "Show what would be released without actually releasing nodes",
   )
+  .addOption(jsonOption)
   .addHelpText(
     "after",
     `
@@ -152,6 +171,12 @@ Examples:
 
   \x1b[2m# Release nodes without confirmation\x1b[0m
   $ sf nodes release node-1 --force
+
+  \x1b[2m# Show what would be released in JSON format\x1b[0m
+  $ sf nodes release node-1 --dry-run --json
+
+  \x1b[2m# Release nodes and output result in JSON format\x1b[0m
+  $ sf nodes release node-1 --json
 `,
   )
   .action(async (names, options) => {

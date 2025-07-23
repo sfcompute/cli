@@ -8,6 +8,7 @@ import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
   createNodesTable,
   forceOption,
+  jsonOption,
   maxPriceOption,
   requiredDurationOption,
 } from "./utils.ts";
@@ -22,6 +23,7 @@ const extend = new Command("extend")
   .addOption(requiredDurationOption)
   .addOption(maxPriceOption)
   .addOption(forceOption)
+  .addOption(jsonOption)
   .addHelpText(
     "after",
     `
@@ -40,6 +42,9 @@ Examples:
 
   \x1b[2m# Skip confirmation prompt\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 10.00 --force
+
+  \x1b[2m# Output extended nodes in JSON format\x1b[0m
+  $ sf nodes extend my-node --duration 1h --max-price 10.00 --json
 `,
   )
   .action(extendNodeAction);
@@ -134,6 +139,11 @@ async function extendNodeAction(
           `Extended ${results.length} node(s), but ${errors.length} failed`,
         );
       }
+    }
+
+    if (options.json) {
+      console.log(JSON.stringify(results.map((r) => r.node), null, 2));
+      process.exit(0);
     }
 
     if (results.length > 0) {
