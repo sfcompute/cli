@@ -1,7 +1,6 @@
-import { green, red, yellow } from "jsr:@std/fmt/colors";
+import { green, red, yellow, cyan } from "jsr:@std/fmt/colors";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
-import { cyan } from "jsr:@std/fmt/colors";
 import dayjs from "dayjs";
 import { CommanderError, Option } from "@commander-js/extra-typings";
 import { parseDate } from "chrono-node";
