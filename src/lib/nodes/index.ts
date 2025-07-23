@@ -35,7 +35,7 @@ $ sf nodes list --verbose
 \x1b[2m# Release a node\x1b[0m
 $ sf nodes release my-node
 
-\x1b[2m# Update node pricing (not currently supported)\x1b[0m
+\x1b[2m# Update node pricing\x1b[0m
 $ sf nodes set my-node --max-price 12.50
 
 \x1b[2m# Extend a node with new pricing\x1b[0m
