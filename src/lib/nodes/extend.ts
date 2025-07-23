@@ -1,20 +1,27 @@
 import { Command } from "@commander-js/extra-typings";
-import { gray } from "jsr:@std/fmt/colors";
+import { confirm } from "@inquirer/prompts";
+import { gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
+import process from "node:process";
 import ora from "ora";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
   createNodesTable,
+  forceOption,
   maxPriceOption,
   requiredDurationOption,
 } from "./utils.ts";
 import SFCNodes from "npm:@sfcompute/nodes-sdk-alpha@latest";
+import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
   .argument("<nodes...>", "Node IDs or names to extend")
   .addOption(requiredDurationOption)
   .addOption(maxPriceOption)
+  .addOption(forceOption)
   .addHelpText(
     "after",
     `
@@ -30,6 +37,9 @@ Examples:
 
   \x1b[2m# Extend with raw seconds\x1b[0m
   $ sf nodes extend my-node --duration 7200 --max-price 10.00
+
+  \x1b[2m# Skip confirmation prompt\x1b[0m
+  $ sf nodes extend my-node --duration 1h --max-price 10.00 --force
 `,
   )
   .action(extendNodeAction);
@@ -40,6 +50,58 @@ async function extendNodeAction(
 ) {
   try {
     const client = await nodesClient();
+
+    // Only show pricing and get confirmation if not using --force
+    if (!options.force) {
+      // Get quote for accurate pricing preview
+      const spinner = ora(
+        `Quoting extending ${nodeNames.length} node(s)...`,
+      ).start();
+
+      // Add flexibility to duration for better quote matching (matches buy command logic)
+      const durationSeconds = options.duration!;
+      const minDurationSeconds = Math.max(
+        1,
+        durationSeconds - Math.ceil(durationSeconds * 0.1),
+      );
+      const maxDurationSeconds = Math.max(
+        durationSeconds + 3600,
+        durationSeconds + Math.ceil(durationSeconds * 0.1),
+      );
+
+      const quote = await getQuote({
+        instanceType: "h100v",
+        quantity: nodeNames.length,
+        minStartTime: "NOW",
+        maxStartTime: "NOW",
+        minDurationSeconds: minDurationSeconds,
+        maxDurationSeconds: maxDurationSeconds,
+      });
+
+      spinner.stop();
+
+      let confirmationMessage = `Extend ${nodeNames.length} node(s) for ${
+        Math.round(durationSeconds / 3600 * 100) / 100
+      } hours`;
+
+      if (quote) {
+        const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+        const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
+        confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(2)}/node/hr`;
+      } else {
+        logAndQuit(
+          red(
+            "No nodes available matching your requirements. This is likely due to insufficient capacity.",
+          ),
+        );
+      }
+
+      const confirmed = await confirm({
+        message: confirmationMessage + "?",
+        default: false,
+      });
+      if (!confirmed) process.exit(0);
+    }
 
     const spinner = ora(`Extending ${nodeNames.length} node(s)...`).start();
 
