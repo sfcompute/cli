@@ -67,7 +67,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags = "procurements" | "zones";
+type FeatureFlags = "procurements" | "zones" | "vm-provider";
 
 /**
  * Checks if a feature is enabled for the current user.

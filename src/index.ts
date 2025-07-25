@@ -25,6 +25,7 @@ import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm.ts";
 import { registerScale } from "./lib/scale/index.tsx";
 import { registerZones } from "./lib/zones.tsx";
+import { registerNodes } from "./lib/nodes/index.ts";
 
 const program = new Command();
 
@@ -51,6 +52,7 @@ await registerScale(program);
 registerClusters(program);
 registerMe(program);
 registerVM(program);
+await registerNodes(program);
 await registerZones(program);
 
 // (development commands)

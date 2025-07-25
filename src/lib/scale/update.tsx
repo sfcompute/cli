@@ -28,7 +28,7 @@ import {
 import console from "node:console";
 import chalk from "chalk";
 
-async function updateProcurement({
+export async function updateProcurement({
   procurementId,
   horizonMinutes,
   nodesRequired,
