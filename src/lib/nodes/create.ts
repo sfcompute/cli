@@ -61,7 +61,7 @@ const create = new Command("create")
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
-    const { count, duration, end } = command.opts();
+    const { count, duration, end, zone } = command.opts();
 
     // Validate arguments
     if (names.length === 0 && !count) {
@@ -85,6 +85,13 @@ const create = new Command("create")
     // Validate duration/end like buy command
     if (end && duration) {
       console.error(red("Specify either --duration or --end, but not both\n"));
+      command.help();
+      process.exit(1);
+    }
+
+    const isReserved = !!(duration || end);
+    if (!isReserved && !zone) {
+      console.error(red("Must specify --zone when creating on-demand nodes\n"));
       command.help();
       process.exit(1);
     }
