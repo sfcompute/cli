@@ -18,7 +18,7 @@ async function releaseNodesAction(
 
     // Fetch and filter nodes for both dry run and confirmation
     const spinner = ora("Fetching nodes to release...").start();
-    const allNodes = await client.nodes.list();
+    const { data: allNodes } = await client.nodes.list();
     spinner.stop();
 
     // Filter nodes that match the provided names/IDs

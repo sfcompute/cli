@@ -10,14 +10,15 @@ import { logAndQuit } from "../../helpers/errors.ts";
 
 export function getStatusColor(status: SFCNodes.Node["status"]): string {
   switch (status) {
-    case "Running":
+    case "running":
       return green("Running");
-    case "Terminated":
-    case "Failed":
-      return red(status);
-    case "Pending":
+    case "terminated":
+      return red("Terminated");
+    case "failed":
+      return red("Failed");
+    case "pending":
       return yellow("Pending");
-    case "Unknown":
+    case "unknown":
     default:
       return status;
   }
@@ -27,7 +28,7 @@ export function printProcurementStatus(
   status: SFCNodes.Node["procurement_status"],
 ) {
   switch (status) {
-    case "AwaitingCapacity":
+    case "awaiting_capacity":
       return "Awaiting capacity";
     default:
       return status;
@@ -82,8 +83,8 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       startEnd = "Not available";
     }
 
-    const maxPrice = node.max_price_per_hour
-      ? (node.max_price_per_hour / 100).toFixed(2)
+    const maxPrice = node.max_price_per_node_hour
+      ? (node.max_price_per_node_hour / 100).toFixed(2)
       : "N/A";
 
     table.push([

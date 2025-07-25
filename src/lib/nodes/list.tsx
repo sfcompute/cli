@@ -26,12 +26,12 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
   const endDate = node.end_at && dayjs.unix(node.end_at);
   const duration = endDate && startDate && endDate.diff(startDate, "hours");
 
-  // Convert max_price_per_hour from cents to dollars
-  const pricePerHour = node.max_price_per_hour
-    ? (node.max_price_per_hour / 100)
+  // Convert max_price_per_node_hour from cents to dollars
+  const pricePerHour = node.max_price_per_node_hour
+    ? (node.max_price_per_node_hour / 100)
     : 0;
-  const totalCost = duration && node.max_price_per_hour
-    ? (duration * node.max_price_per_hour / 100)
+  const totalCost = duration && node.max_price_per_node_hour
+    ? (duration * node.max_price_per_node_hour / 100)
     : 0;
 
   return (
@@ -162,7 +162,7 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
     const client = await nodesClient(token);
 
     const spinner = ora("Fetching nodes...").start();
-    const nodes = await client.nodes.list();
+    const { data: nodes } = await client.nodes.list();
 
     spinner.stop();
 

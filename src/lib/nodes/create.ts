@@ -211,7 +211,7 @@ async function createNodesAction(
       // Convert CLI options to SDK parameters
       const createParams: SFCNodes.NodeCreateParams = {
         desired_count: count,
-        max_price_per_hour: options.maxPrice * 100,
+        max_price_per_node_hour: options.maxPrice * 100,
         names: names.length > 0 ? names : undefined,
         zone: options.zone,
       };
@@ -246,7 +246,7 @@ async function createNodesAction(
         createParams.node_type = "on_demand";
       }
 
-      const createdNodes = await client.nodes.create(createParams);
+      const { data: createdNodes } = await client.nodes.create(createParams);
 
       spinner.succeed(`Successfully created ${createdNodes.length} node(s)`);
 

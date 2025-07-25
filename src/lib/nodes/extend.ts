@@ -115,12 +115,12 @@ async function extendNodeAction(
 
     for (const nodeIdOrName of nodeNames) {
       try {
-        const result = await client.nodes.extend(nodeIdOrName, {
+        const node = await client.nodes.extend(nodeIdOrName, {
           duration_seconds: options.duration!,
-          max_price_per_hour: Math.round(options.maxPrice * 100),
+          max_price_per_node_hour: Math.round(options.maxPrice * 100),
         });
 
-        results.push({ name: nodeIdOrName, node: result.node });
+        results.push({ name: nodeIdOrName, node });
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Unknown error";
         errors.push({ name: nodeIdOrName, error: errorMsg });

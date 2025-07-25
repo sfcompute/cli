@@ -25,7 +25,7 @@ async function setNodesAction(
     const client = await nodesClient();
     const spinner = ora("Updating nodes...").start();
 
-    const allNodes = await client.nodes.list();
+    const { data: allNodes } = await client.nodes.list();
 
     const nodesToUpdate: SFCNodes.Node[] = [];
     const notFound: string[] = [];
