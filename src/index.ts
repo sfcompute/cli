@@ -151,9 +151,13 @@ if (IS_TRACKING_DISABLED) {
   }
 
   try {
-    program.parse(process.argv);
+    await program.parseAsync(process.argv);
+    // Ensure analytics shutdown and clean exit
+    await ensureAnalyticsShutdown();
+    process.exit(0);
   } catch (err) {
     console.log(err);
+    await ensureAnalyticsShutdown();
     process.exit(1);
   }
 }
