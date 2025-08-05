@@ -8,6 +8,7 @@
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.23__react@18.3.1_@types+react@18.3.23_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
     "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.7": "0.1.0-alpha.7",
+    "npm:@sfcompute/nodes-sdk-alpha@latest": "0.1.0-alpha.7",
     "npm:@types/ms@~0.7.34": "0.7.34",
     "npm:@types/node@*": "22.15.15",
     "npm:@types/react@^18.3.20": "18.3.23",
