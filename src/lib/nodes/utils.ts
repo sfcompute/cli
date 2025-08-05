@@ -1,4 +1,4 @@
-import { cyan, green, red, yellow } from "jsr:@std/fmt/colors";
+import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
 import dayjs from "dayjs";
@@ -8,37 +8,42 @@ import { parseDurationArgument } from "../../helpers/duration.ts";
 import { parseStartDate, roundEndDate } from "../../helpers/units.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 
-export function getStatusColor(status: SFCNodes.Node["status"]): string {
+export function printNodeStatus(status: SFCNodes.Node["status"]): string {
   switch (status) {
-    case "running":
-      return green("Running");
-    case "terminated":
-      return red("Terminated");
-    case "failed":
-      return red("Failed");
-    case "pending":
-      return yellow("Pending");
-    case "unknown":
+    case "awaitingcapacity":
+      return "Awaiting Capacity";
     default:
-      return status;
+      if (status.length === 0) return "Unknown";
+      return status.charAt(0).toUpperCase() + status.slice(1);
   }
 }
 
-export function printProcurementStatus(
-  status: SFCNodes.Node["procurement_status"],
-) {
+export function getStatusColor(status: SFCNodes.Node["status"]): string {
+  const statusText = printNodeStatus(status);
+
   switch (status) {
-    case "awaiting_capacity":
-      return "Awaiting capacity";
+    case "pending":
+    case "awaitingcapacity":
+      return yellow(statusText);
+    case "running":
+      return green(statusText);
+    case "released":
+      return cyan(statusText);
+    case "failed":
+    case "terminated":
+      return red(statusText);
+    case "deleted":
+      return gray(statusText);
+    case "unknown":
     default:
-      return status;
+      return statusText;
   }
 }
 
 export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   switch (nodeType) {
-    case "on_demand":
-      return "On-Demand";
+    case "spot":
+      return "Spot";
     case "reserved":
       return "Reserved";
     default:
@@ -221,7 +226,7 @@ export const zoneOption = new Option(
  */
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
-  "Maximum price per GPU per hour in dollars",
+  "Maximum price per node per hour in dollars",
 ).argParser(validatePrice).makeOptionMandatory();
 
 /**

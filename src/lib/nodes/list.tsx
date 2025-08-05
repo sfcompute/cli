@@ -16,7 +16,6 @@ import {
   getStatusColor,
   jsonOption,
   printNodeType,
-  printProcurementStatus,
 } from "./utils.ts";
 
 // Component for displaying a single node in verbose format
@@ -67,14 +66,14 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       <Box marginTop={1} paddingX={1}>
         <Text>📅 Schedule:</Text>
       </Box>
-      {node.node_type === "on_demand" && (
+      {node.node_type === "spot" && (
         <Box marginLeft={4}>
           <Text color="yellow">
-            This node is on-demand and has no explicit start, end, or duration.
+            This node is spot and has no explicit start, end, or duration.
           </Text>
         </Box>
       )}
-      {node.node_type !== "on_demand" && (
+      {node.node_type !== "spot" && (
         <Box marginLeft={3} flexDirection="column" paddingX={1}>
           <Row
             head="Start: "
@@ -99,20 +98,15 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Text>💰 Pricing:</Text>
       </Box>
       <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        {node.node_type === "on_demand" && node.procurement_status && (
+        {node.node_type === "spot" && (
           <>
             <Row
               head="Max Price: "
               value={`$${pricePerHour.toFixed(2)}/hour`}
             />
-
-            <Row
-              head="Procurement Status: "
-              value={printProcurementStatus(node.procurement_status)}
-            />
           </>
         )}
-        {node.node_type !== "on_demand" && (
+        {node.node_type !== "spot" && (
           <>
             <Row head="Price: " value={`$${pricePerHour.toFixed(2)}/hour`} />
 
@@ -130,7 +124,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       <Box marginLeft={3} flexDirection="column" paddingX={1}>
         <Row head="Logs: " value={`sf vms logs ${node.name}`} />
         <Row head="SSH: " value={`sf vms ssh ${node.name}`} />
-        {node.node_type !== "on_demand" && (
+        {node.node_type !== "spot" && (
           <Row
             head="Extend: "
             value={`sf nodes extend ${node.name} --duration 60 --max-price 12.00`}
