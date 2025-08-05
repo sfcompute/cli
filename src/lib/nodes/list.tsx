@@ -16,7 +16,6 @@ import {
   getStatusColor,
   jsonOption,
   printNodeType,
-  printProcurementStatus,
 } from "./utils.ts";
 
 // Component for displaying a single node in verbose format
@@ -99,16 +98,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Text>💰 Pricing:</Text>
       </Box>
       <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        {node.node_type === "spot" && node.procurement_status && (
+        {node.node_type === "spot" && (
           <>
             <Row
               head="Max Price: "
               value={`$${pricePerHour.toFixed(2)}/hour`}
-            />
-
-            <Row
-              head="Procurement Status: "
-              value={printProcurementStatus(node.procurement_status)}
             />
           </>
         )}
