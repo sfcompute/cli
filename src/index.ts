@@ -58,84 +58,102 @@ await registerZones(program);
 // (development commands)
 registerDev(program);
 
-const main = async () => {
-  if (IS_TRACKING_DISABLED) {
-    program.parse(process.argv);
-  } else {
-    const config = await loadConfig();
-    let exchangeAccountId = config.account_id;
-
-    if (!exchangeAccountId) {
-      const response = await fetch(await getApiUrl("me"), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${config.auth_token}`,
-        },
-      });
-
-      // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
-      const data = (await response.json()) as any;
-      if (data.id) {
-        exchangeAccountId = data.id;
-        saveConfig({ ...config, account_id: data.id });
+if (IS_TRACKING_DISABLED) {
+  program.parse(process.argv);
+} else {
+  // Add global process exit handlers to ensure analytics cleanup
+  let isShuttingDown = false;
+  const ensureAnalyticsShutdown = async () => {
+    if (!isShuttingDown) {
+      isShuttingDown = true;
+      try {
+        await analytics.shutdown();
+      } catch (_err) {
+        // Silently ignore analytics shutdown errors
       }
     }
+  };
 
-    program.exitOverride((error) => {
-      let isError = true;
+  process.on("beforeExit", ensureAnalyticsShutdown);
+  process.on("SIGINT", async () => {
+    await ensureAnalyticsShutdown();
+    process.exit(130);
+  });
+  process.on("SIGTERM", async () => {
+    await ensureAnalyticsShutdown();
+    process.exit(0);
+  });
 
-      switch (error.code) {
-        case "commander.helpDisplayed":
-        case "commander.help":
-        case "commander.version":
-          isError = false;
-          break;
-      }
-      process.exit(isError ? 1 : 0);
+  const config = await loadConfig();
+  let exchangeAccountId = config.account_id;
+
+  if (!exchangeAccountId) {
+    const response = await fetch(await getApiUrl("me"), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.auth_token}`,
+      },
     });
 
-    if (exchangeAccountId) {
-      const args = process.argv.slice(2).reduce((acc, arg, i, arr) => {
-        if (arg.startsWith("--")) {
-          const key = arg.slice(2);
-          const nextArg = arr[i + 1];
-          if (nextArg && !nextArg.startsWith("-")) {
-            (acc as Record<string, string | number | boolean>)[key] = isNaN(
-                Number(nextArg),
-              )
-              ? nextArg
-              : Number(nextArg);
-          } else {
-            (acc as Record<string, boolean>)[key] = true;
-          }
-        }
-        return acc;
-      }, {});
-
-      analytics.track({
-        event: `${process.argv[2] || "unknown"}${
-          process.argv[3] ? "_" + process.argv[3] : ""
-        }`,
-        properties: {
-          ...args,
-          shell: process.env.SHELL,
-          os: os.platform(),
-          cliVersion: program.version(),
-          argsRaw: process.argv.slice(2).join(" "),
-        },
-      });
-    }
-
-    try {
-      await analytics.shutdown();
-      program.parse(process.argv);
-    } catch (err) {
-      console.log(err);
-      await analytics.shutdown();
-      process.exit(1);
+    // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
+    const data = (await response.json()) as any;
+    if (data.id) {
+      exchangeAccountId = data.id;
+      saveConfig({ ...config, account_id: data.id });
     }
   }
-};
 
-main();
+  program.exitOverride((error) => {
+    let isError = true;
+
+    switch (error.code) {
+      case "commander.helpDisplayed":
+      case "commander.help":
+      case "commander.version":
+        isError = false;
+        break;
+    }
+
+    process.exit(isError ? 1 : 0);
+  });
+
+  if (exchangeAccountId) {
+    const args = process.argv.slice(2).reduce((acc, arg, i, arr) => {
+      if (arg.startsWith("--")) {
+        const key = arg.slice(2);
+        const nextArg = arr[i + 1];
+        if (nextArg && !nextArg.startsWith("-")) {
+          (acc as Record<string, string | number | boolean>)[key] = isNaN(
+              Number(nextArg),
+            )
+            ? nextArg
+            : Number(nextArg);
+        } else {
+          (acc as Record<string, boolean>)[key] = true;
+        }
+      }
+      return acc;
+    }, {});
+
+    analytics.track({
+      event: `${process.argv[2] || "unknown"}${
+        process.argv[3] ? "_" + process.argv[3] : ""
+      }`,
+      properties: {
+        ...args,
+        shell: process.env.SHELL,
+        os: os.platform(),
+        cliVersion: program.version(),
+        argsRaw: process.argv.slice(2).join(" "),
+      },
+    });
+  }
+
+  try {
+    program.parse(process.argv);
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+}
