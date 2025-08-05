@@ -91,7 +91,7 @@ const create = new Command("create")
 
     const isReserved = !!(duration || end);
     if (!isReserved && !zone) {
-      console.error(red("Must specify --zone when creating on-demand nodes\n"));
+      console.error(red("Must specify --zone when creating spot nodes\n"));
       command.help();
       process.exit(1);
     }
@@ -193,7 +193,7 @@ async function createNodesAction(
           );
         }
       } else if (options.maxPrice) {
-        // On-demand nodes - show max price they're willing to pay
+        // Spot nodes - show max price they're willing to pay
         confirmationMessage += ` for up to $${
           options.maxPrice.toFixed(2)
         }/node/hr`;
@@ -249,8 +249,8 @@ async function createNodesAction(
         createParams.end_at = Math.floor(endDate.getTime() / 1000);
         createParams.node_type = "reserved";
       } else {
-        // Neither provided - on-demand
-        createParams.node_type = "on_demand";
+        // Neither provided - spot
+        createParams.node_type = "spot";
       }
 
       const { data: createdNodes } = await client.nodes.create(createParams);

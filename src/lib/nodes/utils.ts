@@ -37,8 +37,8 @@ export function printProcurementStatus(
 
 export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   switch (nodeType) {
-    case "on_demand":
-      return "On-Demand";
+    case "spot":
+      return "Spot";
     case "reserved":
       return "Reserved";
     default:
