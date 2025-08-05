@@ -151,13 +151,16 @@ if (IS_TRACKING_DISABLED) {
   }
 
   try {
-    await program.parseAsync(process.argv);
-    // Ensure analytics shutdown and clean exit
-    await ensureAnalyticsShutdown();
-    process.exit(0);
+    program.parse(process.argv);
+
+    // Add cleanup only when the process would naturally exit but PostHog keeps it alive
+    // This only triggers when the event loop empties (command is done) but process doesn't exit
+    process.on("beforeExit", async () => {
+      await ensureAnalyticsShutdown();
+      process.exit(0);
+    });
   } catch (err) {
     console.log(err);
-    await ensureAnalyticsShutdown();
     process.exit(1);
   }
 }

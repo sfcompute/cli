@@ -13,6 +13,8 @@ const postHogClient = new PostHog(
     host: "https://us.posthog.com",
     flushAt: 1,
     flushInterval: 0,
+    // Don't keep the process alive
+    requestTimeout: 2000,
   },
 );
 // Uncomment this out to see Posthog debugging logs.
