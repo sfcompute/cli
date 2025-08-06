@@ -13,15 +13,16 @@ async function listProcurements() {
   const procurements: Procurement[] = [];
   let hasMore = true;
   while (hasMore) {
-    const { response, data: listObject, error } = await client.GET(
-      "/v0/procurements",
-      {
-        query: {
-          limit: 100,
-          offset: procurements.length,
-        },
+    const {
+      response,
+      data: listObject,
+      error,
+    } = await client.GET("/v0/procurements", {
+      query: {
+        limit: 100,
+        offset: procurements.length,
       },
-    );
+    });
 
     if (!response.ok) {
       throw new Error(error?.message || "Failed to list procurements");
@@ -52,7 +53,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         const { ids = [], type } = props;
         if (ids.length > 0) {
           const settled = await Promise.allSettled(
-            ids.map((id) => getProcurement({ id })),
+            ids.map(id => getProcurement({ id }))
           );
 
           const failed: { id: string; message: string }[] = [];
@@ -63,11 +64,12 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
             } else {
               failed.push({
                 id: ids[idx],
-                message: result.status === "rejected"
-                  ? (result.reason instanceof Error
-                    ? result.reason.message
-                    : String(result.reason))
-                  : "Unknown error",
+                message:
+                  result.status === "rejected"
+                    ? result.reason instanceof Error
+                      ? result.reason.message
+                      : String(result.reason)
+                    : "Unknown error",
               });
             }
           });
@@ -79,13 +81,13 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 
         // Apply type filter if provided
         const finalProcurements = type
-          ? fetchedProcurements.filter((p) => p.instance_type === type)
+          ? fetchedProcurements.filter(p => p.instance_type === type)
           : fetchedProcurements;
 
         setProcurements(finalProcurements);
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : "An unknown error occurred",
+          err instanceof Error ? err.message : "An unknown error occurred"
         );
       } finally {
         setIsLoading(false);
@@ -128,7 +130,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 
   return (
     <Box flexDirection="column" gap={2} paddingBottom={1}>
-      {procurements.map((procurement) => (
+      {procurements.map(procurement => (
         <ProcurementDisplay procurement={procurement} key={procurement.id} />
       ))}
       {failedFetches.length > 0 && (
@@ -136,7 +138,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
           <Text color="red">
             Failed to fetch {failedFetches.length} procurement(s):
           </Text>
-          {failedFetches.map((f) => (
+          {failedFetches.map(f => (
             <Text key={f.id} color="red">
               - {f.message} ({f.id})
             </Text>
@@ -151,7 +153,7 @@ const show = new Command("show")
   .alias("list")
   .alias("ls")
   .configureHelp({
-    optionDescription: (option) => {
+    optionDescription: option => {
       if (option.flags === "-h, --help") {
         return 'Display help for "scale list"';
       }
@@ -170,7 +172,7 @@ $ sf scale show <procurement_id>
 
 \x1b[2m# List all procurements of a specific node type\x1b[0m
 $ sf scale list -t h100i
-`,
+`
   )
   .showHelpAfterError()
   .description("Show active and disabled procurements")

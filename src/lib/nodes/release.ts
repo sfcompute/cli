@@ -11,7 +11,7 @@ import { createNodesTable, forceOption, jsonOption } from "./utils.ts";
 
 async function releaseNodesAction(
   nodeNames: string[],
-  options: ReturnType<typeof release.opts>,
+  options: ReturnType<typeof release.opts>
 ) {
   try {
     const client = await nodesClient();
@@ -26,20 +26,14 @@ async function releaseNodesAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = allNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
-      );
+      const node = allNodes.find(n => n.name === nameOrId || n.id === nameOrId);
       if (node) nodesToRelease.push(node);
       else notFound.push(nameOrId);
     }
 
     if (options.dryRun) {
       if (options.json) {
-        console.log(JSON.stringify(
-          nodesToRelease,
-          null,
-          2,
-        ));
+        console.log(JSON.stringify(nodesToRelease, null, 2));
         process.exit(0);
       }
 
@@ -85,8 +79,7 @@ async function releaseNodesAction(
       }
 
       const confirmed = await confirm({
-        message:
-          `Release ${nodesToRelease.length} node(s)? This action cannot be undone.`,
+        message: `Release ${nodesToRelease.length} node(s)? This action cannot be undone.`,
         default: false,
       });
       if (!confirmed) {
@@ -95,8 +88,9 @@ async function releaseNodesAction(
       }
     }
 
-    const releaseSpinner = ora(`Releasing ${nodesToRelease.length} node(s)...`)
-      .start();
+    const releaseSpinner = ora(
+      `Releasing ${nodesToRelease.length} node(s)...`
+    ).start();
 
     const results: { name: string; status: string }[] = [];
     const errors: { name: string; error: string }[] = [];
@@ -121,7 +115,7 @@ async function releaseNodesAction(
         releaseSpinner.fail("Failed to release any nodes");
       } else {
         releaseSpinner.warn(
-          `Released ${results.length} node(s), but ${errors.length} failed`,
+          `Released ${results.length} node(s), but ${errors.length} failed`
         );
       }
       console.error(gray("\nFailed to release:"));
@@ -131,11 +125,7 @@ async function releaseNodesAction(
     }
 
     if (options.json) {
-      console.log(JSON.stringify(
-        results,
-        null,
-        2,
-      ));
+      console.log(JSON.stringify(results, null, 2));
       process.exit(0);
     }
 
@@ -153,7 +143,7 @@ const release = new Command("release")
   .addOption(forceOption)
   .option(
     "--dry-run",
-    "Show what would be released without actually releasing nodes",
+    "Show what would be released without actually releasing nodes"
   )
   .addOption(jsonOption)
   .addHelpText(
@@ -177,7 +167,7 @@ Examples:
 
   \x1b[2m# Release nodes and output result in JSON format\x1b[0m
   $ sf nodes release node-1 --json
-`,
+`
   )
   .action(async (names, options) => {
     await releaseNodesAction(names, options);

@@ -10,38 +10,47 @@ import { formatDuration } from "../orders/index.tsx";
 
 import { formatColocationStrategy, Procurement } from "./utils.ts";
 
-export function ProcurementHeader({ id, quantity }: {
+export function ProcurementHeader({
+  id,
+  quantity,
+  status,
+}: {
   id: string;
   quantity: number;
+  status: "active" | "disabled";
 }) {
+  // A procurement is considered active if both quantity > 0 AND status is "active"
+  const isActive = quantity > 0 && status === "active";
+
   return (
     <Box gap={1}>
       <Box width={11}>
-        {quantity > 0
-          ? <Badge color="cyan">Active</Badge>
-          : <Badge color="gray">Disabled</Badge>}
+        {isActive ? (
+          <Badge color="cyan">Active</Badge>
+        ) : (
+          <Badge color="gray">Disabled</Badge>
+        )}
       </Box>
       <Box paddingLeft={0.1}>
-        <Text color={quantity > 0 ? "cyan" : "gray"}>
-          {id}
-        </Text>
+        <Text color={isActive ? "cyan" : "gray"}>{id}</Text>
       </Box>
     </Box>
   );
 }
 
-export default function ProcurementDisplay(
-  {
-    procurement: {
-      id,
-      instance_type,
-      desired_quantity,
-      buy_limit_price_per_gpu_hour,
-      horizon,
-      colocation_strategy,
-    },
-  }: { procurement: Procurement },
-) {
+export default function ProcurementDisplay({
+  procurement: {
+    id,
+    instance_type,
+    status,
+    desired_quantity,
+    buy_limit_price_per_gpu_hour,
+    horizon,
+    colocation_strategy,
+  },
+}: {
+  procurement: Procurement;
+}) {
   const horizonMinutes = horizon;
   const quantity = desired_quantity * GPUS_PER_NODE;
   const pricePerGpuHourInCents = buy_limit_price_per_gpu_hour;
@@ -51,21 +60,21 @@ export default function ProcurementDisplay(
     : instance_type;
   return (
     <Box flexDirection="column">
-      <ProcurementHeader id={id} quantity={quantity} />
+      <ProcurementHeader id={id} quantity={quantity} status={status} />
       <Box flexDirection="column" paddingTop={0.5}>
         <Row
           headWidth={15}
           head="Type"
-          value={isSupportedType
-            ? (
+          value={
+            isSupportedType ? (
               <Box gap={1}>
                 <Text>{typeLabel}</Text>
-                <Text dimColor>
-                  ({instance_type})
-                </Text>
+                <Text dimColor>({instance_type})</Text>
               </Box>
+            ) : (
+              instance_type
             )
-            : instance_type}
+          }
         />
         <Row headWidth={15} head="GPUs" value={String(quantity)} />
         <Row

@@ -35,7 +35,7 @@ export function registerClusters(program: Command) {
     .description("List clusters")
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
-    .action(async (options) => {
+    .action(async options => {
       await listClustersAction({
         returnJson: options.json,
         token: options.token,
@@ -53,12 +53,12 @@ export function registerClusters(program: Command) {
     .requiredOption("--cluster <cluster>", "name of the cluster")
     .requiredOption(
       "--user <username>",
-      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized.",
+      "Username to add. Must follow RFC 1123 subdomain rules (lowercase alphanumeric with hyphens). Non-compliant names will be automatically sanitized."
     )
     .option("--json", "Output in JSON format")
     .option("--token <token>", "API token")
     .option("--print", "Print the kubeconfig instead of syncing to file")
-    .action(async (options) => {
+    .action(async options => {
       await addClusterUserAction({
         clusterName: options.cluster,
         username: options.user,
@@ -85,7 +85,7 @@ export function registerClusters(program: Command) {
     .alias("ls")
     .description("List users in a cluster")
     .option("--token <token>", "API token")
-    .action(async (options) => {
+    .action(async options => {
       await listClusterUsers({ token: options.token });
     });
 
@@ -94,7 +94,7 @@ export function registerClusters(program: Command) {
     .description("Generate or sync kubeconfig")
     .option("--token <token>", "API token")
     .option("--print", "Print the config instead of syncing to file")
-    .action(async (options) => {
+    .action(async options => {
       await kubeconfigAction({
         token: options.token,
         print: options.print,
@@ -150,8 +150,7 @@ const ClusterRowWithContracts = ({
       <Box>
         <Text color="black" backgroundColor="cyan">
           {" "}
-          {cluster.contract.id}
-          {" "}
+          {cluster.contract.id}{" "}
         </Text>
       </Box>
 
@@ -196,24 +195,26 @@ async function listClustersAction({
 
   if (!response.ok) {
     // FIXME: This is a hack to get the error code and message, fix OpenAPI schema to include this
-    const rawError = error as {
-      code?: string;
-      message?: string;
-      details?: unknown;
-    } | undefined;
+    const rawError = error as
+      | {
+          code?: string;
+          message?: string;
+          details?: unknown;
+        }
+      | undefined;
     return logAndQuit(
       `Failed to get clusters: HTTP ${response.status} - ${
         rawError?.code || ""
       }: ${rawError?.message || response.statusText} ${
         rawError?.details || ""
-      } (${response.url})`,
+      } (${response.url})`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get clusters: Unexpected response from server: ${response}`,
+      `Failed to get clusters: Unexpected response from server: ${response}`
     );
   }
 
@@ -230,18 +231,18 @@ async function listClustersAction({
       <ClusterDisplay
         clusters={data.data
           .filter(
-            (cluster) =>
-              cluster.contract?.status === "active" || !cluster.contract,
+            cluster =>
+              cluster.contract?.status === "active" || !cluster.contract
           )
           .map(
-            (cluster) =>
+            cluster =>
               ({
                 ...cluster,
                 // @ts-expect-error - ignore
                 state: cluster.contract?.state || "Active",
-              }) as UserFacingCluster,
+              }) as UserFacingCluster
           )}
-      />,
+      />
     );
   }
 }
@@ -258,7 +259,7 @@ function ClusterUserDisplay({
 }) {
   return (
     <Box flexDirection="column" gap={1}>
-      {users.map((user) => (
+      {users.map(user => (
         <Box key={user.id} flexDirection="column">
           <Row headWidth={11} head="name" value={user.name} />
           <Row headWidth={11} head="id" value={user.id} />
@@ -279,8 +280,7 @@ async function isCredentialReady(id: string) {
   const { data } = await api.GET("/v0/credentials");
 
   const cred = data?.data?.find?.(
-    (credential) =>
-      credential.id === id && credential.object === "k8s_credential",
+    credential => credential.id === id && credential.object === "k8s_credential"
   );
 
   if (!cred) {
@@ -293,7 +293,7 @@ async function isCredentialReady(id: string) {
 
   return Boolean(
     (cred.encrypted_token && cred.nonce && cred.ephemeral_pubkey) ||
-      (cred as K8sCredential).encrypted_kubeconfig,
+      (cred as K8sCredential).encrypted_kubeconfig
   );
 }
 
@@ -309,12 +309,12 @@ async function listClusterUsers({ token }: { token?: string }) {
   if (!data?.data) {
     console.error(error);
     return logAndQuit(
-      `Failed to get users in cluster: Unexpected response from server: ${response}`,
+      `Failed to get users in cluster: Unexpected response from server: ${response}`
     );
   }
 
   const k8s = data.data.filter(
-    (credential) => credential.object === "k8s_credential",
+    credential => credential.object === "k8s_credential"
   );
 
   const users: Array<{
@@ -326,8 +326,10 @@ async function listClusterUsers({ token }: { token?: string }) {
   for (const k of k8s) {
     const is_usable: boolean = Boolean(
       (k.encrypted_token && k.nonce && k.ephemeral_pubkey) ||
-        (k.encrypted_kubeconfig && k.nonce && k.ephemeral_pubkey &&
-          k.cluster_type === "vcluster"),
+        (k.encrypted_kubeconfig &&
+          k.nonce &&
+          k.ephemeral_pubkey &&
+          k.cluster_type === "vcluster")
     );
     if (k.id) {
       users.push({
@@ -453,14 +455,14 @@ async function addClusterUserAction({
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to add user to cluster: HTTP ${response.status} - ${response.statusText}`,
+      `Failed to add user to cluster: HTTP ${response.status} - ${response.statusText}`
     );
   }
 
   if (!data?.id) {
     console.error(error);
     return logAndQuit(
-      `Failed to add user to cluster: Unexpected response from server: ${response}`,
+      `Failed to add user to cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -477,27 +479,24 @@ async function removeClusterUserAction({
 }) {
   const api = await apiClient(token);
 
-  const { data, error, response } = await api.DELETE(
-    "/v0/credentials/{id}",
-    {
-      params: {
-        path: {
-          id,
-        },
+  const { data, error, response } = await api.DELETE("/v0/credentials/{id}", {
+    params: {
+      path: {
+        id,
       },
     },
-  );
+  });
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to remove user from cluster: ${response.statusText}`,
+      `Failed to remove user from cluster: ${response.statusText}`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to remove user from cluster: Unexpected response from server: ${response}`,
+      `Failed to remove user from cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -517,14 +516,14 @@ async function kubeconfigAction({
 
   if (!response.ok) {
     return logAndQuit(
-      `Failed to list users in cluster: ${response.statusText}`,
+      `Failed to list users in cluster: ${response.statusText}`
     );
   }
 
   if (!data) {
     console.error(error);
     return logAndQuit(
-      `Failed to list users in cluster: Unexpected response from server: ${response}`,
+      `Failed to list users in cluster: Unexpected response from server: ${response}`
     );
   }
 
@@ -616,7 +615,7 @@ async function kubeconfigAction({
   // Add check for successful decryption of at least one credential
   if (users.length === 0) {
     return logAndQuit(
-      "Could not decrypt k8s credentials. Please report this unexpected issue: https://sfcompute.com/contact",
+      "Could not decrypt k8s credentials. Please report this unexpected issue: https://sfcompute.com/contact"
     );
   }
 

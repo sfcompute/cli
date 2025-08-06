@@ -4,2851 +4,2957 @@
  */
 
 export interface paths {
-    "/v0/refunds": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of refund requests and their statuses for the account */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountRefunds"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/v0/refunds": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of refund requests and their statuses for the account */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountRefunds"];
+          };
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The balance of the account. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountBalance"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/clusters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of Kubernetes clusters */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["KubernetesCluster"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/contracts/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The balance of the account. */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountBalance"];
+          };
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Contract details */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-                    };
-                };
-                /** @description Contract not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/contracts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    instance_type?: string;
-                    active_within_interval_start?: string;
-                    active_within_interval_end?: string;
-                    state?: "All" | "Upcoming" | "Expired" | "Active";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of contracts */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: (components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"])[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request parameters */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Not authenticated */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotAuthenticatedError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/clusters": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of Kubernetes clusters */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: components["schemas"]["KubernetesCluster"][];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
             };
-            requestBody?: never;
-            responses: {
-                /** @description The authenticated account */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Account"];
-                    };
-                };
-                /** @description Account not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
-                    };
-                };
-            };
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get historical prices for a given instance type */
-        get: {
-            parameters: {
-                query?: {
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    min_quantity?: number;
-                    max_quantity?: number;
-                    min_duration?: number | null;
-                    max_duration?: number | null;
-                    since_n_days_ago?: number | null;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The historical prices for the given instance type */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["PriceHistoryItem"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description The request is too far in past */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PriceRequestTooFarInPastError"] | components["schemas"]["InvalidRequestError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/contracts/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/procurements/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Procurement not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Contract details */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["ActiveContract"]
+              | components["schemas"]["PendingContract"];
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProcurementUpdate"];
-                };
-            };
-            responses: {
-                /** @description Successfully updated procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Procurement not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
+        /** @description Contract not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["NotFoundError"];
+          };
         };
-        trace?: never;
+      };
     };
-    "/v0/procurements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved procurements */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["Procurement"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProcurementCreation"];
-                };
-            };
-            responses: {
-                /** @description Successfully created procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Bad request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementInvalidColocateOnRestartError"] | components["schemas"]["ProcurementInvalidColocateOnClusterError"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Cluster to colocate on not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementColocateOnClusterNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/contracts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: {
+          instance_type?: string;
+          active_within_interval_start?: string;
+          active_within_interval_end?: string;
+          state?: "All" | "Upcoming" | "Expired" | "Active";
         };
-        get: {
-            parameters: {
-                query?: {
-                    include_system?: boolean;
-                    origin_client?: "cli" | "web" | "manual";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of contracts */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: (
+                | components["schemas"]["ActiveContract"]
+                | components["schemas"]["PendingContract"]
+              )[];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
             };
-            requestBody?: never;
-            responses: {
-                /** @description List tokens */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ListTokenResponse"];
-                    };
-                };
-                /** @description Account not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
-                    };
-                };
-            };
+          };
         };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        /** @description Number of seconds until token expires. */
-                        expires_in_seconds: number;
-                        /** @description Name of the token. */
-                        name?: string;
-                        /** @description Description of the token. */
-                        description?: string;
-                        /** @enum {string} */
-                        origin_client: "cli";
-                    };
-                };
-            };
-            responses: {
-                /** @description Token created successfully */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Token"];
-                    };
-                };
-                /** @description Invalid request parameters */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidTokenExpirationDuration"] | components["schemas"]["MaxTokenLimitReached"];
-                    };
-                };
-                /** @description Authentication required */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
-                    };
-                };
-                /** @description Account is frozen */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"];
-                    };
-                };
-                /** @description Token not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["InvalidTokenCreateOriginClient"];
-                    };
-                };
-                /** @description Token generation rate limit exceeded */
-                429: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MaxTokenLimitReached"];
-                    };
-                };
-            };
+        /** @description Invalid request parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InvalidRequestError"];
+          };
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["NotAuthenticatedError"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
     };
-    "/v0/tokens/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Token deleted */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            success: boolean;
-                        };
-                    };
-                };
-                /** @description Token or account not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["TokenNotFound"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/transactions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The authenticated account */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Account"];
+          };
         };
-        get: {
-            parameters: {
-                query?: {
-                    starting_after?: string;
-                    ending_before?: string;
-                    limit?: string;
-                    transaction_type?: ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected") | ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected")[];
-                    account_kind?: components["schemas"]["AccountKind"] | components["schemas"]["AccountKind"][];
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of transactions for the account */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountTransactions"];
-                    };
-                };
-            };
+        /** @description Account not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountNotFoundError"];
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/vms/logs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    instance_id?: string;
-                    before?: string;
-                    since?: string;
-                    limit?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved VM logs */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "list";
-                            data: {
-                                /**
-                                 * Format: date-time
-                                 * @description ISO timestamp of the log line
-                                 */
-                                timestamp: string;
-                                message: string;
-                                instance_id: string;
-                            }[];
-                        } | {
-                            data: {
-                                /**
-                                 * Format: date-time
-                                 * @description ISO timestamp of the log line
-                                 */
-                                timestamp: string;
-                                message: string;
-                                instance_id: string;
-                            }[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/prices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** @description Get historical prices for a given instance type */
+    get: {
+      parameters: {
+        query?: {
+          instance_type?: ("h100i" | "h100v" | "h200ki") | string;
+          min_quantity?: number;
+          max_quantity?: number;
+          min_duration?: number | null;
+          max_duration?: number | null;
+          since_n_days_ago?: number | null;
         };
-        get: {
-            parameters: {
-                query: {
-                    side?: "buy" | "sell";
-                    min_start_date?: "NOW" | string;
-                    max_start_date?: "NOW" | string;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The historical prices for the given instance type */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: components["schemas"]["PriceHistoryItem"][];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
+            };
+          };
+        };
+        /** @description The request is too far in past */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["PriceRequestTooFarInPastError"]
+              | components["schemas"]["InvalidRequestError"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/procurements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Successfully retrieved procurement */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Procurement"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+          };
+        };
+        /** @description Procurement not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotFoundError"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProcurementUpdate"];
+        };
+      };
+      responses: {
+        /** @description Successfully updated procurement */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Procurement"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+          };
+        };
+        /** @description Procurement not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotFoundError"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
+    };
+    trace?: never;
+  };
+  "/v0/procurements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Successfully retrieved procurements */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: components["schemas"]["Procurement"][];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
+            };
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ProcurementCreation"];
+        };
+      };
+      responses: {
+        /** @description Successfully created procurement */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Procurement"];
+          };
+        };
+        /** @description Bad request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["ProcurementInvalidColocateOnRestartError"]
+              | components["schemas"]["ProcurementInvalidColocateOnClusterError"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
+          };
+        };
+        /** @description Cluster to colocate on not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ProcurementColocateOnClusterNotFoundError"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/tokens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          include_system?: boolean;
+          origin_client?: "cli" | "web" | "manual";
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List tokens */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["ListTokenResponse"];
+          };
+        };
+        /** @description Account not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountNotFoundError"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            /** @description Number of seconds until token expires. */
+            expires_in_seconds: number;
+            /** @description Name of the token. */
+            name?: string;
+            /** @description Description of the token. */
+            description?: string;
+            /** @enum {string} */
+            origin_client: "cli";
+          };
+        };
+      };
+      responses: {
+        /** @description Token created successfully */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Token"];
+          };
+        };
+        /** @description Invalid request parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["InvalidTokenExpirationDuration"]
+              | components["schemas"]["MaxTokenLimitReached"];
+          };
+        };
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountNotFoundError"];
+          };
+        };
+        /** @description Account is frozen */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountFrozenError"];
+          };
+        };
+        /** @description Token not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["AccountNotFoundError"]
+              | components["schemas"]["InvalidTokenCreateOriginClient"];
+          };
+        };
+        /** @description Token generation rate limit exceeded */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["MaxTokenLimitReached"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/tokens/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Token deleted */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success: boolean;
+            };
+          };
+        };
+        /** @description Token or account not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["AccountNotFoundError"]
+              | components["schemas"]["TokenNotFound"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          starting_after?: string;
+          ending_before?: string;
+          limit?: string;
+          transaction_type?:
+            | (
+                | "buy"
+                | "sell"
+                | "transfer"
+                | "error"
+                | "instant_deposit"
+                | "deposit_ach"
+                | "withdrawal_bank"
+                | "refund"
+                | "admin_ledger_transfer"
+                | "fulfillment_escrow_release"
+                | "promotional_credit"
+                | "delivery_fees_collected"
+              )
+            | (
+                | "buy"
+                | "sell"
+                | "transfer"
+                | "error"
+                | "instant_deposit"
+                | "deposit_ach"
+                | "withdrawal_bank"
+                | "refund"
+                | "admin_ledger_transfer"
+                | "fulfillment_escrow_release"
+                | "promotional_credit"
+                | "delivery_fees_collected"
+              )[];
+          account_kind?:
+            | components["schemas"]["AccountKind"]
+            | components["schemas"]["AccountKind"][];
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of transactions for the account */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountTransactions"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/logs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          instance_id?: string;
+          before?: string;
+          since?: string;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Successfully retrieved VM logs */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | {
+                  /** @enum {string} */
+                  object: "list";
+                  data: {
+                    /**
+                     * Format: date-time
+                     * @description ISO timestamp of the log line
+                     */
+                    timestamp: string;
+                    message: string;
+                    instance_id: string;
+                  }[];
+                }
+              | {
+                  data: {
+                    /**
+                     * Format: date-time
+                     * @description ISO timestamp of the log line
+                     */
+                    timestamp: string;
+                    message: string;
+                    instance_id: string;
+                  }[];
+                  has_more: boolean;
+                  /**
+                   * @example list
+                   * @enum {string}
+                   */
+                  object: "list";
+                };
+          };
+        };
+        /** @description Invalid request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InvalidRequestError"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["UnauthorizedError"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query: {
+          side?: "buy" | "sell";
+          min_start_date?: "NOW" | string;
+          max_start_date?: "NOW" | string;
+          quantity: number;
+          instance_type?: ("h100i" | "h100v" | "h200ki") | string;
+          contract_id?: string;
+          colocate_with?: string[];
+          duration?: number;
+          min_duration?: number;
+          max_duration?: number;
+          cluster?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Quote response */
+        200: {
+          headers: {
+            /** @description Request limit per window */
+            "RateLimit-Limit"?: number;
+            /** @description Remaining requests for current window */
+            "RateLimit-Remaining"?: number;
+            /** @description Unix timestamp when the rate limit window resets */
+            "RateLimit-Reset"?: number;
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | {
+                  /** @enum {string} */
+                  object: "quote";
+                  /** @enum {string} */
+                  side: "buy";
+                  quote: {
+                    /** @description Price in cents (1 = $0.01) */
+                    price: number | null;
+                    /**
+                     * @description The number of nodes.
+                     * @example 3
+                     */
                     quantity: number;
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    contract_id?: string;
-                    colocate_with?: string[];
-                    duration?: number;
-                    min_duration?: number;
-                    max_duration?: number;
-                    cluster?: string;
+                    /**
+                     * Format: date-time
+                     * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+                     * @example 2025-05-20T01:26:22.670Z
+                     */
+                    start_at: string;
+                    /**
+                     * Format: date-time
+                     * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+                     */
+                    end_at: string;
+                    /** @description The instance type. */
+                    instance_type: ("h100i" | "h100v" | "h200ki") | string;
+                  } | null;
+                }
+              | {
+                  /** @enum {string} */
+                  object: "quote";
+                  /** @enum {string} */
+                  side: "sell";
+                  quote: {
+                    /** @description Price in cents (1 = $0.01) */
+                    price: number | null;
+                    /**
+                     * @description The number of nodes.
+                     * @example 3
+                     */
+                    quantity: number;
+                    /**
+                     * Format: date-time
+                     * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+                     * @example 2025-05-20T01:26:22.670Z
+                     */
+                    start_at: string;
+                    /**
+                     * Format: date-time
+                     * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+                     */
+                    end_at: string;
+                    /** @description An external ID with prefix and alphanumeric string with underscores */
+                    contract_id: string;
+                  } | null;
                 };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Quote response */
-                200: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "quote";
-                            /** @enum {string} */
-                            side: "buy";
-                            quote: {
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes.
-                                 * @example 3
-                                 */
-                                quantity: number;
-                                /**
-                                 * Format: date-time
-                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-20T01:26:22.670Z
-                                 */
-                                start_at: string;
-                                /**
-                                 * Format: date-time
-                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-                                 */
-                                end_at: string;
-                                /** @description The instance type. */
-                                instance_type: ("h100i" | "h100v" | "h200ki") | string;
-                            } | null;
-                        } | {
-                            /** @enum {string} */
-                            object: "quote";
-                            /** @enum {string} */
-                            side: "sell";
-                            quote: {
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes.
-                                 * @example 3
-                                 */
-                                quantity: number;
-                                /**
-                                 * Format: date-time
-                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-20T01:26:22.670Z
-                                 */
-                                start_at: string;
-                                /**
-                                 * Format: date-time
-                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-                                 */
-                                end_at: string;
-                                /** @description An external ID with prefix and alphanumeric string with underscores */
-                                contract_id: string;
-                            } | null;
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidDateRange"] | components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Not found */
-                404: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-                /** @description Too Many Requests */
-                429: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Invalid request */
+        400: {
+          headers: {
+            /** @description Request limit per window */
+            "RateLimit-Limit"?: number;
+            /** @description Remaining requests for current window */
+            "RateLimit-Remaining"?: number;
+            /** @description Unix timestamp when the rate limit window resets */
+            "RateLimit-Reset"?: number;
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["InvalidDateRange"]
+              | components["schemas"]["InvalidRequestError"];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            /** @description Request limit per window */
+            "RateLimit-Limit"?: number;
+            /** @description Remaining requests for current window */
+            "RateLimit-Remaining"?: number;
+            /** @description Unix timestamp when the rate limit window resets */
+            "RateLimit-Reset"?: number;
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["NotFoundError"];
+          };
+        };
+        /** @description Too Many Requests */
+        429: {
+          headers: {
+            /** @description Request limit per window */
+            "RateLimit-Limit"?: number;
+            /** @description Remaining requests for current window */
+            "RateLimit-Remaining"?: number;
+            /** @description Unix timestamp when the rate limit window resets */
+            "RateLimit-Reset"?: number;
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            /** @description Request limit per window */
+            "RateLimit-Limit"?: number;
+            /** @description Remaining requests for current window */
+            "RateLimit-Remaining"?: number;
+            /** @description Unix timestamp when the rate limit window resets */
+            "RateLimit-Reset"?: number;
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
     };
-    "/v0/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description List orders */
-        get: {
-            parameters: {
-                query?: {
-                    side?: "buy" | "sell";
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    min_price?: number | null;
-                    max_price?: number | null;
-                    min_start_date?: string;
-                    max_start_date?: string;
-                    min_duration?: number | null;
-                    max_duration?: number | null;
-                    min_quantity?: number | null;
-                    max_quantity?: number | null;
-                    contract_id?: string;
-                    only_open?: boolean | null;
-                    exclude_filled?: boolean | null;
-                    only_filled?: boolean | null;
-                    min_filled_at?: string | null;
-                    max_filled_at?: string | null;
-                    min_fill_price?: number | null;
-                    max_fill_price?: number | null;
-                    exclude_cancelled?: boolean | null;
-                    only_cancelled?: boolean | null;
-                    min_cancelled_at?: string | null;
-                    max_cancelled_at?: string | null;
-                    min_placed_at?: string | null;
-                    max_placed_at?: string | null;
-                    limit?: number | null;
-                    offset?: number | null;
-                    sort_by?: "created_at" | "start_time";
-                    sort_direction?: "ASC" | "DESC";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of orders */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["OrderResponse"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** @description Create a new order */
-        post: {
-            parameters: {
-                query?: never;
-                header?: {
-                    "Idempotency-Key"?: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["PostOrderRequest"];
-                };
-            };
-            responses: {
-                /** @description Order created successfully */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderPendingResponse"];
-                    };
-                };
-                /** @description Invalid request parameters */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"] | components["schemas"]["ContractNotFound"] | components["schemas"]["InvalidInstanceType"];
-                    };
-                };
-                /** @description Account is unauthorized to place orders */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"] | components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Contract, Cluster, or Market not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ContractNotFound"] | components["schemas"]["ClusterNotFound"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        /** @description Cancel all orders */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description All orders cancelled successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "pending";
-                        };
-                    };
-                };
-                /** @description Account is frozen or unauthorized */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/orders/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** @description List orders */
+    get: {
+      parameters: {
+        query?: {
+          side?: "buy" | "sell";
+          instance_type?: ("h100i" | "h100v" | "h200ki") | string;
+          min_price?: number | null;
+          max_price?: number | null;
+          min_start_date?: string;
+          max_start_date?: string;
+          min_duration?: number | null;
+          max_duration?: number | null;
+          min_quantity?: number | null;
+          max_quantity?: number | null;
+          contract_id?: string;
+          only_open?: boolean | null;
+          exclude_filled?: boolean | null;
+          only_filled?: boolean | null;
+          min_filled_at?: string | null;
+          max_filled_at?: string | null;
+          min_fill_price?: number | null;
+          max_fill_price?: number | null;
+          exclude_cancelled?: boolean | null;
+          only_cancelled?: boolean | null;
+          min_cancelled_at?: string | null;
+          max_cancelled_at?: string | null;
+          min_placed_at?: string | null;
+          max_placed_at?: string | null;
+          limit?: number | null;
+          offset?: number | null;
+          sort_by?: "created_at" | "start_time";
+          sort_direction?: "ASC" | "DESC";
         };
-        /** @description Get order details */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of orders */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: components["schemas"]["OrderResponse"][];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
             };
-            requestBody?: never;
-            responses: {
-                /** @description Order details */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderResponse"];
-                    };
-                };
-                /** @description Unauthorized seller */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
-                    };
-                };
-            };
+          };
         };
-        put?: never;
-        post?: never;
-        /** @description Cancel an order */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Order cancelled successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "pending";
-                        };
-                    };
-                };
-                /** @description Order already cancelled */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AlreadyCancelled"];
-                    };
-                };
-                /** @description Account is frozen */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
+        /** @description Invalid request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InvalidRequestError"];
+          };
         };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
     };
-    "/v0/orders/{id}/clusters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    /** @description Create a new order */
+    post: {
+      parameters: {
+        query?: never;
+        header?: {
+          "Idempotency-Key"?: string;
         };
-        /** @description Get all clusters associated with an order through contracts */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of clusters associated with the order */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: {
-                                /** @enum {string} */
-                                object: "kubernetes_cluster";
-                                kubernetes_api_url: string;
-                                kubernetes_ca_cert: string;
-                                kubernetes_namespace: string;
-                                name: string;
-                                contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-                            }[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Unauthorized seller */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
-                    };
-                };
-            };
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["PostOrderRequest"];
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description Order created successfully */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["OrderPendingResponse"];
+          };
+        };
+        /** @description Invalid request parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["InvalidRequestError"]
+              | components["schemas"]["ContractNotFound"]
+              | components["schemas"]["InvalidInstanceType"];
+          };
+        };
+        /** @description Account is unauthorized to place orders */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["AccountFrozenError"]
+              | components["schemas"]["TradingEngineIsHaltedError"]
+              | components["schemas"]["UnauthorizedSeller"];
+          };
+        };
+        /** @description Contract, Cluster, or Market not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["ContractNotFound"]
+              | components["schemas"]["ClusterNotFound"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
     };
-    "/v0/credentials": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** @description Cancel all orders */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description All orders cancelled successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @enum {string} */
+              object: "pending";
+            };
+          };
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["frontend_server.ListResponse"];
-                    };
-                };
-            };
+        /** @description Account is frozen or unauthorized */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AccountFrozenError"];
+          };
         };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description Credential details */
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["types.KubernetesCredentialBody"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["frontend_server.BaseCredentialResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/credentials/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/orders/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get order details */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Credential ID (format: cred_<nanoid>) */
-                    id: string;
-                };
-                cookie?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Order details */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["OrderResponse"];
+          };
+        };
+        /** @description Unauthorized seller */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["UnauthorizedSeller"];
+          };
+        };
+        /** @description Order not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["OrderNotFound"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /** @description Cancel an order */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Order cancelled successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** @enum {string} */
+              object: "pending";
             };
-            requestBody?: {
-                content: {
-                    "application/json": Record<string, never>;
-                };
+          };
+        };
+        /** @description Order already cancelled */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AlreadyCancelled"];
+          };
+        };
+        /** @description Account is frozen */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json":
+              | components["schemas"]["AccountFrozenError"]
+              | components["schemas"]["TradingEngineIsHaltedError"];
+          };
+        };
+        /** @description Order not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["OrderNotFound"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["InternalServerError"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/orders/{id}/clusters": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get all clusters associated with an order through contracts */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description List of clusters associated with the order */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              data: {
+                /** @enum {string} */
+                object: "kubernetes_cluster";
+                kubernetes_api_url: string;
+                kubernetes_ca_cert: string;
+                kubernetes_namespace: string;
+                name: string;
+                contract?:
+                  | components["schemas"]["ActiveContract"]
+                  | components["schemas"]["PendingContract"];
+              }[];
+              has_more: boolean;
+              /**
+               * @example list
+               * @enum {string}
+               */
+              object: "list";
             };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["frontend_server.DeleteResponse"];
-                    };
-                };
-            };
+          };
         };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/vms/instances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+        /** @description Unauthorized seller */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["UnauthorizedSeller"];
+          };
         };
-        get: operations["get_vms_instances"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/vms/logs2": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+        /** @description Order not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["OrderNotFound"];
+          };
         };
-        get: operations["get_vms_logs2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/vms/replace": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/credentials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["frontend_server.ListResponse"];
+          };
         };
-        get?: never;
-        put?: never;
-        post: operations["post_vms_replace"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v0/vms/script": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      /** @description Credential details */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["types.KubernetesCredentialBody"];
         };
-        get: operations["get_vms_user_data"];
-        put?: never;
-        post: operations["post_vms_user_data"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/vms/ssh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["frontend_server.BaseCredentialResponse"];
+          };
         };
-        get: operations["get_vms_ssh"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/credentials/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Credential ID (format: cred_<nanoid>) */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["frontend_server.DeleteResponse"];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/instances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["get_vms_instances"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/logs2": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["get_vms_logs2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/replace": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["post_vms_replace"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/script": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["get_vms_user_data"];
+    put?: never;
+    post: operations["post_vms_user_data"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/vms/ssh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["get_vms_ssh"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
+  schemas: {
+    /**
+     * @description The current status of a refund request
+     * @enum {string}
+     */
+    RefundStatus: "in_review" | "approved" | "refunded" | "denied";
+    /** @description A refund request for downtime compensation */
+    Refund: {
+      /**
+       * @description Unique identifier of the downtime report
+       * @example 12345
+       */
+      report_id: number;
+      /**
+       * @description Start time of the downtime period
+       * @example 2024-03-15T00:00:00Z
+       */
+      report_start_time: string;
+      /**
+       * @description End time of the downtime period
+       * @example 2024-03-15T02:00:00Z
+       */
+      report_end_time: string;
+      /**
+       * @description Number of nodes affected by the downtime
+       * @example 4
+       */
+      report_nodes_affected: number;
+      /**
+       * @description Identifier of the affected cluster
+       * @example cluster_us_west_1
+       */
+      report_cluster_id: string;
+      /**
+       * @description Description of the downtime incident
+       * @example Network connectivity issues in US-West-1
+       */
+      report_memo: string;
+      /**
+       * @description When the downtime report was created
+       * @example 2024-03-15T00:30:00Z
+       */
+      report_created_at: string;
+      /**
+       * @description Amount of the credit memo in dollars, if approved
+       * @example 500.00
+       */
+      memo_amount: string | null;
+      /**
+       * @description When the refund was processed, if completed
+       * @example 2024-03-16T00:00:00Z
+       */
+      refund_timestamp: string | null;
+      status: components["schemas"]["RefundStatus"];
+    };
+    /**
+     * @description List of refund requests for an account
+     * @example {
+     *       "object": "refunds",
+     *       "refunds": [
+     *         {
+     *           "report_id": 12345,
+     *           "report_start_time": "2024-03-15T00:00:00.000Z",
+     *           "report_end_time": "2024-03-15T02:00:00.000Z",
+     *           "report_nodes_affected": 4,
+     *           "report_cluster_id": "cluster_us_west_1",
+     *           "report_memo": "Network connectivity issues in US-West-1",
+     *           "report_created_at": "2024-03-15T00:30:00.000Z",
+     *           "memo_amount": "500.00",
+     *           "refund_timestamp": "2024-03-16T00:00:00.000Z",
+     *           "status": "refunded"
+     *         }
+     *       ]
+     *     }
+     */
+    AccountRefunds: {
+      /**
+       * @description The type of the response object
+       * @example refunds
+       * @enum {string}
+       */
+      object: "refunds";
+      refunds: components["schemas"]["Refund"][];
+    };
+    AccountBalance: {
+      /**
+       * @example balance
+       * @enum {string}
+       */
+      object: "balance";
+      available: {
         /**
-         * @description The current status of a refund request
+         * @description Funds available to spend or withdraw.
+         * @example 1000000
+         */
+        amount: number;
+        /**
+         * @example usd
          * @enum {string}
          */
-        RefundStatus: "in_review" | "approved" | "refunded" | "denied";
-        /** @description A refund request for downtime compensation */
-        Refund: {
-            /**
-             * @description Unique identifier of the downtime report
-             * @example 12345
-             */
-            report_id: number;
-            /**
-             * @description Start time of the downtime period
-             * @example 2024-03-15T00:00:00Z
-             */
-            report_start_time: string;
-            /**
-             * @description End time of the downtime period
-             * @example 2024-03-15T02:00:00Z
-             */
-            report_end_time: string;
-            /**
-             * @description Number of nodes affected by the downtime
-             * @example 4
-             */
-            report_nodes_affected: number;
-            /**
-             * @description Identifier of the affected cluster
-             * @example cluster_us_west_1
-             */
-            report_cluster_id: string;
-            /**
-             * @description Description of the downtime incident
-             * @example Network connectivity issues in US-West-1
-             */
-            report_memo: string;
-            /**
-             * @description When the downtime report was created
-             * @example 2024-03-15T00:30:00Z
-             */
-            report_created_at: string;
-            /**
-             * @description Amount of the credit memo in dollars, if approved
-             * @example 500.00
-             */
-            memo_amount: string | null;
-            /**
-             * @description When the refund was processed, if completed
-             * @example 2024-03-16T00:00:00Z
-             */
-            refund_timestamp: string | null;
-            status: components["schemas"]["RefundStatus"];
-        };
+        currency: "usd";
+      };
+      reserved: {
         /**
-         * @description List of refund requests for an account
-         * @example {
-         *       "object": "refunds",
-         *       "refunds": [
-         *         {
-         *           "report_id": 12345,
-         *           "report_start_time": "2024-03-15T00:00:00.000Z",
-         *           "report_end_time": "2024-03-15T02:00:00.000Z",
-         *           "report_nodes_affected": 4,
-         *           "report_cluster_id": "cluster_us_west_1",
-         *           "report_memo": "Network connectivity issues in US-West-1",
-         *           "report_created_at": "2024-03-15T00:30:00.000Z",
-         *           "memo_amount": "500.00",
-         *           "refund_timestamp": "2024-03-16T00:00:00.000Z",
-         *           "status": "refunded"
-         *         }
-         *       ]
-         *     }
+         * @description Funds held in reserve for pending withdrawals & open buy orders.
+         * @example 1000000
          */
-        AccountRefunds: {
-            /**
-             * @description The type of the response object
-             * @example refunds
-             * @enum {string}
-             */
-            object: "refunds";
-            refunds: components["schemas"]["Refund"][];
-        };
-        AccountBalance: {
-            /**
-             * @example balance
-             * @enum {string}
-             */
-            object: "balance";
-            available: {
-                /**
-                 * @description Funds available to spend or withdraw.
-                 * @example 1000000
-                 */
-                amount: number;
-                /**
-                 * @example usd
-                 * @enum {string}
-                 */
-                currency: "usd";
-            };
-            reserved: {
-                /**
-                 * @description Funds held in reserve for pending withdrawals & open buy orders.
-                 * @example 1000000
-                 */
-                amount: number;
-                /**
-                 * @example usd
-                 * @enum {string}
-                 */
-                currency: "usd";
-            };
-        };
-        /** @description A shape that describes the distribution of the contract's size over time. */
-        Shape: {
-            intervals: (string)[];
-            /** @example [
-             *       10,
-             *       20,
-             *       0
-             *     ] */
-            quantities: number[];
-        };
-        /** @example {
-         *       "object": "contract",
-         *       "status": "active",
-         *       "id": "cont_122",
-         *       "created_at": "2024-07-15T22:30:17.426Z",
-         *       "instance_type": "h200ki",
-         *       "shape": {
-         *         "intervals": [
-         *           "Tue, 16 Jul 2024 22:30:16 GMT",
-         *           "Wed, 17 Jul 2024 22:30:16 GMT",
-         *           "Thu, 18 Jul 2024 22:30:16 GMT"
-         *         ],
-         *         "quantities": [
-         *           10,
-         *           20,
-         *           0
-         *         ]
-         *       },
-         *       "colocate_with": [
-         *         "cont_123"
-         *       ],
-         *       "cluster_id": "clus_123",
-         *       "state": "Active"
-         *     } */
-        ActiveContract: {
-            /** @enum {string} */
-            object: "contract";
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            status: "active";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            shape: components["schemas"]["Shape"];
-            colocate_with?: string[];
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            cluster_id?: string;
-            /** @enum {string} */
-            state: "Upcoming" | "Expired" | "Active";
-        };
-        /** @example {
-         *       "object": "contract",
-         *       "status": "pending",
-         *       "id": "cont_1234"
-         *     } */
-        PendingContract: {
-            /** @enum {string} */
-            object: "contract";
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            status: "pending";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-        };
-        KubernetesCluster: {
-            /**
-             * @example kubernetes_cluster
-             * @enum {string}
-             */
-            object: "kubernetes_cluster";
-            /** @description The Kubernetes API URL for the cluster */
-            kubernetes_api_url?: string;
-            /** @description Unique name of the cluster */
-            name: string;
-            /** @description Namespace in format sf-<account_id> */
-            kubernetes_namespace: string;
-            /** @description The CA certificate for the cluster */
-            kubernetes_ca_cert?: string;
-            contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-        };
-        NotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example not_found
-             * @enum {string}
-             */
-            code: "not_found";
-            /** @example Not found. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidRequestError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example invalid_request
-             * @enum {string}
-             */
-            code: "invalid_request";
-            /** @example Invalid request */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        NotAuthenticatedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example not_authenticated
-             * @enum {string}
-             */
-            code: "not_authenticated";
-            /** @example Not authenticated, did you pass an auth token? */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InternalServerError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example internal_server
-             * @enum {string}
-             */
-            code: "internal_server";
-            /** @example An unknown error has occurred. Our engineers have been notified. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        Account: {
-            /**
-             * @example account
-             * @enum {string}
-             */
-            object: "account";
-            /** @example acc_123 */
-            id: string;
-            /**
-             * @example user
-             * @enum {string}
-             */
-            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
-            /** @example true */
-            can_buy: boolean;
-            /** @example false */
-            can_sell: boolean;
-        };
-        AccountNotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example account.not_found
-             * @enum {string}
-             */
-            code: "account.not_found";
-            /** @example Account not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        PriceHistoryItem: {
-            /** @enum {string} */
-            object: "price-history-item";
-            /**
-             * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-19T05:00:00.000Z
-             */
-            period_start: string;
-            /**
-             * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-20T04:59:59.999Z
-             */
-            period_end: string;
-            /** @enum {boolean} */
-            no_data: false;
-            gpu_hour: {
-                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                min: number;
-                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                max: number;
-                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                avg: number;
-            };
-        } | {
-            /** @enum {string} */
-            object: "price-history-item";
-            /**
-             * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-19T05:00:00.000Z
-             */
-            period_start: string;
-            /**
-             * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-20T04:59:59.999Z
-             */
-            period_end: string;
-            /** @enum {boolean} */
-            no_data: true;
-        };
-        PriceRequestTooFarInPastError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example price.historical_price_request_too_far_in_past
-             * @enum {string}
-             */
-            code: "price.historical_price_request_too_far_in_past";
-            /** @example Historical price request too far in past */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        /** @description In this strategy, the procurement will buy compute on any cluster, with no guarantees about colocation whatsoever. */
-        AnywhereColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "anywhere";
-        };
-        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. If you scale the procurement down to 0, and then scale back up, the procurement is not guaranteed to land on the same cluster it was on before. */
-        ColocateColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "colocate";
-        };
-        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. However, once the first reservation begins, the procurement will always land on that specific cluster, even if you scale down to 0 and back up again. */
-        ColocatePinnedColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "colocate-pinned";
-        };
-        /** @description In this strategy, the procurement will always buy compute on the given cluster. */
-        PinnedColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "pinned";
-            cluster_name: string;
-        };
-        Procurement: {
-            /** @enum {string} */
-            object: "procurement";
-            id: string;
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @enum {string}
-             */
-            status: "active" | "disabled";
-            /** @description The desired number of nodes the procurement will buy or sell */
-            desired_quantity: number;
-            /**
-             * @description The maximum price, in cents per GPU per hour that the procurement will buy at when extending or scaling up. If the market price goes higher than this, the procurement will not buy compute. Note that this is a *maximum* - the procurement will always try to buy at the lowest price available.
-             * @default 250
-             */
-            buy_limit_price_per_gpu_hour: number;
-            /**
-             * @description The minimum price, in cents per GPU per hour that the procurement will sell at when scaling down. If the market price dips below this price, the procurement will not sell compute when scaling down.
-             * @default 25
-             */
-            sell_limit_price_per_gpu_hour: number;
-            /**
-             * @description The minimum amount of time, in minutes, that the procurement should reserve up-front at any point in time. The procurement will buy more compute if the remaining time is less than this threshold.
-             * @default 60
-             */
-            horizon: number;
-            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
-        };
-        ProcurementNotAuthenticatedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.not_authenticated
-             * @enum {string}
-             */
-            code: "procurement.not_authenticated";
-            /** @example Authorization is needed to access procurements */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementNotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.not_found
-             * @enum {string}
-             */
-            code: "procurement.not_found";
-            /** @example Procurement not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementUpdate: {
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @enum {string}
-             */
-            status?: "active" | "disabled";
-            /** @description The instance type. */
-            instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-            desired_quantity?: number;
-            buy_limit_price_per_gpu_hour?: number;
-            sell_limit_price_per_gpu_hour?: number;
-            horizon?: number;
-        };
-        ProcurementInvalidColocateOnRestartError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.invalid_colocate_on_restart
-             * @enum {string}
-             */
-            code: "procurement.invalid_colocate_on_restart";
-            /** @example If `colocate_on_restart` is `true`, `colocate` cannot be `false` */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementInvalidColocateOnClusterError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.invalid_colocate_on_cluster
-             * @enum {string}
-             */
-            code: "procurement.invalid_colocate_on_cluster";
-            /** @example If `colocate_on_cluster` is specified, neither `colocate` nor `colocate_on_restart` can be `false` */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementColocateOnClusterNotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.colocate_on_cluster_not_found
-             * @enum {string}
-             */
-            code: "procurement.colocate_on_cluster_not_found";
-            /** @example Cluster `cluster_name` not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementCreation: {
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @default active
-             * @enum {string}
-             */
-            status: "active" | "disabled";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            desired_quantity: number;
-            /** @default 250 */
-            buy_limit_price_per_gpu_hour: number;
-            /** @default 25 */
-            sell_limit_price_per_gpu_hour: number;
-            /** @default 60 */
-            horizon: number;
-            /** @default {
-             *       "type": "colocate-pinned"
-             *     } */
-            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
-        };
-        Token: {
-            /**
-             * @description The type of object
-             * @enum {string}
-             */
-            object: "token";
-            id: string;
-            /** @description Only available after creation */
-            token?: string;
-            /** @description Name of the token. */
-            name: string | null;
-            /** @description Description of the token. */
-            description: string | null;
-            is_sandbox: boolean;
-            /** @description ISO 8601 date string of when token expires (in UTC). */
-            last_active_at: string | null;
-            /** @description ISO 8601 date string of when token expires (in UTC). */
-            expires_at: string;
-            /** @description ISO 8601 date string of when token was created (in UTC). */
-            created_at: string;
-            /** @enum {string|null} */
-            origin_client: "cli" | "web" | "manual" | null;
-            /** @description Whether the token was generated by the system & is being used in the background, or whether a user explicitly created it for their own use. */
-            is_system: boolean;
-        };
-        ListTokenResponse: {
-            data: components["schemas"]["Token"][];
-            has_more: boolean;
-            /**
-             * @example list
-             * @enum {string}
-             */
-            object: "list";
-        };
-        InvalidTokenExpirationDuration: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example token.invalid_token_expiration_duration
-             * @enum {string}
-             */
-            code: "token.invalid_token_expiration_duration";
-            /** @example Invalid token expiration duration */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        MaxTokenLimitReached: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example token.max_token_limit_reached
-             * @enum {string}
-             */
-            code: "token.max_token_limit_reached";
-            /** @example Max token limit reached */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        AccountFrozenError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example account.frozen
-             * @enum {string}
-             */
-            code: "account.frozen";
-            /** @example Account is frozen */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidTokenCreateOriginClient: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example token.invalid_token_create_origin_client
-             * @enum {string}
-             */
-            code: "token.invalid_token_create_origin_client";
-            /** @example Invalid token create origin client */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        TokenNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example token.not_found
-             * @enum {string}
-             */
-            code: "token.not_found";
-            /** @example Token not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
+        amount: number;
         /**
-         * @description Whether the transaction is incoming to or outgoing from the account.
+         * @example usd
          * @enum {string}
          */
-        TransactionDirection: "incoming" | "outgoing";
-        /**
-         * @description The current status of a transaction.
-         * @enum {string}
-         */
-        TransactionStatus: "accepted" | "rejected";
-        /**
-         * @description The kind of account involved in the transaction. Each user has one account of each account kind. The account "primary" is the main one used for buy/sell on the platform.
-         * @enum {string}
-         */
-        AccountKind: "primary" | "capital" | "withdrawal_reserve" | "fulfillment_escrow" | "delivery_fee_escrow";
-        /**
-         * @description A transaction representing a movement of funds
-         * @example {
-         *       "id": "tx_1234567890-4",
-         *       "timestamp": "2024-03-15T00:30:00.000Z",
-         *       "direction": "outgoing",
-         *       "status": "accepted",
-         *       "amount": 5000,
-         *       "account_kind": "primary",
-         *       "balance_before": 70000,
-         *       "balance_after": 65000,
-         *       "metadata": {
-         *         "type": "buy",
-         *         "start_time": "2025-05-20T03:26:22.796Z",
-         *         "end_time": "2025-05-20T05:26:22.796Z",
-         *         "quantity": 2,
-         *         "order_id": "ordr_34905N",
-         *         "instance_type_requirements": {
-         *           "accelerator_types": [
-         *             "H100"
-         *           ],
-         *           "interconnect_types": [
-         *             "Infiniband"
-         *           ],
-         *           "regions": [
-         *             "NorthAmerica"
-         *           ],
-         *           "delivery_type": "K8sNamespace"
-         *         }
-         *       }
-         *     }
-         */
-        Transaction: {
-            /** @description Unique identifier for the transaction */
-            id: string;
-            /**
-             * Format: date-time
-             * @description When the money movement occurred within SFCs system
-             */
-            timestamp: string;
-            direction: components["schemas"]["TransactionDirection"];
-            status: components["schemas"]["TransactionStatus"];
-            /** @description Transaction amount in cents */
-            amount: number;
-            account_kind: components["schemas"]["AccountKind"];
-            /** @description Account balance before transaction in cents */
-            balance_before: number;
-            /** @description Account balance after transaction in cents */
-            balance_after: number;
-            /** @description Additional transaction-specific details */
-            metadata: {
-                /** @enum {string} */
-                type: "buy";
-                /** @description Requirements specified for the buy order */
-                instance_type_requirements: {
-                    /** @description List of allowed accelerator types. */
-                    accelerator_types?: ("H100" | "H200")[];
-                    /** @description List of allowed interconnect types. */
-                    interconnect_types?: ("Infiniband" | "None")[];
-                    /** @description List of allowed regions. */
-                    regions?: ("NorthAmerica" | "AsiaPacific" | "EuropeMiddleEastAfrica")[];
-                    /**
-                     * @description Delivery method.
-                     * @enum {string}
-                     */
-                    delivery_type: "K8sNamespace" | "VM";
-                };
-                /** @description Quantity requested in the buy order, in number of nodes (8 gpus) */
-                quantity: number;
-                /**
-                 * Format: date-time
-                 * @description The buy orders requested start time of the compute
-                 */
-                start_time: string;
-                /**
-                 * Format: date-time
-                 * @description The buy orders requested end time of compute
-                 */
-                end_time: string;
-                /** @description An external ID with prefix and alphanumeric string with underscores */
-                order_id: string;
-            } | {
-                /** @enum {string} */
-                type: "sell";
-                /** @description Quantity that was requested to sell, In number of nodes (8 gpus) */
-                quantity: number;
-                /**
-                 * Format: date-time
-                 * @description The orders requested start time of the compute to sell
-                 */
-                start_time: string;
-                /**
-                 * Format: date-time
-                 * @description The orders requested end time of compute to sell
-                 */
-                end_time: string;
-                /** @description The sell order that was executed. */
-                order_id: string;
-                /** @description The backing contract that was sold from. */
-                backing_contract_id: string;
-            } | {
-                /** @enum {string} */
-                type: "transfer";
-            } | {
-                /** @enum {string} */
-                type: "error";
-                /** @description Best effort type of the transaction without additional metadata, but may be 'unknown' */
-                inner_type: string;
-                /** @description message of what went wrong */
-                message?: unknown;
-            } | {
-                /** @enum {string} */
-                type: "instant_deposit";
-                /**
-                 * Format: date-time
-                 * @description The time the bank involved marked marked this transaction as completed.
-                 */
-                completed_at: string;
-                /** @description The last 4 digits of the card that was used to perform the payment. */
-                card_last4: string;
-                /** @description Brand of card used for payment. */
-                card_brand: string;
-                /** @description The funding type of the card. */
-                card_funding: string;
-                /**
-                 * Format: uri
-                 * @description URL for the receipt if available.
-                 * @example https://dashboard.stripe.com/receipts/payment/...
-                 */
-                receipt_url?: string;
-            } | {
-                /** @enum {string} */
-                type: "deposit_ach";
-                /**
-                 * Format: date-time
-                 * @description The date the bank withdrawal was initiated.
-                 */
-                date_initiated: string;
-                /**
-                 * Format: date-time
-                 * @description The date the bank withdrawal was cancelled, if it was cancelled.
-                 */
-                date_cancelled: string | null;
-                /**
-                 * Format: date-time
-                 * @description The date the bank withdrawal settled by the bank, if it was cancelled. This will in most cases be close to the time SFC processed the transaction.
-                 */
-                date_settled: string | null;
-                /** @description A short description of the account. */
-                account_description: string;
-                /** @description The last 4 digits of the bank account number. */
-                bank_account_last4: string;
-            } | {
-                /** @enum {string} */
-                type: "withdrawal_bank";
-                /**
-                 * Format: date-time
-                 * @description The date this bank withdrawal was approved.
-                 */
-                approved_at: string;
-                /** @description A short description of the account. */
-                account_description: string;
-                /** @description The last 4 digits of the bank account number. */
-                bank_account_last4: string;
-            } | {
-                /** @enum {string} */
-                type: "refund";
-                /**
-                 * Format: date-time
-                 * @description Start time of experienced downtime.
-                 */
-                start_time: string;
-                /**
-                 * Format: date-time
-                 * @description End time of experienced downtime.
-                 */
-                end_time: string;
-                /** @description In number of nodes (8 gpus) affected during this period. */
-                quantity: number;
-                /** @description The index rate per GPU, in cents, used to calculate the refund amount. */
-                refund_cents_per_gpu_hour: number;
-                /** @description Downtime report ID that resulted in this refund being issued. */
-                report_id: string;
-                /**
-                 * Format: date-time
-                 * @description The time at which SFC approved the refund.
-                 */
-                issue_date: string;
-            } | {
-                /** @enum {string} */
-                type: "admin_ledger_transfer";
-            } | {
-                /** @enum {string} */
-                type: "fulfillment_escrow_release";
-            } | {
-                /** @enum {string} */
-                type: "promotional_credit";
-            } | {
-                /** @enum {string} */
-                type: "delivery_fees_collected";
-            };
+        currency: "usd";
+      };
+    };
+    /** @description A shape that describes the distribution of the contract's size over time. */
+    Shape: {
+      intervals: string[];
+      /** @example [
+       *       10,
+       *       20,
+       *       0
+       *     ] */
+      quantities: number[];
+    };
+    /** @example {
+     *       "object": "contract",
+     *       "status": "active",
+     *       "id": "cont_122",
+     *       "created_at": "2024-07-15T22:30:17.426Z",
+     *       "instance_type": "h200ki",
+     *       "shape": {
+     *         "intervals": [
+     *           "Tue, 16 Jul 2024 22:30:16 GMT",
+     *           "Wed, 17 Jul 2024 22:30:16 GMT",
+     *           "Thu, 18 Jul 2024 22:30:16 GMT"
+     *         ],
+     *         "quantities": [
+     *           10,
+     *           20,
+     *           0
+     *         ]
+     *       },
+     *       "colocate_with": [
+     *         "cont_123"
+     *       ],
+     *       "cluster_id": "clus_123",
+     *       "state": "Active"
+     *     } */
+    ActiveContract: {
+      /** @enum {string} */
+      object: "contract";
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      status: "active";
+      /** @description An external ID with prefix and alphanumeric string with underscores */
+      id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** @description The instance type. */
+      instance_type: ("h100i" | "h100v" | "h200ki") | string;
+      shape: components["schemas"]["Shape"];
+      colocate_with?: string[];
+      /** @description An external ID with prefix and alphanumeric string with underscores */
+      cluster_id?: string;
+      /** @enum {string} */
+      state: "Upcoming" | "Expired" | "Active";
+    };
+    /** @example {
+     *       "object": "contract",
+     *       "status": "pending",
+     *       "id": "cont_1234"
+     *     } */
+    PendingContract: {
+      /** @enum {string} */
+      object: "contract";
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      status: "pending";
+      /** @description An external ID with prefix and alphanumeric string with underscores */
+      id: string;
+    };
+    KubernetesCluster: {
+      /**
+       * @example kubernetes_cluster
+       * @enum {string}
+       */
+      object: "kubernetes_cluster";
+      /** @description The Kubernetes API URL for the cluster */
+      kubernetes_api_url?: string;
+      /** @description Unique name of the cluster */
+      name: string;
+      /** @description Namespace in format sf-<account_id> */
+      kubernetes_namespace: string;
+      /** @description The CA certificate for the cluster */
+      kubernetes_ca_cert?: string;
+      contract?:
+        | components["schemas"]["ActiveContract"]
+        | components["schemas"]["PendingContract"];
+    };
+    NotFoundError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example not_found
+       * @enum {string}
+       */
+      code: "not_found";
+      /** @example Not found. */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    InvalidRequestError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example invalid_request
+       * @enum {string}
+       */
+      code: "invalid_request";
+      /** @example Invalid request */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    NotAuthenticatedError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example not_authenticated
+       * @enum {string}
+       */
+      code: "not_authenticated";
+      /** @example Not authenticated, did you pass an auth token? */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    InternalServerError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example internal_server
+       * @enum {string}
+       */
+      code: "internal_server";
+      /** @example An unknown error has occurred. Our engineers have been notified. */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    Account: {
+      /**
+       * @example account
+       * @enum {string}
+       */
+      object: "account";
+      /** @example acc_123 */
+      id: string;
+      /**
+       * @example user
+       * @enum {string}
+       */
+      role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+      /** @example true */
+      can_buy: boolean;
+      /** @example false */
+      can_sell: boolean;
+    };
+    AccountNotFoundError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example account.not_found
+       * @enum {string}
+       */
+      code: "account.not_found";
+      /** @example Account not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    PriceHistoryItem:
+      | {
+          /** @enum {string} */
+          object: "price-history-item";
+          /**
+           * @description ISO 8601 datetime marking the start of the period.
+           * @example 2025-04-19T05:00:00.000Z
+           */
+          period_start: string;
+          /**
+           * @description ISO 8601 datetime marking the end of the period.
+           * @example 2025-04-20T04:59:59.999Z
+           */
+          period_end: string;
+          /** @enum {boolean} */
+          no_data: false;
+          gpu_hour: {
+            /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+            min: number;
+            /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+            max: number;
+            /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+            avg: number;
+          };
+        }
+      | {
+          /** @enum {string} */
+          object: "price-history-item";
+          /**
+           * @description ISO 8601 datetime marking the start of the period.
+           * @example 2025-04-19T05:00:00.000Z
+           */
+          period_start: string;
+          /**
+           * @description ISO 8601 datetime marking the end of the period.
+           * @example 2025-04-20T04:59:59.999Z
+           */
+          period_end: string;
+          /** @enum {boolean} */
+          no_data: true;
         };
-        /**
-         * @description List of transactions for an account
-         * @example {
-         *       "object": "transactions",
-         *       "transactions": [
-         *         {
-         *           "id": "tx_1234567890-4",
-         *           "timestamp": "2024-03-15T00:30:00.000Z",
-         *           "direction": "outgoing",
-         *           "status": "accepted",
-         *           "amount": 5000,
-         *           "account_kind": "primary",
-         *           "balance_before": 70000,
-         *           "balance_after": 65000,
-         *           "metadata": {
-         *             "type": "buy",
-         *             "start_time": "2025-05-20T03:26:22.796Z",
-         *             "end_time": "2025-05-20T05:26:22.796Z",
-         *             "quantity": 2,
-         *             "order_id": "ordr_34Az95N",
-         *             "instance_type_requirements": {
-         *               "accelerator_types": [
-         *                 "H100"
-         *               ],
-         *               "interconnect_types": [
-         *                 "Infiniband"
-         *               ],
-         *               "regions": [
-         *                 "NorthAmerica"
-         *               ],
-         *               "delivery_type": "K8sNamespace"
-         *             }
-         *           }
-         *         }
-         *       ],
-         *       "pagination": {
-         *         "has_more": true,
-         *         "count": 1,
-         *         "oldest_timestamp": "2024-03-15T00:30:00.000Z",
-         *         "newest_timestamp": "2024-03-15T00:30:00.000Z"
-         *       }
-         *     }
-         */
-        AccountTransactions: {
-            /**
-             * @description The type of the response object
-             * @example transactions
-             * @enum {string}
-             */
-            object: "transactions";
-            /** @description Transactions for all accounts (see account kind) associated with this user. */
-            transactions: components["schemas"]["Transaction"][];
-            /** @description Pagination information */
-            pagination: {
-                /**
-                 * @description Whether there are more transactions available
-                 * @example true
-                 */
-                has_more: boolean;
-                /**
-                 * @description Number of transactions returned
-                 * @example 20
-                 */
-                count: number;
-                /**
-                 * Format: date-time
-                 * @description Timestamp of the oldest transaction returned, useful for pagination
-                 * @example 2024-03-15T00:30:00.000Z
-                 */
-                oldest_timestamp: string | null;
-                /**
-                 * Format: date-time
-                 * @description Timestamp of the newest transaction returned, useful for pagination
-                 * @example 2024-03-15T00:30:00.000Z
-                 */
-                newest_timestamp: string | null;
-            };
-        };
-        UnauthorizedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example unauthorized
-             * @enum {string}
-             */
-            code: "unauthorized";
-            /** @example Unauthorized. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidDateRange: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example quote.invalid_date_range
-             * @enum {string}
-             */
-            code: "quote.invalid_date_range";
-            /** @example Invalid date range */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderResponse: {
+    PriceRequestTooFarInPastError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example price.historical_price_request_too_far_in_past
+       * @enum {string}
+       */
+      code: "price.historical_price_request_too_far_in_past";
+      /** @example Historical price request too far in past */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    /** @description In this strategy, the procurement will buy compute on any cluster, with no guarantees about colocation whatsoever. */
+    AnywhereColocationStrategy: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "anywhere";
+    };
+    /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. If you scale the procurement down to 0, and then scale back up, the procurement is not guaranteed to land on the same cluster it was on before. */
+    ColocateColocationStrategy: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "colocate";
+    };
+    /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. However, once the first reservation begins, the procurement will always land on that specific cluster, even if you scale down to 0 and back up again. */
+    ColocatePinnedColocationStrategy: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "colocate-pinned";
+    };
+    /** @description In this strategy, the procurement will always buy compute on the given cluster. */
+    PinnedColocationStrategy: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "pinned";
+      cluster_name: string;
+    };
+    Procurement: {
+      /** @enum {string} */
+      object: "procurement";
+      id: string;
+      /** @description The instance type. */
+      instance_type: ("h100i" | "h100v" | "h200ki") | string;
+      /**
+       * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
+       * @enum {string}
+       */
+      status: "active" | "disabled";
+      /** @description The desired number of nodes the procurement will buy or sell */
+      desired_quantity: number;
+      /**
+       * @description The maximum price, in cents per GPU per hour that the procurement will buy at when extending or scaling up. If the market price goes higher than this, the procurement will not buy compute. Note that this is a *maximum* - the procurement will always try to buy at the lowest price available.
+       * @default 250
+       */
+      buy_limit_price_per_gpu_hour: number;
+      /**
+       * @description The minimum price, in cents per GPU per hour that the procurement will sell at when scaling down. If the market price dips below this price, the procurement will not sell compute when scaling down.
+       * @default 25
+       */
+      sell_limit_price_per_gpu_hour: number;
+      /**
+       * @description The minimum amount of time, in minutes, that the procurement should reserve up-front at any point in time. The procurement will buy more compute if the remaining time is less than this threshold.
+       * @default 60
+       */
+      horizon: number;
+      colocation_strategy:
+        | components["schemas"]["AnywhereColocationStrategy"]
+        | components["schemas"]["ColocateColocationStrategy"]
+        | components["schemas"]["ColocatePinnedColocationStrategy"]
+        | components["schemas"]["PinnedColocationStrategy"];
+    };
+    ProcurementNotAuthenticatedError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example procurement.not_authenticated
+       * @enum {string}
+       */
+      code: "procurement.not_authenticated";
+      /** @example Authorization is needed to access procurements */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ProcurementNotFoundError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example procurement.not_found
+       * @enum {string}
+       */
+      code: "procurement.not_found";
+      /** @example Procurement not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ProcurementUpdate: {
+      /**
+       * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
+       * @enum {string}
+       */
+      status?: "active" | "disabled";
+      /** @description The instance type. */
+      instance_type?: ("h100i" | "h100v" | "h200ki") | string;
+      desired_quantity?: number;
+      buy_limit_price_per_gpu_hour?: number;
+      sell_limit_price_per_gpu_hour?: number;
+      horizon?: number;
+    };
+    ProcurementInvalidColocateOnRestartError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example procurement.invalid_colocate_on_restart
+       * @enum {string}
+       */
+      code: "procurement.invalid_colocate_on_restart";
+      /** @example If `colocate_on_restart` is `true`, `colocate` cannot be `false` */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ProcurementInvalidColocateOnClusterError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example procurement.invalid_colocate_on_cluster
+       * @enum {string}
+       */
+      code: "procurement.invalid_colocate_on_cluster";
+      /** @example If `colocate_on_cluster` is specified, neither `colocate` nor `colocate_on_restart` can be `false` */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ProcurementColocateOnClusterNotFoundError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example procurement.colocate_on_cluster_not_found
+       * @enum {string}
+       */
+      code: "procurement.colocate_on_cluster_not_found";
+      /** @example Cluster `cluster_name` not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ProcurementCreation: {
+      /**
+       * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
+       * @default active
+       * @enum {string}
+       */
+      status: "active" | "disabled";
+      /** @description The instance type. */
+      instance_type: ("h100i" | "h100v" | "h200ki") | string;
+      desired_quantity: number;
+      /** @default 250 */
+      buy_limit_price_per_gpu_hour: number;
+      /** @default 25 */
+      sell_limit_price_per_gpu_hour: number;
+      /** @default 60 */
+      horizon: number;
+      /** @default {
+       *       "type": "colocate-pinned"
+       *     } */
+      colocation_strategy:
+        | components["schemas"]["AnywhereColocationStrategy"]
+        | components["schemas"]["ColocateColocationStrategy"]
+        | components["schemas"]["ColocatePinnedColocationStrategy"]
+        | components["schemas"]["PinnedColocationStrategy"];
+    };
+    Token: {
+      /**
+       * @description The type of object
+       * @enum {string}
+       */
+      object: "token";
+      id: string;
+      /** @description Only available after creation */
+      token?: string;
+      /** @description Name of the token. */
+      name: string | null;
+      /** @description Description of the token. */
+      description: string | null;
+      is_sandbox: boolean;
+      /** @description ISO 8601 date string of when token expires (in UTC). */
+      last_active_at: string | null;
+      /** @description ISO 8601 date string of when token expires (in UTC). */
+      expires_at: string;
+      /** @description ISO 8601 date string of when token was created (in UTC). */
+      created_at: string;
+      /** @enum {string|null} */
+      origin_client: "cli" | "web" | "manual" | null;
+      /** @description Whether the token was generated by the system & is being used in the background, or whether a user explicitly created it for their own use. */
+      is_system: boolean;
+    };
+    ListTokenResponse: {
+      data: components["schemas"]["Token"][];
+      has_more: boolean;
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+    };
+    InvalidTokenExpirationDuration: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example token.invalid_token_expiration_duration
+       * @enum {string}
+       */
+      code: "token.invalid_token_expiration_duration";
+      /** @example Invalid token expiration duration */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    MaxTokenLimitReached: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example token.max_token_limit_reached
+       * @enum {string}
+       */
+      code: "token.max_token_limit_reached";
+      /** @example Max token limit reached */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    AccountFrozenError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example account.frozen
+       * @enum {string}
+       */
+      code: "account.frozen";
+      /** @example Account is frozen */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    InvalidTokenCreateOriginClient: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example token.invalid_token_create_origin_client
+       * @enum {string}
+       */
+      code: "token.invalid_token_create_origin_client";
+      /** @example Invalid token create origin client */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    TokenNotFound: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example token.not_found
+       * @enum {string}
+       */
+      code: "token.not_found";
+      /** @example Token not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    /**
+     * @description Whether the transaction is incoming to or outgoing from the account.
+     * @enum {string}
+     */
+    TransactionDirection: "incoming" | "outgoing";
+    /**
+     * @description The current status of a transaction.
+     * @enum {string}
+     */
+    TransactionStatus: "accepted" | "rejected";
+    /**
+     * @description The kind of account involved in the transaction. Each user has one account of each account kind. The account "primary" is the main one used for buy/sell on the platform.
+     * @enum {string}
+     */
+    AccountKind:
+      | "primary"
+      | "capital"
+      | "withdrawal_reserve"
+      | "fulfillment_escrow"
+      | "delivery_fee_escrow";
+    /**
+     * @description A transaction representing a movement of funds
+     * @example {
+     *       "id": "tx_1234567890-4",
+     *       "timestamp": "2024-03-15T00:30:00.000Z",
+     *       "direction": "outgoing",
+     *       "status": "accepted",
+     *       "amount": 5000,
+     *       "account_kind": "primary",
+     *       "balance_before": 70000,
+     *       "balance_after": 65000,
+     *       "metadata": {
+     *         "type": "buy",
+     *         "start_time": "2025-05-20T03:26:22.796Z",
+     *         "end_time": "2025-05-20T05:26:22.796Z",
+     *         "quantity": 2,
+     *         "order_id": "ordr_34905N",
+     *         "instance_type_requirements": {
+     *           "accelerator_types": [
+     *             "H100"
+     *           ],
+     *           "interconnect_types": [
+     *             "Infiniband"
+     *           ],
+     *           "regions": [
+     *             "NorthAmerica"
+     *           ],
+     *           "delivery_type": "K8sNamespace"
+     *         }
+     *       }
+     *     }
+     */
+    Transaction: {
+      /** @description Unique identifier for the transaction */
+      id: string;
+      /**
+       * Format: date-time
+       * @description When the money movement occurred within SFCs system
+       */
+      timestamp: string;
+      direction: components["schemas"]["TransactionDirection"];
+      status: components["schemas"]["TransactionStatus"];
+      /** @description Transaction amount in cents */
+      amount: number;
+      account_kind: components["schemas"]["AccountKind"];
+      /** @description Account balance before transaction in cents */
+      balance_before: number;
+      /** @description Account balance after transaction in cents */
+      balance_after: number;
+      /** @description Additional transaction-specific details */
+      metadata:
+        | {
             /** @enum {string} */
-            object: "order";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-            /**
-             * @description Side of the order (buy/sell)
-             * @enum {string}
-             */
-            side: "buy" | "sell";
-            /**
-             * @description Current status of the order
-             * @enum {string}
-             */
-            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired" | "partially_filled";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
+            type: "buy";
+            /** @description Requirements specified for the buy order */
+            instance_type_requirements: {
+              /** @description List of allowed accelerator types. */
+              accelerator_types?: ("H100" | "H200")[];
+              /** @description List of allowed interconnect types. */
+              interconnect_types?: ("Infiniband" | "None")[];
+              /** @description List of allowed regions. */
+              regions?: (
+                | "NorthAmerica"
+                | "AsiaPacific"
+                | "EuropeMiddleEastAfrica"
+              )[];
+              /**
+               * @description Delivery method.
+               * @enum {string}
+               */
+              delivery_type: "K8sNamespace" | "VM";
+            };
+            /** @description Quantity requested in the buy order, in number of nodes (8 gpus) */
             quantity: number;
             /**
              * Format: date-time
-             * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-05-20T01:26:22.670Z
+             * @description The buy orders requested start time of the compute
              */
-            start_at: string;
+            start_time: string;
             /**
              * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             * @description The buy orders requested end time of compute
              */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            executed: boolean;
-            executed_at?: string;
-            /** @description Execution price in cents (1 = $0.01) */
-            execution_price?: number | null;
-            cancelled: boolean;
-            cancelled_at?: string;
-            colocate_with?: string[];
-            created_at: string;
-            rejected: boolean;
-            rejected_reason?: string;
-            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
-            idempotency_key?: string;
-            cluster?: string;
-        };
-        UnauthorizedSeller: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.unauthorized_seller
-             * @enum {string}
-             */
-            code: "order.unauthorized_seller";
-            /** @example Account unauthorized to place sell orders */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.not_found
-             * @enum {string}
-             */
-            code: "order.not_found";
-            /** @example Order not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        AlreadyCancelled: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.already_cancelled
-             * @enum {string}
-             */
-            code: "order.already_cancelled";
-            /** @example Order already cancelled */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        TradingEngineIsHaltedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example trading_engine.is_halted
-             * @enum {string}
-             */
-            code: "trading_engine.is_halted";
-            /** @example Trading engine is halted */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderPendingResponse: {
-            /** @enum {string} */
-            object: "order";
+            end_time: string;
             /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
+            order_id: string;
+          }
+        | {
             /** @enum {string} */
-            status: "pending";
-            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
-            idempotency_key?: string;
-        };
-        ContractNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.contract_not_found
-             * @enum {string}
-             */
-            code: "order.contract_not_found";
-            /** @example Contract not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidInstanceType: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.invalid_instance_type
-             * @enum {string}
-             */
-            code: "order.invalid_instance_type";
-            /** @example Invalid instance type */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ClusterNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.cluster_not_found
-             * @enum {string}
-             */
-            code: "order.cluster_not_found";
-            /** @example Cluster not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        PostOrderRequest: {
-            /** @enum {string} */
-            side: "buy";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
+            type: "sell";
+            /** @description Quantity that was requested to sell, In number of nodes (8 gpus) */
             quantity: number;
-            start_at: string | "NOW";
             /**
              * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             * @description The orders requested start time of the compute to sell
              */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            colocate_with?: string[];
-            /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
-            cluster?: string;
-        } | {
-            /** @enum {string} */
-            side: "sell";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            contract_id: string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
-            quantity: number;
-            start_at: string | "NOW";
+            start_time: string;
             /**
              * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+             * @description The orders requested end time of compute to sell
              */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            reprice?: {
+            end_time: string;
+            /** @description The sell order that was executed. */
+            order_id: string;
+            /** @description The backing contract that was sold from. */
+            backing_contract_id: string;
+          }
+        | {
+            /** @enum {string} */
+            type: "transfer";
+          }
+        | {
+            /** @enum {string} */
+            type: "error";
+            /** @description Best effort type of the transaction without additional metadata, but may be 'unknown' */
+            inner_type: string;
+            /** @description message of what went wrong */
+            message?: unknown;
+          }
+        | {
+            /** @enum {string} */
+            type: "instant_deposit";
+            /**
+             * Format: date-time
+             * @description The time the bank involved marked marked this transaction as completed.
+             */
+            completed_at: string;
+            /** @description The last 4 digits of the card that was used to perform the payment. */
+            card_last4: string;
+            /** @description Brand of card used for payment. */
+            card_brand: string;
+            /** @description The funding type of the card. */
+            card_funding: string;
+            /**
+             * Format: uri
+             * @description URL for the receipt if available.
+             * @example https://dashboard.stripe.com/receipts/payment/...
+             */
+            receipt_url?: string;
+          }
+        | {
+            /** @enum {string} */
+            type: "deposit_ach";
+            /**
+             * Format: date-time
+             * @description The date the bank withdrawal was initiated.
+             */
+            date_initiated: string;
+            /**
+             * Format: date-time
+             * @description The date the bank withdrawal was cancelled, if it was cancelled.
+             */
+            date_cancelled: string | null;
+            /**
+             * Format: date-time
+             * @description The date the bank withdrawal settled by the bank, if it was cancelled. This will in most cases be close to the time SFC processed the transaction.
+             */
+            date_settled: string | null;
+            /** @description A short description of the account. */
+            account_description: string;
+            /** @description The last 4 digits of the bank account number. */
+            bank_account_last4: string;
+          }
+        | {
+            /** @enum {string} */
+            type: "withdrawal_bank";
+            /**
+             * Format: date-time
+             * @description The date this bank withdrawal was approved.
+             */
+            approved_at: string;
+            /** @description A short description of the account. */
+            account_description: string;
+            /** @description The last 4 digits of the bank account number. */
+            bank_account_last4: string;
+          }
+        | {
+            /** @enum {string} */
+            type: "refund";
+            /**
+             * Format: date-time
+             * @description Start time of experienced downtime.
+             */
+            start_time: string;
+            /**
+             * Format: date-time
+             * @description End time of experienced downtime.
+             */
+            end_time: string;
+            /** @description In number of nodes (8 gpus) affected during this period. */
+            quantity: number;
+            /** @description The index rate per GPU, in cents, used to calculate the refund amount. */
+            refund_cents_per_gpu_hour: number;
+            /** @description Downtime report ID that resulted in this refund being issued. */
+            report_id: string;
+            /**
+             * Format: date-time
+             * @description The time at which SFC approved the refund.
+             */
+            issue_date: string;
+          }
+        | {
+            /** @enum {string} */
+            type: "admin_ledger_transfer";
+          }
+        | {
+            /** @enum {string} */
+            type: "fulfillment_escrow_release";
+          }
+        | {
+            /** @enum {string} */
+            type: "promotional_credit";
+          }
+        | {
+            /** @enum {string} */
+            type: "delivery_fees_collected";
+          };
+    };
+    /**
+     * @description List of transactions for an account
+     * @example {
+     *       "object": "transactions",
+     *       "transactions": [
+     *         {
+     *           "id": "tx_1234567890-4",
+     *           "timestamp": "2024-03-15T00:30:00.000Z",
+     *           "direction": "outgoing",
+     *           "status": "accepted",
+     *           "amount": 5000,
+     *           "account_kind": "primary",
+     *           "balance_before": 70000,
+     *           "balance_after": 65000,
+     *           "metadata": {
+     *             "type": "buy",
+     *             "start_time": "2025-05-20T03:26:22.796Z",
+     *             "end_time": "2025-05-20T05:26:22.796Z",
+     *             "quantity": 2,
+     *             "order_id": "ordr_34Az95N",
+     *             "instance_type_requirements": {
+     *               "accelerator_types": [
+     *                 "H100"
+     *               ],
+     *               "interconnect_types": [
+     *                 "Infiniband"
+     *               ],
+     *               "regions": [
+     *                 "NorthAmerica"
+     *               ],
+     *               "delivery_type": "K8sNamespace"
+     *             }
+     *           }
+     *         }
+     *       ],
+     *       "pagination": {
+     *         "has_more": true,
+     *         "count": 1,
+     *         "oldest_timestamp": "2024-03-15T00:30:00.000Z",
+     *         "newest_timestamp": "2024-03-15T00:30:00.000Z"
+     *       }
+     *     }
+     */
+    AccountTransactions: {
+      /**
+       * @description The type of the response object
+       * @example transactions
+       * @enum {string}
+       */
+      object: "transactions";
+      /** @description Transactions for all accounts (see account kind) associated with this user. */
+      transactions: components["schemas"]["Transaction"][];
+      /** @description Pagination information */
+      pagination: {
+        /**
+         * @description Whether there are more transactions available
+         * @example true
+         */
+        has_more: boolean;
+        /**
+         * @description Number of transactions returned
+         * @example 20
+         */
+        count: number;
+        /**
+         * Format: date-time
+         * @description Timestamp of the oldest transaction returned, useful for pagination
+         * @example 2024-03-15T00:30:00.000Z
+         */
+        oldest_timestamp: string | null;
+        /**
+         * Format: date-time
+         * @description Timestamp of the newest transaction returned, useful for pagination
+         * @example 2024-03-15T00:30:00.000Z
+         */
+        newest_timestamp: string | null;
+      };
+    };
+    UnauthorizedError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example unauthorized
+       * @enum {string}
+       */
+      code: "unauthorized";
+      /** @example Unauthorized. */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    InvalidDateRange: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example quote.invalid_date_range
+       * @enum {string}
+       */
+      code: "quote.invalid_date_range";
+      /** @example Invalid date range */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    OrderResponse: {
+      /** @enum {string} */
+      object: "order";
+      /** @description An external ID with prefix and alphanumeric string with underscores */
+      id: string;
+      /**
+       * @description Side of the order (buy/sell)
+       * @enum {string}
+       */
+      side: "buy" | "sell";
+      /**
+       * @description Current status of the order
+       * @enum {string}
+       */
+      status:
+        | "pending"
+        | "rejected"
+        | "open"
+        | "cancelled"
+        | "filled"
+        | "expired"
+        | "partially_filled";
+      /** @description The instance type. */
+      instance_type: ("h100i" | "h100v" | "h200ki") | string;
+      /**
+       * @description The number of nodes.
+       * @example 3
+       */
+      quantity: number;
+      /**
+       * Format: date-time
+       * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
+       * @example 2025-05-20T01:26:22.670Z
+       */
+      start_at: string;
+      /**
+       * Format: date-time
+       * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+       */
+      end_at: string;
+      /** @description Price in cents (1 = $0.01) */
+      price: number | null;
+      flags: {
+        /** @description If true, this will be a market order. */
+        market?: boolean;
+        /** @description If true, this is a post-only order. */
+        post_only?: boolean;
+        /** @description If true, this is an immediate-or-cancel order. */
+        ioc?: boolean;
+      };
+      executed: boolean;
+      executed_at?: string;
+      /** @description Execution price in cents (1 = $0.01) */
+      execution_price?: number | null;
+      cancelled: boolean;
+      cancelled_at?: string;
+      colocate_with?: string[];
+      created_at: string;
+      rejected: boolean;
+      rejected_reason?: string;
+      /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
+      idempotency_key?: string;
+      cluster?: string;
+    };
+    UnauthorizedSeller: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.unauthorized_seller
+       * @enum {string}
+       */
+      code: "order.unauthorized_seller";
+      /** @example Account unauthorized to place sell orders */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    OrderNotFound: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.not_found
+       * @enum {string}
+       */
+      code: "order.not_found";
+      /** @example Order not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    AlreadyCancelled: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.already_cancelled
+       * @enum {string}
+       */
+      code: "order.already_cancelled";
+      /** @example Order already cancelled */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    TradingEngineIsHaltedError: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example trading_engine.is_halted
+       * @enum {string}
+       */
+      code: "trading_engine.is_halted";
+      /** @example Trading engine is halted */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    OrderPendingResponse: {
+      /** @enum {string} */
+      object: "order";
+      /** @description An external ID with prefix and alphanumeric string with underscores */
+      id: string;
+      /** @enum {string} */
+      status: "pending";
+      /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
+      idempotency_key?: string;
+    };
+    ContractNotFound: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.contract_not_found
+       * @enum {string}
+       */
+      code: "order.contract_not_found";
+      /** @example Contract not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    InvalidInstanceType: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.invalid_instance_type
+       * @enum {string}
+       */
+      code: "order.invalid_instance_type";
+      /** @example Invalid instance type */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    ClusterNotFound: {
+      /**
+       * @example error
+       * @enum {string}
+       */
+      object: "error";
+      /**
+       * @example order.cluster_not_found
+       * @enum {string}
+       */
+      code: "order.cluster_not_found";
+      /** @example Cluster not found */
+      message?: string;
+      /** @example {} */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    PostOrderRequest:
+      | {
+          /** @enum {string} */
+          side: "buy";
+          /** @description The instance type. */
+          instance_type: ("h100i" | "h100v" | "h200ki") | string;
+          /**
+           * @description The number of nodes.
+           * @example 3
+           */
+          quantity: number;
+          start_at: string | "NOW";
+          /**
+           * Format: date-time
+           * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+           */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number | null;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          colocate_with?: string[];
+          /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
+          cluster?: string;
+        }
+      | {
+          /** @enum {string} */
+          side: "sell";
+          /** @description An external ID with prefix and alphanumeric string with underscores */
+          contract_id: string;
+          /**
+           * @description The number of nodes.
+           * @example 3
+           */
+          quantity: number;
+          start_at: string | "NOW";
+          /**
+           * Format: date-time
+           * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
+           */
+          end_at: string;
+          /** @description Price in cents (1 = $0.01) */
+          price: number | null;
+          flags?: {
+            /** @description If true, this will be a market order. */
+            market?: boolean;
+            /** @description If true, this is a post-only order. */
+            post_only?: boolean;
+            /** @description If true, this is an immediate-or-cancel order. */
+            ioc?: boolean;
+          };
+          reprice?:
+            | {
                 /**
                  * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
                  * @enum {string}
@@ -2860,7 +2966,8 @@ export interface components {
                 start_at?: string;
                 /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
                 end_at?: string;
-            } | {
+              }
+            | {
                 /**
                  * @description Adjust this order's price linearly across a given window of time.
                  * @enum {string}
@@ -2880,361 +2987,361 @@ export interface components {
                  * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
                  */
                 window_end: string;
-            };
+              };
         };
-        "frontend_server.BaseCredentialResponse": {
-            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
-            id?: string;
-            label?: string;
-            object?: string;
-            pubkey?: string;
-            username?: string;
-        };
-        "frontend_server.ClusterInfo": {
-            id?: string;
-            kubernetes_api_url?: string;
-            kubernetes_ca_cert?: string;
-            kubernetes_namespace?: string;
-            name?: string;
-            object?: string;
-        };
-        "frontend_server.CredentialResponse": {
-            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
-            cluster_type?: string;
-            encrypted_kubeconfig?: string;
-            encrypted_token?: string;
-            ephemeral_pubkey?: string;
-            id?: string;
-            label?: string;
-            nonce?: string;
-            object?: string;
-            pubkey?: string;
-            username?: string;
-        };
-        "frontend_server.DeleteResponse": {
-            deleted?: boolean;
-            id?: string;
-            object?: string;
-        };
-        "frontend_server.ListResponse": {
-            data?: components["schemas"]["frontend_server.CredentialResponse"][];
-            has_more?: boolean;
-            object?: string;
-        };
-        /** @description Credential request body */
-        "types.KubernetesCredentialBody": {
-            cluster?: string;
-            label?: string;
-            object?: string;
-            pubkey?: string;
-            username?: string;
-        };
-        GetInstancesResponse: {
-            data: components["schemas"]["VmInstance"][];
-        };
-        GetSshResponse: {
-            ssh_host_keys?: components["schemas"]["SshHostKeyInfo"][] | null;
-            ssh_hostname: string;
-            /** Format: u-int16 */
-            ssh_port: number;
-        };
-        GetUserDataResponse: {
-            script: components["schemas"]["UserData"];
-        };
-        PostReplaceRequest: {
-            vm_id: string;
-        };
-        PostReplaceResponse: {
-            replaced: string;
-            replaced_by: string;
-        };
-        PostUserDataRequest: {
-            script: components["schemas"]["UserData"];
-        };
-        PostUserDataResponse: {
-            script: components["schemas"]["UserData"];
-        };
-        SshHostKeyInfo: {
-            base64_encoded_key: string;
-            key_type: string;
-        };
-        /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
-        UserData: string | number[];
-        VmInstance: {
-            cluster_id: string;
-            current_status: string;
-            id: string;
-            instance_group_id: string;
-            last_updated_at: string;
-        };
-        VmsLogChunk: {
-            data: number[];
-            instance_id: string;
-            /** Format: u-int32 */
-            monotonic_timestamp_nano_sec: number;
-            /** Format: u-int64 */
-            monotonic_timestamp_sec: number;
-            /** @description In RFC 3339 format */
-            realtime_timestamp: string;
-            /** Format: u-int64 */
-            seqnum: number;
-        };
-        VmsLogsResponse: {
-            data: components["schemas"]["VmsLogChunk"][];
-        };
+    "frontend_server.BaseCredentialResponse": {
+      cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+      id?: string;
+      label?: string;
+      object?: string;
+      pubkey?: string;
+      username?: string;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    "frontend_server.ClusterInfo": {
+      id?: string;
+      kubernetes_api_url?: string;
+      kubernetes_ca_cert?: string;
+      kubernetes_namespace?: string;
+      name?: string;
+      object?: string;
+    };
+    "frontend_server.CredentialResponse": {
+      cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+      cluster_type?: string;
+      encrypted_kubeconfig?: string;
+      encrypted_token?: string;
+      ephemeral_pubkey?: string;
+      id?: string;
+      label?: string;
+      nonce?: string;
+      object?: string;
+      pubkey?: string;
+      username?: string;
+    };
+    "frontend_server.DeleteResponse": {
+      deleted?: boolean;
+      id?: string;
+      object?: string;
+    };
+    "frontend_server.ListResponse": {
+      data?: components["schemas"]["frontend_server.CredentialResponse"][];
+      has_more?: boolean;
+      object?: string;
+    };
+    /** @description Credential request body */
+    "types.KubernetesCredentialBody": {
+      cluster?: string;
+      label?: string;
+      object?: string;
+      pubkey?: string;
+      username?: string;
+    };
+    GetInstancesResponse: {
+      data: components["schemas"]["VmInstance"][];
+    };
+    GetSshResponse: {
+      ssh_host_keys?: components["schemas"]["SshHostKeyInfo"][] | null;
+      ssh_hostname: string;
+      /** Format: u-int16 */
+      ssh_port: number;
+    };
+    GetUserDataResponse: {
+      script: components["schemas"]["UserData"];
+    };
+    PostReplaceRequest: {
+      vm_id: string;
+    };
+    PostReplaceResponse: {
+      replaced: string;
+      replaced_by: string;
+    };
+    PostUserDataRequest: {
+      script: components["schemas"]["UserData"];
+    };
+    PostUserDataResponse: {
+      script: components["schemas"]["UserData"];
+    };
+    SshHostKeyInfo: {
+      base64_encoded_key: string;
+      key_type: string;
+    };
+    /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
+    UserData: string | number[];
+    VmInstance: {
+      cluster_id: string;
+      current_status: string;
+      id: string;
+      instance_group_id: string;
+      last_updated_at: string;
+    };
+    VmsLogChunk: {
+      data: number[];
+      instance_id: string;
+      /** Format: u-int32 */
+      monotonic_timestamp_nano_sec: number;
+      /** Format: u-int64 */
+      monotonic_timestamp_sec: number;
+      /** @description In RFC 3339 format */
+      realtime_timestamp: string;
+      /** Format: u-int64 */
+      seqnum: number;
+    };
+    VmsLogsResponse: {
+      data: components["schemas"]["VmsLogChunk"][];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    get_vms_instances: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetInstancesResponse"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  get_vms_instances: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    get_vms_logs2: {
-        parameters: {
-            query: {
-                instance_id: string;
-                before_seqnum?: number;
-                since_seqnum?: number;
-                before_realtime_timestamp?: string;
-                since_realtime_timestamp?: string;
-                order_by: "seqnum_asc" | "seqnum_desc";
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VmsLogsResponse"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": components["schemas"]["GetInstancesResponse"];
         };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    post_vms_replace: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostReplaceRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PostReplaceResponse"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  get_vms_logs2: {
+    parameters: {
+      query: {
+        instance_id: string;
+        before_seqnum?: number;
+        since_seqnum?: number;
+        before_realtime_timestamp?: string;
+        since_realtime_timestamp?: string;
+        order_by: "seqnum_asc" | "seqnum_desc";
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    get_vms_user_data: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetUserDataResponse"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": components["schemas"]["VmsLogsResponse"];
         };
+      };
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    post_vms_user_data: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostUserDataRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PostUserDataResponse"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  post_vms_replace: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    get_vms_ssh: {
-        parameters: {
-            query: {
-                vm_id: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetSshResponse"];
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PostReplaceRequest"];
+      };
     };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PostReplaceResponse"];
+        };
+      };
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_vms_user_data: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GetUserDataResponse"];
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  post_vms_user_data: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PostUserDataRequest"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PostUserDataResponse"];
+        };
+      };
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  get_vms_ssh: {
+    parameters: {
+      query: {
+        vm_id: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GetSshResponse"];
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
 }

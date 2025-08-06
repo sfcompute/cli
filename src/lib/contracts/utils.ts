@@ -35,7 +35,7 @@ export function getContractState(shape: {
 }
 
 export function getContractStateColor(
-  state: ContractState,
+  state: ContractState
 ): "green" | "gray" | "cyan" {
   switch (state) {
     case "Upcoming":

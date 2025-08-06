@@ -49,13 +49,13 @@ export async function updateProcurement({
         buy_limit_price_per_gpu_hour: pricePerGpuHourInCents,
         horizon: horizonMinutes,
       },
-    },
+    }
   );
   if (!response.ok) {
     throw new Error(
       error?.message
         ? `${error.message} (${response.status})`
-        : "Failed to update procurement",
+        : "Failed to update procurement"
     );
   }
   return data;
@@ -64,43 +64,46 @@ export async function updateProcurement({
 function useUpdateProcurements() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [results, setResults] = useState<
-    PromiseSettledResult<Procurement | undefined>[]
-  >();
+  const [results, setResults] =
+    useState<PromiseSettledResult<Procurement | undefined>[]>();
 
-  const updateProcurements = useCallback(async (ids: string[], params: {
-    horizonMinutes?: number;
-    nodesRequired?: number;
-    pricePerGpuHourInCents?: number;
-  }) => {
-    try {
-      setIsLoading(true);
-      setError(undefined);
-
-      const updatePromises = ids.map((id) =>
-        updateProcurement({
-          procurementId: id,
-          ...params,
-        })
-      );
-
-      const results = await Promise.allSettled(
-        updatePromises,
-      );
-      setResults(results);
-
-      const failures = results.filter((r) => r.status === "rejected");
-      if (failures.length > 0) {
-        setError(`Failed to update ${failures.length} procurement(s)`);
+  const updateProcurements = useCallback(
+    async (
+      ids: string[],
+      params: {
+        horizonMinutes?: number;
+        nodesRequired?: number;
+        pricePerGpuHourInCents?: number;
       }
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    ) => {
+      try {
+        setIsLoading(true);
+        setError(undefined);
+
+        const updatePromises = ids.map(id =>
+          updateProcurement({
+            procurementId: id,
+            ...params,
+          })
+        );
+
+        const results = await Promise.allSettled(updatePromises);
+        setResults(results);
+
+        const failures = results.filter(r => r.status === "rejected");
+        if (failures.length > 0) {
+          setError(`Failed to update ${failures.length} procurement(s)`);
+        }
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   return {
     isLoading,
@@ -116,15 +119,15 @@ type UpdateProcurementCommandProps = ReturnType<typeof update.opts> & {
 
 function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const { exit } = useApp();
-  const [procurements, setProcurements] = useState<
-    PromiseSettledResult<Procurement | null>[]
-  >();
+  const [procurements, setProcurements] =
+    useState<PromiseSettledResult<Procurement | null>[]>();
   const { successfulProcurements } = useMemo(() => {
     const successfulProcurements = procurements
-      ?.filter?.((p): p is PromiseFulfilledResult<Procurement> =>
-        p.status === "fulfilled" && p.value != null
+      ?.filter?.(
+        (p): p is PromiseFulfilledResult<Procurement> =>
+          p.status === "fulfilled" && p.value != null
       )
-      ?.map?.((p) => p.value);
+      ?.map?.(p => p.value);
     return { successfulProcurements };
   }, [procurements]);
   const [confirmationMessage, setConfirmationMessage] = useState<ReactNode>();
@@ -133,9 +136,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
       props.accelerators !== undefined
         ? acceleratorsToNodes(props.accelerators)
         : undefined,
-    [
-      props.accelerators,
-    ],
+    [props.accelerators]
   );
 
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
@@ -144,26 +145,30 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
     (async function init() {
       try {
         const settledResults = await Promise.allSettled(
-          props.ids.map((id) => getProcurement({ id })),
+          props.ids.map(id => getProcurement({ id }))
         );
 
         const successfullyFetched = settledResults
-          .filter((r): r is PromiseFulfilledResult<Procurement> =>
-            r.status === "fulfilled" && r.value != null
+          .filter(
+            (r): r is PromiseFulfilledResult<Procurement> =>
+              r.status === "fulfilled" && r.value != null
           )
-          .map((r) => r.value);
+          .map(r => r.value);
 
         const failedToFetch = settledResults
           .map((r, i) => [r, props.ids[i]] as const)
-          .filter((r): r is [PromiseRejectedResult, string] =>
-            r[0].status === "rejected"
-          ).map((r) =>
-            [
-              r[0].reason instanceof Error
-                ? r[0].reason.message
-                : "Unknown error",
-              r[1],
-            ] as const
+          .filter(
+            (r): r is [PromiseRejectedResult, string] =>
+              r[0].status === "rejected"
+          )
+          .map(
+            r =>
+              [
+                r[0].reason instanceof Error
+                  ? r[0].reason.message
+                  : "Unknown error",
+                r[1],
+              ] as const
           );
 
         if (successfullyFetched.length === 0) {
@@ -175,18 +180,18 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
 
         if (props.yes) {
           await updateProcurements(
-            successfullyFetched.map((p) => p.id),
+            successfullyFetched.map(p => p.id),
             {
               horizonMinutes: props.horizon,
               nodesRequired,
               pricePerGpuHourInCents: props.price,
-            },
+            }
           );
         } else {
           setConfirmationMessage(
             <Box flexDirection="column">
               {successfullyFetched?.length > 0 &&
-                successfullyFetched.map((p) => (
+                successfullyFetched.map(p => (
                   <Box key={p.id} flexDirection="column">
                     <ProcurementHeader
                       id={p.id}
@@ -196,18 +201,21 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                       key={p.id}
                       quote={false}
                       type={p.instance_type}
-                      horizonMinutes={props.horizon === p.horizon
-                        ? undefined
-                        : props.horizon}
-                      pricePerGpuHourInCents={props.price ===
-                          p.buy_limit_price_per_gpu_hour
-                        ? undefined
-                        : props.price}
-                      accelerators={props.accelerators !== undefined &&
-                          acceleratorsToNodes(props.accelerators) !==
-                            p.desired_quantity
-                        ? props.accelerators
-                        : undefined}
+                      horizonMinutes={
+                        props.horizon === p.horizon ? undefined : props.horizon
+                      }
+                      pricePerGpuHourInCents={
+                        props.price === p.buy_limit_price_per_gpu_hour
+                          ? undefined
+                          : props.price
+                      }
+                      accelerators={
+                        props.accelerators !== undefined &&
+                        acceleratorsToNodes(props.accelerators) !==
+                          p.desired_quantity
+                          ? props.accelerators
+                          : undefined
+                      }
                       update
                     />
                   </Box>
@@ -226,12 +234,12 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                   ))}
                 </>
               )}
-            </Box>,
+            </Box>
           );
         }
       } catch (err: unknown) {
         exit(
-          err instanceof Error ? err : new Error("An unknown error occurred"),
+          err instanceof Error ? err : new Error("An unknown error occurred")
         );
       }
     })();
@@ -240,25 +248,28 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const { isLoading, error, results, updateProcurements } =
     useUpdateProcurements();
 
-  const handleSubmit = useCallback((submitValue: boolean) => {
-    if (!submitValue || !successfulProcurements) {
-      exit();
-      return;
-    }
-    updateProcurements(
-      successfulProcurements.map((p) => p.id),
-      {
-        horizonMinutes: props.horizon,
-        nodesRequired,
-        pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
-      },
-    );
-  }, [
-    successfulProcurements,
-    props.horizon,
-    nodesRequired,
-    displayedPricePerGpuHourInCents,
-  ]);
+  const handleSubmit = useCallback(
+    (submitValue: boolean) => {
+      if (!submitValue || !successfulProcurements) {
+        exit();
+        return;
+      }
+      updateProcurements(
+        successfulProcurements.map(p => p.id),
+        {
+          horizonMinutes: props.horizon,
+          nodesRequired,
+          pricePerGpuHourInCents: displayedPricePerGpuHourInCents,
+        }
+      );
+    },
+    [
+      successfulProcurements,
+      props.horizon,
+      nodesRequired,
+      displayedPricePerGpuHourInCents,
+    ]
+  );
 
   if (error && !results) {
     return <Text color="red">Error: {error}</Text>;
@@ -274,16 +285,17 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   }
 
   if (results) {
-    const successfulProcurements = results.filter((
-      r,
-    ): r is PromiseFulfilledResult<Procurement> =>
-      r.status === "fulfilled" && r.value != null
-    ).map((r) => r.value);
-    const failedProcurements = results.filter((r): r is PromiseRejectedResult =>
-      r.status === "rejected"
-    ).map((r) =>
-      r.reason instanceof Error ? r.reason.message : "Unknown error"
-    );
+    const successfulProcurements = results
+      .filter(
+        (r): r is PromiseFulfilledResult<Procurement> =>
+          r.status === "fulfilled" && r.value != null
+      )
+      .map(r => r.value);
+    const failedProcurements = results
+      .filter((r): r is PromiseRejectedResult => r.status === "rejected")
+      .map(r =>
+        r.reason instanceof Error ? r.reason.message : "Unknown error"
+      );
     return (
       <Box flexDirection="column" gap={1}>
         {successfulProcurements && successfulProcurements.length > 0 && (
@@ -343,10 +355,10 @@ $ sf scale update <procurement_id...> -n 0
 
 \x1b[2m# Update the limit price of procurements to $1.50/GPU/hr\x1b[0m
 $ sf scale update <procurement_id...> -p 1.50
-`,
+`
   )
   .configureHelp({
-    optionDescription: (option) => {
+    optionDescription: option => {
       if (option.flags === "-h, --help") {
         return 'Display help for "scale update"';
       }
@@ -358,35 +370,30 @@ $ sf scale update <procurement_id...> -p 1.50
   .option(
     "-n, --accelerators <accelerators>",
     "Desired number of GPUs (0 to turn off)",
-    parseAccelerators,
+    parseAccelerators
   )
   .option(
     "-d, --horizon <horizon>",
     "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
-    parseHorizonArg,
+    parseHorizonArg
   )
   .option(
     "-p, --price <price>",
     "Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if we can't get a price estimate.",
-    parsePriceArg,
+    parsePriceArg
   )
   .option("-y, --yes", "Automatically confirm the command.")
   .action((id, options) => {
     if (Object.keys(options).length === 0) {
       console.error(
         chalk.yellow(
-          "No options provided. Please provide at least one option.\n",
-        ),
+          "No options provided. Please provide at least one option.\n"
+        )
       );
       update.help();
       return;
     }
-    render(
-      <UpdateProcurementCommand
-        {...options}
-        ids={parseIds(id)}
-      />,
-    );
+    render(<UpdateProcurementCommand {...options} ids={parseIds(id)} />);
   });
 
 export default update;

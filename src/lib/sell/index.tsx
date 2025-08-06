@@ -39,13 +39,13 @@ export function registerSell(program: Command) {
     .option("-n, --accelerators <quantity>", "Specify the number of GPUs", "8")
     .option(
       "-s, --start <start>",
-      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'",
+      "Specify the start date. Can be a date, relative time like '+1d', or the string 'NOW'"
     )
     .option("-d, --duration <duration>", "Specify the duration", "1h")
     .option(
       "-f, --flags <flags>",
       "Specify additional flags as JSON",
-      JSON.parse,
+      JSON.parse
     )
     .option("-y, --yes", "Automatically confirm the order")
     .action(async function sellOrderAction(options) {
@@ -67,7 +67,7 @@ export function registerSell(program: Command) {
       const size = parseAccelerators(options.accelerators);
       if (isNaN(size) || size <= 0) {
         return logAndQuit(
-          `Invalid number of accelerators: ${options.accelerators}`,
+          `Invalid number of accelerators: ${options.accelerators}`
         );
       }
 
@@ -82,7 +82,7 @@ export function registerSell(program: Command) {
       }
 
       const endDate = roundEndDate(
-        dayjs(startDate).add(durationSeconds, "seconds").toDate(),
+        dayjs(startDate).add(durationSeconds, "seconds").toDate()
       ).toDate();
 
       // Fetch contract details
@@ -145,7 +145,7 @@ function roundEndDate(endDate: Date) {
 function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
-  durationInHours: number,
+  durationInHours: number
 ) {
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
@@ -177,7 +177,7 @@ function SellOrder(props: {
 
       submitOrder();
     },
-    [exit],
+    [exit]
   );
 
   async function submitOrder() {
@@ -237,10 +237,7 @@ function SellOrder(props: {
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       )}
 
@@ -301,8 +298,8 @@ function SellOrderPreview(props: {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
-    100;
+  const totalPrice =
+    getTotalPrice(props.price, props.size, realDurationHours) / 100;
 
   return (
     <Box flexDirection="column">
@@ -352,19 +349,20 @@ export async function placeSellOrder(options: {
   endsAt: Date;
   flags?: SellOrderFlags;
 }) {
-  const realDurationHours = dayjs(options.endsAt).diff(
-    dayjs(options.startAt === "NOW" ? new Date() : options.startAt),
-  ) /
+  const realDurationHours =
+    dayjs(options.endsAt).diff(
+      dayjs(options.startAt === "NOW" ? new Date() : options.startAt)
+    ) /
     3600 /
     1000;
   const totalPrice = getTotalPrice(
     options.price,
     options.quantity,
-    realDurationHours,
+    realDurationHours
   );
   invariant(
     totalPrice == Math.ceil(totalPrice),
-    "totalPrice must be a whole number",
+    "totalPrice must be a whole number"
   );
 
   const api = await apiClient();
@@ -374,9 +372,8 @@ export async function placeSellOrder(options: {
       price: totalPrice,
       contract_id: options.contractId,
       quantity: options.quantity,
-      start_at: options.startAt === "NOW"
-        ? "NOW"
-        : options.startAt.toISOString(),
+      start_at:
+        options.startAt === "NOW" ? "NOW" : options.startAt.toISOString(),
       end_at: options.endsAt.toISOString(),
       flags: options.flags || {},
     },
@@ -397,7 +394,7 @@ export async function placeSellOrder(options: {
 
   if (!data) {
     return logAndQuit(
-      `Failed to place order: Unexpected response from server: ${response}`,
+      `Failed to place order: Unexpected response from server: ${response}`
     );
   }
 

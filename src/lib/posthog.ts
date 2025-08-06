@@ -15,7 +15,7 @@ const postHogClient = new PostHog(
     flushInterval: 0,
     // Don't keep the process alive
     requestTimeout: 2000,
-  },
+  }
 );
 // Uncomment this out to see Posthog debugging logs.
 // postHogClient.debug();
@@ -91,7 +91,7 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
   // If not in cache or expired, fetch from PostHog
   const result = await postHogClient.isFeatureEnabled(
     feature,
-    exchangeAccountId,
+    exchangeAccountId
   );
 
   // Cache the result (PostHog returns undefined if there's an error, default to false)

@@ -31,9 +31,9 @@ type ZonesListResponse = {
 
 // Delivery type conversion similar to InstanceTypeMetadata pattern
 const DeliveryTypeMetadata: Record<string, { displayName: string }> = {
-  "K8s": { displayName: "Kubernetes" },
-  "K8sNamespace": { displayName: "Kubernetes" },
-  "VM": { displayName: "Virtual Machine" },
+  K8s: { displayName: "Kubernetes" },
+  K8sNamespace: { displayName: "Kubernetes" },
+  VM: { displayName: "Virtual Machine" },
 } as const;
 
 function formatDeliveryType(deliveryType: string): string {
@@ -42,9 +42,9 @@ function formatDeliveryType(deliveryType: string): string {
 
 // Region conversion to short slugs
 const RegionMetadata: Record<string, { slug: string }> = {
-  "NorthAmerica": { slug: "North America" },
-  "AsiaPacific": { slug: "Asia" },
-  "EuropeMiddleEastAfrica": { slug: "EMEA" },
+  NorthAmerica: { slug: "North America" },
+  AsiaPacific: { slug: "Asia" },
+  EuropeMiddleEastAfrica: { slug: "EMEA" },
 } as const;
 
 function formatRegion(region: string): string {
@@ -69,21 +69,21 @@ Examples:
   $ sf zones ls --json
 
 Note: This is an early access feature (v0) that may change at any time.
-`,
+`
     );
   zones
     .command("list")
     .alias("ls")
     .description("List all zones")
     .option("--json", "Output in JSON format")
-    .action(async (options) => {
+    .action(async options => {
       await listZonesAction(options);
     });
 }
 
 async function listZonesAction(options: { json?: boolean }) {
   console.error(
-    `\x1b[33mNote: This is an early access feature (v0) and may change at any time.\x1b[0m\n`,
+    `\x1b[33mNote: This is an early access feature (v0) and may change at any time.\x1b[0m\n`
   );
 
   const loggedIn = await isLoggedIn();
@@ -107,15 +107,15 @@ async function listZonesAction(options: { json?: boolean }) {
         return await logSessionTokenExpiredAndQuit();
       case 403:
         return logAndQuit(
-          "Access denied. This feature may require special permissions. Reach out to hello@sfcompute.com if you need access.",
+          "Access denied. This feature may require special permissions. Reach out to hello@sfcompute.com if you need access."
         );
       case 404:
         return logAndQuit(
-          "Zones not found. Please wait a few seconds and try again.",
+          "Zones not found. Please wait a few seconds and try again."
         );
       default:
         return logAndQuit(
-          `Failed to fetch zones: ${response.status} ${response.statusText}`,
+          `Failed to fetch zones: ${response.status} ${response.statusText}`
         );
     }
   }
@@ -124,7 +124,7 @@ async function listZonesAction(options: { json?: boolean }) {
 
   if (!data?.data) {
     return logAndQuit(
-      "Failed to fetch zones: Unexpected response format from server",
+      "Failed to fetch zones: Unexpected response format from server"
     );
   }
   const filteredZones = data.data;
@@ -168,10 +168,11 @@ function displayZonesTable(zones: ZoneInfo[]) {
     },
   });
 
-  sortedZones.forEach((zone) => {
-    const availableNodesText = zone.available_capacity > 0
-      ? green(zone.available_capacity.toString())
-      : red(zone.available_capacity.toString());
+  sortedZones.forEach(zone => {
+    const availableNodesText =
+      zone.available_capacity > 0
+        ? green(zone.available_capacity.toString())
+        : red(zone.available_capacity.toString());
 
     table.push([
       zone.name,
@@ -183,11 +184,11 @@ function displayZonesTable(zones: ZoneInfo[]) {
     ]);
   });
 
-  const availableZones = sortedZones.filter((zone) => zone.available);
+  const availableZones = sortedZones.filter(zone => zone.available);
   const availableZoneName = availableZones?.[0]?.name ?? "alamo";
   console.log(table.toString());
   console.log(
-    `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`,
+    `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`
   );
   console.log(gray("Examples:"));
   console.log(`  sf buy --zone ${green(availableZoneName)}`);

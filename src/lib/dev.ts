@@ -33,7 +33,7 @@ export function registerDev(program: Command) {
       const unixEpochSecondsNow = dayjs().unix();
       console.log(unixEpochSecondsNow);
       console.log(
-        chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A")),
+        chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A"))
       );
 
       // process.exit(0);
@@ -59,7 +59,7 @@ function registerConfig(program: Command) {
 
   // sf config
   // sf config [-rm, --remove]
-  configCmd.action(async (options) => {
+  configCmd.action(async options => {
     if (options.remove) {
       await removeConfigAction();
     } else {
@@ -114,11 +114,9 @@ function registerEpoch(program: Command) {
         timestamps.forEach((epochTimestamp, i) => {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
-            `${colorDiffedEpochs[i]} | ${
-              chalk.yellow(
-                dayjs(date).format("hh:mm A MM-DD-YYYY"),
-              )
-            } Local`,
+            `${colorDiffedEpochs[i]} | ${chalk.yellow(
+              dayjs(date).format("hh:mm A MM-DD-YYYY")
+            )} Local`
           );
         });
       }
@@ -137,14 +135,14 @@ function registerEpoch(program: Command) {
 }
 
 function colorDiffEpochs(epochStrings: string[]): string[] {
-  const minLength = Math.min(...epochStrings.map((num) => num.length));
+  const minLength = Math.min(...epochStrings.map(num => num.length));
 
   // function to find the common prefix between all numbers
   const findCommonPrefix = (arr: string[]): string => {
     let prefix = "";
     for (let i = 0; i < minLength; i++) {
       const currentChar = arr[0][i];
-      if (arr.every((num) => num[i] === currentChar)) {
+      if (arr.every(num => num[i] === currentChar)) {
         prefix += currentChar;
       } else {
         break;
@@ -157,7 +155,7 @@ function colorDiffEpochs(epochStrings: string[]): string[] {
   // find the common prefix for all numbers
   const commonPrefix = findCommonPrefix(epochStrings);
 
-  return epochStrings.map((num) => {
+  return epochStrings.map(num => {
     const prefix = num.startsWith(commonPrefix) ? commonPrefix : "";
     const rest = num.slice(prefix.length);
 

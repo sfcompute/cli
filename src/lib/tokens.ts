@@ -99,11 +99,9 @@ async function createTokenAction() {
     default: "",
   });
   const description = await input({
-    message: `Description for your token ${
-      chalk.gray(
-        "(optional, ↵ to skip)",
-      )
-    }:`,
+    message: `Description for your token ${chalk.gray(
+      "(optional, ↵ to skip)"
+    )}:`,
     default: "",
   });
 
@@ -143,7 +141,7 @@ async function createTokenAction() {
 
   // tell them they will set this in the Authorization header
   console.log(
-    `${chalk.gray(`Pass this in the 'Authorization' header of API requests:`)}`,
+    `${chalk.gray(`Pass this in the 'Authorization' header of API requests:`)}`
   );
   console.log(
     [
@@ -154,7 +152,7 @@ async function createTokenAction() {
       chalk.magenta("<token>"),
       chalk.green('"'),
       chalk.gray(" }"),
-    ].join(""),
+    ].join("")
   );
   console.log("\n");
 
@@ -164,8 +162,8 @@ async function createTokenAction() {
   console.log(
     chalk.white(
       // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
-      `curl --request GET --url ${pingUrl} --header 'Authorization: Bearer ${data.token}'`,
-    ),
+      `curl --request GET --url ${pingUrl} --header 'Authorization: Bearer ${data.token}'`
+    )
   );
   console.log("\n");
 
@@ -234,11 +232,9 @@ async function listTokensAction() {
     // prompt user that they can generate one
     const base = getCommandBase();
     console.log(
-      `${chalk.gray("Generate your first token with: ")}${
-        chalk.magenta(
-          `${base} tokens create`,
-        )
-      }`,
+      `${chalk.gray("Generate your first token with: ")}${chalk.magenta(
+        `${base} tokens create`
+      )}`
     );
 
     process.exit(0);
@@ -292,22 +288,18 @@ async function deleteTokenAction({
   }
 
   const deleteTokenConfirmed = await confirm({
-    message: `Are you sure you want to delete this token? ${
-      chalk.gray(
-        "(it will stop working immediately.)",
-      )
-    }`,
+    message: `Are you sure you want to delete this token? ${chalk.gray(
+      "(it will stop working immediately.)"
+    )}`,
     default: false,
   });
   if (!deleteTokenConfirmed) {
     process.exit(0);
   } else {
     const verySureConfirmed = await confirm({
-      message: `${chalk.red("Very sure?")} ${
-        chalk.gray(
-          "(just double-checking)",
-        )
-      }`,
+      message: `${chalk.red("Very sure?")} ${chalk.gray(
+        "(just double-checking)"
+      )}`,
       default: false,
     });
 

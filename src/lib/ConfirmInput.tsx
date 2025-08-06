@@ -2,8 +2,8 @@ import React, { ComponentProps, useCallback, useState } from "react";
 import TextInput from "ink-text-input";
 import yn from "npm:yn";
 
-interface ConfirmInputProps extends
-  Omit<
+interface ConfirmInputProps
+  extends Omit<
     ComponentProps<typeof TextInput>,
     "value" | "onChange" | "onSubmit"
   > {
@@ -25,7 +25,7 @@ const ConfirmInput = ({
     (newValue: string) => {
       onSubmit?.(yn(newValue, { default: isChecked }));
     },
-    [isChecked, onSubmit],
+    [isChecked, onSubmit]
   );
 
   const handleChange = useCallback(
@@ -33,7 +33,7 @@ const ConfirmInput = ({
       setValue(newValue);
       onChange?.(newValue);
     },
-    [onChange],
+    [onChange]
   );
 
   return (

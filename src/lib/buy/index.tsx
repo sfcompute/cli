@@ -44,44 +44,41 @@ export function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .showHelpAfterError()
-    .option(
-      "-t, --type <type>",
-      "Type of GPU",
-    )
+    .option("-t, --type <type>", "Type of GPU")
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
-      (val) => parseAccelerators(val, "buy"),
-      8,
+      val => parseAccelerators(val, "buy"),
+      8
     )
     .option(
       "-d, --duration <duration>",
       "Duration of reservation (rounded up to the nearest hour)",
-      parseDuration,
+      parseDuration
     )
     .option(
       "-p, --price <price>",
-      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate",
+      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate"
     )
     .option(
       "-s, --start <start>",
       "Start time (date, relative time like '+1d', or 'NOW')",
       parseStartDateOrNow,
-      "NOW",
+      "NOW"
     )
     .addOption(
       new Option(
         "-e, --end <end>",
-        "End time (date or relative time like '+1d', rounded up to nearest hour)",
+        "End time (date or relative time like '+1d', rounded up to nearest hour)"
       )
         .argParser(parseEnd)
-        .conflicts("duration"),
+        .conflicts("duration")
     )
-    .hook("preAction", (command) => {
+    .hook("preAction", command => {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
         console.error(
-          chalk.yellow("Specify either --duration or --end, but not both"),
+          chalk.yellow("Specify either --duration or --end, but not both")
         );
         command.help();
         process.exit(1);
@@ -90,25 +87,25 @@ export function _registerBuy(program: Command) {
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-colo, --colocate <contract_id>",
-      "Colocate with existing contracts",
+      "Colocate with existing contracts"
     )
     .option(
       "-q, --quote",
-      "Get a price quote without placing an order. Useful for scripting.",
+      "Get a price quote without placing an order. Useful for scripting."
     )
     .option(
       "--standing",
-      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately.",
+      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately."
     )
     .option(
       "-z, --zone <zone>",
-      "Send into a specific zone. If provided, \`-t\`/`--type` will be ignored.",
+      "Send into a specific zone. If provided, \`-t\`/`--type` will be ignored."
     )
     .option(
       "-c, --cluster <cluster>",
-      "Send into a specific cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
+      "Send into a specific cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored."
     )
-    .hook("preAction", (command) => {
+    .hook("preAction", command => {
       const { type, zone, cluster } = command.opts();
       if (!type && !zone && !cluster) {
         console.error(chalk.yellow("Must specify either --type or --zone"));
@@ -117,7 +114,7 @@ export function _registerBuy(program: Command) {
       }
     })
     .configureHelp({
-      optionDescription: (option) => {
+      optionDescription: option => {
         if (option.flags === "-h, --help") {
           return "Display help for buy";
         }
@@ -142,7 +139,7 @@ Examples:
 
   \x1b[2m# Place a standing order at a specific price\x1b[0m
   $ sf buy -n 16 -d 24h -p 1.50 --standing
-`,
+`
     )
     .action(function buyOrderAction(options) {
       /*
@@ -217,16 +214,16 @@ export function QuoteComponent(props: { options: SfBuyOptions }) {
     })();
   }, [props.options]);
 
-  return isLoading
-    ? (
+  return isLoading ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
       <Box gap={1}>
-        <Spinner type="dots" />
-        <Box gap={1}>
-          <Text>Getting quote...</Text>
-        </Box>
+        <Text>Getting quote...</Text>
       </Box>
-    )
-    : <QuoteDisplay quote={quote} />;
+    </Box>
+  ) : (
+    <QuoteDisplay quote={quote} />
+  );
 }
 
 export function QuoteAndBuy(props: { options: SfBuyOptions }) {
@@ -244,13 +241,13 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (duration) {
         // If duration is set, calculate end from start + duration
         endsAt = roundEndDate(
-          dayjs(coercedStart).add(duration, "seconds").toDate(),
+          dayjs(coercedStart).add(duration, "seconds").toDate()
         );
       } else if (end) {
         endsAt = end;
         props.options.duration = dayjs(endsAt).diff(
           dayjs(coercedStart),
-          "seconds",
+          "seconds"
         );
       } else {
         throw new Error("Either duration or end must be set");
@@ -260,7 +257,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
           return logAndQuit(
-            "No quote found for the desired order. Try with a different start date, duration, or price.",
+            "No quote found for the desired order. Try with a different start date, duration, or price."
           );
         }
 
@@ -288,22 +285,22 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
     })();
   }, [props.options]);
 
-  return orderProps === null
-    ? (
+  return orderProps === null ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
       <Box gap={1}>
-        <Spinner type="dots" />
-        <Box gap={1}>
-          <Text>Getting quote...</Text>
-        </Box>
+        <Text>Getting quote...</Text>
       </Box>
-    )
-    : <BuyOrder {...orderProps} />;
+    </Box>
+  ) : (
+    <BuyOrder {...orderProps} />
+  );
 }
 
 export function getTotalPrice(
   pricePerGpuHour: number,
   size: number,
-  durationInHours: number,
+  durationInHours: number
 ) {
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
@@ -329,8 +326,8 @@ function BuyOrderPreview(props: {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
-    100;
+  const totalPrice =
+    getTotalPrice(props.price, props.size, realDurationHours) / 100;
 
   const isSupportedType = props.type in InstanceTypeMetadata;
   const typeLabel = isSupportedType
@@ -371,11 +368,7 @@ function BuyOrderPreview(props: {
         </Box>
         <Box gap={1}>
           <Text>{typeLabel}</Text>
-          {isSupportedType && (
-            <Text dimColor>
-              ({props.type})
-            </Text>
-          )}
+          {isSupportedType && <Text dimColor>({props.type})</Text>}
         </Box>
       </Box>
       <Row
@@ -411,7 +404,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [loadingMsg, setLoadingMsg] = useState<string | null>(
-    "Placing order...",
+    "Placing order..."
   );
 
   const submitOrder = useCallback(async () => {
@@ -425,7 +418,7 @@ function BuyOrder(props: BuyOrderProps) {
       totalPriceInCents: getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours,
+        realDurationInHours
       ),
       startsAt: props.startAt,
       endsAt,
@@ -441,12 +434,12 @@ function BuyOrder(props: BuyOrderProps) {
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       const { startAt, endsAt } = props;
-      const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
-        3600;
+      const realDurationInHours =
+        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
       const totalPriceInCents = getTotalPrice(
         props.price,
         props.size,
-        realDurationInHours,
+        realDurationInHours
       );
 
       analytics.track({
@@ -493,7 +486,7 @@ function BuyOrder(props: BuyOrderProps) {
       });
       submitOrder();
     },
-    [props, exit, submitOrder],
+    [props, exit, submitOrder]
   );
 
   useEffect(() => {
@@ -506,7 +499,7 @@ function BuyOrder(props: BuyOrderProps) {
         const o = await getOrder(order.id);
         if (!o) {
           setLoadingMsg(
-            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
+            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed."
           );
           return;
         }
@@ -547,10 +540,7 @@ function BuyOrder(props: BuyOrderProps) {
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       )}
 
@@ -579,52 +569,47 @@ function BuyOrder(props: BuyOrderProps) {
             order.status === "filled" &&
             (order as Awaited<ReturnType<typeof getOrder>>) &&
             order.execution_price && (
-            <Box flexDirection="column">
-              {order.start_at && order.end_at &&
-                order.start_at !== order.end_at && (
+              <Box flexDirection="column">
+                {order.start_at &&
+                  order.end_at &&
+                  order.start_at !== order.end_at && (
+                    <Row
+                      headWidth={16}
+                      head="executed rate"
+                      value={`~${centsToDollarsFormatted(
+                        Number(order.execution_price) /
+                          (Number(order.quantity) * GPUS_PER_NODE) /
+                          dayjs(order.end_at).diff(
+                            dayjs(order.start_at),
+                            "hours",
+                            true
+                          )
+                      )}/gpu/hr`}
+                    />
+                  )}
                 <Row
                   headWidth={16}
-                  head="executed rate"
-                  value={`~${
-                    centsToDollarsFormatted(
-                      Number(order.execution_price) /
-                        ((Number(order.quantity)) *
-                          GPUS_PER_NODE) /
-                        dayjs(order.end_at).diff(
-                          dayjs(order.start_at),
-                          "hours",
-                          true,
-                        ),
-                    )
-                  }/gpu/hr`}
+                  head="executed total"
+                  value={`~${centsToDollarsFormatted(
+                    Number(order.execution_price)
+                  )}`}
                 />
-              )}
-              <Row
-                headWidth={16}
-                head="executed total"
-                value={`~${
-                  centsToDollarsFormatted(
-                    Number(order.execution_price),
-                  )
-                }`}
-              />
-              {order.execution_price && Number(order.price) > 0 &&
-                Number(order.execution_price) > 0 &&
-                Number(order.execution_price) < Number(order.price) && (
-                <Row
-                  headWidth={16}
-                  head="saved"
-                  value={`~${
-                    (
-                      ((Number(order.price) - Number(order.execution_price)) *
-                        100) /
-                      Number(order.price)
-                    ).toFixed(2)
-                  }%`}
-                />
-              )}
-            </Box>
-          )}
+                {order.execution_price &&
+                  Number(order.price) > 0 &&
+                  Number(order.execution_price) > 0 &&
+                  Number(order.execution_price) < Number(order.price) && (
+                    <Row
+                      headWidth={16}
+                      head="saved"
+                      value={`~${(
+                        ((Number(order.price) - Number(order.execution_price)) *
+                          100) /
+                        Number(order.price)
+                      ).toFixed(2)}%`}
+                    />
+                  )}
+              </Box>
+            )}
         </Box>
       )}
 
@@ -659,12 +644,12 @@ export async function placeBuyOrder(options: {
 }) {
   invariant(
     options.totalPriceInCents === Math.ceil(options.totalPriceInCents),
-    "totalPriceInCents must be a whole number",
+    "totalPriceInCents must be a whole number"
   );
   invariant(options.numberNodes > 0, "numberNodes must be greater than 0");
   invariant(
     options.numberNodes === Math.ceil(options.numberNodes),
-    "numberNodes must be a whole number",
+    "numberNodes must be a whole number"
   );
 
   const api = await apiClient();
@@ -689,8 +674,9 @@ export async function placeBuyOrder(options: {
     start_at,
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
-    colocate_with:
-      (options.colocateWith ? [options.colocateWith] : []) as string[],
+    colocate_with: (options.colocateWith
+      ? [options.colocateWith]
+      : []) as string[],
     flags: {
       ioc: !options.standing,
     },
@@ -705,12 +691,12 @@ export async function placeBuyOrder(options: {
       case 400: {
         if (error?.message === "Insufficient balance") {
           return logAndQuit(
-            "Order not placed. You don't have enough funds. Add funds with\n\t🏦 Bank transfer: https://sfcompute.com/dashboard?bankTransferDialogOpen=true\n\t💳 Credit card: https://sfcompute.com/dashboard?payWithCardDialogOpen=true",
+            "Order not placed. You don't have enough funds. Add funds with\n\t🏦 Bank transfer: https://sfcompute.com/dashboard?bankTransferDialogOpen=true\n\t💳 Credit card: https://sfcompute.com/dashboard?payWithCardDialogOpen=true"
           );
         }
 
         return logAndQuit(
-          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`,
+          `Bad Request: ${error?.message}; ${JSON.stringify(error, null, 2)}`
         );
       }
       case 401:
@@ -721,14 +707,14 @@ export async function placeBuyOrder(options: {
         return logAndQuit(
           `Failed to place order: ${response.status} ${response.statusText} - ${
             error?.code ? `[${error.code}] ` : ""
-          }${error?.message || "Unknown error"}`,
+          }${error?.message || "Unknown error"}`
         );
     }
   }
 
   if (!data) {
     return logAndQuit(
-      `Failed to place order: Unexpected response from server: ${response}`,
+      `Failed to place order: Unexpected response from server: ${response}`
     );
   }
 
@@ -737,7 +723,7 @@ export async function placeBuyOrder(options: {
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartDate(quote.start_at),
+    parseStartDate(quote.start_at)
   );
   const durationHours = durationSeconds / 3600 / 1000;
 
@@ -745,9 +731,10 @@ export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt = options.start === "NOW"
-    ? "NOW"
-    : roundStartDate(parseStartDate(options.start));
+  const startsAt =
+    options.start === "NOW"
+      ? "NOW"
+      : roundStartDate(parseStartDate(options.start));
   const durationSeconds = options.duration
     ? options.duration
     : dayjs(options.end).diff(dayjs(parseStartDate(startsAt)), "seconds");
@@ -755,11 +742,11 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
 
   const minDurationSeconds = Math.max(
     1,
-    durationSeconds - Math.ceil(durationSeconds * 0.1),
+    durationSeconds - Math.ceil(durationSeconds * 0.1)
   );
   const maxDurationSeconds = Math.max(
     durationSeconds + 3600,
-    durationSeconds + Math.ceil(durationSeconds * 0.1),
+    durationSeconds + Math.ceil(durationSeconds * 0.1)
   );
 
   return await getQuote({
@@ -793,17 +780,20 @@ export async function getQuote(options: QuoteOptions) {
       side: "buy",
       instance_type: options.instanceType,
       quantity: options.quantity,
-      min_start_date: options.minStartTime === "NOW"
-        ? ("NOW" as const)
-        : options.minStartTime.toISOString(),
-      max_start_date: options.maxStartTime === "NOW"
-        ? ("NOW" as const)
-        : options.maxStartTime.toISOString(),
+      min_start_date:
+        options.minStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.minStartTime.toISOString(),
+      max_start_date:
+        options.maxStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.maxStartTime.toISOString(),
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
       cluster: options.cluster,
-      colocate_with:
-        (options.colocateWith ? [options.colocateWith] : []) as string[],
+      colocate_with: (options.colocateWith
+        ? [options.colocateWith]
+        : []) as string[],
     },
   } as const;
 
@@ -828,7 +818,7 @@ export async function getQuote(options: QuoteOptions) {
 
   if (!data) {
     return logAndQuit(
-      `Failed to get quote: Unexpected response from server: ${response}`,
+      `Failed to get quote: Unexpected response from server: ${response}`
     );
   }
 
@@ -869,9 +859,11 @@ export async function getMostRecentIndexAvgPrice(instanceType: string) {
     return logAndQuit("Failed to get prices: Unexpected response from server");
   }
 
-  const sortedData = data.data.filter((item) => !item.no_data).sort((a, b) => {
-    return dayjs(b.period_start).diff(dayjs(a.period_start));
-  });
+  const sortedData = data.data
+    .filter(item => !item.no_data)
+    .sort((a, b) => {
+      return dayjs(b.period_start).diff(dayjs(a.period_start));
+    });
 
   return sortedData[0].gpu_hour;
 }

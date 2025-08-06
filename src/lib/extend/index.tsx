@@ -24,28 +24,28 @@ function _registerExtend(program: Command) {
     .description("Extend an existing contract")
     .requiredOption(
       "-c, --contract <contract>",
-      "Contract ID to extend e.g. cont_a9IcKaLesUBTHEY",
+      "Contract ID to extend e.g. cont_a9IcKaLesUBTHEY"
     )
     .requiredOption(
       "-d, --duration <duration>",
       "Extension duration (rounded up to the nearest hour)",
-      parseDuration,
+      parseDuration
     )
     .option(
       "-p, --price <price>",
-      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate",
+      "Sets the maximize price per gpu/hr you're willing to pay. If the market rate is lower, then you'll pay the market rate"
     )
     .option("-y, --yes", "Automatically confirm the extension")
     .option(
       "-q, --quote",
-      "Get a price quote without placing an extension order",
+      "Get a price quote without placing an extension order"
     )
     .option(
       "--standing",
-      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately.",
+      "Places a standing order. Default behavior is to place an order that auto-cancels if it can't be filled immediately."
     )
     .configureHelp({
-      optionDescription: (option) => {
+      optionDescription: option => {
         if (option.flags === "-h, --help") {
           return "Display help for extend";
         }
@@ -64,7 +64,7 @@ Examples:
 
   \x1b[2m# Extend a contract for 2 hours at a specific price\x1b[0m
   $ sf extend -c <contract_id> -d 2h --price 1.50
-`,
+`
     )
     .action(async function extendAction(options) {
       const contract = await getContract(options.contract);
@@ -74,7 +74,7 @@ Examples:
 
       if (contract.status !== "active") {
         logAndQuit(
-          `Contract ${contract.id} is ${contract.status}. Only active contracts can be extended.`,
+          `Contract ${contract.id} is ${contract.status}. Only active contracts can be extended.`
         );
       }
 
@@ -83,8 +83,8 @@ Examples:
 
       const quoteOptions: SfBuyOptions = {
         type: activeContract.instance_type,
-        accelerators: getContractAcceleratorQuantity(activeContract.shape) *
-          GPUS_PER_NODE,
+        accelerators:
+          getContractAcceleratorQuantity(activeContract.shape) * GPUS_PER_NODE,
         colocate: activeContract.id,
         duration: options.duration,
         price: options.price,

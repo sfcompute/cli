@@ -16,6 +16,6 @@ export function handleNodesError(err: unknown) {
     logAndQuit(err.message);
   }
   logAndQuit(
-    err instanceof Error ? err.message : "An unexpected error occurred.",
+    err instanceof Error ? err.message : "An unexpected error occurred."
   );
 }

@@ -11,14 +11,14 @@ import { GPUS_PER_NODE } from "../constants.ts";
 
 async function setNodesAction(
   names: string[],
-  options: ReturnType<typeof set.opts>,
+  options: ReturnType<typeof set.opts>
 ) {
   try {
     if (!options.maxPrice) {
       throw new CommanderError(
         1,
         "NO_ATTRIBUTES_PROVIDED",
-        "No attributes provided to update. Use `--max-price` to update pricing.",
+        "No attributes provided to update. Use `--max-price` to update pricing."
       );
     }
 
@@ -31,19 +31,17 @@ async function setNodesAction(
     const notFound: string[] = [];
 
     for (const nameOrId of names) {
-      const node = allNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
-      );
+      const node = allNodes.find(n => n.name === nameOrId || n.id === nameOrId);
       if (node) nodesToUpdate.push(node);
       else notFound.push(nameOrId);
     }
 
     // Filter nodes that have procurement_id (spot nodes)
-    const nodesWithProcurement = nodesToUpdate.filter((node) =>
-      node.procurement_id
+    const nodesWithProcurement = nodesToUpdate.filter(
+      node => node.procurement_id
     );
-    const nodesWithoutProcurement = nodesToUpdate.filter((node) =>
-      !node.procurement_id
+    const nodesWithoutProcurement = nodesToUpdate.filter(
+      node => !node.procurement_id
     );
 
     if (nodesWithProcurement.length === 0) {
@@ -51,13 +49,15 @@ async function setNodesAction(
       throw new CommanderError(
         1,
         "NO_UPDATABLE_NODES",
-        "No nodes with procurement IDs found. Only spot nodes can have their pricing updated.",
+        "No nodes with procurement IDs found. Only spot nodes can have their pricing updated."
       );
     }
 
-    const results: Array<
-      { name: string; maxPrice: number; procurementId: string }
-    > = [];
+    const results: Array<{
+      name: string;
+      maxPrice: number;
+      procurementId: string;
+    }> = [];
     const errors: Array<{ name: string; error: string }> = [];
     const priceInCents = Math.round(options.maxPrice * 100);
 
@@ -83,7 +83,7 @@ async function setNodesAction(
       spinner.succeed(`Successfully updated ${results.length} node(s)`);
     } else if (results.length > 0 && errors.length > 0) {
       spinner.warn(
-        `Updated ${results.length} node(s), but ${errors.length} failed`,
+        `Updated ${results.length} node(s), but ${errors.length} failed`
       );
     } else {
       spinner.fail("Failed to update any nodes");
@@ -94,9 +94,9 @@ async function setNodesAction(
       console.log(gray("\nUpdated nodes:"));
       for (const result of results) {
         console.log(
-          `  • ${result.name}: Max price set to $${
-            result.maxPrice.toFixed(2)
-          }/GPU/hr`,
+          `  • ${result.name}: Max price set to $${result.maxPrice.toFixed(
+            2
+          )}/GPU/hr`
         );
       }
     }
@@ -139,7 +139,7 @@ Examples:
 
   \x1b[2m# Update max price for multiple nodes\x1b[0m
   $ sf nodes set node-1 node-2 --max-price 10.50
-`,
+`
   )
   .action(async (names, options) => {
     await setNodesAction(names, options);

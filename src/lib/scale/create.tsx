@@ -56,7 +56,7 @@ function useCreateProcurement() {
               status: "active",
               colocation_strategy: p.colocationStrategy,
             },
-          },
+          }
         );
         if (!response.ok) {
           throw new Error(error?.message || "Failed to create procurement");
@@ -66,13 +66,13 @@ function useCreateProcurement() {
         setError(
           err instanceof Error
             ? err.message
-            : "An unknown error occurred during creation",
+            : "An unknown error occurred during creation"
         );
       } finally {
         setIsLoading(false);
       }
     },
-    [setIsLoading, setResult, setError],
+    [setIsLoading, setResult, setError]
   );
 
   return {
@@ -87,15 +87,14 @@ type CreateProcurementCommandProps = ReturnType<typeof create.opts>;
 
 function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const { exit } = useApp();
-  const [confirmationMessage, setConfirmationMessage] = useState<
-    React.ReactNode
-  >();
+  const [confirmationMessage, setConfirmationMessage] =
+    useState<React.ReactNode>();
 
   const clusterName = props.zone || props.cluster;
 
   const nodesRequired = useMemo(
     () => acceleratorsToNodes(props.accelerators),
-    [props.accelerators],
+    [props.accelerators]
   );
 
   const colocationStrategy = useMemo(() => {
@@ -137,15 +136,15 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
           // Calculate market price from quote or use default
           limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
           if (quote) {
-            const quoteStart =
-              (quote.start_at === "NOW" ? new Date() : new Date(quote.start_at))
-                .getTime();
+            const quoteStart = (
+              quote.start_at === "NOW" ? new Date() : new Date(quote.start_at)
+            ).getTime();
             const quoteEnd = new Date(quote.end_at).getTime();
             const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
             limitPricePerGpuHourInCents = Math.ceil(
               DEFAULT_LIMIT_PRICE_MULTIPLIER *
                 (quote.price /
-                  (quoteDurationHours * (quoteQuantity * GPUS_PER_NODE))),
+                  (quoteDurationHours * (quoteQuantity * GPUS_PER_NODE)))
             );
           }
         }
@@ -172,7 +171,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
               accelerators={props.accelerators}
               type={props.type}
               colocationStrategy={colocationStrategy}
-            />,
+            />
           );
         }
       } catch (err: unknown) {
@@ -180,18 +179,14 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
         logAndQuit(
           err instanceof Error
             ? err.message
-            : "An unknown error occurred during initialization",
+            : "An unknown error occurred during initialization"
         );
       }
     })();
   }, []);
 
-  const {
-    isLoading,
-    error,
-    result,
-    createProcurement,
-  } = useCreateProcurement();
+  const { isLoading, error, result, createProcurement } =
+    useCreateProcurement();
 
   const handleSubmit = (submitValue: boolean) => {
     if (!submitValue) {
@@ -241,8 +236,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     return (
       <Box flexDirection="column">
         <Text color="green">
-          Successfully created procurement for {props.accelerators} {props.type}
-          {" "}
+          Successfully created procurement for {props.accelerators} {props.type}{" "}
           instances!
         </Text>
         <ProcurementDisplay procurement={result} />
@@ -256,10 +250,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
         {confirmationMessage}
         <Box>
           <Text>Create procurement? (y/N)</Text>
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       </Box>
     );
@@ -283,10 +274,10 @@ $ sf scale create -n 32 -p 1.50
 
 \x1b[2m# Maintain 8 GPUs, start buying the next reservation when there's 30 minutes left\x1b[0m
 $ sf scale create -n 8 --horizon '30m'
-`,
+`
   )
   .configureHelp({
-    optionDescription: (option) => {
+    optionDescription: option => {
       if (option.flags === "-h, --help") {
         return 'Display help for "scale create"';
       }
@@ -297,62 +288,55 @@ $ sf scale create -n 8 --horizon '30m'
   .requiredOption(
     "-n, --accelerators <accelerators>",
     "Desired number of GPUs (0 to turn off)",
-    parseAccelerators,
+    parseAccelerators
   )
   .option("-t, --type <type>", "Specify node type", "h100i")
   .addOption(
     new Option(
       "-z, --zone <zone>",
-      "Only buy on the specified zone. If provided, \`-t\`/`--type` will be ignored.",
-    ).implies({ colocationStrategy: "pinned" as const }),
+      "Only buy on the specified zone. If provided, \`-t\`/`--type` will be ignored."
+    ).implies({ colocationStrategy: "pinned" as const })
   )
   .addOption(
     new Option(
       "-c, --cluster <cluster>",
-      "Only buy on the specified cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
-    ).implies({ colocationStrategy: "pinned" as const }),
+      "Only buy on the specified cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored."
+    ).implies({ colocationStrategy: "pinned" as const })
   )
   .addOption(
     new Option(
       "-cs, --colocation-strategy <colocation-strategy>",
-      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
-    ).choices([
-      "anywhere",
-      "colocate",
-      "colocate-pinned",
-      "pinned",
-    ]).default("colocate-pinned"),
+      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`
+    )
+      .choices(["anywhere", "colocate", "colocate-pinned", "pinned"])
+      .default("colocate-pinned")
   )
   .option(
     "-d, --horizon <horizon>",
     "The minimum amount of time to reserve the GPUs for. That is, start buying more compute if the remaining time is less than this threshold.",
     parseHorizonArg,
-    60,
+    60
   )
   .option(
     "-p, --price <price>",
-    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${
-      (DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100).toFixed(2)
-    } if we can't get a price estimate.`,
-    parsePriceArg,
+    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${(
+      DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100
+    ).toFixed(2)} if we can't get a price estimate.`,
+    parsePriceArg
   )
   .option("-y, --yes", "Automatically confirm the command.")
-  .hook("preAction", (command) => {
+  .hook("preAction", command => {
     const { colocationStrategy, zone, cluster } = command.opts();
     if (colocationStrategy === "pinned" && !(zone || cluster)) {
       console.error(
-        "Invalid colocation strategy: `-z`/`--zone` or `-c`/`--cluster` is required when using `pinned` colocation strategy.",
+        "Invalid colocation strategy: `-z`/`--zone` or `-c`/`--cluster` is required when using `pinned` colocation strategy."
       );
       command.help();
       process.exit(1);
     }
   })
-  .action((options) => {
-    render(
-      <CreateProcurementCommand
-        {...options}
-      />,
-    );
+  .action(options => {
+    render(<CreateProcurementCommand {...options} />);
   });
 
 export default create;

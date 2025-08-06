@@ -27,11 +27,12 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
 
   // Convert max_price_per_node_hour from cents to dollars
   const pricePerHour = node.max_price_per_node_hour
-    ? (node.max_price_per_node_hour / 100)
+    ? node.max_price_per_node_hour / 100
     : 0;
-  const totalCost = duration && node.max_price_per_node_hour
-    ? (duration * node.max_price_per_node_hour / 100)
-    : 0;
+  const totalCost =
+    duration && node.max_price_per_node_hour
+      ? (duration * node.max_price_per_node_hour) / 100
+      : 0;
 
   return (
     <Box
@@ -50,7 +51,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         borderRight={false}
         borderColor="cyan"
       >
-        <Text color="cyan" bold>Node: {node.name}</Text>
+        <Text color="cyan" bold>
+          Node: {node.name}
+        </Text>
       </Box>
 
       {/* Basic Information */}
@@ -77,15 +80,19 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Box marginLeft={3} flexDirection="column" paddingX={1}>
           <Row
             head="Start: "
-            value={startDate
-              ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
-              : "Not specified"}
+            value={
+              startDate
+                ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+                : "Not specified"
+            }
           />
           <Row
             head="End: "
-            value={endDate
-              ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
-              : "Not specified"}
+            value={
+              endDate
+                ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+                : "Not specified"
+            }
           />
           <Row
             head="Duration: "
@@ -178,8 +185,8 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       console.log(createNodesTable(nodes));
       console.log(
         gray(
-          `\nFound ${nodes.length} node(s). Use --verbose for detailed information.`,
-        ),
+          `\nFound ${nodes.length} node(s). Use --verbose for detailed information.`
+        )
       );
       console.log(gray("\nExamples:"));
       console.log(`  sf nodes set ${nodes[0].name} --max-price 12.50`);
@@ -207,9 +214,9 @@ Examples:
 
   \x1b[2m# List nodes in JSON format\x1b[0m
   $ sf nodes list --json
-`,
+`
   )
-  .action(async (options) => {
+  .action(async options => {
     await listNodesAction(options);
   });
 
