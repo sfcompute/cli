@@ -10,6 +10,7 @@ import {
   forceOption,
   jsonOption,
   maxPriceOption,
+  pluralizeNodes,
   requiredDurationOption,
 } from "./utils.ts";
 import SFCNodes from "npm:@sfcompute/nodes-sdk-alpha@latest";
@@ -60,7 +61,9 @@ async function extendNodeAction(
     if (!options.force) {
       // Get quote for accurate pricing preview
       const spinner = ora(
-        `Quoting extending ${nodeNames.length} node(s)...`,
+        `Quoting extending ${nodeNames.length} ${
+          pluralizeNodes(nodeNames.length)
+        }...`,
       ).start();
 
       // Add flexibility to duration for better quote matching (matches buy command logic)
@@ -85,9 +88,9 @@ async function extendNodeAction(
 
       spinner.stop();
 
-      let confirmationMessage = `Extend ${nodeNames.length} node(s) for ${
-        Math.round(durationSeconds / 3600 * 100) / 100
-      } hours`;
+      let confirmationMessage = `Extend ${nodeNames.length} ${
+        pluralizeNodes(nodeNames.length)
+      } for ${Math.round(durationSeconds / 3600 * 100) / 100} hours`;
 
       if (quote) {
         const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
@@ -108,7 +111,9 @@ async function extendNodeAction(
       if (!confirmed) process.exit(0);
     }
 
-    const spinner = ora(`Extending ${nodeNames.length} node(s)...`).start();
+    const spinner = ora(
+      `Extending ${nodeNames.length} ${pluralizeNodes(nodeNames.length)}...`,
+    ).start();
 
     const results: { name: string; node: SFCNodes.Node }[] = [];
     const errors: { name: string; error: string }[] = [];
@@ -128,7 +133,11 @@ async function extendNodeAction(
     }
 
     if (results.length > 0) {
-      spinner.succeed(`Successfully extended ${results.length} node(s)`);
+      spinner.succeed(
+        `Successfully extended ${results.length} ${
+          pluralizeNodes(results.length)
+        }`,
+      );
     }
 
     if (errors.length > 0) {
@@ -136,7 +145,9 @@ async function extendNodeAction(
         spinner.fail("Failed to extend any nodes");
       } else {
         spinner.warn(
-          `Extended ${results.length} node(s), but ${errors.length} failed`,
+          `Extended ${results.length} ${
+            pluralizeNodes(results.length)
+          }, but ${errors.length} failed`,
         );
       }
     }

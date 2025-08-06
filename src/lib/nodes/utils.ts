@@ -106,6 +106,10 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
   return table.toString();
 }
 
+export function pluralizeNodes(count: number) {
+  return count === 1 ? "node" as const : "nodes" as const;
+}
+
 /**
  * Validates that a price value is a positive number and meets a minimum threshold
  * @param val String value to validate

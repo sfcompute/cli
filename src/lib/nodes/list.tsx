@@ -15,6 +15,7 @@ import {
   createNodesTable,
   getStatusColor,
   jsonOption,
+  pluralizeNodes,
   printNodeType,
 } from "./utils.ts";
 
@@ -178,7 +179,9 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       console.log(createNodesTable(nodes));
       console.log(
         gray(
-          `\nFound ${nodes.length} node(s). Use --verbose for detailed information.`,
+          `\nFound ${nodes.length} ${
+            pluralizeNodes(nodes.length)
+          }. Use --verbose for detailed information, such as previous virtual machines.`,
         ),
       );
       console.log(gray("\nExamples:"));
