@@ -117,15 +117,15 @@ const create = new Command("create")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Create a single node with a specific name\x1b[0m
-  $ sf nodes create node-1 --zone alamo --max-price 12.50
+  $ sf nodes create node-1 --zone hayesvalley --max-price 12.50
 
   \x1b[2m# Create multiple nodes with specific names\x1b[0m
   $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --max-price 9
 
   \x1b[2m# Create 3 nodes with auto-generated names\x1b[0m
-  $ sf nodes create -n 3 --zone seacliff --max-price 10.00
+  $ sf nodes create -n 3 --zone hayesvalley --max-price 10.00
 
   \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
   $ sf nodes create node-1 --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z"
