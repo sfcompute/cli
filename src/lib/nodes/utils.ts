@@ -62,6 +62,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       cyan("NAME"),
       cyan("TYPE"),
       cyan("STATUS"),
+      cyan("CURRENT VIRTUAL MACHINE"),
       cyan("GPU"),
       cyan("ZONE"),
       cyan("START/END"),
@@ -92,10 +93,14 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       ? (node.max_price_per_node_hour / 100).toFixed(2)
       : "N/A";
 
+    const lastVm = node.vms?.data.sort((a, b) => b.updated_at - a.updated_at)
+      .at(0);
+
     table.push([
       node.name,
       printNodeType(node.node_type),
       getStatusColor(node.status),
+      lastVm?.id ?? "",
       node.gpu_type,
       node.zone || "N/A",
       startEnd,
