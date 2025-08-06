@@ -19,9 +19,7 @@ export function ProcurementHeader({
   quantity: number;
   status: "active" | "disabled";
 }) {
-  // A procurement is considered active if both quantity > 0 AND status is "active"
   const isActive = quantity > 0 && status === "active";
-
   return (
     <Box gap={1}>
       <Box width={11}>
