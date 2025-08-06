@@ -191,6 +191,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                     <ProcurementHeader
                       id={p.id}
                       quantity={p.desired_quantity}
+                      status={p.status}
                     />
                     <ConfirmationMessage
                       key={p.id}
