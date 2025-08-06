@@ -299,14 +299,18 @@ async function createNodesAction(
         console.log(
           `  sf nodes list`,
         );
-        console.log(
-          `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
-        );
-        console.log(
-          `  sf nodes set ${
-            cyan(createdNodes?.[0]?.name ?? "my-node")
-          } --max-price ${cyan("12.50")}`,
-        );
+        // Spot nodes can't be extended, so only suggest it for reserved nodes
+        if (isReserved) {
+          console.log(
+            `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
+          );
+        } else {
+          console.log(
+            `  sf nodes set ${
+              cyan(createdNodes?.[0]?.name ?? "my-node")
+            } --max-price ${cyan("12.50")}`,
+          );
+        }
         console.log(
           `  sf nodes release ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
         );
