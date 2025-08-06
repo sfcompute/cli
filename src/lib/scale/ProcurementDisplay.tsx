@@ -10,19 +10,21 @@ import { formatDuration } from "../orders/index.tsx";
 
 import { formatColocationStrategy, Procurement } from "./utils.ts";
 
-export function ProcurementHeader({ id, quantity }: {
+export function ProcurementHeader({ id, quantity, status }: {
   id: string;
   quantity: number;
+  status: Procurement["status"];
 }) {
+  const isActive = quantity > 0 && status === "active";
   return (
     <Box gap={1}>
       <Box width={11}>
-        {quantity > 0
+        {isActive
           ? <Badge color="cyan">Active</Badge>
           : <Badge color="gray">Disabled</Badge>}
       </Box>
       <Box paddingLeft={0.1}>
-        <Text color={quantity > 0 ? "cyan" : "gray"}>
+        <Text color={isActive ? "cyan" : "gray"}>
           {id}
         </Text>
       </Box>
@@ -35,6 +37,7 @@ export default function ProcurementDisplay(
     procurement: {
       id,
       instance_type,
+      status,
       desired_quantity,
       buy_limit_price_per_gpu_hour,
       horizon,
@@ -51,7 +54,7 @@ export default function ProcurementDisplay(
     : instance_type;
   return (
     <Box flexDirection="column">
-      <ProcurementHeader id={id} quantity={quantity} />
+      <ProcurementHeader id={id} quantity={quantity} status={status} />
       <Box flexDirection="column" paddingTop={0.5}>
         <Row
           headWidth={15}
