@@ -28,7 +28,7 @@ const extend = new Command("extend")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Extend a single node by 1 hour with max price $15/hour\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 15.00
 

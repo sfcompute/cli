@@ -230,7 +230,7 @@ export const zoneOption = new Option(
  */
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
-  "Maximum price per node per hour in dollars",
+  "Maximum price per node hour in dollars",
 ).argParser(validatePrice).makeOptionMandatory();
 
 /**

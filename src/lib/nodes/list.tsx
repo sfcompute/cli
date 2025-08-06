@@ -201,7 +201,7 @@ const list = new Command("list")
   .addHelpText(
     "after",
     `
-Examples:
+Next Steps:\n
   \x1b[2m# List nodes in short format (default)\x1b[0m
   $ sf nodes list
 

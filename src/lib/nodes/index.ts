@@ -22,7 +22,7 @@ export async function registerNodes(program: Command) {
 A node is a compute instance that provides GPUs for your workloads. Nodes can be created 
 as reservations (with specific start/end times) or as procurements (spot pricing).
 
-Examples:
+Examples:\n
 \x1b[2m# Create a single node\x1b[0m
 $ sf nodes create my-node
 
@@ -45,7 +45,7 @@ $ sf nodes extend my-node --duration 3600 --max-price 12.50
 $ sf nodes create -n 3
 
 \x1b[2m# Create nodes in a specific zone\x1b[0m
-$ sf nodes create my-node --zone alamo
+$ sf nodes create my-node --zone hayesvalley
     `,
     );
 
