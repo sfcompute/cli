@@ -14,7 +14,7 @@ export async function registerScale(program: Command) {
     .alias("procurements")
     .alias("procurement")
     .configureHelp({
-      optionDescription: option => {
+      optionDescription: (option) => {
         if (option.flags === "-h, --help") {
           return "Display help for scale";
         }
@@ -23,7 +23,7 @@ export async function registerScale(program: Command) {
     })
     .showHelpAfterError()
     .description(
-      "Create and manage procurements that purchase a desired number of GPUs on a rolling basis."
+      "Create and manage procurements that purchase a desired number of GPUs on a rolling basis.",
     )
     .addHelpText(
       "after",
@@ -50,7 +50,7 @@ $ sf scale update <procurement-id...> -p 1.50
 $ sf scale update <procurement-id...> --horizon '30m'
 
 See https://docs.sfcompute.com/docs/on-demand-and-spot for more information.
-    `
+    `,
     )
     .showHelpAfterError();
 

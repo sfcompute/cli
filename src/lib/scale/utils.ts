@@ -7,7 +7,9 @@ import type { paths } from "../../schema.ts";
 
 import { GPUS_PER_NODE } from "../constants.ts";
 export type Procurement =
-  paths["/v0/procurements"]["get"]["responses"]["200"]["content"]["application/json"]["data"][number];
+  paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
+    "application/json"
+  ]["data"][number];
 export type ColocationStrategyName = Procurement["colocation_strategy"]["type"];
 
 export const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265 as const; // Example default price
@@ -15,7 +17,7 @@ export const MIN_CONTRACT_MINUTES = 60 as const; // Minimum contract size is 1 h
 export const DEFAULT_LIMIT_PRICE_MULTIPLIER = 1.5 as const;
 
 export function parseIds(ids: string[]): string[] {
-  return Array.from(new Set(ids.map(id => id.trim())));
+  return Array.from(new Set(ids.map((id) => id.trim())));
 }
 
 export function parsePriceArg(price: string) {
@@ -72,7 +74,7 @@ export async function getProcurement({ id }: { id: string }) {
 }
 
 export function formatColocationStrategy(
-  colocationStrategy: Procurement["colocation_strategy"]
+  colocationStrategy: Procurement["colocation_strategy"],
 ) {
   if (colocationStrategy.type === "pinned") {
     return `pinned (${colocationStrategy.cluster_name})`;

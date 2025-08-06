@@ -34,7 +34,7 @@ function validateCount(val: string): number {
     throw new CommanderError(
       1,
       "INVALID_COUNT",
-      "Count must be a positive integer"
+      "Count must be a positive integer",
     );
   }
   return parsed;
@@ -45,12 +45,12 @@ const create = new Command("create")
   .showHelpAfterError()
   .argument(
     "[names...]",
-    "Names of the nodes to create (must be unique across your account)"
+    "Names of the nodes to create (must be unique across your account)",
   )
   .option(
     "-n, --count <number>",
     "Number of nodes to create with auto-generated names",
-    validateCount
+    validateCount,
   )
   .addOption(zoneOption)
   .addOption(maxPriceOption)
@@ -59,14 +59,14 @@ const create = new Command("create")
   .addOption(durationOption.conflicts("end"))
   .addOption(forceOption)
   .addOption(jsonOption)
-  .hook("preAction", command => {
+  .hook("preAction", (command) => {
     const names = command.args;
     const { count, duration, end, zone } = command.opts();
 
     // Validate arguments
     if (names.length === 0 && !count) {
       console.error(
-        red("Must specify either node names or use \`--count\` option\n")
+        red("Must specify either node names or use \`--count\` option\n"),
       );
       command.help();
       process.exit(1);
@@ -76,8 +76,8 @@ const create = new Command("create")
       if (names.length !== count) {
         console.error(
           red(
-            `You specified ${names.length} node name(s) but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`
-          )
+            `You specified ${names.length} node name(s) but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`,
+          ),
         );
         command.help();
         process.exit(1);
@@ -119,13 +119,13 @@ Examples:
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
   $ sf nodes create node-1 --start "+1h" --duration 6h
-`
+`,
   )
   .action(createNodesAction);
 
 async function createNodesAction(
   names: typeof create.args,
-  options: ReturnType<typeof create.opts>
+  options: ReturnType<typeof create.opts>,
 ) {
   try {
     const client = await nodesClient();
@@ -146,31 +146,34 @@ async function createNodesAction(
         if (options.duration) {
           durationSeconds = options.duration;
         } else if (options.end) {
-          const startDate =
-            typeof options.start === "string" ? new Date() : options.start;
+          const startDate = typeof options.start === "string"
+            ? new Date()
+            : options.start;
           durationSeconds = Math.floor(
-            (options.end.getTime() - startDate.getTime()) / 1000
+            (options.end.getTime() - startDate.getTime()) / 1000,
           );
         }
 
         // Add flexibility to duration for better quote matching (matches buy command logic)
         const minDurationSeconds = Math.max(
           1,
-          durationSeconds - Math.ceil(durationSeconds * 0.1)
+          durationSeconds - Math.ceil(durationSeconds * 0.1),
         );
         const maxDurationSeconds = Math.max(
           durationSeconds + 3600,
-          durationSeconds + Math.ceil(durationSeconds * 0.1)
+          durationSeconds + Math.ceil(durationSeconds * 0.1),
         );
 
         // Use default instance type h100i and zone if provided
         const quote = await getQuote({
           instanceType: "h100v", // This should get ignored by the zone
           quantity: count,
-          minStartTime:
-            typeof options.start === "string" ? "NOW" : options.start,
-          maxStartTime:
-            typeof options.start === "string" ? "NOW" : options.start,
+          minStartTime: typeof options.start === "string"
+            ? "NOW"
+            : options.start,
+          maxStartTime: typeof options.start === "string"
+            ? "NOW"
+            : options.start,
           minDurationSeconds: minDurationSeconds,
           maxDurationSeconds: maxDurationSeconds,
           cluster: options.zone,
@@ -181,21 +184,25 @@ async function createNodesAction(
         if (quote) {
           const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
           const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
-          confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(
-            2
-          )}/node/hr`;
+          confirmationMessage += ` for ~$${
+            pricePerNodeHour.toFixed(
+              2,
+            )
+          }/node/hr`;
         } else {
           logAndQuit(
             red(
-              "No nodes available matching your requirements. This is likely due to insufficient capacity."
-            )
+              "No nodes available matching your requirements. This is likely due to insufficient capacity.",
+            ),
           );
         }
       } else if (options.maxPrice) {
         // Spot nodes - show max price they're willing to pay
-        confirmationMessage += ` for up to $${options.maxPrice.toFixed(
-          2
-        )}/node/hr`;
+        confirmationMessage += ` for up to $${
+          options.maxPrice.toFixed(
+            2,
+          )
+        }/node/hr`;
       }
 
       // Add node names at the end after a colon
@@ -236,10 +243,11 @@ async function createNodesAction(
         createParams.node_type = "reserved";
       } else if (options.duration) {
         // Duration provided - calculate end time
-        const actualStartDate =
-          typeof startDate === "string" ? new Date() : startDate;
+        const actualStartDate = typeof startDate === "string"
+          ? new Date()
+          : startDate;
         const endDate = roundEndDate(
-          new Date(actualStartDate.getTime() + options.duration * 1000)
+          new Date(actualStartDate.getTime() + options.duration * 1000),
         );
         createParams.end_at = Math.floor(endDate.getTime() / 1000);
         createParams.node_type = "reserved";
@@ -263,15 +271,17 @@ async function createNodesAction(
         console.log(`\n${gray("Next steps:")}`);
         console.log(`  sf nodes list`);
         console.log(
-          `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`
+          `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
         );
         console.log(
-          `  sf nodes set ${cyan(
-            createdNodes?.[0]?.name ?? "my-node"
-          )} --max-price ${cyan("12.50")}`
+          `  sf nodes set ${
+            cyan(
+              createdNodes?.[0]?.name ?? "my-node",
+            )
+          } --max-price ${cyan("12.50")}`,
         );
         console.log(
-          `  sf nodes release ${cyan(createdNodes?.[0]?.name ?? "my-node")}`
+          `  sf nodes release ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
         );
       } else {
         console.log(yellow("No nodes created.\n"));

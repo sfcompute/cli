@@ -25,39 +25,41 @@ export function registerContracts(program: Command) {
         .option("--json", "Output in JSON format")
         .option(
           "--all",
-          "Show all contracts including expired ones (Active, Upcoming, Expired)"
+          "Show all contracts including expired ones (Active, Upcoming, Expired)",
         )
         .option(
           "--state <state>",
           "Filter contracts by state: active, upcoming, or expired",
-          value => {
+          (value) => {
             const validStates = ["active", "upcoming", "expired"];
             if (!validStates.includes(value.toLowerCase())) {
               throw new Error(
-                `Invalid state: ${value}. Valid states are: ${validStates.join(
-                  ", "
-                )}`
+                `Invalid state: ${value}. Valid states are: ${
+                  validStates.join(
+                    ", ",
+                  )
+                }`,
               );
             }
             // Convert lowercase input to title case for internal use
-            return value.toLowerCase().replace(/^\w/, c => c.toUpperCase());
-          }
+            return value.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+          },
         )
         .description("List all contracts")
-        .action(async options => {
+        .action(async (options) => {
           const contracts = await listContracts(options.all, options.state);
           if (options.json) {
             console.log(JSON.stringify(contracts, null, 2));
           } else {
             render(<ContractList contracts={contracts} />);
           }
-        })
+        }),
     );
 }
 
 async function listContracts(
   showAll = false,
-  stateFilter?: string
+  stateFilter?: string,
 ): Promise<Contract[]> {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
@@ -89,7 +91,7 @@ async function listContracts(
 
   if (!data) {
     return logAndQuit(
-      `Failed to get contracts: Unexpected response from server: ${response}`
+      `Failed to get contracts: Unexpected response from server: ${response}`,
     );
   }
 

@@ -23,11 +23,9 @@ export function ProcurementHeader({
   return (
     <Box gap={1}>
       <Box width={11}>
-        {isActive ? (
-          <Badge color="cyan">Active</Badge>
-        ) : (
-          <Badge color="gray">Disabled</Badge>
-        )}
+        {isActive
+          ? <Badge color="cyan">Active</Badge>
+          : <Badge color="gray">Disabled</Badge>}
       </Box>
       <Box paddingLeft={0.1}>
         <Text color={isActive ? "cyan" : "gray"}>{id}</Text>
@@ -63,16 +61,14 @@ export default function ProcurementDisplay({
         <Row
           headWidth={15}
           head="Type"
-          value={
-            isSupportedType ? (
+          value={isSupportedType
+            ? (
               <Box gap={1}>
                 <Text>{typeLabel}</Text>
                 <Text dimColor>({instance_type})</Text>
               </Box>
-            ) : (
-              instance_type
             )
-          }
+            : instance_type}
         />
         <Row headWidth={15} head="GPUs" value={String(quantity)} />
         <Row

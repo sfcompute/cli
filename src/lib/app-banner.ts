@@ -22,7 +22,7 @@ export const getAppBanner = async () => {
           padding: 1,
           borderColor: "yellow",
           borderStyle: "round",
-        })
+        }),
       );
     }
 

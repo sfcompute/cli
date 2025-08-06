@@ -58,70 +58,70 @@ export function registerOrders(program: Command) {
     .description("List orders")
     .addOption(
       new Option("--side <side>", "Filter by order side (buy or sell)").choices(
-        ["buy", "sell"] as const
-      )
+        ["buy", "sell"] as const,
+      ),
     )
     .option("-t, --type <type>", "Filter by instance type")
     .addOption(
       new Option(
         "--public",
-        "This option is deprecated. It's no longer possible to view public orders."
+        "This option is deprecated. It's no longer possible to view public orders.",
       )
         .conflicts(["onlyFilled", "onlyCancelled"])
         .implies({
           onlyOpen: true,
-        })
+        }),
     )
     .option(
       "--min-price <price>",
       "Filter by minimum price (in cents)",
-      Number.parseInt
+      Number.parseInt,
     )
     .option(
       "--max-price <price>",
       "Filter by maximum price (in cents)",
-      Number.parseInt
+      Number.parseInt,
     )
     .option(
       "--min-start <date>",
-      "Filter by minimum start date (ISO 8601 datestring)"
+      "Filter by minimum start date (ISO 8601 datestring)",
     )
     .option(
       "--max-start <date>",
-      "Filter by maximum start date (ISO 8601 datestring)"
+      "Filter by maximum start date (ISO 8601 datestring)",
     )
     .option(
       "--min-duration <duration>",
-      "Filter by minimum duration (in seconds)"
+      "Filter by minimum duration (in seconds)",
     )
     .option(
       "--max-duration <duration>",
-      "Filter by maximum duration (in seconds)"
+      "Filter by maximum duration (in seconds)",
     )
     .option(
       "--min-quantity <quantity>",
       "Filter by minimum quantity",
-      Number.parseInt
+      Number.parseInt,
     )
     .option(
       "--max-quantity <quantity>",
       "Filter by maximum quantity",
-      Number.parseInt
+      Number.parseInt,
     )
     .option(
       "--contract-id <id>",
-      "Filter by contract ID (only for sell orders)"
+      "Filter by contract ID (only for sell orders)",
     )
     .addOption(
       new Option("--only-open", "Show only open orders").conflicts([
         "onlyFilled",
         "onlyCancelled",
-      ])
+      ]),
     )
     .addOption(
       new Option("--exclude-filled", "Exclude filled orders").conflicts([
         "onlyFilled",
-      ])
+      ]),
     )
     .addOption(
       new Option("--only-filled", "Show only filled orders").conflicts([
@@ -129,25 +129,25 @@ export function registerOrders(program: Command) {
         "onlyCancelled",
         "onlyOpen",
         "public",
-      ])
+      ]),
     )
     .option(
       "--min-filled-at <date>",
-      "Filter by minimum filled date (ISO 8601 datestring)"
+      "Filter by minimum filled date (ISO 8601 datestring)",
     )
     .option(
       "--max-filled-at <date>",
-      "Filter by maximum filled date (ISO 8601 datestring)"
+      "Filter by maximum filled date (ISO 8601 datestring)",
     )
     .option(
       "--min-fill-price <price>",
       "Filter by minimum fill price (in cents)",
-      Number.parseInt
+      Number.parseInt,
     )
     .option(
       "--max-fill-price <price>",
       "Filter by maximum fill price (in cents)",
-      Number.parseInt
+      Number.parseInt,
     )
     .option("--include-cancelled", "Include cancelled orders")
     .addOption(
@@ -155,32 +155,32 @@ export function registerOrders(program: Command) {
         .conflicts(["onlyFilled", "onlyOpen", "public"])
         .implies({
           includeCancelled: true,
-        })
+        }),
     )
     .option(
       "--min-cancelled-at <date>",
-      "Filter by minimum cancelled date (ISO 8601 datestring)"
+      "Filter by minimum cancelled date (ISO 8601 datestring)",
     )
     .option(
       "--max-cancelled-at <date>",
-      "Filter by maximum cancelled date (ISO 8601 datestring)"
+      "Filter by maximum cancelled date (ISO 8601 datestring)",
     )
     .option(
       "--min-placed-at <date>",
-      "Filter by minimum placed date (ISO 8601 datestring)"
+      "Filter by minimum placed date (ISO 8601 datestring)",
     )
     .option(
       "--max-placed-at <date>",
-      "Filter by maximum placed date (ISO 8601 datestring)"
+      "Filter by maximum placed date (ISO 8601 datestring)",
     )
     .option("--limit <number>", "Limit the number of results", Number.parseInt)
     .option(
       "--offset <number>",
       "Offset the results (for pagination)",
-      Number.parseInt
+      Number.parseInt,
     )
     .option("--json", "Output in JSON format")
-    .action(async options => {
+    .action(async (options) => {
       const minDuration = parseDurationArgument(options.minDuration);
       const maxDuration = parseDurationArgument(options.maxDuration);
       const orders = await getOrders({

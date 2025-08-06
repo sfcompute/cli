@@ -79,9 +79,11 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
 
     let startEnd: string;
     if (startDate && endDate) {
-      startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ${endDate.format(
-        "HH:mm"
-      )}`;
+      startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ${
+        endDate.format(
+          "HH:mm",
+        )
+      }`;
     } else if (startDate) {
       startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ?`;
     } else {
@@ -119,14 +121,14 @@ export function validatePrice(val: string, minimum = 0): number {
     throw new CommanderError(
       1,
       "INVALID_PRICE",
-      "Price must be a positive number"
+      "Price must be a positive number",
     );
   }
   if (minimum > 0 && parsed < minimum) {
     throw new CommanderError(
       1,
       "INVALID_PRICE",
-      `Price must be at least $${minimum.toFixed(2)}/hour`
+      `Price must be at least $${minimum.toFixed(2)}/hour`,
     );
   }
   return parsed;
@@ -145,16 +147,18 @@ export function validateDuration(val: string, minimum = 3600): number {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      "Duration must be a number"
+      "Duration must be a number",
     );
   }
   if (parsed < minimum) {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Duration must be at least ${minimum} seconds (${Math.round(
-        minimum / 3600
-      )} hour${minimum === 3600 ? "" : "s"})`
+      `Duration must be at least ${minimum} seconds (${
+        Math.round(
+          minimum / 3600,
+        )
+      } hour${minimum === 3600 ? "" : "s"})`,
     );
   }
   return parsed;
@@ -172,14 +176,14 @@ export function parseDuration(duration: string): number {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Invalid duration: ${duration} (examples: 1h, 30m, 2d, 3600)`
+      `Invalid duration: ${duration} (examples: 1h, 30m, 2d, 3600)`,
     );
   }
   if (parsed < 3600) {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Duration must be at least 1 hour`
+      `Duration must be at least 1 hour`,
     );
   }
   return parsed;
@@ -210,7 +214,7 @@ export const jsonOption = new Option("-j, --json", "Output in JSON format");
  */
 export const forceOption = new Option(
   "-f, --force",
-  "Skip confirmation prompt"
+  "Skip confirmation prompt",
 );
 
 /**
@@ -218,7 +222,7 @@ export const forceOption = new Option(
  */
 export const zoneOption = new Option(
   "-z, --zone <zone>",
-  "Zone to create the nodes in"
+  "Zone to create the nodes in",
 ).makeOptionMandatory();
 
 /**
@@ -226,7 +230,7 @@ export const zoneOption = new Option(
  */
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
-  "Maximum price per node per hour in dollars"
+  "Maximum price per node per hour in dollars",
 )
   .argParser(validatePrice)
   .makeOptionMandatory();
@@ -236,7 +240,7 @@ export const maxPriceOption = new Option(
  */
 export const startOption = new Option(
   "-s, --start <start>",
-  "Start time (ISO 8601 format or relative time like '+1d', or 'now')"
+  "Start time (ISO 8601 format or relative time like '+1d', or 'now')",
 )
   .argParser(parseStartDate)
   .default("now");
@@ -246,7 +250,7 @@ export const startOption = new Option(
  */
 export const endOption = new Option(
   "-e, --end <end>",
-  "End time (ISO 8601 format or relative time like '+1d', rounded up to nearest hour)"
+  "End time (ISO 8601 format or relative time like '+1d', rounded up to nearest hour)",
 ).argParser(parseEnd);
 
 /**
@@ -254,7 +258,7 @@ export const endOption = new Option(
  */
 export const durationOption = new Option(
   "-d, --duration <duration>",
-  "Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour"
+  "Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour",
 ).argParser(parseDurationArgument);
 
 /**
@@ -262,7 +266,7 @@ export const durationOption = new Option(
  */
 export const requiredDurationOption = new Option(
   "-d, --duration <duration>",
-  "Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour"
+  "Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour",
 )
   .argParser(parseDurationArgument)
   .makeOptionMandatory();

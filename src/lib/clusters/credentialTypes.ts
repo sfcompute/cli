@@ -11,7 +11,7 @@ export type K8sCredential = CredentialsList[number];
  * @returns True if the credential is a vcluster credential, false otherwise
  */
 export const isVClusterCredential = (
-  cred: CredentialsList[number]
+  cred: CredentialsList[number],
 ): cred is K8sCredential & {
   encrypted_kubeconfig: string;
   nonce: string;

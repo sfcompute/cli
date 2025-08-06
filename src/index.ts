@@ -104,7 +104,7 @@ if (IS_TRACKING_DISABLED) {
     }
   }
 
-  program.exitOverride(error => {
+  program.exitOverride((error) => {
     let isError = true;
 
     switch (error.code) {
@@ -125,8 +125,8 @@ if (IS_TRACKING_DISABLED) {
         const nextArg = arr[i + 1];
         if (nextArg && !nextArg.startsWith("-")) {
           (acc as Record<string, string | number | boolean>)[key] = isNaN(
-            Number(nextArg)
-          )
+              Number(nextArg),
+            )
             ? nextArg
             : Number(nextArg);
         } else {

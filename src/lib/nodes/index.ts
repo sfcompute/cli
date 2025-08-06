@@ -46,7 +46,7 @@ $ sf nodes create -n 3
 
 \x1b[2m# Create nodes in a specific zone\x1b[0m
 $ sf nodes create my-node --zone alamo
-    `
+    `,
     );
 
   // Attach sub-commands

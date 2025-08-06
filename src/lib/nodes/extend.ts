@@ -45,13 +45,13 @@ Examples:
 
   \x1b[2m# Output extended nodes in JSON format\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 10.00 --json
-`
+`,
   )
   .action(extendNodeAction);
 
 async function extendNodeAction(
   nodeNames: string[],
-  options: ReturnType<typeof extend.opts>
+  options: ReturnType<typeof extend.opts>,
 ) {
   try {
     const client = await nodesClient();
@@ -60,18 +60,18 @@ async function extendNodeAction(
     if (!options.force) {
       // Get quote for accurate pricing preview
       const spinner = ora(
-        `Quoting extending ${nodeNames.length} node(s)...`
+        `Quoting extending ${nodeNames.length} node(s)...`,
       ).start();
 
       // Add flexibility to duration for better quote matching (matches buy command logic)
       const durationSeconds = options.duration!;
       const minDurationSeconds = Math.max(
         1,
-        durationSeconds - Math.ceil(durationSeconds * 0.1)
+        durationSeconds - Math.ceil(durationSeconds * 0.1),
       );
       const maxDurationSeconds = Math.max(
         durationSeconds + 3600,
-        durationSeconds + Math.ceil(durationSeconds * 0.1)
+        durationSeconds + Math.ceil(durationSeconds * 0.1),
       );
 
       const quote = await getQuote({
@@ -96,8 +96,8 @@ async function extendNodeAction(
       } else {
         logAndQuit(
           red(
-            "No nodes available matching your requirements. This is likely due to insufficient capacity."
-          )
+            "No nodes available matching your requirements. This is likely due to insufficient capacity.",
+          ),
         );
       }
 
@@ -136,7 +136,7 @@ async function extendNodeAction(
         spinner.fail("Failed to extend any nodes");
       } else {
         spinner.warn(
-          `Extended ${results.length} node(s), but ${errors.length} failed`
+          `Extended ${results.length} node(s), but ${errors.length} failed`,
         );
       }
     }
@@ -144,23 +144,23 @@ async function extendNodeAction(
     if (options.json) {
       console.log(
         JSON.stringify(
-          results.map(r => r.node),
+          results.map((r) => r.node),
           null,
-          2
-        )
+          2,
+        ),
       );
       process.exit(0);
     }
 
     if (results.length > 0) {
       console.log(gray("\nExtended nodes:"));
-      console.log(createNodesTable(results.map(r => r.node)));
+      console.log(createNodesTable(results.map((r) => r.node)));
       console.log(
         gray(
           `\nDuration extended by: ${options.duration} seconds (${
             Math.round((options.duration! / 3600) * 100) / 100
-          } hours)`
-        )
+          } hours)`,
+        ),
       );
       console.log(gray(`Max price: $${options.maxPrice.toFixed(2)}/hour`));
     }

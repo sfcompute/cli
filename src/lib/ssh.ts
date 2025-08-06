@@ -22,11 +22,11 @@ export function registerSsh(program: Command) {
     .option(
       "--use-host-keys [value]",
       "Use API provided SSH server host keys if known",
-      true
+      true,
     )
     .argument(
       "<destination>",
-      "USERNAME@VM_ID The (optional) username, and VM id to SSH into."
+      "USERNAME@VM_ID The (optional) username, and VM id to SSH into.",
     )
     .allowExcessArguments(false)
     .action(async (destination, options) => {
@@ -60,7 +60,7 @@ export function registerSsh(program: Command) {
         }
 
         logAndQuit(
-          `Failed to retrieve ssh information: ${response.statusText}`
+          `Failed to retrieve ssh information: ${response.statusText}`,
         );
       }
 
