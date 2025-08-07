@@ -114,7 +114,7 @@ function getActionsForNode(node: SFCNodes.Node) {
         );
         nodeActions.push({
           label: "SSH",
-          command: `sf vms ssh ${lastVm.id}`,
+          command: `sf vms ssh root@${lastVm.id}`,
         });
       }
       nodeActions.push({
@@ -134,7 +134,7 @@ function getActionsForNode(node: SFCNodes.Node) {
       if (lastVm?.id) {
         nodeActions.push(
           { label: "Logs", command: `sf vms logs ${lastVm.id}` },
-          { label: "SSH", command: `sf vms ssh ${lastVm.id}` },
+          { label: "SSH", command: `sf vms ssh root@${lastVm.id}` },
         );
       }
 
@@ -203,7 +203,7 @@ function getActionsForNode(node: SFCNodes.Node) {
       if (lastVm?.id) {
         nodeActions.push(
           { label: "Logs", command: `sf vms logs ${lastVm.id}` },
-          { label: "SSH", command: `sf vms ssh ${lastVm.id}` },
+          { label: "SSH", command: `sf vms ssh root@${lastVm.id}` },
         );
       }
       nodeActions.push({
