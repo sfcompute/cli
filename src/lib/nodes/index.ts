@@ -23,29 +23,23 @@ A node is a compute instance that provides GPUs for your workloads. Nodes can be
 as reservations (with specific start/end times) or as procurements (spot pricing).
 
 Examples:\n
-\x1b[2m# Create a single node\x1b[0m
-$ sf nodes create my-node
+\x1b[2m# Create a spot node\x1b[0m
+$ sf nodes create my-node-name --zone hayesvalley --max-price 12.50
+
+\x1b[2m# Create multiple reserved nodes with auto-generated names\x1b[0m
+$ sf nodes create -n 2 -z hayesvalley --start +1h --duration 2d -p 15.00
 
 \x1b[2m# List all nodes\x1b[0m
 $ sf nodes list
 
-\x1b[2m# List all nodes with detailed information\x1b[0m
-$ sf nodes list --verbose
-
 \x1b[2m# Release a node\x1b[0m
-$ sf nodes release my-node
+$ sf nodes release my-node-name
 
-\x1b[2m# Update node pricing\x1b[0m
-$ sf nodes set my-node --max-price 12.50
+\x1b[2m# Update the max price of a spot node\x1b[0m
+$ sf nodes set my-node-name --max-price 12.50
 
-\x1b[2m# Extend a node with new pricing\x1b[0m
-$ sf nodes extend my-node --duration 3600 --max-price 12.50
-
-\x1b[2m# Create multiple nodes with auto-generated names\x1b[0m
-$ sf nodes create -n 3
-
-\x1b[2m# Create nodes in a specific zone\x1b[0m
-$ sf nodes create my-node --zone hayesvalley
+\x1b[2m# Extend a reserved node\x1b[0m
+$ sf nodes extend my-node-name --duration 3600 --max-price 12.50
     `,
     );
 

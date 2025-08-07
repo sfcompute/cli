@@ -128,13 +128,13 @@ Examples:\n
   $ sf nodes create -n 3 --zone hayesvalley --max-price 10.00
 
   \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
-  $ sf nodes create node-1 --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z"
+  $ sf nodes create node-1 --zone hayesvalley --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z"
 
   \x1b[2m# Create a reserved node for 2 hours starting now\x1b[0m
-  $ sf nodes create node-1 --duration 2h
+  $ sf nodes create node-1 --zone hayesvalley --duration 2h
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
-  $ sf nodes create node-1 --start "+1h" --duration 6h
+  $ sf nodes create node-1 --zone hayesvalley --start "+1h" --duration 6h
 `,
   )
   .action(createNodesAction);
