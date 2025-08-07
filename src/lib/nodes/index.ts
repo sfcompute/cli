@@ -39,7 +39,7 @@ $ sf nodes release my-node-name
 $ sf nodes set my-node-name --max-price 12.50
 
 \x1b[2m# Extend a reserved node\x1b[0m
-$ sf nodes extend my-node --duration 3600 --max-price 12.50
+$ sf nodes extend my-node-name --duration 3600 --max-price 12.50
     `,
     );
 
