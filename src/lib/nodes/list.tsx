@@ -22,6 +22,10 @@ import {
 
 // Helper component to display VMs in a table format using Ink
 function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
+  const sortedVms = vms.sort((a, b) => b.updated_at - a.updated_at);
+  const vmsToShow = sortedVms.slice(0, 5);
+  const remainingVms = sortedVms.length - 5;
+
   return (
     <Box flexDirection="column" padding={0}>
       {/* Header */}
@@ -47,7 +51,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
       </Box>
 
       {/* VM rows */}
-      {vms.map((vm) => {
+      {vmsToShow.map((vm) => {
         const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
         const endDate = vm.end_at ? dayjs.unix(vm.end_at) : null;
 
@@ -76,6 +80,18 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
           </Box>
         );
       })}
+
+      {/* Show message if there are more VMs */}
+      {remainingVms > 0 && (
+        <Box gap={1}>
+          <Text color="gray">
+            {remainingVms} past {remainingVms === 1 ? "VM" : "VMs"} not shown.
+          </Text>
+          <Text color="cyan">
+            (To see all VMs, use `sf nodes ls --json`)
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }
