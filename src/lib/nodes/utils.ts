@@ -1,4 +1,11 @@
-import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
+import {
+  brightBlack,
+  cyan,
+  gray,
+  green,
+  red,
+  yellow,
+} from "jsr:@std/fmt/colors";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
 import dayjs from "dayjs";
@@ -40,6 +47,35 @@ export function getStatusColor(status: SFCNodes.Node["status"]): string {
   }
 }
 
+export function printVMStatus(status: string): string {
+  switch (status) {
+    case "NodeFailure":
+      return "Node Failure";
+    default:
+      if (status.length === 0) return "Unknown";
+      return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+}
+
+export function getVMStatusColor(status: string): string {
+  const statusText = printVMStatus(status);
+
+  switch (status) {
+    case "Pending":
+      return yellow(statusText);
+    case "Running":
+      return green(statusText);
+    case "Destroyed":
+      return brightBlack(statusText);
+    case "NodeFailure":
+      return red(statusText);
+    case "Unspecified":
+      return gray(statusText);
+    default:
+      return statusText;
+  }
+}
+
 export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   switch (nodeType) {
     case "spot":
@@ -62,7 +98,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       cyan("NAME"),
       cyan("TYPE"),
       cyan("STATUS"),
-      cyan("CURRENT VIRTUAL MACHINE"),
+      cyan("CURRENT VM"),
       cyan("GPU"),
       cyan("ZONE"),
       cyan("START/END"),
