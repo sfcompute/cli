@@ -1,6 +1,6 @@
 import { Command } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { gray, red } from "jsr:@std/fmt/colors";
+import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
@@ -10,6 +10,7 @@ import {
   forceOption,
   jsonOption,
   maxPriceOption,
+  pluralizeNodes,
   requiredDurationOption,
 } from "./utils.ts";
 import SFCNodes from "npm:@sfcompute/nodes-sdk-alpha@latest";
@@ -27,7 +28,7 @@ const extend = new Command("extend")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Extend a single node by 1 hour with max price $15/hour\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 15.00
 
@@ -56,11 +57,75 @@ async function extendNodeAction(
   try {
     const client = await nodesClient();
 
+    // Fetch all nodes and filter by provided names/IDs
+    const fetchSpinner = ora().start();
+    const { data: allNodes } = await client.nodes.list();
+    fetchSpinner.stop();
+
+    // Filter nodes that match the provided names/IDs
+    const nodes: { name: string; node: SFCNodes.Node }[] = [];
+    const notFound: string[] = [];
+
+    for (const nameOrId of nodeNames) {
+      const node = allNodes.find((n) =>
+        n.name === nameOrId || n.id === nameOrId
+      );
+      if (node) {
+        nodes.push({ name: nameOrId, node });
+      } else {
+        notFound.push(nameOrId);
+      }
+    }
+
+    if (notFound.length > 0) {
+      console.log(
+        red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
+            pluralizeNodes(notFound.length)
+          }:`,
+        ),
+      );
+      for (const name of notFound) {
+        console.log(`  • ${name}`);
+      }
+      console.log();
+    }
+
+    // Filter out spot nodes (they can't be extended)
+    const spotNodes = nodes.filter(({ node }) => node.node_type === "spot");
+    const extendableNodes = nodes.filter(({ node }) =>
+      node.node_type !== "spot"
+    );
+
+    if (spotNodes.length > 0) {
+      console.log(
+        red(
+          `Cannot extend ${spotNodes.length === 1 ? "this" : "these"} spot ${
+            pluralizeNodes(spotNodes.length)
+          } (they auto-extend):`,
+        ),
+      );
+      for (const { name } of spotNodes) {
+        console.log(`  • ${name}`);
+      }
+      console.log(
+        brightRed(
+          `\nTo configure spot nodes, use the \`sf nodes set\` command.`,
+        ),
+      );
+    }
+
+    if (extendableNodes.length === 0) {
+      process.exit(1);
+    }
+
     // Only show pricing and get confirmation if not using --force
     if (!options.force) {
       // Get quote for accurate pricing preview
       const spinner = ora(
-        `Quoting extending ${nodeNames.length} node(s)...`,
+        `Quoting extending ${extendableNodes.length} ${
+          pluralizeNodes(extendableNodes.length)
+        }...`,
       ).start();
 
       // Add flexibility to duration for better quote matching (matches buy command logic)
@@ -76,7 +141,7 @@ async function extendNodeAction(
 
       const quote = await getQuote({
         instanceType: "h100v",
-        quantity: nodeNames.length,
+        quantity: extendableNodes.length,
         minStartTime: "NOW",
         maxStartTime: "NOW",
         minDurationSeconds: minDurationSeconds,
@@ -85,9 +150,9 @@ async function extendNodeAction(
 
       spinner.stop();
 
-      let confirmationMessage = `Extend ${nodeNames.length} node(s) for ${
-        Math.round(durationSeconds / 3600 * 100) / 100
-      } hours`;
+      let confirmationMessage = `Extend ${extendableNodes.length} ${
+        pluralizeNodes(extendableNodes.length)
+      } for ${Math.round(durationSeconds / 3600 * 100) / 100} hours`;
 
       if (quote) {
         const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
@@ -108,19 +173,23 @@ async function extendNodeAction(
       if (!confirmed) process.exit(0);
     }
 
-    const spinner = ora(`Extending ${nodeNames.length} node(s)...`).start();
+    const spinner = ora(
+      `Extending ${extendableNodes.length} ${
+        pluralizeNodes(extendableNodes.length)
+      }...`,
+    ).start();
 
     const results: { name: string; node: SFCNodes.Node }[] = [];
     const errors: { name: string; error: string }[] = [];
 
-    for (const nodeIdOrName of nodeNames) {
+    for (const { name: nodeIdOrName, node: originalNode } of extendableNodes) {
       try {
-        const node = await client.nodes.extend(nodeIdOrName, {
+        const extendedNode = await client.nodes.extend(originalNode.id, {
           duration_seconds: options.duration!,
           max_price_per_node_hour: Math.round(options.maxPrice * 100),
         });
 
-        results.push({ name: nodeIdOrName, node });
+        results.push({ name: nodeIdOrName, node: extendedNode });
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Unknown error";
         errors.push({ name: nodeIdOrName, error: errorMsg });
@@ -128,7 +197,11 @@ async function extendNodeAction(
     }
 
     if (results.length > 0) {
-      spinner.succeed(`Successfully extended ${results.length} node(s)`);
+      spinner.succeed(
+        `Successfully extended ${results.length} ${
+          pluralizeNodes(results.length)
+        }`,
+      );
     }
 
     if (errors.length > 0) {
@@ -136,7 +209,9 @@ async function extendNodeAction(
         spinner.fail("Failed to extend any nodes");
       } else {
         spinner.warn(
-          `Extended ${results.length} node(s), but ${errors.length} failed`,
+          `Extended ${results.length} ${
+            pluralizeNodes(results.length)
+          }, but ${errors.length} failed`,
         );
       }
     }

@@ -14,17 +14,216 @@ import { Row } from "../Row.tsx";
 import {
   createNodesTable,
   getStatusColor,
+  getVMStatusColor,
   jsonOption,
+  pluralizeNodes,
   printNodeType,
 } from "./utils.ts";
+
+// Helper component to display VMs in a table format using Ink
+function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
+  const sortedVms = vms.sort((a, b) => b.updated_at - a.updated_at);
+  const vmsToShow = sortedVms.slice(0, 5);
+  const remainingVms = sortedVms.length - 5;
+
+  return (
+    <Box flexDirection="column" padding={0}>
+      {/* Header */}
+      <Box
+        padding={0}
+        marginY={0}
+        borderStyle="single"
+        borderBottom
+        borderTop={false}
+        borderLeft={false}
+        borderRight={false}
+        borderColor="gray"
+      >
+        <Box width={25} padding={0}>
+          <Text bold color="cyan">Virtual Machines</Text>
+        </Box>
+        <Box width={15} padding={0}>
+          <Text bold color="cyan">Status</Text>
+        </Box>
+        <Box width={30} padding={0}>
+          <Text bold color="cyan">Start/End</Text>
+        </Box>
+      </Box>
+
+      {/* VM rows */}
+      {vmsToShow.map((vm) => {
+        const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
+        const endDate = vm.end_at ? dayjs.unix(vm.end_at) : null;
+
+        let startEnd: string;
+        if (startDate && endDate) {
+          startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ${
+            endDate.format("HH:mm")
+          }`;
+        } else if (startDate) {
+          startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ?`;
+        } else {
+          startEnd = "Not available";
+        }
+
+        return (
+          <Box key={vm.id}>
+            <Box width={25} padding={0}>
+              <Text>{vm.id}</Text>
+            </Box>
+            <Box width={15} padding={0}>
+              <Text>{getVMStatusColor(vm.status)}</Text>
+            </Box>
+            <Box width={30} padding={0}>
+              <Text>{startEnd}</Text>
+            </Box>
+          </Box>
+        );
+      })}
+
+      {/* Show message if there are more VMs */}
+      {remainingVms > 0 && (
+        <Box gap={1}>
+          <Text color="gray">
+            {remainingVms} past {remainingVms === 1 ? "VM" : "VMs"} not shown.
+          </Text>
+          <Text color="cyan">
+            (To see all VMs, use `sf nodes ls --json`)
+          </Text>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+// Helper function to get available actions for a node based on its status
+function getActionsForNode(node: SFCNodes.Node) {
+  const nodeActions: { label: string; command: string }[] = [];
+
+  // Get the last VM for logs/ssh commands
+  const lastVm = node.vms?.data?.sort((a, b) => b.updated_at - a.updated_at).at(
+    0,
+  );
+
+  switch (node.status) {
+    case "released":
+      // Released nodes: can view logs/ssh until the node ends
+      if (lastVm?.id) {
+        nodeActions.push(
+          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
+        );
+        nodeActions.push({
+          label: "SSH",
+          command: `sf vms ssh ${lastVm.id}`,
+        });
+      }
+      nodeActions.push({
+        label: "Delete",
+        command: `sf nodes delete ${node.name} (coming soon)`,
+      });
+      break;
+
+    case "failed":
+    case "terminated":
+    case "deleted":
+      // No actions for ended nodes
+      break;
+
+    case "running":
+      // Running nodes
+      if (lastVm?.id) {
+        nodeActions.push(
+          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
+          { label: "SSH", command: `sf vms ssh ${lastVm.id}` },
+        );
+      }
+
+      if (node.node_type === "reserved") {
+        // Reserved nodes: can extend or delete
+        nodeActions.push(
+          {
+            label: "Extend",
+            command:
+              `sf nodes extend ${node.name} --duration 60 --max-price 12.00`,
+          },
+          {
+            label: "Delete",
+            command: `sf nodes delete ${node.name} --force (coming soon)`,
+          },
+        );
+      } else if (node.node_type === "spot") {
+        // Spot nodes: can update, release, delete
+        nodeActions.push(
+          {
+            label: "Update",
+            command: `sf nodes set ${node.name} --max-price 12.50`,
+          },
+          { label: "Release", command: `sf nodes release ${node.name}` },
+          {
+            label: "Delete",
+            command: `sf nodes delete ${node.name} --force (coming soon)`,
+          },
+        );
+      }
+      break;
+
+    case "pending":
+    case "awaitingcapacity":
+      // Pending/awaiting nodes
+      if (lastVm?.id) {
+        nodeActions.push(
+          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
+        );
+      }
+
+      if (node.node_type === "spot") {
+        // Spot nodes: can update, release, delete
+        nodeActions.push(
+          {
+            label: "Update",
+            command: `sf nodes set ${node.name} --max-price 12.50`,
+          },
+          { label: "Release", command: `sf nodes release ${node.name}` },
+          {
+            label: "Delete",
+            command: `sf nodes delete ${node.name} --force (coming soon)`,
+          },
+        );
+      } else if (node.node_type === "reserved") {
+        // Reserved nodes: can delete
+        nodeActions.push({
+          label: "Delete",
+          command: `sf nodes delete ${node.name} --force (coming soon)`,
+        });
+      }
+      break;
+
+    default:
+      // For unknown statuses, show basic actions if VM is available
+      if (lastVm?.id) {
+        nodeActions.push(
+          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
+          { label: "SSH", command: `sf vms ssh ${lastVm.id}` },
+        );
+      }
+      nodeActions.push({
+        label: "Release",
+        command: `sf nodes release ${node.name}`,
+      });
+      break;
+  }
+  return nodeActions;
+}
 
 // Component for displaying a single node in verbose format
 function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
   // Convert Unix timestamps to dates and calculate duration
   const startDate = node.start_at && dayjs.unix(node.start_at);
   const endDate = node.end_at && dayjs.unix(node.end_at);
-  const duration = endDate && startDate && endDate.diff(startDate, "hours");
-
+  let duration = endDate && startDate && endDate.diff(startDate, "hours");
+  if (typeof duration === "number" && duration < 1) {
+    duration = 1;
+  }
   // Convert max_price_per_node_hour from cents to dollars
   const pricePerHour = node.max_price_per_node_hour
     ? (node.max_price_per_node_hour / 100)
@@ -32,6 +231,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
   const totalCost = duration && node.max_price_per_node_hour
     ? (duration * node.max_price_per_node_hour / 100)
     : 0;
+
+  // Get available actions for this node
+  const nodeActions = getActionsForNode(node);
 
   return (
     <Box
@@ -66,33 +268,33 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       <Box marginTop={1} paddingX={1}>
         <Text>📅 Schedule:</Text>
       </Box>
-      {node.node_type === "spot" && (
-        <Box marginLeft={4}>
-          <Text color="yellow">
-            This node is spot and has no explicit start, end, or duration.
-          </Text>
-        </Box>
-      )}
-      {node.node_type !== "spot" && (
-        <Box marginLeft={3} flexDirection="column" paddingX={1}>
-          <Row
-            head="Start: "
-            value={startDate
-              ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
-              : "Not specified"}
-          />
-          <Row
-            head="End: "
-            value={endDate
-              ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
-              : "Not specified"}
-          />
+
+      <Box marginLeft={3} flexDirection="column" paddingX={1}>
+        <Row
+          head="Start: "
+          value={startDate
+            ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            : "Not specified"}
+        />
+        <Row
+          head={node.node_type === "spot" &&
+              (node.status === "running" ||
+                node.status === "pending" ||
+                node.status === "awaitingcapacity") &&
+              endDate
+            ? "End (Rolling): "
+            : "End: "}
+          value={endDate
+            ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            : "Not specified"}
+        />
+        {duration && (
           <Row
             head="Duration: "
-            value={duration ? `${duration} hours` : "Not specified"}
+            value={`${duration} hours`}
           />
-        </Box>
-      )}
+        )}
+      </Box>
 
       <Box marginTop={1} paddingX={1}>
         <Text>💰 Pricing:</Text>
@@ -118,20 +320,35 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         )}
       </Box>
 
-      <Box marginTop={1} paddingX={1}>
-        <Text>🎯 Actions:</Text>
-      </Box>
-      <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        <Row head="Logs: " value={`sf vms logs ${node.name}`} />
-        <Row head="SSH: " value={`sf vms ssh ${node.name}`} />
-        {node.node_type !== "spot" && (
-          <Row
-            head="Extend: "
-            value={`sf nodes extend ${node.name} --duration 60 --max-price 12.00`}
-          />
-        )}
-        <Row head="Release: " value={`sf nodes release ${node.name}`} />
-      </Box>
+      {/* VMs Section - Show if node has VMs */}
+      {node.vms?.data && node.vms.data.length > 0 && (
+        <Box flexDirection="row" gap={0}>
+          <Box marginTop={1} paddingX={1}>
+            <Text color="cyan" bold>💿</Text>
+          </Box>
+          <Box marginTop={1}>
+            <VMTable vms={node.vms.data} />
+          </Box>
+        </Box>
+      )}
+
+      {/* Actions Section - Show based on available actions */}
+      {nodeActions.length > 0 && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text>🎯 Actions:</Text>
+          </Box>
+          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+            {nodeActions.map((action, index) => (
+              <Row
+                key={index}
+                head={`${action.label}: `}
+                value={action.command}
+              />
+            ))}
+          </Box>
+        </>
+      )}
     </Box>
   );
 }
@@ -178,12 +395,60 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       console.log(createNodesTable(nodes));
       console.log(
         gray(
-          `\nFound ${nodes.length} node(s). Use --verbose for detailed information.`,
+          `\nFound ${nodes.length} ${
+            pluralizeNodes(nodes.length)
+          }. Use --verbose for detailed information, such as previous virtual machines.`,
         ),
       );
-      console.log(gray("\nExamples:"));
-      console.log(`  sf nodes set ${nodes[0].name} --max-price 12.50`);
-      console.log(`  sf nodes release ${nodes[0].name}`);
+
+      // Get actions from all nodes, deduplicated with newest nodes taking precedence
+      const nodesCommands: string[] = [];
+      const vmsCommands: string[] = [];
+      const seenNodesLabels = new Set<string>();
+
+      // Sort nodes by created_at (newest first), fallback to index for consistent ordering
+      const sortedNodes = [...nodes].sort((a, b) => {
+        const aTime = a.created_at || 0;
+        const bTime = b.created_at || 0;
+        return bTime - aTime; // Newest first
+      });
+
+      // Collect actions from each node, with newer nodes taking precedence
+      // Limit to 3 nodes commands and 1 vms command
+      for (const node of sortedNodes) {
+        const nodeActions = getActionsForNode(node);
+        for (const action of nodeActions) {
+          const isVmsCommand = action.command.includes("sf vms");
+
+          if (isVmsCommand) {
+            // Only add the first vms command we encounter (from newest node)
+            if (vmsCommands.length === 0) {
+              vmsCommands.push(action.command);
+            }
+          } else {
+            // For nodes commands, limit to 3 and deduplicate by label
+            if (
+              nodesCommands.length < 3 && !seenNodesLabels.has(action.label)
+            ) {
+              nodesCommands.push(action.command);
+              seenNodesLabels.add(action.label);
+            }
+          }
+        }
+      }
+
+      // Print Next Steps section
+      if (nodesCommands.length > 0 || vmsCommands.length > 0) {
+        console.log(gray("\nNext steps:"));
+        // Print nodes commands first
+        for (const command of nodesCommands) {
+          console.log(`  ${command}`);
+        }
+        // Then print vms commands
+        for (const command of vmsCommands) {
+          console.log(`  ${command}`);
+        }
+      }
     }
   } catch (err) {
     handleNodesError(err);
@@ -198,7 +463,7 @@ const list = new Command("list")
   .addHelpText(
     "after",
     `
-Examples:
+Next Steps:\n
   \x1b[2m# List nodes in short format (default)\x1b[0m
   $ sf nodes list
 

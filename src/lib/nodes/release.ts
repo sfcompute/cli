@@ -7,7 +7,12 @@ import ora from "ora";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { createNodesTable, forceOption, jsonOption } from "./utils.ts";
+import {
+  createNodesTable,
+  forceOption,
+  jsonOption,
+  pluralizeNodes,
+} from "./utils.ts";
 
 async function releaseNodesAction(
   nodeNames: string[],
@@ -47,7 +52,13 @@ async function releaseNodesAction(
 
       if (nodesToRelease.length > 0) {
         console.log(createNodesTable(nodesToRelease));
-        console.log(gray(`\nWould release ${nodesToRelease.length} node(s).`));
+        console.log(
+          gray(
+            `\nWould release ${nodesToRelease.length} ${
+              pluralizeNodes(nodesToRelease.length)
+            }.`,
+          ),
+        );
       }
 
       if (notFound.length > 0) {
@@ -85,8 +96,9 @@ async function releaseNodesAction(
       }
 
       const confirmed = await confirm({
-        message:
-          `Release ${nodesToRelease.length} node(s)? This action cannot be undone.`,
+        message: `Release ${nodesToRelease.length} ${
+          pluralizeNodes(nodesToRelease.length)
+        }? This action cannot be undone.`,
         default: false,
       });
       if (!confirmed) {
@@ -95,7 +107,11 @@ async function releaseNodesAction(
       }
     }
 
-    const releaseSpinner = ora(`Releasing ${nodesToRelease.length} node(s)...`)
+    const releaseSpinner = ora(
+      `Releasing ${nodesToRelease.length} ${
+        pluralizeNodes(nodesToRelease.length)
+      }...`,
+    )
       .start();
 
     const results: { name: string; status: string }[] = [];
@@ -113,7 +129,9 @@ async function releaseNodesAction(
     }
 
     if (results.length > 0) {
-      releaseSpinner.succeed(`Released ${results.length} node(s)`);
+      releaseSpinner.succeed(
+        `Released ${results.length} ${pluralizeNodes(results.length)}`,
+      );
     }
 
     if (errors.length > 0) {
@@ -121,7 +139,9 @@ async function releaseNodesAction(
         releaseSpinner.fail("Failed to release any nodes");
       } else {
         releaseSpinner.warn(
-          `Released ${results.length} node(s), but ${errors.length} failed`,
+          `Released ${results.length} ${
+            pluralizeNodes(results.length)
+          }, but ${errors.length} failed`,
         );
       }
       console.error(gray("\nFailed to release:"));
@@ -159,7 +179,7 @@ const release = new Command("release")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Release a single node by name\x1b[0m
   $ sf nodes release node-1
 

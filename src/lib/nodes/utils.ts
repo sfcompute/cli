@@ -1,4 +1,11 @@
-import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
+import {
+  brightBlack,
+  cyan,
+  gray,
+  green,
+  red,
+  yellow,
+} from "jsr:@std/fmt/colors";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
 import dayjs from "dayjs";
@@ -40,6 +47,35 @@ export function getStatusColor(status: SFCNodes.Node["status"]): string {
   }
 }
 
+export function printVMStatus(status: string): string {
+  switch (status) {
+    case "NodeFailure":
+      return "Node Failure";
+    default:
+      if (status.length === 0) return "Unknown";
+      return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+}
+
+export function getVMStatusColor(status: string): string {
+  const statusText = printVMStatus(status);
+
+  switch (status) {
+    case "Pending":
+      return yellow(statusText);
+    case "Running":
+      return green(statusText);
+    case "Destroyed":
+      return brightBlack(statusText);
+    case "NodeFailure":
+      return red(statusText);
+    case "Unspecified":
+      return gray(statusText);
+    default:
+      return statusText;
+  }
+}
+
 export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   switch (nodeType) {
     case "spot":
@@ -62,6 +98,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       cyan("NAME"),
       cyan("TYPE"),
       cyan("STATUS"),
+      cyan("CURRENT VM"),
       cyan("GPU"),
       cyan("ZONE"),
       cyan("START/END"),
@@ -92,10 +129,14 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       ? (node.max_price_per_node_hour / 100).toFixed(2)
       : "N/A";
 
+    const lastVm = node.vms?.data.sort((a, b) => b.updated_at - a.updated_at)
+      .at(0);
+
     table.push([
       node.name,
       printNodeType(node.node_type),
       getStatusColor(node.status),
+      lastVm?.id ?? "",
       node.gpu_type,
       node.zone || "N/A",
       startEnd,
@@ -104,6 +145,21 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
   }
 
   return table.toString();
+}
+
+export function pluralizeNodes(count: number) {
+  return count === 1 ? "node" as const : "nodes" as const;
+}
+
+/**
+ * Determine node type based on create command options
+ * @param options Options object with duration and/or end properties
+ * @returns "reserved" if duration or end is provided, "spot" otherwise
+ */
+export function determineNodeType(
+  options: { duration?: number; end?: Date },
+): "reserved" | "spot" {
+  return (options.duration || options.end) ? "reserved" : "spot";
 }
 
 /**
@@ -226,7 +282,7 @@ export const zoneOption = new Option(
  */
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
-  "Maximum price per node per hour in dollars",
+  "Maximum price per node hour in dollars",
 ).argParser(validatePrice).makeOptionMandatory();
 
 /**

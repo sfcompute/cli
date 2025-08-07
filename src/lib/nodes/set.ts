@@ -5,7 +5,7 @@ import console from "node:console";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { maxPriceOption } from "./utils.ts";
+import { maxPriceOption, pluralizeNodes } from "./utils.ts";
 import { updateProcurement } from "../scale/update.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 
@@ -80,10 +80,16 @@ async function setNodesAction(
 
     // Conclude spinner based on results
     if (results.length > 0 && errors.length === 0) {
-      spinner.succeed(`Successfully updated ${results.length} node(s)`);
+      spinner.succeed(
+        `Successfully updated ${results.length} ${
+          pluralizeNodes(results.length)
+        }`,
+      );
     } else if (results.length > 0 && errors.length > 0) {
       spinner.warn(
-        `Updated ${results.length} node(s), but ${errors.length} failed`,
+        `Updated ${results.length} ${
+          pluralizeNodes(results.length)
+        }, but ${errors.length} failed`,
       );
     } else {
       spinner.fail("Failed to update any nodes");
@@ -133,7 +139,7 @@ const set = new Command("set")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Update max price for a single node\x1b[0m
   $ sf nodes set node-1 --max-price 15.00
 

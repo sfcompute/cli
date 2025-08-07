@@ -8,11 +8,13 @@ import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import {
   createNodesTable,
+  determineNodeType,
   durationOption,
   endOption,
   forceOption,
   jsonOption,
   maxPriceOption,
+  pluralizeNodes,
   startOption,
   zoneOption,
 } from "./utils.ts";
@@ -21,6 +23,20 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { roundEndDate } from "../../helpers/units.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
+
+/**
+ * Create a formatted node type description with count
+ * @param count Number of nodes
+ * @param nodeType Type of node ("spot" or "reserved")
+ * @returns Formatted string like "1 spot node" or "3 reserved nodes"
+ */
+function formatNodeDescription(
+  count: number,
+  nodeType: "reserved" | "spot",
+): string {
+  const plural = pluralizeNodes(count);
+  return `${count} ${nodeType} ${plural}`;
+}
 
 /**
  * Validates that a count value is a positive integer
@@ -41,7 +57,7 @@ function validateCount(val: string): number {
 }
 
 const create = new Command("create")
-  .description("Create one or more compute nodes")
+  .description("Create reserved or spot nodes")
   .showHelpAfterError()
   .argument(
     "[names...]",
@@ -75,7 +91,9 @@ const create = new Command("create")
     if (names.length > 0 && count) {
       if (names.length !== count) {
         console.error(red(
-          `You specified ${names.length} node name(s) but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`,
+          `You specified ${names.length} ${
+            names.length === 1 ? "node name" : "node names"
+          } but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`,
         ));
         command.help();
         process.exit(1);
@@ -99,15 +117,15 @@ const create = new Command("create")
   .addHelpText(
     "after",
     `
-Examples:
+Examples:\n
   \x1b[2m# Create a single node with a specific name\x1b[0m
-  $ sf nodes create node-1 --zone alamo --max-price 12.50
+  $ sf nodes create node-1 --zone hayesvalley --max-price 12.50
 
   \x1b[2m# Create multiple nodes with specific names\x1b[0m
   $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --max-price 9
 
   \x1b[2m# Create 3 nodes with auto-generated names\x1b[0m
-  $ sf nodes create -n 3 --zone seacliff --max-price 10.00
+  $ sf nodes create -n 3 --zone hayesvalley --max-price 10.00
 
   \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
   $ sf nodes create node-1 --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z"
@@ -128,16 +146,22 @@ async function createNodesAction(
   try {
     const client = await nodesClient();
     const count = options.count ?? names.length;
-    const isReserved = !!(options.duration || options.end);
+    const nodeType = determineNodeType(options);
+    const isReserved = nodeType === "reserved";
 
     // Only show pricing and get confirmation if not using --force
     if (!options.force) {
       // Determine node type and prepare confirmation message
-      let confirmationMessage = `Create ${count} node(s)`;
+      let confirmationMessage = `Create ${
+        formatNodeDescription(count, nodeType)
+      }`;
 
       if (isReserved) {
         // Reserved nodes - get quote for accurate pricing
-        const spinner = ora(`Quoting ${count} node(s)...`).start();
+        const spinner = ora(
+          `Quoting ${formatNodeDescription(count, nodeType)}...`,
+        )
+          .start();
 
         // Calculate duration for quote
         let durationSeconds: number = 3600; // Default 1 hour
@@ -211,7 +235,7 @@ async function createNodesAction(
       if (!confirmed) process.exit(0);
     }
 
-    const spinner = ora(`Creating ${count} node(s)...`)
+    const spinner = ora(`Creating ${formatNodeDescription(count, nodeType)}...`)
       .start();
 
     try {
@@ -255,7 +279,11 @@ async function createNodesAction(
 
       const { data: createdNodes } = await client.nodes.create(createParams);
 
-      spinner.succeed(`Successfully created ${createdNodes.length} node(s)`);
+      spinner.succeed(
+        `Successfully created ${
+          formatNodeDescription(createdNodes.length, nodeType)
+        }`,
+      );
 
       if (options.json) {
         console.log(JSON.stringify(createdNodes, null, 2));
@@ -271,14 +299,18 @@ async function createNodesAction(
         console.log(
           `  sf nodes list`,
         );
-        console.log(
-          `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
-        );
-        console.log(
-          `  sf nodes set ${
-            cyan(createdNodes?.[0]?.name ?? "my-node")
-          } --max-price ${cyan("12.50")}`,
-        );
+        // Spot nodes can't be extended, so only suggest it for reserved nodes
+        if (isReserved) {
+          console.log(
+            `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
+          );
+        } else {
+          console.log(
+            `  sf nodes set ${
+              cyan(createdNodes?.[0]?.name ?? "my-node")
+            } --max-price ${cyan("12.50")}`,
+          );
+        }
         console.log(
           `  sf nodes release ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,
         );
