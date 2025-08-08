@@ -20,6 +20,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
+  .showHelpAfterError()
   .argument("<nodes...>", "Node IDs or names to extend")
   .addOption(requiredDurationOption)
   .addOption(maxPriceOption)

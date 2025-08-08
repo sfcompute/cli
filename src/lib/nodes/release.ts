@@ -18,6 +18,7 @@ const release = new Command("release")
   .description(
     "Release one or more compute nodes (stop a node from auto-renewing)",
   )
+  .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to release")
   .addOption(forceOption)
   .option(

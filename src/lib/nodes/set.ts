@@ -134,6 +134,7 @@ async function setNodesAction(
 
 const set = new Command("set")
   .description("Update attributes of one or more compute nodes")
+  .showHelpAfterError()
   .argument("<names...>", "Names of the nodes to update")
   .addOption(maxPriceOption)
   .addHelpText(
