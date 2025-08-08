@@ -458,6 +458,7 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
 const list = new Command("list")
   .alias("ls")
   .description("List all compute nodes")
+  .showHelpAfterError()
   .option("--verbose", "Show detailed information for each node")
   .addOption(jsonOption)
   .addHelpText(
