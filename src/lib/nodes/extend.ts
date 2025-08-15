@@ -13,7 +13,7 @@ import {
   pluralizeNodes,
   requiredDurationOption,
 } from "./utils.ts";
-import SFCNodes from "npm:@sfcompute/nodes-sdk-alpha@latest";
+import SFCNodes from "@sfcompute/nodes-sdk-alpha";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -92,26 +92,30 @@ async function extendNodeAction(
       console.log();
     }
 
-    // Filter out spot nodes (they can't be extended)
-    const spotNodes = nodes.filter(({ node }) => node.node_type === "spot");
+    // Filter out auto reserved nodes (they can't be extended)
+    const autoReservedNodes = nodes.filter(({ node }) =>
+      node.node_type === "autoreserved"
+    );
     const extendableNodes = nodes.filter(({ node }) =>
-      node.node_type !== "spot"
+      node.node_type !== "autoreserved"
     );
 
-    if (spotNodes.length > 0) {
+    if (autoReservedNodes.length > 0) {
       console.log(
         red(
-          `Cannot extend ${spotNodes.length === 1 ? "this" : "these"} spot ${
-            pluralizeNodes(spotNodes.length)
+          `Cannot extend ${
+            autoReservedNodes.length === 1 ? "this" : "these"
+          } auto reserved ${
+            pluralizeNodes(autoReservedNodes.length)
           } (they auto-extend):`,
         ),
       );
-      for (const { name } of spotNodes) {
+      for (const { name } of autoReservedNodes) {
         console.log(`  • ${name}`);
       }
       console.log(
         brightRed(
-          `\nTo configure spot nodes, use the \`sf nodes set\` command.`,
+          `\nTo configure auto reserved nodes, use the \`sf nodes set\` command.`,
         ),
       );
     }
