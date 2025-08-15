@@ -7,11 +7,11 @@ import ora from "ora";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
   createNodesTable,
-  forceOption,
   jsonOption,
   maxPriceOption,
   pluralizeNodes,
   requiredDurationOption,
+  yesOption,
 } from "./utils.ts";
 import SFCNodes from "@sfcompute/nodes-sdk-alpha";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
@@ -24,7 +24,7 @@ const extend = new Command("extend")
   .argument("<nodes...>", "Node IDs or names to extend")
   .addOption(requiredDurationOption)
   .addOption(maxPriceOption)
-  .addOption(forceOption)
+  .addOption(yesOption)
   .addOption(jsonOption)
   .addHelpText(
     "after",
@@ -43,7 +43,7 @@ Examples:\n
   $ sf nodes extend my-node --duration 7200 --max-price 10.00
 
   \x1b[2m# Skip confirmation prompt\x1b[0m
-  $ sf nodes extend my-node --duration 1h --max-price 10.00 --force
+  $ sf nodes extend my-node --duration 1h --max-price 10.00 --yes
 
   \x1b[2m# Output extended nodes in JSON format\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 10.00 --json
@@ -124,8 +124,8 @@ async function extendNodeAction(
       process.exit(1);
     }
 
-    // Only show pricing and get confirmation if not using --force
-    if (!options.force) {
+    // Only show pricing and get confirmation if not using --yes
+    if (!options.yes) {
       // Get quote for accurate pricing preview
       const spinner = ora(
         `Quoting extending ${extendableNodes.length} ${
