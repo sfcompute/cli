@@ -3,12 +3,12 @@ import { getAuthToken } from "./helpers/config.ts";
 import { logAndQuit } from "./helpers/errors.ts";
 
 export async function nodesClient($token?: string) {
-  if ($token) return new SFCNodes({ apiKey: $token });
+  if ($token) return new SFCNodes({ bearerToken: $token });
   const token = await getAuthToken();
   if (!token) {
     logAndQuit("Not logged in. Please run 'sf login' first.");
   }
-  return new SFCNodes({ apiKey: token });
+  return new SFCNodes({ bearerToken: token });
 }
 
 export function handleNodesError(err: unknown) {
