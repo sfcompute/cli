@@ -151,8 +151,8 @@ function getActionsForNode(node: SFCNodes.Node) {
             command: `sf nodes delete ${node.name} --force (coming soon)`,
           },
         );
-      } else if (node.node_type === "spot") {
-        // Spot nodes: can update, release, delete
+      } else if (node.node_type === "autoreserved") {
+        // Auto reserved nodes: can update, release, delete
         nodeActions.push(
           {
             label: "Update",
@@ -176,8 +176,8 @@ function getActionsForNode(node: SFCNodes.Node) {
         );
       }
 
-      if (node.node_type === "spot") {
-        // Spot nodes: can update, release, delete
+      if (node.node_type === "autoreserved") {
+        // Auto reserved nodes: can update, release, delete
         nodeActions.push(
           {
             label: "Update",
@@ -277,7 +277,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             : "Not specified"}
         />
         <Row
-          head={node.node_type === "spot" &&
+          head={node.node_type === "autoreserved" &&
               (node.status === "running" ||
                 node.status === "pending" ||
                 node.status === "awaitingcapacity") &&
@@ -300,7 +300,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Text>💰 Pricing:</Text>
       </Box>
       <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        {node.node_type === "spot" && (
+        {node.node_type === "autoreserved" && (
           <>
             <Row
               head="Max Price: "
@@ -308,7 +308,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             />
           </>
         )}
-        {node.node_type !== "spot" && (
+        {node.node_type !== "autoreserved" && (
           <>
             <Row head="Price: " value={`$${pricePerHour.toFixed(2)}/hour`} />
 
