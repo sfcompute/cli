@@ -9,10 +9,10 @@ import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
   createNodesTable,
-  forceOption,
   jsonOption,
   pluralizeNodes,
   printNodeStatus,
+  yesOption,
 } from "./utils.ts";
 
 const release = new Command("release")
@@ -21,7 +21,7 @@ const release = new Command("release")
   )
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to release")
-  .addOption(forceOption)
+  .addOption(yesOption)
   .option(
     "--dry-run",
     "Show what would be released without actually releasing nodes",
@@ -41,7 +41,7 @@ Examples:\n
   $ sf nodes release node-abc123
 
   \x1b[2m# Release nodes without confirmation\x1b[0m
-  $ sf nodes release node-1 --force
+  $ sf nodes release node-1 --yes
 
   \x1b[2m# Show what would be released in JSON format\x1b[0m
   $ sf nodes release node-1 --dry-run --json
@@ -163,7 +163,7 @@ async function releaseNodesAction(
     }
 
     // Show nodes table and get confirmation for destructive action
-    if (!options.force) {
+    if (!options.yes) {
       if (nodesToRelease.length > 0) {
         console.log(
           `The following ${

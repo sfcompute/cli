@@ -44,7 +44,7 @@ export function registerTokens(program: Command) {
     .alias("rm")
     .description("Delete a token")
     .requiredOption("--id <id>", "Specify the token ID")
-    .option("--force", "Force delete the token, skipping confirmation")
+    .option("--yes", "Force delete the token, skipping confirmation")
     .action(deleteTokenAction);
 }
 
@@ -275,17 +275,17 @@ function formatDate(isoString: string): string {
 
 async function deleteTokenAction({
   id,
-  force,
+  yes,
 }: {
   id: string;
-  force?: boolean;
+  yes?: boolean;
 }) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();
   }
 
-  if (force) {
+  if (yes) {
     await deleteTokenById(id);
     console.log(`${chalk.green("✓")} Token deleted successfully`);
     process.exit(0);

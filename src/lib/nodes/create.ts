@@ -11,11 +11,11 @@ import {
   determineNodeType,
   durationOption,
   endOption,
-  forceOption,
   jsonOption,
   maxPriceOption,
   pluralizeNodes,
   startOption,
+  yesOption,
   zoneOption,
 } from "./utils.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
@@ -73,7 +73,7 @@ const create = new Command("create")
   .addOption(startOption)
   .addOption(endOption.conflicts("duration"))
   .addOption(durationOption.conflicts("end"))
-  .addOption(forceOption)
+  .addOption(yesOption)
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
@@ -151,8 +151,8 @@ async function createNodesAction(
     const nodeType = determineNodeType(options);
     const isReserved = nodeType === "reserved";
 
-    // Only show pricing and get confirmation if not using --force
-    if (!options.force) {
+    // Only show pricing and get confirmation if not using --yes
+    if (!options.yes) {
       // Determine node type and prepare confirmation message
       let confirmationMessage = `Create ${
         formatNodeDescription(count, nodeType)

@@ -417,15 +417,18 @@ Examples:
   vm.command("replace")
     .description("Replace a virtual machine")
     .requiredOption("-i, --id <id>", "ID of the VM to replace")
+    .option("-y, --yes", "Automatically confirm the command.")
     .action(async (options) => {
       // Replace is a destructive action - get confirmation
-      const replaceConfirmed = await confirm({
-        message:
-          `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
-        default: false,
-      });
-      if (!replaceConfirmed) {
-        process.exit(0);
+      if (!options.yes) {
+        const replaceConfirmed = await confirm({
+          message:
+            `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
+          default: false,
+        });
+        if (!replaceConfirmed) {
+          process.exit(0);
+        }
       }
 
       const loadingSpinner = ora(`Replacing VM ${options.id}`).start();

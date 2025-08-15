@@ -148,7 +148,7 @@ function getActionsForNode(node: SFCNodes.Node) {
           },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --force (coming soon)`,
+            command: `sf nodes delete ${node.name} --yes (coming soon)`,
           },
         );
       } else if (node.node_type === "autoreserved") {
@@ -161,7 +161,7 @@ function getActionsForNode(node: SFCNodes.Node) {
           { label: "Release", command: `sf nodes release ${node.name}` },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --force (coming soon)`,
+            command: `sf nodes delete ${node.name} --yes (coming soon)`,
           },
         );
       }
@@ -186,14 +186,14 @@ function getActionsForNode(node: SFCNodes.Node) {
           { label: "Release", command: `sf nodes release ${node.name}` },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --force (coming soon)`,
+            command: `sf nodes delete ${node.name} --yes (coming soon)`,
           },
         );
       } else if (node.node_type === "reserved") {
         // Reserved nodes: can delete
         nodeActions.push({
           label: "Delete",
-          command: `sf nodes delete ${node.name} --force (coming soon)`,
+          command: `sf nodes delete ${node.name} --yes (coming soon)`,
         });
       }
       break;

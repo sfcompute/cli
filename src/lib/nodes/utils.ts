@@ -262,10 +262,10 @@ export function parseEnd(value: string): Date {
 export const jsonOption = new Option("-j, --json", "Output in JSON format");
 
 /**
- * Common --force option to skip confirmation prompts
+ * Common --yes option to skip confirmation prompts
  */
-export const forceOption = new Option(
-  "-f, --force",
+export const yesOption = new Option(
+  "-y, --yes",
   "Skip confirmation prompt",
 );
 
