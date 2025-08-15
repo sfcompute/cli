@@ -38,7 +38,7 @@ async function setNodesAction(
       else notFound.push(nameOrId);
     }
 
-    // Filter nodes that have procurement_id (spot nodes)
+    // Filter nodes that have procurement_id (auto reserved nodes)
     const nodesWithProcurement = nodesToUpdate.filter((node) =>
       node.procurement_id
     );
@@ -51,7 +51,7 @@ async function setNodesAction(
       throw new CommanderError(
         1,
         "NO_UPDATABLE_NODES",
-        "No nodes with procurement IDs found. Only spot nodes can have their pricing updated.",
+        "No nodes with procurement IDs found. Only auto reserved nodes can have their pricing updated.",
       );
     }
 
