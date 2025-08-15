@@ -20,10 +20,10 @@ export async function registerNodes(program: Command) {
       "after",
       `
 A node is a compute instance that provides GPUs for your workloads. Nodes can be created 
-as reservations (with specific start/end times) or as procurements (spot pricing).
+as reservations (with specific start/end times) or as procurements (auto reserved pricing).
 
 Examples:\n
-\x1b[2m# Create a spot node\x1b[0m
+\x1b[2m# Create an auto reserved node\x1b[0m
 $ sf nodes create my-node-name --zone hayesvalley --max-price 12.50
 
 \x1b[2m# Create multiple reserved nodes with auto-generated names\x1b[0m
@@ -35,7 +35,7 @@ $ sf nodes list
 \x1b[2m# Release a node\x1b[0m
 $ sf nodes release my-node-name
 
-\x1b[2m# Update the max price of a spot node\x1b[0m
+\x1b[2m# Update the max price of an auto reserved node\x1b[0m
 $ sf nodes set my-node-name --max-price 12.50
 
 \x1b[2m# Extend a reserved node\x1b[0m
