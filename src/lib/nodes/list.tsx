@@ -345,7 +345,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
 }
 
 // Component for displaying multiple nodes in verbose format
-function NodesVerboseDisplay({ nodes }: { nodes: SFCNodes.Node[] }) {
+export function NodesVerboseDisplay({ nodes }: { nodes: SFCNodes.Node[] }) {
   return (
     <Box flexDirection="column" gap={1}>
       {nodes.map((node, index) => (

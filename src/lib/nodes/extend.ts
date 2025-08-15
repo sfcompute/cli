@@ -58,19 +58,17 @@ async function extendNodeAction(
   try {
     const client = await nodesClient();
 
-    // Fetch all nodes and filter by provided names/IDs
+    // Use the API's names parameter to filter nodes directly
     const fetchSpinner = ora().start();
-    const { data: allNodes } = await client.nodes.list();
+    const { data: fetchedNodes } = await client.nodes.list({ names: nodeNames });
     fetchSpinner.stop();
 
-    // Filter nodes that match the provided names/IDs
+    // Check which names were not found
     const nodes: { name: string; node: SFCNodes.Node }[] = [];
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = allNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
-      );
+      const node = fetchedNodes.find((n) => n.name === nameOrId);
       if (node) {
         nodes.push({ name: nameOrId, node });
       } else {
