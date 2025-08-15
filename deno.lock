@@ -1,14 +1,12 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/assert@^1.0.11": "1.0.13",
-    "jsr:@std/fmt@*": "1.0.8",
-    "jsr:@std/internal@^1.0.6": "1.0.10",
+    "jsr:@std/assert@^1.0.11": "1.0.14",
+    "jsr:@std/internal@^1.0.10": "1.0.10",
     "npm:@commander-js/extra-typings@^12.1.0": "12.1.0_commander@12.1.0",
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.23__react@18.3.1_@types+react@18.3.23_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
-    "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.7": "0.1.0-alpha.7",
-    "npm:@sfcompute/nodes-sdk-alpha@latest": "0.1.0-alpha.7",
+    "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.9": "0.1.0-alpha.9",
     "npm:@types/ms@~0.7.34": "0.7.34",
     "npm:@types/node@*": "22.15.15",
     "npm:@types/react@^18.3.20": "18.3.23",
@@ -19,8 +17,6 @@
     "npm:chrono-node@^2.7.6": "2.8.4",
     "npm:cli-table3@0.6.5": "0.6.5",
     "npm:commander@^12.1.0": "12.1.0",
-    "npm:dayjs@*": "1.11.13",
-    "npm:dayjs@1.11.13": "1.11.13",
     "npm:dayjs@^1.11.13": "1.11.13",
     "npm:dotenv@^16.4.5": "16.6.1",
     "npm:ink-confirm-input@2": "2.0.0_ink@5.2.1__@types+react@18.3.23__react@18.3.1_react@18.3.1_@types+react@18.3.23",
@@ -41,22 +37,16 @@
     "npm:semver@^7.6.3": "7.7.2",
     "npm:shescape@^2.1.1": "2.1.6",
     "npm:tiny-invariant@^1.3.3": "1.3.3",
-    "npm:tweetnacl-util@*": "0.15.1",
     "npm:tweetnacl-util@~0.15.1": "0.15.1",
-    "npm:tweetnacl@*": "1.0.3",
     "npm:tweetnacl@^1.0.3": "1.0.3",
-    "npm:yaml@2.6.1": "2.6.1",
-    "npm:yn@*": "3.1.1"
+    "npm:yaml@2.6.1": "2.6.1"
   },
   "jsr": {
-    "@std/assert@1.0.13": {
-      "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
+    "@std/assert@1.0.14": {
+      "integrity": "68d0d4a43b365abc927f45a9b85c639ea18a9fab96ad92281e493e4ed84abaa4",
       "dependencies": [
         "jsr:@std/internal"
       ]
-    },
-    "@std/fmt@1.0.8": {
-      "integrity": "71e1fc498787e4434d213647a6e43e794af4fd393ef8f52062246e06f7e372b7"
     },
     "@std/internal@1.0.10": {
       "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
@@ -70,8 +60,8 @@
         "is-fullwidth-code-point@4.0.0"
       ]
     },
-    "@babel/runtime@7.28.2": {
-      "integrity": "sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA=="
+    "@babel/runtime@7.28.3": {
+      "integrity": "sha512-9uIQ10o0WGdpP6GDhXcdOJPJuDgFtIDtN/9+ArJQ2NAfAmiuhTQdzkaTGR33v43GYS2UrSA0eX2pPPHoFVvpxA=="
     },
     "@colors/colors@1.5.0": {
       "integrity": "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ=="
@@ -115,7 +105,7 @@
         "@inquirer/figures",
         "@inquirer/type@2.0.0",
         "@types/mute-stream",
-        "@types/node@22.17.0",
+        "@types/node@22.17.1",
         "@types/wrap-ansi",
         "ansi-escapes@4.3.2",
         "cli-width",
@@ -221,8 +211,8 @@
         "mute-stream"
       ]
     },
-    "@sfcompute/nodes-sdk-alpha@0.1.0-alpha.7": {
-      "integrity": "sha512-AxqGHXQhX/GHvpZ8eG2dL/+MhRHp5dwycjEWtDWsW1IVjQioyzJ22q8/2SQMabOMNUCleGZtV3giV05AXzUG4Q=="
+    "@sfcompute/nodes-sdk-alpha@0.1.0-alpha.9": {
+      "integrity": "sha512-Psi3r9oC2UJeA1V6PNyJFxoEQkBwjX2+NpTYdRUGVzemQuYBNzlbvAq7PaNKhUgMmEjKgnBnYJqhNQOQZvHxvg=="
     },
     "@types/ms@0.7.34": {
       "integrity": "sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g=="
@@ -239,8 +229,8 @@
         "undici-types"
       ]
     },
-    "@types/node@22.17.0": {
-      "integrity": "sha512-bbAKTCqX5aNVryi7qXVMi+OkB3w/OyblodicMbvE38blyAz7GxXf6XYhklokijuPwwVg9sDLKRxt0ZHXQwZVfQ==",
+    "@types/node@22.17.1": {
+      "integrity": "sha512-y3tBaz+rjspDTylNjAX37jEC3TETEFGNJL6uQDxwF9/8GLLIjW1rvVHlynyuUKMnMr1Roq8jOv3vkopBjC4/VA==",
       "dependencies": [
         "undici-types"
       ]
@@ -479,8 +469,8 @@
         "hasown"
       ]
     },
-    "es-toolkit@1.39.8": {
-      "integrity": "sha512-A8QO9TfF+rltS8BXpdu8OS+rpGgEdnRhqIVxO/ZmNvnXBYgOdSsxukT55ELyP94gZIntWJ+Li9QRrT2u1Kitpg=="
+    "es-toolkit@1.39.9": {
+      "integrity": "sha512-9OtbkZmTA2Qc9groyA1PUNeb6knVTkvB2RSdr/LcJXDL8IdEakaxwXLHXa7VX/Wj0GmdMJPR3WhnPGhiP3E+qg=="
     },
     "escape-string-regexp@2.0.0": {
       "integrity": "sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w=="
@@ -1054,6 +1044,9 @@
     "https://esm.sh/yn": "https://esm.sh/yn@5.0.0"
   },
   "remote": {
+    "https://deno.land/std@0.112.0/fmt/colors.ts": "8368ddf2d48dfe413ffd04cdbb7ae6a1009cf0dccc9c7ff1d76259d9c61a0621",
+    "https://deno.land/std@0.112.0/testing/_diff.ts": "ccd6c3af6e44c74bf1591acb1361995f5f50df64323a6e7fb3f16c8ea792c940",
+    "https://deno.land/std@0.112.0/testing/asserts.ts": "cb82284da34f9e863250efacb985886336a9bbdcd2cf81cc9311a32aff53da35",
     "https://esm.sh/@colors/colors@1.6.0/denonext/safe.mjs": "672444cb6774ba3c81b20f5bbfcf418f90995a01009055adc0755143b482e5e2",
     "https://esm.sh/@colors/colors@1.6.0/safe?target=denonext": "6affb64b51a87ea13b07ae8e13b329bacfb225a344bf6bc721656ae6b3abb2ad",
     "https://esm.sh/ansi-align@3.0.1/denonext/ansi-align.mjs": "0f4b86c34935f09a6bf23d184bb50b9c5df453c1a78527cbeaae9bb03af30a63",
@@ -1081,10 +1074,10 @@
     "https://esm.sh/dayjs@1.11.13/denonext/dayjs.mjs": "a6d8258bec464149ab2c9ae26e4bd3736897828586b03f8fea45403080bf8a80",
     "https://esm.sh/dayjs@1.11.13/denonext/plugin/duration.mjs": "64bd1dd95adf21a54fcda2dd3161998cd2780a4789d43c14b63d33ed012d3938",
     "https://esm.sh/dayjs@1.11.13/denonext/plugin/relativeTime.mjs": "b38196c727ee8c425eff06f091298f945b1f041fb8c3a0756b40081d6f067b3d",
-    "https://esm.sh/dayjs@1.11.13/denonext/plugin/utc.mjs": "7e89223a0933377aaa5fd52d97f116ed3d48c93d5b2ed305d86bde9e496b3e12",
+    "https://esm.sh/dayjs@1.11.13/es2022/plugin/utc.mjs": "01c663b7318d6daa10a2377306a878808a535d6dc4056fa5b60a8d31c5d2254f",
     "https://esm.sh/dayjs@1.11.13/plugin/duration.js": "9f6f119d7af58b8e08424bf897daaa286cadaa63d58262140969102671296a51",
     "https://esm.sh/dayjs@1.11.13/plugin/relativeTime.js": "48ccbeb4a6e19c6320f41edc1028ac85e7baf8cd434faebe65e3208ec70cea6b",
-    "https://esm.sh/dayjs@1.11.13/plugin/utc.js": "2e41a0673e6e7c7c962983f1680911ef6feb27ded6007bc7705787ac1b2637b7",
+    "https://esm.sh/dayjs@1.11.13/plugin/utc.js": "3c51f2f90816004281990ed17d5010311c2b77875663127cbc773dc440ae7dde",
     "https://esm.sh/emoji-regex@10.4.0/denonext/emoji-regex.mjs": "7e89c53d8651a966f77c1901971efc9dc108ac39d0a30f5254079330c9b46920",
     "https://esm.sh/emoji-regex@10.4.0?target=denonext": "d69f33ab60bfa309f95861ee5279a2501237c80da122fd91b826ec8101b29d8d",
     "https://esm.sh/emoji-regex@8.0.0/denonext/emoji-regex.mjs": "3969ad7b107b6f585354a5019c24320e3d91d6bb70a96e2beead925247aed9dc",
@@ -1150,7 +1143,7 @@
         "npm:@commander-js/extra-typings@^12.1.0",
         "npm:@inkjs/ui@2",
         "npm:@inquirer/prompts@^5.1.2",
-        "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.7",
+        "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.9",
         "npm:@types/ms@~0.7.34",
         "npm:@types/react@^18.3.20",
         "npm:@types/semver@^7.5.8",
