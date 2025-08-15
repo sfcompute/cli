@@ -27,12 +27,12 @@ import { GPUS_PER_NODE } from "../constants.ts";
 /**
  * Create a formatted node type description with count
  * @param count Number of nodes
- * @param nodeType Type of node ("spot" or "reserved")
- * @returns Formatted string like "1 spot node" or "3 reserved nodes"
+ * @param nodeType Type of node ("autoreserved" or "reserved")
+ * @returns Formatted string like "1 auto reserved node" or "3 reserved nodes"
  */
 function formatNodeDescription(
   count: number,
-  nodeType: "reserved" | "spot",
+  nodeType: "reserved" | "autoreserved",
 ): string {
   const plural = pluralizeNodes(count);
   return `${count} ${nodeType} ${plural}`;
@@ -57,7 +57,7 @@ function validateCount(val: string): number {
 }
 
 const create = new Command("create")
-  .description("Create reserved or spot nodes")
+  .description("Create reserved or auto reserved nodes")
   .showHelpAfterError()
   .argument(
     "[names...]",
@@ -109,7 +109,9 @@ const create = new Command("create")
 
     const isReserved = !!(duration || end);
     if (!isReserved && !zone) {
-      console.error(red("Must specify --zone when creating spot nodes\n"));
+      console.error(
+        red("Must specify --zone when creating auto reserved nodes\n"),
+      );
       command.help();
       process.exit(1);
     }
@@ -217,7 +219,7 @@ async function createNodesAction(
           );
         }
       } else if (options.maxPrice) {
-        // Spot nodes - show max price they're willing to pay
+        // Auto Reserved nodes - show max price they're willing to pay
         confirmationMessage += ` for up to $${
           options.maxPrice.toFixed(2)
         }/node/hr`;
@@ -273,8 +275,8 @@ async function createNodesAction(
         createParams.end_at = Math.floor(endDate.getTime() / 1000);
         createParams.node_type = "reserved";
       } else {
-        // Neither provided - spot
-        createParams.node_type = "spot";
+        // Neither provided - auto reserved
+        createParams.node_type = "autoreserved";
       }
 
       const { data: createdNodes } = await client.nodes.create(createParams);
@@ -299,7 +301,7 @@ async function createNodesAction(
         console.log(
           `  sf nodes list`,
         );
-        // Spot nodes can't be extended, so only suggest it for reserved nodes
+        // Auto Reserved nodes can't be extended, so only suggest it for reserved nodes
         if (isReserved) {
           console.log(
             `  sf nodes extend ${cyan(createdNodes?.[0]?.name ?? "my-node")}`,

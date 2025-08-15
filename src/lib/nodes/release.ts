@@ -12,6 +12,7 @@ import {
   forceOption,
   jsonOption,
   pluralizeNodes,
+  printNodeStatus,
 } from "./utils.ts";
 
 const release = new Command("release")
@@ -115,8 +116,8 @@ async function releaseNodesAction(
           } ${pluralizeNodes(nonReleasableNodes.length)}:`,
         ),
       );
-      for (const { name } of nonReleasableNodes) {
-        console.log(`  • ${name}`);
+      for (const { name, node } of nonReleasableNodes) {
+        console.log(`  • ${name} (${printNodeStatus(node.status)})`);
       }
       console.log(
         brightRed(

@@ -78,8 +78,8 @@ export function getVMStatusColor(status: string): string {
 
 export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   switch (nodeType) {
-    case "spot":
-      return "Spot";
+    case "autoreserved":
+      return "Auto Reserved";
     case "reserved":
       return "Reserved";
     default:
@@ -154,12 +154,12 @@ export function pluralizeNodes(count: number) {
 /**
  * Determine node type based on create command options
  * @param options Options object with duration and/or end properties
- * @returns "reserved" if duration or end is provided, "spot" otherwise
+ * @returns "reserved" if duration or end is provided, "autoreserved" otherwise
  */
 export function determineNodeType(
   options: { duration?: number; end?: Date },
-): "reserved" | "spot" {
-  return (options.duration || options.end) ? "reserved" : "spot";
+): "reserved" | "autoreserved" {
+  return (options.duration || options.end) ? "reserved" : "autoreserved";
 }
 
 /**
