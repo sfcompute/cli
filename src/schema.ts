@@ -4,41 +4,6 @@
  */
 
 export interface paths {
-    "/v0/refunds": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of refund requests and their statuses for the account */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountRefunds"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v0/balance": {
         parameters: {
             query?: never;
@@ -61,171 +26,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountBalance"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/clusters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of Kubernetes clusters */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["KubernetesCluster"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/contracts/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Contract details */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-                    };
-                };
-                /** @description Contract not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/contracts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    instance_type?: string;
-                    active_within_interval_start?: string;
-                    active_within_interval_end?: string;
-                    state?: "All" | "Upcoming" | "Expired" | "Active";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of contracts */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: (components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"])[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request parameters */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Not authenticated */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotAuthenticatedError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
                     };
                 };
             };
@@ -260,7 +61,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Account"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Account"];
                     };
                 };
                 /** @description Account not found */
@@ -269,300 +70,13 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
                     };
                 };
             };
         };
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get historical prices for a given instance type */
-        get: {
-            parameters: {
-                query?: {
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    min_quantity?: number;
-                    max_quantity?: number;
-                    min_duration?: number | null;
-                    max_duration?: number | null;
-                    since_n_days_ago?: number | null;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description The historical prices for the given instance type */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["PriceHistoryItem"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description The request is too far in past */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PriceRequestTooFarInPastError"] | components["schemas"]["InvalidRequestError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/procurements/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Procurement not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProcurementUpdate"];
-                };
-            };
-            responses: {
-                /** @description Successfully updated procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Procurement not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        trace?: never;
-    };
-    "/v0/procurements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved procurements */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["Procurement"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProcurementCreation"];
-                };
-            };
-            responses: {
-                /** @description Successfully created procurement */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Procurement"];
-                    };
-                };
-                /** @description Bad request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementInvalidColocateOnRestartError"] | components["schemas"]["ProcurementInvalidColocateOnClusterError"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementNotAuthenticatedError"];
-                    };
-                };
-                /** @description Cluster to colocate on not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProcurementColocateOnClusterNotFoundError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
         delete?: never;
         options?: never;
         head?: never;
@@ -594,7 +108,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ListTokenResponse"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_ListTokenResponse"];
                     };
                 };
                 /** @description Account not found */
@@ -603,7 +117,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
                     };
                 };
             };
@@ -619,7 +133,10 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        /** @description Number of seconds until token expires. */
+                        /**
+                         * @description Number of seconds until token expires.
+                         * @example 604800
+                         */
                         expires_in_seconds: number;
                         /** @description Name of the token. */
                         name?: string;
@@ -637,7 +154,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Token"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Token"];
                     };
                 };
                 /** @description Invalid request parameters */
@@ -646,7 +163,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["InvalidTokenExpirationDuration"] | components["schemas"]["MaxTokenLimitReached"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_MaxTokenLimitReached"];
                     };
                 };
                 /** @description Authentication required */
@@ -655,7 +172,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
                     };
                 };
                 /** @description Account is frozen */
@@ -664,7 +181,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountFrozenError"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountFrozenError"];
                     };
                 };
                 /** @description Token not found */
@@ -673,7 +190,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["InvalidTokenCreateOriginClient"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"] | components["schemas"]["San_Francisco_Compute_Documentation_InvalidTokenCreateOriginClient"];
                     };
                 };
                 /** @description Token generation rate limit exceeded */
@@ -682,7 +199,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MaxTokenLimitReached"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_MaxTokenLimitReached"];
                     };
                 };
             };
@@ -731,7 +248,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountNotFoundError"] | components["schemas"]["TokenNotFound"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"] | components["schemas"]["San_Francisco_Compute_Documentation_TokenNotFound"];
                     };
                 };
             };
@@ -755,7 +272,7 @@ export interface paths {
                     ending_before?: string;
                     limit?: string;
                     transaction_type?: ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected") | ("buy" | "sell" | "transfer" | "error" | "instant_deposit" | "deposit_ach" | "withdrawal_bank" | "refund" | "admin_ledger_transfer" | "fulfillment_escrow_release" | "promotional_credit" | "delivery_fees_collected")[];
-                    account_kind?: components["schemas"]["AccountKind"] | components["schemas"]["AccountKind"][];
+                    account_kind?: components["schemas"]["San_Francisco_Compute_Documentation_AccountKind"] | components["schemas"]["San_Francisco_Compute_Documentation_AccountKind"][];
                 };
                 header?: never;
                 path?: never;
@@ -769,632 +286,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccountTransactions"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/vms/logs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    instance_id?: string;
-                    before?: string;
-                    since?: string;
-                    limit?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Successfully retrieved VM logs */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "list";
-                            data: {
-                                /**
-                                 * Format: date-time
-                                 * @description ISO timestamp of the log line
-                                 */
-                                timestamp: string;
-                                message: string;
-                                instance_id: string;
-                            }[];
-                        } | {
-                            data: {
-                                /**
-                                 * Format: date-time
-                                 * @description ISO timestamp of the log line
-                                 */
-                                timestamp: string;
-                                message: string;
-                                instance_id: string;
-                            }[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    side?: "buy" | "sell";
-                    min_start_date?: "NOW" | string;
-                    max_start_date?: "NOW" | string;
-                    quantity: number;
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    contract_id?: string;
-                    colocate_with?: string[];
-                    duration?: number;
-                    min_duration?: number;
-                    max_duration?: number;
-                    cluster?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Quote response */
-                200: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "quote";
-                            /** @enum {string} */
-                            side: "buy";
-                            quote: {
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes.
-                                 * @example 3
-                                 */
-                                quantity: number;
-                                /**
-                                 * Format: date-time
-                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-20T01:26:22.670Z
-                                 */
-                                start_at: string;
-                                /**
-                                 * Format: date-time
-                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-                                 */
-                                end_at: string;
-                                /** @description The instance type. */
-                                instance_type: ("h100i" | "h100v" | "h200ki") | string;
-                            } | null;
-                        } | {
-                            /** @enum {string} */
-                            object: "quote";
-                            /** @enum {string} */
-                            side: "sell";
-                            quote: {
-                                /** @description Price in cents (1 = $0.01) */
-                                price: number | null;
-                                /**
-                                 * @description The number of nodes.
-                                 * @example 3
-                                 */
-                                quantity: number;
-                                /**
-                                 * Format: date-time
-                                 * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-                                 * @example 2025-05-20T01:26:22.670Z
-                                 */
-                                start_at: string;
-                                /**
-                                 * Format: date-time
-                                 * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-                                 */
-                                end_at: string;
-                                /** @description An external ID with prefix and alphanumeric string with underscores */
-                                contract_id: string;
-                            } | null;
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidDateRange"] | components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Not found */
-                404: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["NotFoundError"];
-                    };
-                };
-                /** @description Too Many Requests */
-                429: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        /** @description Request limit per window */
-                        "RateLimit-Limit"?: number;
-                        /** @description Remaining requests for current window */
-                        "RateLimit-Remaining"?: number;
-                        /** @description Unix timestamp when the rate limit window resets */
-                        "RateLimit-Reset"?: number;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description List orders */
-        get: {
-            parameters: {
-                query?: {
-                    side?: "buy" | "sell";
-                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-                    min_price?: number | null;
-                    max_price?: number | null;
-                    min_start_date?: string;
-                    max_start_date?: string;
-                    min_duration?: number | null;
-                    max_duration?: number | null;
-                    min_quantity?: number | null;
-                    max_quantity?: number | null;
-                    contract_id?: string;
-                    only_open?: boolean | null;
-                    exclude_filled?: boolean | null;
-                    only_filled?: boolean | null;
-                    min_filled_at?: string | null;
-                    max_filled_at?: string | null;
-                    min_fill_price?: number | null;
-                    max_fill_price?: number | null;
-                    exclude_cancelled?: boolean | null;
-                    only_cancelled?: boolean | null;
-                    min_cancelled_at?: string | null;
-                    max_cancelled_at?: string | null;
-                    min_placed_at?: string | null;
-                    max_placed_at?: string | null;
-                    limit?: number | null;
-                    offset?: number | null;
-                    sort_by?: "created_at" | "start_time";
-                    sort_direction?: "ASC" | "DESC";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of orders */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: components["schemas"]["OrderResponse"][];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Invalid request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** @description Create a new order */
-        post: {
-            parameters: {
-                query?: never;
-                header?: {
-                    "Idempotency-Key"?: string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["PostOrderRequest"];
-                };
-            };
-            responses: {
-                /** @description Order created successfully */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderPendingResponse"];
-                    };
-                };
-                /** @description Invalid request parameters */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InvalidRequestError"] | components["schemas"]["ContractNotFound"] | components["schemas"]["InvalidInstanceType"];
-                    };
-                };
-                /** @description Account is unauthorized to place orders */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"] | components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Contract, Cluster, or Market not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ContractNotFound"] | components["schemas"]["ClusterNotFound"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        /** @description Cancel all orders */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description All orders cancelled successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "pending";
-                        };
-                    };
-                };
-                /** @description Account is frozen or unauthorized */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/orders/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get order details */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Order details */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderResponse"];
-                    };
-                };
-                /** @description Unauthorized seller */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        /** @description Cancel an order */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Order cancelled successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            object: "pending";
-                        };
-                    };
-                };
-                /** @description Order already cancelled */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AlreadyCancelled"];
-                    };
-                };
-                /** @description Account is frozen */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AccountFrozenError"] | components["schemas"]["TradingEngineIsHaltedError"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
-                    };
-                };
-                /** @description Internal server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["InternalServerError"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v0/orders/{id}/clusters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get all clusters associated with an order through contracts */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of clusters associated with the order */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data: {
-                                /** @enum {string} */
-                                object: "kubernetes_cluster";
-                                kubernetes_api_url: string;
-                                kubernetes_ca_cert: string;
-                                kubernetes_namespace: string;
-                                name: string;
-                                contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-                            }[];
-                            has_more: boolean;
-                            /**
-                             * @example list
-                             * @enum {string}
-                             */
-                            object: "list";
-                        };
-                    };
-                };
-                /** @description Unauthorized seller */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UnauthorizedSeller"];
-                    };
-                };
-                /** @description Order not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["OrderNotFound"];
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountTransactions"];
                     };
                 };
             };
@@ -1429,7 +321,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["frontend_server.ListResponse"];
+                        "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ListResponse"];
                     };
                 };
             };
@@ -1445,7 +337,7 @@ export interface paths {
             /** @description Credential details */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["types.KubernetesCredentialBody"];
+                    "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_types.KubernetesCredentialBody"];
                 };
             };
             responses: {
@@ -1455,7 +347,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["frontend_server.BaseCredentialResponse"];
+                        "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.BaseCredentialResponse"];
                     };
                 };
             };
@@ -1498,7 +390,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["frontend_server.DeleteResponse"];
+                        "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.DeleteResponse"];
                     };
                 };
             };
@@ -1588,94 +480,527 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/_healthz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Health check
+         * @description Health check endpoint
+         */
+        get: operations["health_handler"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List nodes
+         * @description List all VM nodes for the authenticated account
+         */
+        get: operations["list_nodes_handler"];
+        put?: never;
+        /**
+         * Create nodes
+         * @description Create VM nodes
+         */
+        post: operations["create_nodes_handler"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nodes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Node
+         * @description Retrieve details of a specific node by its ID or name
+         */
+        get: operations["get_node_handler"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nodes/{id}/extend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Extend node reservation
+         * @description Purchase additional time to extend the end time of a reserved VM node
+         */
+        patch: operations["extend_node_handler"];
+        trace?: never;
+    };
+    "/v1/nodes/{id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Release node
+         * @description Release an on-demand VM node from its procurement, reducing the procurement's desired quantity by 1
+         */
+        patch: operations["release_node_handler"];
+        trace?: never;
+    };
+    "/v0/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Kubernetes clusters
+         * @description List all Kubernetes clusters
+         */
+        get: operations["listClusters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List contracts
+         * @description List contracts
+         */
+        get: operations["listContracts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/contracts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get contract
+         * @description Get a contract
+         */
+        get: operations["getContract"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Orders
+         * @description List active and historical orders
+         */
+        get: operations["listOrders"];
+        put?: never;
+        /** Create a new order */
+        post: operations["createOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get order details */
+        get: operations["getOrder"];
+        put?: never;
+        post?: never;
+        /** Cancel an order */
+        delete: operations["cancelOrder"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/orders/{id}/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get order clusters
+         * @description Get clusters associated with this order. This can currently canonly be one, but might in the future be multiple.
+         */
+        get: operations["getOrderClusters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/procurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List procurements
+         * @description List all procurements
+         */
+        get: operations["listProcurements"];
+        put?: never;
+        /**
+         * Create procurement
+         * @description Create a procurement. A procurement tries to continuously buy small blocks of compute over and over again. Advantage being that you might be able to get a cheaper price than a longer term reservation. Disadvantage being that you can never be sure if you're nodes will spin up and down as market prices fluctuate.
+         */
+        post: operations["createProcurement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/procurements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get procurement
+         * @description Get procurements state and details
+         */
+        get: operations["getProcurement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update procurement
+         * @description Update an existing procurement.
+         */
+        patch: operations["updateProcurement"];
+        trace?: never;
+    };
+    "/v0/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get refunds
+         * @description Get status of refunds
+         */
+        get: operations["getRefunds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/account/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current account information
+         * @description Retrieves detailed information about the currently authenticated account.
+         *
+         *     This endpoint returns:
+         *     - Account ID
+         *     - Account status and permissions (role, KYC level, frozen status)
+         *     - Account metadata (creation date, waitlist status)
+         *
+         *     Use this endpoint to:
+         *     - Display user profile information
+         *     - Check account permissions and limits
+         *     - Verify KYC status before performing restricted operations
+         *     - Determine feature availability based on account role
+         */
+        get: operations["getAccountMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/balances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current account balance
+         * @description Retrieves the current account balance.
+         */
+        get: operations["getBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/credits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current credit balance
+         * @description Retrieves the current credit balance for the authenticated user's account.
+         *
+         *     This endpoint returns:
+         *     - The current balance in cents
+         *     - The available prepaid credits in cents
+         *     - The amount due for the next billing period in cents
+         *
+         */
+        get: operations["getCredits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/credits/migrate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Migrate account to new billing system
+         * @description Migrates your account from the legacy billing system to the new credit-based billing system.
+         *
+         *     This endpoint supports two migration options:
+         *     - **Withdraw**: Transfer your account balance to an external bank account
+         *     - **Convert to Credits**: Convert your existing balance to credits for use in the new system
+         *
+         *     The migration process will:
+         *     - Check your current account balance
+         *     - Verify that your account is eligible for automatic migration
+         *     - Process the migration according to your chosen option
+         *
+         *     **Note**: Some accounts with complex balance states may require manual migration assistance. In such cases, the response will indicate `requires_manual_migration` and our support team will help you complete the process.
+         */
+        post: operations["migrateAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get transactions
+         * @description Lists transaction history
+         */
+        get: operations["getTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_batches"];
+        put?: never;
+        /** Create a batch job. */
+        post: operations["create_batches"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/batches/{batch_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_batch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/batches/{batch_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["health_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_models"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/inference/models/{model_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_model_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * @description The current status of a refund request
-         * @enum {string}
-         */
-        RefundStatus: "in_review" | "approved" | "refunded" | "denied";
-        /** @description A refund request for downtime compensation */
-        Refund: {
-            /**
-             * @description Unique identifier of the downtime report
-             * @example 12345
-             */
-            report_id: number;
-            /**
-             * @description Start time of the downtime period
-             * @example 2024-03-15T00:00:00Z
-             */
-            report_start_time: string;
-            /**
-             * @description End time of the downtime period
-             * @example 2024-03-15T02:00:00Z
-             */
-            report_end_time: string;
-            /**
-             * @description Number of nodes affected by the downtime
-             * @example 4
-             */
-            report_nodes_affected: number;
-            /**
-             * @description Identifier of the affected cluster
-             * @example cluster_us_west_1
-             */
-            report_cluster_id: string;
-            /**
-             * @description Description of the downtime incident
-             * @example Network connectivity issues in US-West-1
-             */
-            report_memo: string;
-            /**
-             * @description When the downtime report was created
-             * @example 2024-03-15T00:30:00Z
-             */
-            report_created_at: string;
-            /**
-             * @description Amount of the credit memo in dollars, if approved
-             * @example 500.00
-             */
-            memo_amount: string | null;
-            /**
-             * @description When the refund was processed, if completed
-             * @example 2024-03-16T00:00:00Z
-             */
-            refund_timestamp: string | null;
-            status: components["schemas"]["RefundStatus"];
-        };
-        /**
-         * @description List of refund requests for an account
-         * @example {
-         *       "object": "refunds",
-         *       "refunds": [
-         *         {
-         *           "report_id": 12345,
-         *           "report_start_time": "2024-03-15T00:00:00.000Z",
-         *           "report_end_time": "2024-03-15T02:00:00.000Z",
-         *           "report_nodes_affected": 4,
-         *           "report_cluster_id": "cluster_us_west_1",
-         *           "report_memo": "Network connectivity issues in US-West-1",
-         *           "report_created_at": "2024-03-15T00:30:00.000Z",
-         *           "memo_amount": "500.00",
-         *           "refund_timestamp": "2024-03-16T00:00:00.000Z",
-         *           "status": "refunded"
-         *         }
-         *       ]
-         *     }
-         */
-        AccountRefunds: {
-            /**
-             * @description The type of the response object
-             * @example refunds
-             * @enum {string}
-             */
-            object: "refunds";
-            refunds: components["schemas"]["Refund"][];
-        };
-        AccountBalance: {
+        San_Francisco_Compute_Documentation_AccountBalance: {
             /**
              * @example balance
              * @enum {string}
@@ -1706,166 +1031,7 @@ export interface components {
                 currency: "usd";
             };
         };
-        /** @description A shape that describes the distribution of the contract's size over time. */
-        Shape: {
-            intervals: (string)[];
-            /** @example [
-             *       10,
-             *       20,
-             *       0
-             *     ] */
-            quantities: number[];
-        };
-        /** @example {
-         *       "object": "contract",
-         *       "status": "active",
-         *       "id": "cont_122",
-         *       "created_at": "2024-07-15T22:30:17.426Z",
-         *       "instance_type": "h200ki",
-         *       "shape": {
-         *         "intervals": [
-         *           "Tue, 16 Jul 2024 22:30:16 GMT",
-         *           "Wed, 17 Jul 2024 22:30:16 GMT",
-         *           "Thu, 18 Jul 2024 22:30:16 GMT"
-         *         ],
-         *         "quantities": [
-         *           10,
-         *           20,
-         *           0
-         *         ]
-         *       },
-         *       "colocate_with": [
-         *         "cont_123"
-         *       ],
-         *       "cluster_id": "clus_123",
-         *       "state": "Active"
-         *     } */
-        ActiveContract: {
-            /** @enum {string} */
-            object: "contract";
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            status: "active";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            shape: components["schemas"]["Shape"];
-            colocate_with?: string[];
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            cluster_id?: string;
-            /** @enum {string} */
-            state: "Upcoming" | "Expired" | "Active";
-        };
-        /** @example {
-         *       "object": "contract",
-         *       "status": "pending",
-         *       "id": "cont_1234"
-         *     } */
-        PendingContract: {
-            /** @enum {string} */
-            object: "contract";
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            status: "pending";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-        };
-        KubernetesCluster: {
-            /**
-             * @example kubernetes_cluster
-             * @enum {string}
-             */
-            object: "kubernetes_cluster";
-            /** @description The Kubernetes API URL for the cluster */
-            kubernetes_api_url?: string;
-            /** @description Unique name of the cluster */
-            name: string;
-            /** @description Namespace in format sf-<account_id> */
-            kubernetes_namespace: string;
-            /** @description The CA certificate for the cluster */
-            kubernetes_ca_cert?: string;
-            contract?: components["schemas"]["ActiveContract"] | components["schemas"]["PendingContract"];
-        };
-        NotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example not_found
-             * @enum {string}
-             */
-            code: "not_found";
-            /** @example Not found. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidRequestError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example invalid_request
-             * @enum {string}
-             */
-            code: "invalid_request";
-            /** @example Invalid request */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        NotAuthenticatedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example not_authenticated
-             * @enum {string}
-             */
-            code: "not_authenticated";
-            /** @example Not authenticated, did you pass an auth token? */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InternalServerError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example internal_server
-             * @enum {string}
-             */
-            code: "internal_server";
-            /** @example An unknown error has occurred. Our engineers have been notified. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        Account: {
+        San_Francisco_Compute_Documentation_Account: {
             /**
              * @example account
              * @enum {string}
@@ -1883,7 +1049,7 @@ export interface components {
             /** @example false */
             can_sell: boolean;
         };
-        AccountNotFoundError: {
+        San_Francisco_Compute_Documentation_AccountNotFoundError: {
             /**
              * @example error
              * @enum {string}
@@ -1901,258 +1067,17 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        PriceHistoryItem: {
-            /** @enum {string} */
-            object: "price-history-item";
-            /**
-             * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-19T05:00:00.000Z
-             */
-            period_start: string;
-            /**
-             * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-20T04:59:59.999Z
-             */
-            period_end: string;
-            /** @enum {boolean} */
-            no_data: false;
-            gpu_hour: {
-                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
-                min: number;
-                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
-                max: number;
-                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
-                avg: number;
-            };
-        } | {
-            /** @enum {string} */
-            object: "price-history-item";
-            /**
-             * @description ISO 8601 datetime marking the start of the period.
-             * @example 2025-04-19T05:00:00.000Z
-             */
-            period_start: string;
-            /**
-             * @description ISO 8601 datetime marking the end of the period.
-             * @example 2025-04-20T04:59:59.999Z
-             */
-            period_end: string;
-            /** @enum {boolean} */
-            no_data: true;
-        };
-        PriceRequestTooFarInPastError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example price.historical_price_request_too_far_in_past
-             * @enum {string}
-             */
-            code: "price.historical_price_request_too_far_in_past";
-            /** @example Historical price request too far in past */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        /** @description In this strategy, the procurement will buy compute on any cluster, with no guarantees about colocation whatsoever. */
-        AnywhereColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "anywhere";
-        };
-        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. If you scale the procurement down to 0, and then scale back up, the procurement is not guaranteed to land on the same cluster it was on before. */
-        ColocateColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "colocate";
-        };
-        /** @description In this strategy, the procurement will guarantee that all compute it buys is colocated in the same cluster, but not any specific cluster. However, once the first reservation begins, the procurement will always land on that specific cluster, even if you scale down to 0 and back up again. */
-        ColocatePinnedColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "colocate-pinned";
-        };
-        /** @description In this strategy, the procurement will always buy compute on the given cluster. */
-        PinnedColocationStrategy: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "pinned";
-            cluster_name: string;
-        };
-        Procurement: {
-            /** @enum {string} */
-            object: "procurement";
-            id: string;
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @enum {string}
-             */
-            status: "active" | "disabled";
-            /** @description The desired number of nodes the procurement will buy or sell */
-            desired_quantity: number;
-            /**
-             * @description The maximum price, in cents per GPU per hour that the procurement will buy at when extending or scaling up. If the market price goes higher than this, the procurement will not buy compute. Note that this is a *maximum* - the procurement will always try to buy at the lowest price available.
-             * @default 250
-             */
-            buy_limit_price_per_gpu_hour: number;
-            /**
-             * @description The minimum price, in cents per GPU per hour that the procurement will sell at when scaling down. If the market price dips below this price, the procurement will not sell compute when scaling down.
-             * @default 25
-             */
-            sell_limit_price_per_gpu_hour: number;
-            /**
-             * @description The minimum amount of time, in minutes, that the procurement should reserve up-front at any point in time. The procurement will buy more compute if the remaining time is less than this threshold.
-             * @default 60
-             */
-            horizon: number;
-            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
-        };
-        ProcurementNotAuthenticatedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.not_authenticated
-             * @enum {string}
-             */
-            code: "procurement.not_authenticated";
-            /** @example Authorization is needed to access procurements */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementNotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.not_found
-             * @enum {string}
-             */
-            code: "procurement.not_found";
-            /** @example Procurement not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementUpdate: {
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @enum {string}
-             */
-            status?: "active" | "disabled";
-            /** @description The instance type. */
-            instance_type?: ("h100i" | "h100v" | "h200ki") | string;
-            desired_quantity?: number;
-            buy_limit_price_per_gpu_hour?: number;
-            sell_limit_price_per_gpu_hour?: number;
-            horizon?: number;
-        };
-        ProcurementInvalidColocateOnRestartError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.invalid_colocate_on_restart
-             * @enum {string}
-             */
-            code: "procurement.invalid_colocate_on_restart";
-            /** @example If `colocate_on_restart` is `true`, `colocate` cannot be `false` */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementInvalidColocateOnClusterError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.invalid_colocate_on_cluster
-             * @enum {string}
-             */
-            code: "procurement.invalid_colocate_on_cluster";
-            /** @example If `colocate_on_cluster` is specified, neither `colocate` nor `colocate_on_restart` can be `false` */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementColocateOnClusterNotFoundError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example procurement.colocate_on_cluster_not_found
-             * @enum {string}
-             */
-            code: "procurement.colocate_on_cluster_not_found";
-            /** @example Cluster `cluster_name` not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ProcurementCreation: {
-            /**
-             * @description The status of the procurement. If `disabled`, the procurement will not buy or sell compute.
-             * @default active
-             * @enum {string}
-             */
-            status: "active" | "disabled";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            desired_quantity: number;
-            /** @default 250 */
-            buy_limit_price_per_gpu_hour: number;
-            /** @default 25 */
-            sell_limit_price_per_gpu_hour: number;
-            /** @default 60 */
-            horizon: number;
-            /** @default {
-             *       "type": "colocate-pinned"
-             *     } */
-            colocation_strategy: components["schemas"]["AnywhereColocationStrategy"] | components["schemas"]["ColocateColocationStrategy"] | components["schemas"]["ColocatePinnedColocationStrategy"] | components["schemas"]["PinnedColocationStrategy"];
-        };
-        Token: {
+        San_Francisco_Compute_Documentation_Token: {
             /**
              * @description The type of object
              * @enum {string}
              */
             object: "token";
             id: string;
-            /** @description Only available after creation */
+            /**
+             * @description Only available after creation
+             * @example <jwt>
+             */
             token?: string;
             /** @description Name of the token. */
             name: string | null;
@@ -2170,8 +1095,12 @@ export interface components {
             /** @description Whether the token was generated by the system & is being used in the background, or whether a user explicitly created it for their own use. */
             is_system: boolean;
         };
-        ListTokenResponse: {
-            data: components["schemas"]["Token"][];
+        San_Francisco_Compute_Documentation_ListTokenResponse: {
+            data: components["schemas"]["San_Francisco_Compute_Documentation_Token"][];
+            /**
+             * @example true
+             * @example false
+             */
             has_more: boolean;
             /**
              * @example list
@@ -2179,25 +1108,7 @@ export interface components {
              */
             object: "list";
         };
-        InvalidTokenExpirationDuration: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example token.invalid_token_expiration_duration
-             * @enum {string}
-             */
-            code: "token.invalid_token_expiration_duration";
-            /** @example Invalid token expiration duration */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        MaxTokenLimitReached: {
+        San_Francisco_Compute_Documentation_MaxTokenLimitReached: {
             /**
              * @example error
              * @enum {string}
@@ -2215,7 +1126,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        AccountFrozenError: {
+        San_Francisco_Compute_Documentation_AccountFrozenError: {
             /**
              * @example error
              * @enum {string}
@@ -2233,7 +1144,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        InvalidTokenCreateOriginClient: {
+        San_Francisco_Compute_Documentation_InvalidTokenCreateOriginClient: {
             /**
              * @example error
              * @enum {string}
@@ -2251,7 +1162,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        TokenNotFound: {
+        San_Francisco_Compute_Documentation_TokenNotFound: {
             /**
              * @example error
              * @enum {string}
@@ -2271,19 +1182,25 @@ export interface components {
         };
         /**
          * @description Whether the transaction is incoming to or outgoing from the account.
+         * @example incoming
+         * @example outgoing
          * @enum {string}
          */
-        TransactionDirection: "incoming" | "outgoing";
+        San_Francisco_Compute_Documentation_TransactionDirection: "incoming" | "outgoing";
         /**
          * @description The current status of a transaction.
+         * @example accepted
+         * @example rejected
          * @enum {string}
          */
-        TransactionStatus: "accepted" | "rejected";
+        San_Francisco_Compute_Documentation_TransactionStatus: "accepted" | "rejected";
         /**
          * @description The kind of account involved in the transaction. Each user has one account of each account kind. The account "primary" is the main one used for buy/sell on the platform.
+         * @example primary
+         * @example withdrawal_reserve
          * @enum {string}
          */
-        AccountKind: "primary" | "capital" | "withdrawal_reserve" | "fulfillment_escrow" | "delivery_fee_escrow";
+        San_Francisco_Compute_Documentation_AccountKind: "primary" | "capital" | "withdrawal_reserve" | "fulfillment_escrow" | "delivery_fee_escrow";
         /**
          * @description A transaction representing a movement of funds
          * @example {
@@ -2297,8 +1214,8 @@ export interface components {
          *       "balance_after": 65000,
          *       "metadata": {
          *         "type": "buy",
-         *         "start_time": "2025-05-20T03:26:22.796Z",
-         *         "end_time": "2025-05-20T05:26:22.796Z",
+         *         "start_time": "2024-11-05T07:24:24.207Z",
+         *         "end_time": "2024-11-05T09:24:24.207Z",
          *         "quantity": 2,
          *         "order_id": "ordr_34905N",
          *         "instance_type_requirements": {
@@ -2311,12 +1228,12 @@ export interface components {
          *           "regions": [
          *             "NorthAmerica"
          *           ],
-         *           "delivery_type": "K8sNamespace"
+         *           "delivery_type": "K8s"
          *         }
          *       }
          *     }
          */
-        Transaction: {
+        San_Francisco_Compute_Documentation_Transaction: {
             /** @description Unique identifier for the transaction */
             id: string;
             /**
@@ -2324,11 +1241,11 @@ export interface components {
              * @description When the money movement occurred within SFCs system
              */
             timestamp: string;
-            direction: components["schemas"]["TransactionDirection"];
-            status: components["schemas"]["TransactionStatus"];
+            direction: components["schemas"]["San_Francisco_Compute_Documentation_TransactionDirection"];
+            status: components["schemas"]["San_Francisco_Compute_Documentation_TransactionStatus"];
             /** @description Transaction amount in cents */
             amount: number;
-            account_kind: components["schemas"]["AccountKind"];
+            account_kind: components["schemas"]["San_Francisco_Compute_Documentation_AccountKind"];
             /** @description Account balance before transaction in cents */
             balance_before: number;
             /** @description Account balance after transaction in cents */
@@ -2349,7 +1266,7 @@ export interface components {
                      * @description Delivery method.
                      * @enum {string}
                      */
-                    delivery_type: "K8sNamespace" | "VM";
+                    delivery_type: "K8s" | "VM";
                 };
                 /** @description Quantity requested in the buy order, in number of nodes (8 gpus) */
                 quantity: number;
@@ -2402,11 +1319,23 @@ export interface components {
                  * @description The time the bank involved marked marked this transaction as completed.
                  */
                 completed_at: string;
-                /** @description The last 4 digits of the card that was used to perform the payment. */
+                /**
+                 * @description The last 4 digits of the card that was used to perform the payment.
+                 * @example 7302
+                 * @example 1038
+                 */
                 card_last4: string;
-                /** @description Brand of card used for payment. */
+                /**
+                 * @description Brand of card used for payment.
+                 * @example visa
+                 * @example mastercard
+                 */
                 card_brand: string;
-                /** @description The funding type of the card. */
+                /**
+                 * @description The funding type of the card.
+                 * @example credit
+                 * @example debit
+                 */
                 card_funding: string;
                 /**
                  * Format: uri
@@ -2432,9 +1361,16 @@ export interface components {
                  * @description The date the bank withdrawal settled by the bank, if it was cancelled. This will in most cases be close to the time SFC processed the transaction.
                  */
                 date_settled: string | null;
-                /** @description A short description of the account. */
+                /**
+                 * @description A short description of the account.
+                 * @example TOTAL CHECKING (checking)
+                 */
                 account_description: string;
-                /** @description The last 4 digits of the bank account number. */
+                /**
+                 * @description The last 4 digits of the bank account number.
+                 * @example 4902
+                 * @example 2038
+                 */
                 bank_account_last4: string;
             } | {
                 /** @enum {string} */
@@ -2444,9 +1380,16 @@ export interface components {
                  * @description The date this bank withdrawal was approved.
                  */
                 approved_at: string;
-                /** @description A short description of the account. */
+                /**
+                 * @description A short description of the account.
+                 * @example TOTAL CHECKING (checking)
+                 */
                 account_description: string;
-                /** @description The last 4 digits of the bank account number. */
+                /**
+                 * @description The last 4 digits of the bank account number.
+                 * @example 4902
+                 * @example 2038
+                 */
                 bank_account_last4: string;
             } | {
                 /** @enum {string} */
@@ -2502,8 +1445,8 @@ export interface components {
          *           "balance_after": 65000,
          *           "metadata": {
          *             "type": "buy",
-         *             "start_time": "2025-05-20T03:26:22.796Z",
-         *             "end_time": "2025-05-20T05:26:22.796Z",
+         *             "start_time": "2024-11-05T07:24:24.207Z",
+         *             "end_time": "2024-11-05T09:24:24.207Z",
          *             "quantity": 2,
          *             "order_id": "ordr_34Az95N",
          *             "instance_type_requirements": {
@@ -2516,7 +1459,7 @@ export interface components {
          *               "regions": [
          *                 "NorthAmerica"
          *               ],
-         *               "delivery_type": "K8sNamespace"
+         *               "delivery_type": "K8s"
          *             }
          *           }
          *         }
@@ -2529,7 +1472,7 @@ export interface components {
          *       }
          *     }
          */
-        AccountTransactions: {
+        San_Francisco_Compute_Documentation_AccountTransactions: {
             /**
              * @description The type of the response object
              * @example transactions
@@ -2537,7 +1480,7 @@ export interface components {
              */
             object: "transactions";
             /** @description Transactions for all accounts (see account kind) associated with this user. */
-            transactions: components["schemas"]["Transaction"][];
+            transactions: components["schemas"]["San_Francisco_Compute_Documentation_Transaction"][];
             /** @description Pagination information */
             pagination: {
                 /**
@@ -2564,333 +1507,15 @@ export interface components {
                 newest_timestamp: string | null;
             };
         };
-        UnauthorizedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example unauthorized
-             * @enum {string}
-             */
-            code: "unauthorized";
-            /** @example Unauthorized. */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidDateRange: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example quote.invalid_date_range
-             * @enum {string}
-             */
-            code: "quote.invalid_date_range";
-            /** @example Invalid date range */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderResponse: {
-            /** @enum {string} */
-            object: "order";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-            /**
-             * @description Side of the order (buy/sell)
-             * @enum {string}
-             */
-            side: "buy" | "sell";
-            /**
-             * @description Current status of the order
-             * @enum {string}
-             */
-            status: "pending" | "rejected" | "open" | "cancelled" | "filled" | "expired" | "partially_filled";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
-            quantity: number;
-            /**
-             * Format: date-time
-             * @description The start time, as an ISO 8601 string. Start times must be either "right now" or on the hour. Order start times must be in the future, and can be either the next minute from now or on the hour. For example, if it's 16:00, valid start times include 16:01, 17:00, and 18:00, but not 16:30. Dates are always rounded up to the nearest minute.
-             * @example 2025-05-20T01:26:22.670Z
-             */
-            start_at: string;
-            /**
-             * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-             */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            executed: boolean;
-            executed_at?: string;
-            /** @description Execution price in cents (1 = $0.01) */
-            execution_price?: number | null;
-            cancelled: boolean;
-            cancelled_at?: string;
-            colocate_with?: string[];
-            created_at: string;
-            rejected: boolean;
-            rejected_reason?: string;
-            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
-            idempotency_key?: string;
-            cluster?: string;
-        };
-        UnauthorizedSeller: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.unauthorized_seller
-             * @enum {string}
-             */
-            code: "order.unauthorized_seller";
-            /** @example Account unauthorized to place sell orders */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.not_found
-             * @enum {string}
-             */
-            code: "order.not_found";
-            /** @example Order not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        AlreadyCancelled: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.already_cancelled
-             * @enum {string}
-             */
-            code: "order.already_cancelled";
-            /** @example Order already cancelled */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        TradingEngineIsHaltedError: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example trading_engine.is_halted
-             * @enum {string}
-             */
-            code: "trading_engine.is_halted";
-            /** @example Trading engine is halted */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        OrderPendingResponse: {
-            /** @enum {string} */
-            object: "order";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            id: string;
-            /** @enum {string} */
-            status: "pending";
-            /** @description Client-provided idempotency key to prevent duplicate requests. Calls to an endpoint with the same idempotency key will only execute the operation once, and return the same information on subsequent calls. */
-            idempotency_key?: string;
-        };
-        ContractNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.contract_not_found
-             * @enum {string}
-             */
-            code: "order.contract_not_found";
-            /** @example Contract not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        InvalidInstanceType: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.invalid_instance_type
-             * @enum {string}
-             */
-            code: "order.invalid_instance_type";
-            /** @example Invalid instance type */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        ClusterNotFound: {
-            /**
-             * @example error
-             * @enum {string}
-             */
-            object: "error";
-            /**
-             * @example order.cluster_not_found
-             * @enum {string}
-             */
-            code: "order.cluster_not_found";
-            /** @example Cluster not found */
-            message?: string;
-            /** @example {} */
-            details?: {
-                [key: string]: unknown;
-            };
-        };
-        PostOrderRequest: {
-            /** @enum {string} */
-            side: "buy";
-            /** @description The instance type. */
-            instance_type: ("h100i" | "h100v" | "h200ki") | string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
-            quantity: number;
-            start_at: string | "NOW";
-            /**
-             * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-             */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            colocate_with?: string[];
-            /** @description Specific cluster the reservation should land on. If provided, the `instance_type` will be ignored. */
-            cluster?: string;
-        } | {
-            /** @enum {string} */
-            side: "sell";
-            /** @description An external ID with prefix and alphanumeric string with underscores */
-            contract_id: string;
-            /**
-             * @description The number of nodes.
-             * @example 3
-             */
-            quantity: number;
-            start_at: string | "NOW";
-            /**
-             * Format: date-time
-             * @description The end time, as an ISO 8601 string. End times must be on the hour, i.e. 16:00, 17:00, 18:00, etc. 17:30, 17:01, etc are not valid end times. Dates are always rounded up to the nearest minute.
-             */
-            end_at: string;
-            /** @description Price in cents (1 = $0.01) */
-            price: number | null;
-            flags?: {
-                /** @description If true, this will be a market order. */
-                market?: boolean;
-                /** @description If true, this is a post-only order. */
-                post_only?: boolean;
-                /** @description If true, this is an immediate-or-cancel order. */
-                ioc?: boolean;
-            };
-            reprice?: {
-                /**
-                 * @description Adjust this order's price linearly from adjustment start to end. This is deprecated, and will soon be unsupported. Please use `linear_v2` instead.
-                 * @enum {string}
-                 */
-                strategy: "linear";
-                /** @description For sell orders, the floor (lowest) price the order can be adjusted to, in cents. For buy orders, the ceiling (highest) price the order can be adjusted to. */
-                limit: number;
-                /** @description When to start adjusting the order's price. If this date is in the past, it will be clamped such that the adjustment starts immediately. */
-                start_at?: string;
-                /** @description When to stop adjusting the order's price. If this date is past the order's end time, it will be clamped such that the adjustment ends at the order's end time. */
-                end_at?: string;
-            } | {
-                /**
-                 * @description Adjust this order's price linearly across a given window of time.
-                 * @enum {string}
-                 */
-                strategy: "linear_v2";
-                /** @description The desired order limit price at the beginning of the repricing window, in cents. */
-                start_price: number;
-                /** @description The desired order limit price at the end of the repricing window, in cents. */
-                end_price: number;
-                /**
-                 * Format: date-time
-                 * @description The start time of the repricing window. Must be at or before the window end time. If this date is in the past, it will be clamped such that window starts immediately.
-                 */
-                window_start: string;
-                /**
-                 * Format: date-time
-                 * @description The end time of the repricing window. If this date is past the order's start time, it will be clamped such that the repricing window ends at the order's start time.
-                 */
-                window_end: string;
-            };
-        };
-        "frontend_server.BaseCredentialResponse": {
-            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+        "SF_Compute_K8s_Orchestration_API_frontend_server.BaseCredentialResponse": {
+            cluster?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo"];
             id?: string;
             label?: string;
             object?: string;
             pubkey?: string;
             username?: string;
         };
-        "frontend_server.ClusterInfo": {
+        "SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo": {
             id?: string;
             kubernetes_api_url?: string;
             kubernetes_ca_cert?: string;
@@ -2898,8 +1523,8 @@ export interface components {
             name?: string;
             object?: string;
         };
-        "frontend_server.CredentialResponse": {
-            cluster?: components["schemas"]["frontend_server.ClusterInfo"];
+        "SF_Compute_K8s_Orchestration_API_frontend_server.CredentialResponse": {
+            cluster?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo"];
             cluster_type?: string;
             encrypted_kubeconfig?: string;
             encrypted_token?: string;
@@ -2911,63 +1536,63 @@ export interface components {
             pubkey?: string;
             username?: string;
         };
-        "frontend_server.DeleteResponse": {
+        "SF_Compute_K8s_Orchestration_API_frontend_server.DeleteResponse": {
             deleted?: boolean;
             id?: string;
             object?: string;
         };
-        "frontend_server.ListResponse": {
-            data?: components["schemas"]["frontend_server.CredentialResponse"][];
+        "SF_Compute_K8s_Orchestration_API_frontend_server.ListResponse": {
+            data?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.CredentialResponse"][];
             has_more?: boolean;
             object?: string;
         };
         /** @description Credential request body */
-        "types.KubernetesCredentialBody": {
+        "SF_Compute_K8s_Orchestration_API_types.KubernetesCredentialBody": {
             cluster?: string;
             label?: string;
             object?: string;
             pubkey?: string;
             username?: string;
         };
-        GetInstancesResponse: {
-            data: components["schemas"]["VmInstance"][];
+        vmorch_GetInstancesResponse: {
+            data: components["schemas"]["vmorch_VmInstance"][];
         };
-        GetSshResponse: {
-            ssh_host_keys?: components["schemas"]["SshHostKeyInfo"][] | null;
+        vmorch_GetSshResponse: {
+            ssh_host_keys?: components["schemas"]["vmorch_SshHostKeyInfo"][] | null;
             ssh_hostname: string;
             /** Format: u-int16 */
             ssh_port: number;
         };
-        GetUserDataResponse: {
-            script: components["schemas"]["UserData"];
+        vmorch_GetUserDataResponse: {
+            script: components["schemas"]["vmorch_UserData"];
         };
-        PostReplaceRequest: {
+        vmorch_PostReplaceRequest: {
             vm_id: string;
         };
-        PostReplaceResponse: {
+        vmorch_PostReplaceResponse: {
             replaced: string;
             replaced_by: string;
         };
-        PostUserDataRequest: {
-            script: components["schemas"]["UserData"];
+        vmorch_PostUserDataRequest: {
+            script: components["schemas"]["vmorch_UserData"];
         };
-        PostUserDataResponse: {
-            script: components["schemas"]["UserData"];
+        vmorch_PostUserDataResponse: {
+            script: components["schemas"]["vmorch_UserData"];
         };
-        SshHostKeyInfo: {
+        vmorch_SshHostKeyInfo: {
             base64_encoded_key: string;
             key_type: string;
         };
         /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
-        UserData: string | number[];
-        VmInstance: {
+        vmorch_UserData: string | number[];
+        vmorch_VmInstance: {
             cluster_id: string;
             current_status: string;
             id: string;
             instance_group_id: string;
             last_updated_at: string;
         };
-        VmsLogChunk: {
+        vmorch_VmsLogChunk: {
             data: number[];
             instance_id: string;
             /** Format: u-int32 */
@@ -2979,8 +1604,960 @@ export interface components {
             /** Format: u-int64 */
             seqnum: number;
         };
-        VmsLogsResponse: {
-            data: components["schemas"]["VmsLogChunk"][];
+        vmorch_VmsLogsResponse: {
+            data: components["schemas"]["vmorch_VmsLogChunk"][];
+        };
+        /** @enum {string} */
+        "node-api_AcceleratorType": "H100" | "H200";
+        "node-api_CreateNodesRequest": {
+            /**
+             * Format: u-int32
+             * @example 1
+             */
+            desired_count: number;
+            /**
+             * Format: int64
+             * @description End time as Unix timestamp in seconds.
+             *     If provided, end time must be aligned to the hour.
+             *     If not provided, the node will be created as an on-demand node.
+             */
+            end_at?: number | null;
+            /**
+             * Format: int64
+             * @description Max price per hour for a node in cents
+             * @example 1000
+             */
+            max_price_per_node_hour: number;
+            /**
+             * @description Custom node names.
+             *     Names cannot follow the vm_{alpha_numeric_chars} as this is reserved for system-generated IDs.
+             *     Names cannot be numeric strings.
+             * @example [
+             *       "cuda-crunch"
+             *     ]
+             */
+            names?: string[];
+            /** @default autoreserved */
+            node_type: null | components["schemas"]["node-api_NodeType"];
+            /**
+             * Format: int64
+             * @description Start time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            start_at?: number;
+            /**
+             * @description Zone to create the nodes in. See Zone enum for valid values.
+             * @example hayesvalley
+             */
+            zone: string;
+        };
+        "node-api_ErrorContent": {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            type: components["schemas"]["node-api_ErrorType"];
+        };
+        "node-api_ErrorDetail": {
+            /** @description Specific error code for this detail */
+            code: string;
+            /** @description The field that caused the error (for validation errors) */
+            field?: string | null;
+            /** @description Detailed error message */
+            message: string;
+        };
+        "node-api_ErrorKind": {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "api_error";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "invalid_request_error";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "authentication_error";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "idempotency_error";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "conflict";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "not_found";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "request_timed_out";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "forbidden";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "not_implemented";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "upgrade_required";
+        } | {
+            details?: components["schemas"]["node-api_ErrorDetail"][];
+            message: string;
+            /** @enum {string} */
+            type: "payment_required";
+        };
+        "node-api_ErrorObject": {
+            error: components["schemas"]["node-api_ErrorContent"];
+        };
+        /** @enum {string} */
+        "node-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        "node-api_ExtendNodeRequest": {
+            /**
+             * Format: int64
+             * @description Duration in seconds to extend the node
+             *     Must be at least 1 hour (3600 seconds) and a multiple of 1 hour.
+             * @example 7200
+             */
+            duration_seconds: number;
+            /**
+             * Format: int64
+             * @description Max price per hour for the extension in cents
+             * @example 1000
+             */
+            max_price_per_node_hour: number;
+        };
+        "node-api_ListResponse_Node": {
+            data: {
+                /**
+                 * Format: int64
+                 * @description Creation time as Unix timestamp in seconds
+                 * @example 1640995200
+                 */
+                created_at?: number | null;
+                /**
+                 * Format: int64
+                 * @description Deletion time as Unix timestamp in seconds
+                 * @example 1640995200
+                 */
+                deleted_at?: number | null;
+                /**
+                 * Format: int64
+                 * @description End time as Unix timestamp in seconds
+                 * @example 1640995200
+                 */
+                end_at?: number | null;
+                gpu_type: components["schemas"]["node-api_AcceleratorType"];
+                /** @example n_b1dc52505c6db142 */
+                id: string;
+                /**
+                 * Format: int64
+                 * @description Max price per hour you're willing to pay for a node in cents
+                 * @example 1000
+                 */
+                max_price_per_node_hour?: number | null;
+                /** @example cuda-crunch */
+                name: string;
+                node_type: components["schemas"]["node-api_NodeType"];
+                /** @example node */
+                object: string;
+                /** @example sfcompute */
+                owner: string;
+                /** @example proc_h100ondemand_1 */
+                procurement_id?: string | null;
+                /**
+                 * Format: int64
+                 * @description Start time as Unix timestamp in seconds
+                 * @example 1640995200
+                 */
+                start_at?: number | null;
+                status: components["schemas"]["node-api_Status"];
+                /**
+                 * Format: int64
+                 * @description Last updated time as Unix timestamp in seconds
+                 * @example 1640995200
+                 */
+                updated_at?: number | null;
+                vms?: null | components["schemas"]["node-api_VmList"];
+                zone?: null | components["schemas"]["node-api_Zone"];
+            }[];
+            /** @example list */
+            object: string;
+        };
+        "node-api_Node": {
+            /**
+             * Format: int64
+             * @description Creation time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            created_at?: number | null;
+            /**
+             * Format: int64
+             * @description Deletion time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            deleted_at?: number | null;
+            /**
+             * Format: int64
+             * @description End time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            end_at?: number | null;
+            gpu_type: components["schemas"]["node-api_AcceleratorType"];
+            /** @example n_b1dc52505c6db142 */
+            id: string;
+            /**
+             * Format: int64
+             * @description Max price per hour you're willing to pay for a node in cents
+             * @example 1000
+             */
+            max_price_per_node_hour?: number | null;
+            /** @example cuda-crunch */
+            name: string;
+            node_type: components["schemas"]["node-api_NodeType"];
+            /** @example node */
+            object: string;
+            /** @example sfcompute */
+            owner: string;
+            /** @example proc_h100ondemand_1 */
+            procurement_id?: string | null;
+            /**
+             * Format: int64
+             * @description Start time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            start_at?: number | null;
+            status: components["schemas"]["node-api_Status"];
+            /**
+             * Format: int64
+             * @description Last updated time as Unix timestamp in seconds
+             * @example 1640995200
+             */
+            updated_at?: number | null;
+            vms?: null | components["schemas"]["node-api_VmList"];
+            zone?: null | components["schemas"]["node-api_Zone"];
+        };
+        /** @enum {string} */
+        "node-api_NodeType": "autoreserved" | "reserved";
+        /**
+         * @description Node Status
+         * @enum {string}
+         */
+        "node-api_Status": "pending" | "awaitingcapacity" | "running" | "released" | "terminated" | "deleted" | "failed" | "unknown";
+        "node-api_Vm": {
+            /**
+             * Format: int64
+             * @example 1640995200
+             */
+            created_at: number;
+            /**
+             * Format: int64
+             * @example 1640998200
+             */
+            end_at: number | null;
+            /** @example vm_myOZZXw4pfcp7H9DQOldd */
+            id: string;
+            /** @example vm */
+            object: string;
+            /**
+             * Format: int64
+             * @example 1640995200
+             */
+            start_at: number | null;
+            status: components["schemas"]["node-api_VmStatus"];
+            /**
+             * Format: int64
+             * @example 1640995200
+             */
+            updated_at: number;
+        };
+        "node-api_VmList": {
+            data: components["schemas"]["node-api_Vm"][];
+            /** @example list */
+            object: string;
+        };
+        /** @enum {string} */
+        "node-api_VmStatus": "Pending" | "Running" | "Destroyed" | "NodeFailure" | "Unspecified";
+        /**
+         * @description Choose from these zones when creating a node
+         * @enum {string}
+         */
+        "node-api_Zone": "hayesvalley" | "fishermanswharf";
+        /** @description Response body for the account/me endpoint. */
+        "market-api_AccountMeResponse": {
+            /**
+             * Format: u-int64
+             * @description When the account was created as a epoch unix timestamp
+             * @example 1749704176
+             */
+            created_at: number;
+            /**
+             * @description The unique identifier for the account
+             * @example gmail-com-name
+             */
+            id: string;
+            /**
+             * @description Whether the account is currently frozen
+             * @example false
+             */
+            is_frozen: boolean;
+            /**
+             * @description The KYC (Know Your Customer) verification level
+             * @example basic
+             */
+            kyc: string;
+            /**
+             * @description Whether the KYC-B form has been submitted
+             * @example false
+             */
+            kycb_form_submitted: boolean;
+            /**
+             * @description The role assigned to this account
+             * @example user
+             */
+            role: string;
+            /**
+             * @description Whether the user has submitted the waitlist form
+             * @example true
+             */
+            submitted_waitlist: boolean;
+            /**
+             * @description Whether the user is on the waitlist
+             * @example false
+             */
+            waitlist: boolean;
+        };
+        "market-api_AccountRefundsResponse": {
+            object: components["schemas"]["market-api_ObjectType"];
+            refunds: components["schemas"]["market-api_RefundResponse"][];
+        };
+        "market-api_CancelOrderResponse": {
+            object: components["schemas"]["market-api_CancelOrderStatus"];
+        };
+        /** @enum {string} */
+        "market-api_CancelOrderStatus": "pending";
+        /** @description string with format '"clus"_{base62_encoded_id}' used for referencing a ClusterId resource. Never user-generated. */
+        "market-api_ClusterId": string;
+        "market-api_ClusterName": string;
+        "market-api_ColocationStrategy": {
+            /** @enum {string} */
+            type: "anywhere";
+        } | {
+            /** @enum {string} */
+            type: "colocate";
+        } | {
+            /** @enum {string} */
+            type: "colocate-pinned";
+        } | {
+            cluster_name: components["schemas"]["market-api_ClusterName"];
+            /** @enum {string} */
+            type: "pinned";
+        };
+        /** @description string with format '"cont"_{base62_encoded_id}' used for referencing a ContractId resource. Never user-generated. */
+        "market-api_ContractId": string;
+        "market-api_ContractResponse": {
+            cluster_id?: null | components["schemas"]["market-api_ClusterId"];
+            colocate_with?: components["schemas"]["market-api_ContractId"][];
+            created_at: components["schemas"]["market-api_ISO8601DateTime"];
+            id: components["schemas"]["market-api_ContractId"];
+            instance_type: components["schemas"]["market-api_Ticker"];
+            object: components["schemas"]["market-api_ObjectType"];
+            shape: components["schemas"]["market-api_ContractShape"];
+            state: components["schemas"]["market-api_ContractState"];
+            status: components["schemas"]["market-api_ContractStatus"];
+        };
+        "market-api_ContractShape": {
+            intervals: components["schemas"]["market-api_ISO8601DateTime"][];
+            quantities: number[];
+        };
+        /** @enum {string} */
+        "market-api_ContractState": "Upcoming" | "Active" | "Expired";
+        /** @enum {string} */
+        "market-api_ContractStatus": "active" | "pending";
+        "market-api_CreateOrderRequest": {
+            cluster?: null | components["schemas"]["market-api_ClusterName"];
+            colocate_with?: components["schemas"]["market-api_ContractId"][];
+            end_at: components["schemas"]["market-api_NowOrISO8601DateTime"];
+            flags?: components["schemas"]["market-api_OrderFlags"];
+            instance_type: components["schemas"]["market-api_Ticker"];
+            /**
+             * Format: int64
+             * @description Price in cents
+             * @example 5000
+             */
+            price: number;
+            /**
+             * Format: int32
+             * @example 10
+             */
+            quantity: number;
+            /** @enum {string} */
+            side: "buy";
+            start_at: components["schemas"]["market-api_NowOrISO8601DateTime"];
+        } | {
+            contract_id: components["schemas"]["market-api_ContractId"];
+            end_at: components["schemas"]["market-api_NowOrISO8601DateTime"];
+            flags?: components["schemas"]["market-api_OrderFlags"];
+            /**
+             * Format: int64
+             * @description Price in cents
+             * @example 4500
+             */
+            price: number;
+            /**
+             * Format: int32
+             * @example 5
+             */
+            quantity: number;
+            reprice?: unknown;
+            /** @enum {string} */
+            side: "sell";
+            start_at: components["schemas"]["market-api_NowOrISO8601DateTime"];
+        };
+        /** @example {
+         *       "object": "order",
+         *       "status": "pending",
+         *       "id": "order_xyz789",
+         *       "idempotency_key": "key_123"
+         *     } */
+        "market-api_CreateOrderResponse": {
+            id: components["schemas"]["market-api_OrderId"];
+            /** @example key_123 */
+            idempotency_key?: string | null;
+            object: components["schemas"]["market-api_ObjectType"];
+            status: components["schemas"]["market-api_CreateOrderStatus"];
+        };
+        /** @enum {string} */
+        "market-api_CreateOrderStatus": "pending" | "filled" | "cancelled";
+        "market-api_CreateProcurementRequest": {
+            /**
+             * Format: int32
+             * @description Maximum price per GPU hour in cents
+             * @example 250
+             */
+            buy_limit_price_per_gpu_hour?: number;
+            /** @description Colocation strategy for the procurement */
+            colocation_strategy?: components["schemas"]["market-api_ColocationStrategy"];
+            /**
+             * Format: int32
+             * @description Desired quantity of nodes
+             * @example 5
+             */
+            desired_quantity: number;
+            /**
+             * Format: int32
+             * @description Planning horizon in minutes
+             * @example 60
+             */
+            horizon?: number;
+            /** @description Instance type to procure */
+            instance_type: components["schemas"]["market-api_Ticker"];
+            /**
+             * Format: int32
+             * @description Minimum price per GPU hour in cents when selling back
+             * @example 25
+             */
+            sell_limit_price_per_gpu_hour?: number;
+            /** @description Procurement status (active or disabled) */
+            status?: components["schemas"]["market-api_ProcurementStatus"];
+        };
+        "market-api_ErrorDetail": {
+            /** @description Specific error code for this detail */
+            code: string;
+            /** @description The field that caused the error (for validation errors) */
+            field?: string | null;
+            /** @description Detailed error message */
+            message: string;
+        };
+        /** @enum {string} */
+        "market-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        /**
+         * @description Response body for getting account balance from the credit ledger.
+         * @example {
+         *       "object": "balance",
+         *       "available": 150000,
+         *       "reserved": 180000,
+         *       "created_at": 1640995200,
+         *       "updated_at": 1640995200
+         *     }
+         */
+        "market-api_GetBalanceResponse": {
+            /**
+             * Format: int64
+             * @description Available balance in cents: sum(credit) - sum(debit) - sum(committed holds)
+             * @example 150000
+             */
+            available: number;
+            /**
+             * Format: int64
+             * @description When the balance was first created as a unix timestamp
+             * @example 1640995200
+             */
+            created_at: number;
+            /** @description Resource object type */
+            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * Format: int64
+             * @description Reserved balance in cents: sum(credit) - sum(debit)
+             * @example 180000
+             */
+            reserved: number;
+            /**
+             * Format: int64
+             * @description When the balance was last updated as a unix timestamp
+             * @example 1640995200
+             */
+            updated_at: number;
+        };
+        /**
+         * @description TODO rename route to "balance"?
+         *     Response body for getting account credits.
+         * @example {
+         *       "current_balance_cents": 150000,
+         *       "available_credits_cents": 150000,
+         *       "amount_due_next_billing_period_cents": 0
+         *     }
+         */
+        "market-api_GetCreditsResponse": {
+            /**
+             * Format: int64
+             * @description The amount due for the next billing period in cents (positive means customer owes, 0 or negative means no payment due)
+             * @example 0
+             */
+            amount_due_next_billing_period_cents: number;
+            /**
+             * Format: int64
+             * @description The available prepaid credits in cents (always positive)
+             * @example 150000
+             */
+            available_credits_cents: number;
+            /**
+             * Format: int64
+             * @description The current balance in cents (from customer account)
+             * @example 150000
+             */
+            current_balance_cents: number;
+        };
+        /**
+         * Format: date-time
+         * @description An ISO 8601 datetime string
+         * @example 2025-07-11T20:41:37.423Z
+         */
+        "market-api_ISO8601DateTime": string;
+        "market-api_KubernetesClusterResponse": {
+            contract?: null | components["schemas"]["market-api_ContractResponse"];
+            /** @example https://cluster.example.com */
+            kubernetes_api_url?: string | null;
+            /** @example -----BEGIN CERTIFICATE-----... */
+            kubernetes_ca_cert?: string | null;
+            /** @example sf-user123 */
+            kubernetes_namespace: string;
+            name: components["schemas"]["market-api_ClusterName"];
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        "market-api_ListClustersResponse": {
+            data: components["schemas"]["market-api_KubernetesClusterResponse"][];
+            has_more: boolean;
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        "market-api_ListContractsResponse": {
+            data: components["schemas"]["market-api_ContractResponse"][];
+            has_more: boolean;
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        "market-api_ListOrdersResponse": {
+            data: components["schemas"]["market-api_OrderResponse"][];
+            has_more: boolean;
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        "market-api_ListProcurementsResponse": {
+            data: components["schemas"]["market-api_ProcurementResponse"][];
+            has_more: boolean;
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        /** @description Generic paginated list response structure */
+        "market-api_ListResponse": {
+            data: components["schemas"]["market-api_TransactionResponse"][];
+            has_more: boolean;
+            object: components["schemas"]["market-api_ObjectType"];
+        };
+        /**
+         * @description Request body for migrating an account to the new billing system.
+         * @example {
+         *       "type": "withdraw",
+         *       "column_counterparty_id": "cpty_2n4f8bxg3qj5p6r7s9t1v"
+         *     }
+         */
+        "market-api_MigrateAccountRequest": {
+            /**
+             * @description The identifier for your external bank account where funds will be transferred
+             * @example cpty_2n4f8bxg3qj5p6r7s9t1v
+             */
+            column_counterparty_id: string;
+            /** @enum {string} */
+            type: "withdraw";
+        } | {
+            /** @enum {string} */
+            type: "convert_to_credits";
+        };
+        /**
+         * @description Response body for account migration requests.
+         * @example {
+         *       "status": "migrated"
+         *     }
+         * @enum {string}
+         */
+        "market-api_MigrateAccountResponse": "migrated" | "requires_manual_migration";
+        /**
+         * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
+         * @example 2025-07-11T20:41:37.423Z
+         */
+        "market-api_NowOrISO8601DateTime": "Now" | {
+            /** @description An ISO 8601 datetime string */
+            DateTime: components["schemas"]["market-api_ISO8601DateTime"];
+        };
+        /** @enum {string} */
+        "market-api_ObjectType": "list" | "order" | "procurement" | "contract" | "kubernetes_cluster" | "downtime_report" | "downtime_report_amendment" | "refunds";
+        /** @description Configure more fine grained order behavior. */
+        "market-api_OrderFlags": {
+            /** @description If true, the order will be automatically cancelled if it doesn't
+             *     immediately fill when being placed. */
+            ioc?: boolean;
+            /** @description If true, ignores the set limit price and matches any price that is available. */
+            market?: boolean;
+            /** @description If true, places the order straight into the book without trying to match
+             *     against existing orders. */
+            post_only?: boolean;
+            /** @description If the order start time should be automatically changed to "now" once
+             *     start time < "now", proportionally changing it's limit price to reflect
+             *     it's shorter duration. */
+            prorate?: boolean;
+        };
+        /** @description string with format '"ordr"_{base62_encoded_id}' used for referencing a OrderId resource. Never user-generated. */
+        "market-api_OrderId": string;
+        "market-api_OrderResponse": {
+            cancelled: boolean;
+            cancelled_at?: null | components["schemas"]["market-api_ISO8601DateTime"];
+            cluster?: null | components["schemas"]["market-api_ClusterName"];
+            colocate_with?: components["schemas"]["market-api_ContractId"][];
+            created_at: components["schemas"]["market-api_ISO8601DateTime"];
+            duration: components["schemas"]["market-api_UnixEpoch"];
+            end_at: components["schemas"]["market-api_ISO8601DateTime"];
+            executed: boolean;
+            executed_at?: null | components["schemas"]["market-api_ISO8601DateTime"];
+            /** Format: int64 */
+            execution_price?: number | null;
+            flags: components["schemas"]["market-api_OrderFlags"];
+            id: components["schemas"]["market-api_OrderId"];
+            instance_type: components["schemas"]["market-api_Ticker"];
+            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * Format: int64
+             * @description Price in cents
+             * @example 2850000
+             */
+            price: number;
+            /**
+             * Format: int32
+             * @example 4
+             */
+            quantity: number;
+            rejected: boolean;
+            rejected_reason?: string | null;
+            side: components["schemas"]["market-api_OrderSide"];
+            start_at: components["schemas"]["market-api_ISO8601DateTime"];
+            status: components["schemas"]["market-api_OrderStatus"];
+        };
+        /** @enum {string} */
+        "market-api_OrderSide": "buy" | "sell";
+        /** @enum {string} */
+        "market-api_OrderStatus": "open" | "filled" | "cancelled" | "rejected";
+        "market-api_ProcurementResponse": {
+            /**
+             * Format: int32
+             * @example 250
+             */
+            buy_limit_price_per_gpu_hour: number;
+            colocation_strategy: components["schemas"]["market-api_ColocationStrategy"];
+            /**
+             * Format: int32
+             * @example 1
+             */
+            desired_quantity: number;
+            /**
+             * Format: int32
+             * @example 60
+             */
+            horizon: number;
+            /** @example proc_W9TRG */
+            id: string;
+            instance_type: components["schemas"]["market-api_Ticker"];
+            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * Format: int32
+             * @example 25
+             */
+            sell_limit_price_per_gpu_hour: number;
+            status: components["schemas"]["market-api_ProcurementStatus"];
+        };
+        /** @enum {string} */
+        "market-api_ProcurementStatus": "active" | "disabled";
+        "market-api_RefundResponse": {
+            memo_amount?: string | null;
+            refund_timestamp?: null | components["schemas"]["market-api_ISO8601DateTime"];
+            report_cluster_id: components["schemas"]["market-api_ClusterId"];
+            report_created_at: components["schemas"]["market-api_ISO8601DateTime"];
+            report_end_time: components["schemas"]["market-api_ISO8601DateTime"];
+            /** Format: int64 */
+            report_id: number;
+            report_memo: string;
+            /** Format: int32 */
+            report_nodes_affected: number;
+            report_start_time: components["schemas"]["market-api_ISO8601DateTime"];
+            status: components["schemas"]["market-api_RefundStatus"];
+        };
+        /** @enum {string} */
+        "market-api_RefundStatus": "in_review" | "approved" | "refunded" | "denied";
+        /** @description Standard error response format following API guidelines. */
+        "market-api_SerdeErrorProxy": {
+            /** @description Array of detailed error information when applicable */
+            details: components["schemas"]["market-api_ErrorDetail"][];
+            /** @description Human-readable error message */
+            message: string;
+            /** @description The error type identifier */
+            type: components["schemas"]["market-api_ErrorType"];
+        };
+        /**
+         * @description Sort field for listing orders
+         * @example created_at
+         * @example start_time
+         * @enum {string}
+         */
+        "market-api_SortBy": "created_at" | "start_time";
+        /**
+         * @description Sort direction for listing orders
+         * @example ASC
+         * @example DESC
+         * @enum {string}
+         */
+        "market-api_SortDirection": "ASC" | "DESC";
+        /**
+         * @example h100i
+         * @example h100v
+         * @example h200ki
+         */
+        "market-api_Ticker": string;
+        "market-api_TransactionDetails": {
+            card_brand: string;
+            card_funding: string;
+            card_last4: string;
+            object: components["schemas"]["market-api_ObjectType"];
+            receipt_url: string;
+            /** @enum {string} */
+            type: "stripe_card_payment";
+        } | {
+            description: string;
+            /** @enum {string} */
+            type: "out_of_band_payment";
+        } | {
+            memo: string;
+            object: components["schemas"]["market-api_ObjectType"];
+            /** @enum {string} */
+            type: "credit_grant";
+        } | {
+            object: components["schemas"]["market-api_ObjectType"];
+            /** @enum {string} */
+            type: "refund";
+        } | {
+            object: components["schemas"]["market-api_ObjectType"];
+            order_id: components["schemas"]["market-api_OrderId"];
+            /** @enum {string} */
+            type: "buy_order";
+        } | {
+            object: components["schemas"]["market-api_ObjectType"];
+            order_id: components["schemas"]["market-api_OrderId"];
+            /** @enum {string} */
+            type: "buy_order_hold";
+        };
+        /** @description string with format '"tx"_{base62_encoded_id}' used for referencing a TransactionId resource. Never user-generated. */
+        "market-api_TransactionId": string;
+        "market-api_TransactionResponse": {
+            /**
+             * Format: int64
+             * @description Transaction amount in cents (e.g., 50000 = $500.00)
+             * @example 50000
+             */
+            amount_cents: number;
+            /** @description Unique identifier for the transaction */
+            id: components["schemas"]["market-api_TransactionId"];
+            object: components["schemas"]["market-api_ObjectType"];
+            transaction_details: components["schemas"]["market-api_TransactionDetails"];
+            /**
+             * Format: int64
+             * @description Time the transaction took place as Unix timestamp in seconds.
+             * @example 1640995200
+             */
+            transaction_time: number;
+        };
+        /**
+         * Format: int64
+         * @description Unix timestamp in seconds since epoch
+         */
+        "market-api_UnixEpoch": number;
+        "market-api_UpdateProcurementRequest": {
+            /**
+             * Format: int32
+             * @description Maximum price per GPU hour in cents
+             * @example 350
+             */
+            buy_limit_price_per_gpu_hour?: number | null;
+            /**
+             * Format: int32
+             * @description Desired quantity of nodes
+             * @example 5
+             */
+            desired_quantity?: number | null;
+            /**
+             * Format: int32
+             * @description Planning horizon in minutes. The procurement will try to buy compute
+             *     ahead of time as to always have at least this amount of time ahead
+             *     scheduled at a minimum.
+             * @example 120
+             */
+            horizon?: number | null;
+            instance_type?: null | components["schemas"]["market-api_Ticker"];
+            /**
+             * Format: int32
+             * @description Minimum price per GPU hour in cents when selling back
+             * @example 50
+             */
+            sell_limit_price_per_gpu_hour?: number | null;
+            status?: null | components["schemas"]["market-api_ProcurementStatus"];
+        };
+        large_scale_inference_Batch: {
+            account_id: string;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            cancelling_at?: string | null;
+            /** Format: date-time */
+            completed_at?: string | null;
+            completion_window: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            deadline_at: string;
+            endpoint: string;
+            errors?: null | components["schemas"]["large_scale_inference_BatchErrors"];
+            /** Format: date-time */
+            expired_at?: string | null;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: date-time */
+            failed_at?: string | null;
+            /** Format: date-time */
+            finalizing_at?: string | null;
+            id: string;
+            /** Format: date-time */
+            in_progress_at?: string | null;
+            input_file_uri: string;
+            metadata?: null | components["schemas"]["large_scale_inference_BatchMetadata"];
+            model_id: string;
+            object: string;
+            output_file_uri: string;
+            request_counts: components["schemas"]["large_scale_inference_RequestCounts"];
+            status: components["schemas"]["large_scale_inference_BatchStatus"];
+        };
+        large_scale_inference_BatchErrorData: {
+            code: string;
+            /** Format: u-int32 */
+            line?: number | null;
+            message: string;
+            param?: string | null;
+        };
+        large_scale_inference_BatchErrors: {
+            data: components["schemas"]["large_scale_inference_BatchErrorData"][];
+            object: string;
+        };
+        large_scale_inference_BatchMetadata: {
+            input_token_usage?: string | null;
+            output_token_usage?: string | null;
+        };
+        large_scale_inference_BatchRequest: {
+            completion_window: string;
+            endpoint: string;
+            input_file_uri: string;
+            metadata?: null | components["schemas"]["large_scale_inference_BatchMetadata"];
+            model_id: string;
+            output_file_uri: string;
+            store: string;
+        };
+        large_scale_inference_BatchRequests: components["schemas"]["large_scale_inference_BatchRequest"] | components["schemas"]["large_scale_inference_BatchRequest"][];
+        /** @enum {string} */
+        large_scale_inference_BatchStatus: "accepted" | "compute_purchased" | "not_started" | "started" | "validating" | "failed" | "in_progress" | "finalizing" | "completed" | "expired" | "cancelling" | "cancelled" | "waiting";
+        large_scale_inference_BlendedPrice: {
+            /** Format: double */
+            cents_per_million_tokens: number;
+        };
+        large_scale_inference_ErrorDetail: {
+            /** @description Specific error code for this detail */
+            code: string;
+            /** @description The field that caused the error (for validation errors) */
+            field?: string | null;
+            /** @description Detailed error message */
+            message: string;
+        };
+        /** @enum {string} */
+        large_scale_inference_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        large_scale_inference_Model: {
+            /** Format: date-time */
+            created_at: string;
+            external_reference: string;
+            id: string;
+            name: string;
+            /** Format: date-time */
+            retired_at?: string | null;
+        };
+        large_scale_inference_Price: {
+            Blended: components["schemas"]["large_scale_inference_BlendedPrice"];
+        } | {
+            Specific: components["schemas"]["large_scale_inference_SpecificPrice"];
+        };
+        large_scale_inference_RequestCounts: {
+            /** Format: u-int32 */
+            completed: number;
+            /** Format: u-int32 */
+            failed: number;
+            /** Format: u-int32 */
+            total: number;
+        };
+        /** @description Standard error response format following API guidelines. */
+        large_scale_inference_SerdeErrorProxy: {
+            /** @description Array of detailed error information when applicable */
+            details: components["schemas"]["large_scale_inference_ErrorDetail"][];
+            /** @description Human-readable error message */
+            message: string;
+            /** @description The error type identifier */
+            type: components["schemas"]["large_scale_inference_ErrorType"];
+        };
+        large_scale_inference_SpecificPrice: {
+            /** Format: double */
+            cents_per_million_input_tokens: number;
+            /** Format: double */
+            cents_per_million_output_tokens: number;
         };
     };
     responses: never;
@@ -3005,7 +2582,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GetInstancesResponse"];
+                    "application/json": components["schemas"]["vmorch_GetInstancesResponse"];
                 };
             };
             401: {
@@ -3044,7 +2621,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["VmsLogsResponse"];
+                    "application/json": components["schemas"]["vmorch_VmsLogsResponse"];
                 };
             };
             400: {
@@ -3082,7 +2659,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PostReplaceRequest"];
+                "application/json": components["schemas"]["vmorch_PostReplaceRequest"];
             };
         };
         responses: {
@@ -3091,7 +2668,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PostReplaceResponse"];
+                    "application/json": components["schemas"]["vmorch_PostReplaceResponse"];
                 };
             };
             400: {
@@ -3134,7 +2711,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GetUserDataResponse"];
+                    "application/json": components["schemas"]["vmorch_GetUserDataResponse"];
                 };
             };
             401: {
@@ -3166,7 +2743,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PostUserDataRequest"];
+                "application/json": components["schemas"]["vmorch_PostUserDataRequest"];
             };
         };
         responses: {
@@ -3175,7 +2752,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PostUserDataResponse"];
+                    "application/json": components["schemas"]["vmorch_PostUserDataResponse"];
                 };
             };
             400: {
@@ -3214,7 +2791,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GetSshResponse"];
+                    "application/json": components["schemas"]["vmorch_GetSshResponse"];
                 };
             };
             401: {
@@ -3230,6 +2807,2581 @@ export interface operations {
                 content?: never;
             };
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    health_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health check successful */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example OK */
+                    "text/plain": string;
+                };
+            };
+            /** @description Health check failed */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example Internal Server Error */
+                    "text/plain": string;
+                };
+            };
+        };
+    };
+    list_nodes_handler: {
+        parameters: {
+            query?: {
+                /** @description Filter nodes by node_id
+                 *     Use ?id=n_b1dc52505c6db142&id=n_b1dc52505c6db133 to specify multiple IDs.
+                 *     Cannot be used with name */
+                id?: string[];
+                /**
+                 * @description Filter nodes by their names
+                 *     Use ?name=val1&name=val2 to specify multiple names.
+                 *     Cannot be used with id
+                 * @example [
+                 *       "cuda-crunch"
+                 *     ]
+                 */
+                name?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of nodes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "node",
+                     *           "id": "n_b1dc52505c6db142",
+                     *           "name": "cuda-crunch",
+                     *           "zone": "hayesvalley",
+                     *           "gpu_type": "H100",
+                     *           "owner": "sfcompute",
+                     *           "status": "running",
+                     *           "created_at": 1640995200,
+                     *           "updated_at": 1640995200,
+                     *           "start_at": 1640995200,
+                     *           "procurement_id": "proc_h100ondemand_1",
+                     *           "max_price_per_node_hour": 1000,
+                     *           "node_type": "autoreserved",
+                     *           "vms": {
+                     *             "object": "list",
+                     *             "data": [
+                     *               {
+                     *                 "object": "vm",
+                     *                 "id": "vm_myOZZXw4pfcp7H9DQOldd",
+                     *                 "status": "running",
+                     *                 "created_at": 1640995200,
+                     *                 "updated_at": 1640995200,
+                     *                 "start_at": 1640995200,
+                     *                 "end_at": 1641007200
+                     *               }
+                     *             ]
+                     *           }
+                     *         }
+                     *       ]
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ListResponse_Node"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Invalid query parameters",
+                     *         "details": [
+                     *           {
+                     *             "field": "node_id|name",
+                     *             "code": "invalid_value",
+                     *             "message": "Cannot specify both node_id and name parameters"
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "You do not have permission to list nodes"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    create_nodes_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["node-api_CreateNodesRequest"];
+            };
+        };
+        responses: {
+            /** @description Nodes created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "node",
+                     *           "id": "n_b1dc52505c6db142",
+                     *           "name": "cuda-crunch",
+                     *           "zone": "hayesvalley",
+                     *           "gpu_type": "H100",
+                     *           "owner": "sfcompute",
+                     *           "status": "running",
+                     *           "created_at": 1640995200,
+                     *           "updated_at": 1640995200,
+                     *           "start_at": 1640995200,
+                     *           "procurement_id": "proc_h100ondemand_1",
+                     *           "max_price_per_node_hour": 1000,
+                     *           "node_type": "autoreserved"
+                     *         }
+                     *       ]
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ListResponse_Node"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "One or more fields are invalid",
+                     *         "details": [
+                     *           {
+                     *             "field": "start_at",
+                     *             "code": "invalid_value",
+                     *             "message": "start_at time must be in the future"
+                     *           },
+                     *           {
+                     *             "field": "names",
+                     *             "code": "invalid_value",
+                     *             "message": "node name 'vm_test' cannot follow the vm_id pattern vm_{16_hex_chars} as this prefix is reserved for system-generated IDs"
+                     *           },
+                     *           {
+                     *             "field": "names",
+                     *             "code": "invalid_value",
+                     *             "message": "node name cannot be a numeric string"
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "You do not have permission to create nodes"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    get_node_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node ID or name */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Node details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "node",
+                     *       "id": "n_b1dc52505c6db142",
+                     *       "name": "cuda-crunch",
+                     *       "zone": "hayesvalley",
+                     *       "gpu_type": "H100",
+                     *       "owner": "sfcompute",
+                     *       "status": "running",
+                     *       "created_at": 1640995200,
+                     *       "updated_at": 1640995200,
+                     *       "start_at": 1640995200,
+                     *       "procurement_id": "proc_h100ondemand_1",
+                     *       "max_price_per_node_hour": 1000,
+                     *       "node_type": "autoreserved",
+                     *       "vms": {
+                     *         "object": "list",
+                     *         "data": [
+                     *           {
+                     *             "object": "vm",
+                     *             "id": "vm_myOZZXw4pfcp7H9DQOldd",
+                     *             "status": "running",
+                     *             "created_at": 1640995200,
+                     *             "updated_at": 1640995200,
+                     *             "start_at": 1640995200,
+                     *             "end_at": 1641007200
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_Node"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Invalid node identifier",
+                     *         "details": [
+                     *           {
+                     *             "field": "id",
+                     *             "code": "invalid_value",
+                     *             "message": "Numeric strings are not supported as node identifiers"
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "You do not have permission to access this node"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Node not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Node not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    extend_node_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node ID or name */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["node-api_ExtendNodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Node extended successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "node",
+                     *       "id": "n_b1dc52505c6db142",
+                     *       "name": "cuda-crunch",
+                     *       "zone": "hayesvalley",
+                     *       "gpu_type": "H100",
+                     *       "owner": "sfcompute",
+                     *       "status": "running",
+                     *       "created_at": 1640995200,
+                     *       "updated_at": 1640995200,
+                     *       "start_at": 1640995200,
+                     *       "end_at": 1641007200,
+                     *       "max_price_per_node_hour": 1000,
+                     *       "node_type": "reserved",
+                     *       "vms": {
+                     *         "object": "list",
+                     *         "data": [
+                     *           {
+                     *             "object": "vm",
+                     *             "id": "vm_myOZZXw4pfcp7H9DQOldd",
+                     *             "status": "running",
+                     *             "created_at": 1640995200,
+                     *             "updated_at": 1640995200,
+                     *             "start_at": 1640995200,
+                     *             "end_at": 1641007200
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_Node"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Node is On Demand not Reserved - only reservation nodes can be extended",
+                     *         "details": [
+                     *           {
+                     *             "field": "duration_seconds",
+                     *             "code": "invalid_value",
+                     *             "message": "duration must be at least 1 hour (3600 seconds)"
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen or node is not associated with this account"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Node not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Node not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Extension failed due to capacity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Extension failed: No capacity available for the requested time period"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    release_node_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Node ID or name */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Node released successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "node",
+                     *       "id": "n_b1dc52505c6db142",
+                     *       "name": "cuda-crunch",
+                     *       "zone": "hayesvalley",
+                     *       "gpu_type": "H100",
+                     *       "owner": "sfcompute",
+                     *       "status": "terminated",
+                     *       "created_at": 1640995200,
+                     *       "updated_at": 1640995200,
+                     *       "start_at": 1640995200,
+                     *       "end_at": 1641000000,
+                     *       "max_price_per_node_hour": 1000,
+                     *       "node_type": "autoreserved",
+                     *       "procurement_id": "proc_h100ondemand_1",
+                     *       "vms": {
+                     *         "object": "list",
+                     *         "data": [
+                     *           {
+                     *             "object": "vm",
+                     *             "id": "vm_myOZZXw4pfcp7H9DQOldd",
+                     *             "status": "running",
+                     *             "created_at": 1640995200,
+                     *             "updated_at": 1640995200,
+                     *             "start_at": 1640995200,
+                     *             "end_at": 1641007200
+                     *           }
+                     *         ]
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_Node"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Node is Reserved not On Demand - only on-demand nodes can be released"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen or node is not associated with this account"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Node not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Node not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    listClusters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of Kubernetes clusters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "kubernetes_cluster",
+                     *           "name": "starlight",
+                     *           "kubernetes_namespace": "sf-user123",
+                     *           "kubernetes_api_url": "https://starlight.sf-k8s.com",
+                     *           "kubernetes_ca_cert": "-----BEGIN CERTIFICATE-----...",
+                     *           "contract": {
+                     *             "object": "contract",
+                     *             "status": "active",
+                     *             "id": "cont_xyz123",
+                     *             "created_at": "2024-07-15T22:30:17.426Z",
+                     *             "instance_type": "h100i",
+                     *             "shape": {
+                     *               "intervals": [
+                     *                 "2024-07-16T00:00:00Z",
+                     *                 "2024-07-17T00:00:00Z"
+                     *               ],
+                     *               "quantities": [
+                     *                 4,
+                     *                 0
+                     *               ]
+                     *             },
+                     *             "colocate_with": [],
+                     *             "cluster_id": "clstr_abc456",
+                     *             "state": "Active"
+                     *           }
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListClustersResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    listContracts: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Filter by instance type
+                 * @example h100i
+                 */
+                instance_type?: components["schemas"]["market-api_Ticker"];
+                /**
+                 * @description Start of interval to find active contracts. Must be used with active_within_interval_end
+                 * @example 2024-01-01T00:00:00Z
+                 */
+                active_within_interval_start?: components["schemas"]["market-api_ISO8601DateTime"];
+                /**
+                 * @description End of interval to find active contracts. Must be used with active_within_interval_start
+                 * @example 2024-01-02T00:00:00Z
+                 */
+                active_within_interval_end?: components["schemas"]["market-api_ISO8601DateTime"];
+                /**
+                 * @description Filter by contract state. Options: "All", "Upcoming", "Active", "Expired". Default excludes expired contracts
+                 * @example Active
+                 */
+                state?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of contracts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "contract",
+                     *           "status": "active",
+                     *           "id": "cont_xyz789",
+                     *           "created_at": "2024-07-15T22:30:17.426Z",
+                     *           "instance_type": "h100i",
+                     *           "shape": {
+                     *             "intervals": [
+                     *               "2024-07-16T00:00:00Z",
+                     *               "2024-07-17T00:00:00Z"
+                     *             ],
+                     *             "quantities": [
+                     *               10,
+                     *               0
+                     *             ]
+                     *           },
+                     *           "state": "Active"
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListContractsResponse"];
+                };
+            };
+            /** @description Bad request - invalid query parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "must provide both active_within_interval_start and active_within_interval_end or none of them"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getContract: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Contract ID
+                 * @example cont_xyz789
+                 */
+                id: components["schemas"]["market-api_ContractId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Contract details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "contract",
+                     *       "status": "active",
+                     *       "id": "cont_xyz789",
+                     *       "created_at": "2024-07-15T22:30:17.426Z",
+                     *       "instance_type": "h100i",
+                     *       "shape": {
+                     *         "intervals": [
+                     *           "2024-07-16T22:30:16Z",
+                     *           "2024-07-17T22:30:16Z",
+                     *           "2024-07-18T22:30:16Z"
+                     *         ],
+                     *         "quantities": [
+                     *           10,
+                     *           20,
+                     *           0
+                     *         ]
+                     *       },
+                     *       "colocate_with": [
+                     *         "cont_abc456"
+                     *       ],
+                     *       "cluster_id": "clus_xyz123",
+                     *       "state": "Active"
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ContractResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Contract not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Contract not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    listOrders: {
+        parameters: {
+            query?: {
+                /** @description Filter by order side (buy or sell) */
+                side?: components["schemas"]["market-api_OrderSide"];
+                /** @description Filter by instance type */
+                instance_type?: components["schemas"]["market-api_Ticker"];
+                /** @description Minimum price in cents */
+                min_price?: number;
+                /** @description Maximum price in cents */
+                max_price?: number;
+                /** @description Minimum start date */
+                min_start_date?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Maximum start date */
+                max_start_date?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Minimum duration in seconds */
+                min_duration?: components["schemas"]["market-api_UnixEpoch"];
+                /** @description Maximum duration in seconds */
+                max_duration?: components["schemas"]["market-api_UnixEpoch"];
+                /** @description Minimum quantity */
+                min_quantity?: number;
+                /** @description Maximum quantity */
+                max_quantity?: number;
+                /** @description Filter by contract ID */
+                contract_id?: components["schemas"]["market-api_ContractId"];
+                /** @description Show only open orders */
+                only_open?: boolean;
+                /** @description Exclude filled orders */
+                exclude_filled?: boolean;
+                /** @description Show only filled orders */
+                only_filled?: boolean;
+                /** @description Minimum filled at date */
+                min_filled_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Maximum filled at date */
+                max_filled_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Minimum fill price in cents */
+                min_fill_price?: number;
+                /** @description Maximum fill price in cents */
+                max_fill_price?: number;
+                /** @description Exclude cancelled orders */
+                exclude_cancelled?: boolean;
+                /** @description Show only cancelled orders */
+                only_cancelled?: boolean;
+                /** @description Minimum cancelled at date */
+                min_cancelled_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Maximum cancelled at date */
+                max_cancelled_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Minimum placed at date */
+                min_placed_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Maximum placed at date */
+                max_placed_at?: components["schemas"]["market-api_ISO8601DateTime"];
+                /** @description Maximum number of results to return (default: 100, max: 100) */
+                limit?: number;
+                /** @description Number of results to skip */
+                offset?: number;
+                /** @description Sort field */
+                sort_by?: components["schemas"]["market-api_SortBy"];
+                /** @description Sort direction */
+                sort_direction?: components["schemas"]["market-api_SortDirection"];
+                include_public?: unknown;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "order",
+                     *           "id": "ordr_xyz123",
+                     *           "side": "buy",
+                     *           "instance_type": "h100i",
+                     *           "price": 5000,
+                     *           "quantity": 2,
+                     *           "status": "open",
+                     *           "created_at": "2024-07-15T22:30:17.426Z",
+                     *           "start_at": "2024-07-16T00:00:00Z",
+                     *           "end_at": "2024-07-17T00:00:00Z",
+                     *           "flags": {
+                     *             "ioc": false,
+                     *             "post_only": false,
+                     *             "market": false,
+                     *             "prorate": false
+                     *           }
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListOrdersResponse"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "Cannot specify both 'only_filled' and 'only_cancelled'"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional key to ensure idempotent order creation */
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["market-api_CreateOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Order created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "order",
+                     *       "status": "pending",
+                     *       "id": "order_xyz789",
+                     *       "idempotency_key": "key_123"
+                     *     } */
+                    "application/json": components["schemas"]["market-api_CreateOrderResponse"];
+                };
+            };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "invalid_request_error",
+                     *       "message": "Start time must be within +/- 1 minute of now, on a future hour, or the string literal 'NOW'",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "authentication_error",
+                     *       "message": "missing authentication token",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen, insufficient credits, unauthorized seller, or trading halted */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "forbidden",
+                     *       "message": "Account is frozen",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Not found - contract or cluster not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "not_found",
+                     *       "message": "Contract not found",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Upgrade required - legacy account needs migration */
+            426: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "invalid_request_error",
+                     *       "message": "Legacy account must be upgraded before placing orders",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "api_error",
+                     *       "message": "An internal server error occurred",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Order ID
+                 * @example order_xyz789
+                 */
+                id: components["schemas"]["market-api_OrderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "order",
+                     *       "id": "order_xyz789",
+                     *       "side": "buy",
+                     *       "status": "open",
+                     *       "instance_type": "h100i",
+                     *       "quantity": 4,
+                     *       "start_at": "2021-01-01T00:00:00Z",
+                     *       "end_at": "2021-01-01T01:00:00Z",
+                     *       "price": 2850000,
+                     *       "flags": {
+                     *         "market": false,
+                     *         "post_only": false,
+                     *         "ioc": false
+                     *       },
+                     *       "executed": false,
+                     *       "cancelled": false,
+                     *       "colocate_with": [],
+                     *       "created_at": "2021-01-01T00:00:00Z",
+                     *       "rejected": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_OrderResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "authentication_error",
+                     *       "message": "missing authentication token",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - user not authorized to view this order */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "forbidden",
+                     *       "message": "User not authorized to view this order",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "not_found",
+                     *       "message": "Order not found",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "api_error",
+                     *       "message": "An internal server error occurred",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    cancelOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Order ID
+                 * @example ordr_xyz789
+                 */
+                id: components["schemas"]["market-api_OrderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order cancelled successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "pending"
+                     *     } */
+                    "application/json": components["schemas"]["market-api_CancelOrderResponse"];
+                };
+            };
+            /** @description Order already cancelled */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "validation_error",
+                     *       "message": "Order already cancelled",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "not_found",
+                     *       "message": "Order not found",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "type": "api_error",
+                     *       "message": "An internal server error occurred",
+                     *       "details": []
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getOrderClusters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Order ID
+                 * @example ordr_W9TRG
+                 */
+                id: components["schemas"]["market-api_OrderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of clusters associated with the order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "kubernetes_cluster",
+                     *           "name": "starlight",
+                     *           "kubernetes_namespace": "sf-user123",
+                     *           "kubernetes_api_url": "https://starlight.sf-k8s.com",
+                     *           "kubernetes_ca_cert": "-----BEGIN CERTIFICATE-----...",
+                     *           "contract": {
+                     *             "object": "contract",
+                     *             "status": "active",
+                     *             "id": "cont_xyz123",
+                     *             "created_at": "2024-07-15T22:30:17.426Z",
+                     *             "instance_type": "h100i",
+                     *             "shape": {
+                     *               "intervals": [
+                     *                 "2024-07-16T00:00:00Z",
+                     *                 "2024-07-17T00:00:00Z"
+                     *               ],
+                     *               "quantities": [
+                     *                 4,
+                     *                 0
+                     *               ]
+                     *             },
+                     *             "colocate_with": [],
+                     *             "cluster_id": "clstr_abc456",
+                     *             "state": "Active"
+                     *           }
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListClustersResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Order not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Order not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    listProcurements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of procurements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "procurement",
+                     *           "id": "proc_test123",
+                     *           "status": "active",
+                     *           "instance_type": "h100i",
+                     *           "desired_quantity": 5,
+                     *           "buy_limit_price_per_gpu_hour": 250,
+                     *           "sell_limit_price_per_gpu_hour": 25,
+                     *           "horizon": 60,
+                     *           "colocation_strategy": "colocate_pinned",
+                     *           "actual_quantity": 5,
+                     *           "active_order_count": 2
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListProcurementsResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    createProcurement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["market-api_CreateProcurementRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully created procurement */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "procurement",
+                     *       "id": "proc_xyz123",
+                     *       "status": "active",
+                     *       "instance_type": "h100i",
+                     *       "desired_quantity": 5,
+                     *       "buy_limit_price_per_gpu_hour": 250,
+                     *       "sell_limit_price_per_gpu_hour": 25,
+                     *       "horizon": 60,
+                     *       "colocation_strategy": "colocate_pinned",
+                     *       "actual_quantity": 0,
+                     *       "active_order_count": 0
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ProcurementResponse"];
+                };
+            };
+            /** @description Bad request - invalid field values */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "desired_quantity must be non-negative"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Payment required - insufficient funds */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "payment_required",
+                     *         "message": "insufficient funds"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Not found - cluster not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "cluster starlight not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getProcurement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Procurement ID
+                 * @example proc_xyz123
+                 */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Procurement details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "procurement",
+                     *       "id": "proc_xyz123",
+                     *       "status": "active",
+                     *       "instance_type": "h100i",
+                     *       "desired_quantity": 5,
+                     *       "buy_limit_price_per_gpu_hour": 250,
+                     *       "sell_limit_price_per_gpu_hour": 25,
+                     *       "horizon": 60,
+                     *       "colocation_strategy": "colocate_pinned",
+                     *       "actual_quantity": 5,
+                     *       "active_order_count": 2
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ProcurementResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Procurement not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Procurement proc_xyz123 not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    updateProcurement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Procurement ID
+                 * @example proc_xyz123
+                 */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["market-api_UpdateProcurementRequest"];
+            };
+        };
+        responses: {
+            /** @description Successfully updated procurement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "procurement",
+                     *       "id": "proc_xyz123",
+                     *       "status": "disabled",
+                     *       "instance_type": "h100i",
+                     *       "desired_quantity": 5,
+                     *       "buy_limit_price_per_gpu_hour": 400,
+                     *       "sell_limit_price_per_gpu_hour": 100,
+                     *       "horizon": 120,
+                     *       "colocation_strategy": "colocate_pinned",
+                     *       "actual_quantity": 3,
+                     *       "active_order_count": 1
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ProcurementResponse"];
+                };
+            };
+            /** @description Bad request - invalid field values */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "invalid_request_error",
+                     *         "message": "desired_quantity must be non-negative"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Payment required - insufficient funds */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "payment_required",
+                     *         "message": "insufficient funds"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Procurement not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "procurement proc_xyz123 not found"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getRefunds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of refund requests and their statuses for the account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "refunds",
+                     *       "refunds": [
+                     *         {
+                     *           "report_id": 12345,
+                     *           "report_start_time": "2024-03-15T00:00:00Z",
+                     *           "report_end_time": "2024-03-15T02:00:00Z",
+                     *           "report_nodes_affected": 4,
+                     *           "report_cluster_id": "cluster_us_west_1",
+                     *           "report_memo": "Network connectivity issues in US-West-1",
+                     *           "report_created_at": "2024-03-15T00:30:00Z",
+                     *           "memo_amount": "500.00",
+                     *           "refund_timestamp": "2024-03-16T00:00:00Z",
+                     *           "status": "refunded"
+                     *         }
+                     *       ]
+                     *     } */
+                    "application/json": components["schemas"]["market-api_AccountRefundsResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "missing authentication token"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Forbidden - account frozen */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "Account is frozen"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "An internal server error occurred"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getAccountMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account information retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "id": "gmail-com-name",
+                     *       "role": "user",
+                     *       "is_frozen": false,
+                     *       "kyc": "basic",
+                     *       "submitted_waitlist": true,
+                     *       "waitlist": false,
+                     *       "kycb_form_submitted": false,
+                     *       "created_at": "2024-01-15T10:30:00Z"
+                     *     } */
+                    "application/json": components["schemas"]["market-api_AccountMeResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Account not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "account not found",
+                     *         "details": [],
+                     *         "request_id": "req_550e8400-e29b-41d4-a716-446655440000"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getBalance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully retrieved balance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "balance",
+                     *       "available": 150000,
+                     *       "reserved": 180000,
+                     *       "created_at": 1640995200,
+                     *       "updated_at": 1640995200
+                     *     } */
+                    "application/json": components["schemas"]["market-api_GetBalanceResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCredits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully retrieved credit balance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "current_balance_cents": 150000,
+                     *       "available_credits_cents": 150000,
+                     *       "amount_due_next_billing_period_cents": 0
+                     *     } */
+                    "application/json": components["schemas"]["market-api_GetCreditsResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    migrateAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Migration request specifying the desired migration method */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["market-api_MigrateAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description Account successfully migrated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "status": "migrated"
+                     *     } */
+                    "application/json": components["schemas"]["market-api_MigrateAccountResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Account already migrated */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "account_already_migrated",
+                     *         "message": "Account has already been migrated",
+                     *         "details": [],
+                     *         "request_id": "req_550e8400-e29b-41d4-a716-446655440000"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "internal_server_error",
+                     *         "message": "An internal server error occurred",
+                     *         "details": [],
+                     *         "request_id": "req_550e8400-e29b-41d4-a716-446655440000"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    getTransactions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully retrieved transactions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "object": "list",
+                     *       "data": [
+                     *         {
+                     *           "object": "transaction",
+                     *           "id": "tx_1234567890",
+                     *           "transaction_time": 1640995200,
+                     *           "amount_cents": 25000,
+                     *           "transaction_details": {
+                     *             "type": "credit_grant",
+                     *             "object": "transaction_details",
+                     *             "memo": "Promotional credit"
+                     *           }
+                     *         }
+                     *       ],
+                     *       "has_more": false
+                     *     } */
+                    "application/json": components["schemas"]["market-api_ListResponse"];
+                };
+            };
+            /** @description Unauthorized - missing or invalid authentication token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_batches: {
+        parameters: {
+            query: {
+                /** @description Max items to return */
+                limit: number;
+                /** @description Pagination offset */
+                after: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of batches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_Batch"][];
+                };
+            };
+        };
+    };
+    create_batches: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["large_scale_inference_BatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Batches created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_Batch"][];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    get_batch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Batch identifier */
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batch found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_Batch"];
+                };
+            };
+            /** @description Batch not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    cancel_batch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Batch identifier */
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batch cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_Batch"];
+                };
+            };
+            /** @description Batch not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    health_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is healthy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_models: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List available models */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_Model"][];
+                };
+            };
+        };
+    };
+    get_model_history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Model identifier */
+                model_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Not implemented */
+            501: {
                 headers: {
                     [name: string]: unknown;
                 };
