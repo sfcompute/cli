@@ -1,7 +1,7 @@
 import type { Command } from "@commander-js/extra-typings";
-import chalk from "chalk";
 import Table from "cli-table3";
 import * as console from "node:console";
+import { gray, green } from "jsr:@std/fmt/colors";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
 import {
@@ -9,7 +9,6 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import type { Cents } from "../helpers/units.ts";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -22,10 +21,38 @@ export function registerBalance(program: Command) {
     .description("Get account balance")
     .option("--json", "Output in JSON format")
     .action(async (options) => {
+      const loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        logLoginMessageAndQuit();
+      }
+      const client = await apiClient();
+
+      const { data, response } = await client.GET("/v1/balances");
+
+      if (!response.ok) {
+        switch (response.status) {
+          case 401:
+            return await logSessionTokenExpiredAndQuit();
+          default:
+            return logAndQuit(`Failed to get balance: ${response.statusText}`);
+        }
+      }
+
+      if (!data) {
+        return logAndQuit(
+          `Failed to get balance: Unexpected response from server: ${response}`,
+        );
+      }
+
       const {
-        available: { whole: availableWhole, cents: availableCents },
-        reserved: { whole: reservedWhole, cents: reservedCents },
-      } = await getBalance();
+        available,
+        reserved,
+      } = data;
+
+      const availableWhole = available / 100;
+      const availableCents = available;
+      const reservedWhole = reserved / 100;
+      const reservedCents = reserved;
 
       if (options.json) {
         const jsonOutput = {
@@ -44,82 +71,24 @@ export function registerBalance(program: Command) {
         const formattedReserved = usdFormatter.format(reservedWhole);
 
         const table = new Table({
-          head: [chalk.gray("Type"), chalk.gray("Amount"), chalk.gray("Cents")],
+          head: [gray("Type"), gray("Amount"), gray("Cents")],
           colWidths: [15, 15, 35],
         });
 
         table.push(
           [
             "Available",
-            chalk.green(formattedAvailable),
-            chalk.green(availableCents.toLocaleString()),
+            green(formattedAvailable),
+            green(availableCents.toLocaleString()),
           ],
           [
             "Reserved",
-            chalk.gray(formattedReserved),
-            chalk.gray(reservedCents.toLocaleString()),
+            gray(formattedReserved),
+            gray(reservedCents.toLocaleString()),
           ],
         );
 
         console.log(`${table.toString()}\n`);
       }
     });
-}
-
-export type BalanceUsdCents = {
-  available: { cents: Cents; whole: number };
-  reserved: { cents: Cents; whole: number };
-};
-export async function getBalance(): Promise<BalanceUsdCents> {
-  const loggedIn = await isLoggedIn();
-  if (!loggedIn) {
-    logLoginMessageAndQuit();
-  }
-  const client = await apiClient();
-
-  const { data, response } = await client.GET("/v0/balance");
-
-  if (!response.ok) {
-    switch (response.status) {
-      case 401:
-        return await logSessionTokenExpiredAndQuit();
-      default:
-        return logAndQuit(`Failed to get balance: ${response.statusText}`);
-    }
-  }
-
-  if (!data) {
-    return logAndQuit(
-      `Failed to get balance: Unexpected response from server: ${response}`,
-    );
-  }
-
-  let available: number;
-  switch (data.available.currency) {
-    case "usd":
-      available = data.available.amount;
-      break;
-    default:
-      logAndQuit(`Unsupported currency: ${data.available.currency}`);
-  }
-
-  let reserved: number;
-  switch (data.reserved.currency) {
-    case "usd":
-      reserved = data.reserved.amount;
-      break;
-    default:
-      logAndQuit(`Unsupported currency: ${data.reserved.currency}`);
-  }
-
-  return {
-    available: {
-      cents: available,
-      whole: available / 100,
-    },
-    reserved: {
-      cents: reserved,
-      whole: reserved / 100,
-    },
-  };
 }
