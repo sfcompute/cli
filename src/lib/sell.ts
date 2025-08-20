@@ -16,7 +16,6 @@ import {
   roundEndDate,
   roundStartDate,
 } from "../helpers/units.ts";
-import { waitForOrderToNotBePending } from "../helpers/waitingForOrder.ts";
 import { GPUS_PER_NODE } from "./constants.ts";
 import { parseAccelerators } from "./index.ts";
 import type { PlaceSellOrderParameters } from "./orders/types.ts";
@@ -161,7 +160,6 @@ export function registerSell(program: Command) {
         return logAndQuit("Order ID not found");
       }
 
-      await waitForOrderToNotBePending(data.id);
       // process.exit(0);
     });
 }
