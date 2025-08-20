@@ -1,7 +1,8 @@
 import type { components } from "../../schema.ts";
 
-type CredentialsResponse =
-  components["schemas"]["frontend_server.ListResponse"];
+type CredentialsResponse = components["schemas"][
+  "SF_Compute_K8s_Orchestration_API_frontend_server.ListResponse"
+];
 type CredentialsList = NonNullable<CredentialsResponse["data"]>;
 export type K8sCredential = CredentialsList[number];
 
