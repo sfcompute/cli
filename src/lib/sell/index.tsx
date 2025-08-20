@@ -25,7 +25,7 @@ import invariant from "tiny-invariant";
 import { getContract } from "../../helpers/fetchers.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
 
-type SellOrderFlags = components["schemas"]["PostOrderRequest"]["flags"];
+type SellOrderFlags = components["schemas"]["market-api_OrderFlags"];
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -214,11 +214,6 @@ function SellOrder(props: {
 
         const o = await getOrder(order!.id);
         setOrder(o);
-
-        if (o && o.status != "pending") {
-          exit();
-          return;
-        }
       }, 200);
     }
 

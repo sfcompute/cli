@@ -237,8 +237,7 @@ async function listClustersAction({
             (cluster) =>
               ({
                 ...cluster,
-                // @ts-expect-error - ignore
-                state: cluster.contract?.state || "Active",
+                state: cluster.contract?.state ?? "Active",
               }) as UserFacingCluster,
           )}
       />,
