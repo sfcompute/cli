@@ -390,9 +390,11 @@ function BuyOrderPreview(props: {
 
 const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
 
-type Order =
-  | Awaited<ReturnType<typeof getOrder>>
-  | Awaited<ReturnType<typeof placeBuyOrder>>;
+type Order = Omit<Awaited<ReturnType<typeof getOrder>>, "status"> & {
+  status:
+    | Awaited<ReturnType<typeof getOrder>>["status"]
+    | Awaited<ReturnType<typeof placeBuyOrder>>["status"];
+};
 type BuyOrderProps = {
   price: number;
   size: number;
@@ -434,7 +436,7 @@ function BuyOrder(props: BuyOrderProps) {
       standing: props.standing,
       cluster: props.cluster,
     });
-    setOrder(order);
+    setOrder(order as Order);
   }, [props]);
 
   const [resultMessage, setResultMessage] = useState<string | null>(null);
@@ -508,10 +510,6 @@ function BuyOrder(props: BuyOrderProps) {
           setLoadingMsg(
             "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
           );
-          return;
-        }
-        if (o.status === "pending") {
-          setLoadingMsg("Pending...");
           return;
         }
         setOrder(o);
@@ -720,7 +718,7 @@ export async function placeBuyOrder(options: {
       default:
         return logAndQuit(
           `Failed to place order: ${response.status} ${response.statusText} - ${
-            error?.code ? `[${error.code}] ` : ""
+            error ? `[${error}] ` : ""
           }${error?.message || "Unknown error"}`,
         );
     }
@@ -802,8 +800,7 @@ export async function getQuote(options: QuoteOptions) {
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
       cluster: options.cluster,
-      colocate_with:
-        (options.colocateWith ? [options.colocateWith] : []) as string[],
+      colocate_with: options.colocateWith,
     },
   } as const;
 
@@ -816,11 +813,11 @@ export async function getQuote(options: QuoteOptions) {
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error?.message}`);
+        return logAndQuit(`Bad Request: ${error}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
-        return logAndQuit(`Failed to get quote: ${error?.code}`);
+        return logAndQuit(`Failed to get quote: ${error}`);
       default:
         return logAndQuit(`Failed to get quote: ${response.statusText}`);
     }
@@ -848,48 +845,13 @@ export async function getQuote(options: QuoteOptions) {
 export async function getOrder(orderId: string) {
   const api = await apiClient();
 
-  const { data: order } = await api.GET("/v0/orders/{id}", {
+  const { data: order, error } = await api.GET("/v0/orders/{id}", {
     params: { path: { id: orderId } },
   });
+
+  if (error) {
+    return logAndQuit(`Failed to get order: ${error.message}`);
+  }
+
   return order;
-}
-
-export async function getMostRecentIndexAvgPrice(instanceType: string) {
-  const api = await apiClient();
-
-  const { data } = await api.GET("/v0/prices", {
-    params: {
-      query: {
-        instance_type: instanceType,
-      },
-    },
-  });
-
-  if (!data) {
-    return logAndQuit("Failed to get prices: Unexpected response from server");
-  }
-
-  const sortedData = data.data.filter((item) => !item.no_data).sort((a, b) => {
-    return dayjs(b.period_start).diff(dayjs(a.period_start));
-  });
-
-  return sortedData[0].gpu_hour;
-}
-
-export async function getAggressivePricePerHour(instanceType: string) {
-  const mostRecentPrice = await getMostRecentIndexAvgPrice(instanceType);
-  // We'll set a floor on the recommended price here, because the index price
-  // will report 0 if there was no data, which might happen due to an outage.
-  const minimumPrice = 75; // 75 cents
-
-  if (!mostRecentPrice) {
-    return minimumPrice;
-  }
-
-  const recommendedIndexPrice = (mostRecentPrice.avg + mostRecentPrice.max) / 2;
-  if (recommendedIndexPrice < minimumPrice) {
-    return minimumPrice;
-  }
-
-  return recommendedIndexPrice;
 }
