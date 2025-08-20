@@ -996,6 +996,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v0/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["handle_quote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2223,12 +2239,10 @@ export interface components {
         "market-api_MigrateAccountResponse": "migrated" | "requires_manual_migration";
         /**
          * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
+         * @example NOW
          * @example 2025-07-11T20:41:37.423Z
          */
-        "market-api_NowOrISO8601DateTime": "Now" | {
-            /** @description An ISO 8601 datetime string */
-            DateTime: components["schemas"]["market-api_ISO8601DateTime"];
-        };
+        "market-api_NowOrISO8601DateTime": string;
         /** @enum {string} */
         "market-api_ObjectType": "list" | "order" | "procurement" | "contract" | "kubernetes_cluster" | "downtime_report" | "downtime_report_amendment" | "refunds";
         /** @description Configure more fine grained order behavior. */
@@ -2558,6 +2572,143 @@ export interface components {
             cents_per_million_input_tokens: number;
             /** Format: double */
             cents_per_million_output_tokens: number;
+        };
+        /** @description Quote details with side-specific fields
+         *
+         *     The response structure differs based on order side:
+         *     - Buy orders include `instance_type`
+         *     - Sell orders include `contract_id` */
+        quoter_ApiQuoteDetails: {
+            /** @description End time: ISO 8601 */
+            end_at: components["schemas"]["quoter_NowOrISO8601DateTime"];
+            /** @description Instance type being quoted */
+            instance_type: string;
+            /**
+             * Format: u-int64
+             * @description Total price in cents (USD)
+             */
+            price: number;
+            /**
+             * Format: u-int64
+             * @description Number of nodes
+             */
+            quantity: number;
+            /** @description Start time: ISO 8601 or "NOW" */
+            start_at: components["schemas"]["quoter_NowOrISO8601DateTime"];
+            zone: string;
+        } | {
+            /** @description Contract being sold from */
+            contract_id: components["schemas"]["quoter_ContractId"];
+            /** @description End time: ISO 8601 */
+            end_at: components["schemas"]["quoter_NowOrISO8601DateTime"];
+            /**
+             * Format: u-int64
+             * @description Total price in cents (USD)
+             */
+            price: number;
+            /**
+             * Format: u-int64
+             * @description Number of nodes
+             */
+            quantity: number;
+            /** @description Start time: ISO 8601 or "NOW" */
+            start_at: components["schemas"]["quoter_NowOrISO8601DateTime"];
+        };
+        /** @description Response format for GET /v0/quote
+         *
+         *     Returns a quote object with side-specific details.
+         *     If no quote is available, the `quote` field will be `None`. */
+        quoter_ApiQuoteResponse: {
+            /** @description Always "quote" */
+            object: string;
+            quote?: null | components["schemas"]["quoter_ApiQuoteDetails"];
+            /** @description Matches the requested side: "buy" or "sell" */
+            side: string;
+        };
+        /** @description string with format '"cont"_{base62_encoded_id}' used for referencing a ContractId resource. Never user-generated. */
+        quoter_ContractId: string;
+        /** @enum {string} */
+        quoter_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        /**
+         * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
+         * @example NOW
+         * @example 2025-07-11T20:41:37.423Z
+         */
+        quoter_NowOrISO8601DateTime: string;
+        /** @description Side-specific parameters for quote requests */
+        quoter_OrderSideParams: {
+            /** @description Cluster constraint (optional) - hostname to resolve to cluster_id */
+            cluster?: string | null;
+            colocate_with?: null | components["schemas"]["quoter_ContractId"];
+            /** @description Instance type for buy orders: "h100i", "h100v", or "h200ki" */
+            instance_type: string;
+            /** @enum {string} */
+            side: "buy";
+        } | {
+            /** @description Contract ID for sell orders (must be owned by user) */
+            contract_id: components["schemas"]["quoter_ContractId"];
+            /** @enum {string} */
+            side: "sell";
+        };
+        /** @description Query parameters for GET /v0/quote
+         *
+         *     # Validation Rules
+         *
+         *     ## Required Fields
+         *     - `side`: Must be "buy" or "sell"
+         *     - `quantity`: Must be a positive integer (1-1024)
+         *
+         *     ## Date Constraints
+         *     - `min_start_date` and `max_start_date` accept:
+         *       - "NOW" (literal string for current time)
+         *       - ISO 8601 date string
+         *     - If neither provided, defaults to "NOW"
+         *     - `max_start_date` must be >= `min_start_date`
+         *
+         *     ## Duration Constraints (mutually exclusive)
+         *     - EITHER provide `duration` (in seconds)
+         *     - OR provide both `min_duration` AND `max_duration` (in seconds)
+         *     - All durations must be positive
+         *     - Maximum duration: 3 years (94,608,000 seconds)
+         *     - When `duration` is provided, it expands to a range:
+         *       - min = duration
+         *       - max = duration + 59 minutes
+         *
+         *     ## Side-Specific Constraints
+         *
+         *     ### Buy Orders
+         *     - **Required**: `instance_type` (must be one of: "h100i", "h100v", "h200ki")
+         *     - **Optional**: `colocate_with` (contract ID), `cluster`
+         *     - **Forbidden**: `contract_id`
+         *
+         *     ### Sell Orders
+         *     - **Required**: `contract_id` (must be owned by authenticated user)
+         *     - **Forbidden**: `instance_type`, `cluster`, `colocate_with` */
+        quoter_QuoteRequestParams: components["schemas"]["quoter_OrderSideParams"] & components["schemas"]["quoter_SpatialQuoteParams"];
+        /** @description Spatial parameters for quote requests (time, quantity, duration) */
+        quoter_SpatialQuoteParams: {
+            /**
+             * Format: u-int64
+             * @description Exact duration in seconds (mutually exclusive with min_duration/max_duration)
+             */
+            duration?: number | null;
+            /**
+             * Format: u-int64
+             * @description Maximum duration in seconds (must be used with min_duration)
+             */
+            max_duration?: number | null;
+            max_start_date?: null | components["schemas"]["quoter_NowOrISO8601DateTime"];
+            /**
+             * Format: u-int64
+             * @description Minimum duration in seconds (must be used with max_duration)
+             */
+            min_duration?: number | null;
+            min_start_date?: null | components["schemas"]["quoter_NowOrISO8601DateTime"];
+            /**
+             * Format: u-int64
+             * @description Number of nodes (1-1024)
+             */
+            quantity: number;
         };
     };
     responses: never;
@@ -5386,6 +5537,67 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    handle_quote: {
+        parameters: {
+            query: {
+                /** @description Order side: buy or sell */
+                side: string;
+                /** @description Number of nodes (1-1024) */
+                quantity: number;
+                /** @description Instance type for buy orders (h100i, h100v, h200ki) */
+                instance_type?: string;
+                /** @description Contract ID for sell orders */
+                contract_id?: string;
+                /** @description Cluster constraint (hostname) */
+                cluster?: string;
+                /** @description Contract ID to colocate with */
+                colocate_with?: string;
+                /** @description Exact duration in seconds (mutually exclusive with min/max, minimum 3600) */
+                duration?: number;
+                /** @description Min duration in seconds (minimum 3600, requires max_duration) */
+                min_duration?: number;
+                /** @description Max duration in seconds (requires min_duration) */
+                max_duration?: number;
+                /** @description Min start date: 'NOW' or ISO8601 */
+                min_start_date?: string;
+                /** @description Max start date: 'NOW' or ISO8601 */
+                max_start_date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quote retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["quoter_ApiQuoteResponse"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["quoter_ErrorType"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["quoter_ErrorType"];
+                };
             };
         };
     };
