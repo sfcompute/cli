@@ -45,14 +45,14 @@ export function registerBalance(program: Command) {
       }
 
       const {
-        available,
-        reserved,
+        available_balance_cents,
+        current_balance_cents,
       } = data;
 
-      const availableWhole = available / 100;
-      const availableCents = available;
-      const reservedWhole = reserved / 100;
-      const reservedCents = reserved;
+      const availableWhole = available_balance_cents / 100;
+      const availableCents = available_balance_cents;
+      const balanceWhole = current_balance_cents / 100;
+      const balanceCents = current_balance_cents;
 
       if (options.json) {
         const jsonOutput = {
@@ -60,15 +60,15 @@ export function registerBalance(program: Command) {
             whole: availableWhole,
             cents: availableCents,
           },
-          reserved: {
-            whole: reservedWhole,
-            cents: reservedCents,
+          balance: {
+            whole: balanceWhole,
+            cents: balanceCents,
           },
         };
         console.log(JSON.stringify(jsonOutput, null, 2));
       } else {
         const formattedAvailable = usdFormatter.format(availableWhole);
-        const formattedReserved = usdFormatter.format(reservedWhole);
+        const formattedBalance = usdFormatter.format(balanceWhole);
 
         const table = new Table({
           head: [gray("Type"), gray("Amount"), gray("Cents")],
@@ -82,9 +82,9 @@ export function registerBalance(program: Command) {
             green(availableCents.toLocaleString()),
           ],
           [
-            "Reserved",
-            gray(formattedReserved),
-            gray(reservedCents.toLocaleString()),
+            "Balance",
+            gray(formattedBalance),
+            gray(balanceCents.toLocaleString()),
           ],
         );
 

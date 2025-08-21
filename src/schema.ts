@@ -1740,7 +1740,7 @@ export interface components {
             error: components["schemas"]["node-api_ErrorContent"];
         };
         /** @enum {string} */
-        "node-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        "node-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required" | "service_unavailable";
         "node-api_ExtendNodeRequest": {
             /**
              * Format: int64
@@ -1957,7 +1957,11 @@ export interface components {
             waitlist: boolean;
         };
         "market-api_AccountRefundsResponse": {
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example refunds
+             * @enum {string}
+             */
+            object: "refunds";
             refunds: components["schemas"]["market-api_RefundResponse"][];
         };
         "market-api_CancelOrderResponse": {
@@ -1990,7 +1994,11 @@ export interface components {
             created_at: components["schemas"]["market-api_ISO8601DateTime"];
             id: components["schemas"]["market-api_ContractId"];
             instance_type: components["schemas"]["market-api_Ticker"];
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example contract
+             * @enum {string}
+             */
+            object: "contract";
             shape: components["schemas"]["market-api_ContractShape"];
             state: components["schemas"]["market-api_ContractState"];
             status: components["schemas"]["market-api_ContractStatus"];
@@ -2053,7 +2061,11 @@ export interface components {
             id: components["schemas"]["market-api_OrderId"];
             /** @example key_123 */
             idempotency_key?: string | null;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example order
+             * @enum {string}
+             */
+            object: "order";
             status: components["schemas"]["market-api_CreateOrderStatus"];
         };
         /** @enum {string} */
@@ -2099,38 +2111,55 @@ export interface components {
             message: string;
         };
         /** @enum {string} */
-        "market-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        "market-api_ErrorType": "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required" | "service_unavailable";
         /**
          * @description Response body for getting account balance from the credit ledger.
          * @example {
          *       "object": "balance",
-         *       "available": 150000,
-         *       "reserved": 180000,
+         *       "available_cents": 150000,
+         *       "current_cents": 180000,
+         *       "current_overage_cents": 0,
+         *       "current_hold_cents": 0,
          *       "created_at": 1640995200,
          *       "updated_at": 1640995200
          *     }
          */
         "market-api_GetBalanceResponse": {
             /**
-             * Format: int64
+             * Format: u-int64
              * @description Available balance in cents: sum(credit) - sum(debit) - sum(committed holds)
              * @example 150000
              */
-            available: number;
+            available_balance_cents: number;
             /**
              * Format: int64
              * @description When the balance was first created as a unix timestamp
              * @example 1640995200
              */
             created_at: number;
-            /** @description Resource object type */
-            object: components["schemas"]["market-api_ObjectType"];
             /**
-             * Format: int64
+             * Format: u-int64
              * @description Reserved balance in cents: sum(credit) - sum(debit)
              * @example 180000
              */
-            reserved: number;
+            current_balance_cents: number;
+            /**
+             * Format: u-int64
+             * @description Total spend that hasn't been paid for yet, in cents.
+             * @example 0
+             */
+            current_overage_cents: number;
+            /**
+             * @example balances
+             * @enum {string}
+             */
+            object: "balances";
+            /**
+             * Format: u-int64
+             * @description The maximum amount of overages the account can incur before they are blocked from buying compute.
+             * @example 0
+             */
+            overage_limit_cents: number;
             /**
              * Format: int64
              * @description When the balance was last updated as a unix timestamp
@@ -2182,33 +2211,56 @@ export interface components {
             /** @example sf-user123 */
             kubernetes_namespace: string;
             name: components["schemas"]["market-api_ClusterName"];
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example kubernetes_cluster
+             * @enum {string}
+             */
+            object: "kubernetes_cluster";
         };
         "market-api_ListClustersResponse": {
             data: components["schemas"]["market-api_KubernetesClusterResponse"][];
             has_more: boolean;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
         "market-api_ListContractsResponse": {
             data: components["schemas"]["market-api_ContractResponse"][];
             has_more: boolean;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
         "market-api_ListOrdersResponse": {
             data: components["schemas"]["market-api_OrderResponse"][];
             has_more: boolean;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
         "market-api_ListProcurementsResponse": {
             data: components["schemas"]["market-api_ProcurementResponse"][];
             has_more: boolean;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
-        /** @description Generic paginated list response structure */
-        "market-api_ListResponse": {
+        "market-api_ListTransactionsResponse": {
             data: components["schemas"]["market-api_TransactionResponse"][];
             has_more: boolean;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
         /**
          * @description Request body for migrating an account to the new billing system.
@@ -2244,7 +2296,7 @@ export interface components {
          */
         "market-api_NowOrISO8601DateTime": string;
         /** @enum {string} */
-        "market-api_ObjectType": "list" | "order" | "procurement" | "contract" | "kubernetes_cluster" | "downtime_report" | "downtime_report_amendment" | "refunds";
+        "market-api_ObjectType": "balance" | "transaction" | "transaction_details" | "list";
         /** @description Configure more fine grained order behavior. */
         "market-api_OrderFlags": {
             /** @description If true, the order will be automatically cancelled if it doesn't
@@ -2277,7 +2329,11 @@ export interface components {
             flags: components["schemas"]["market-api_OrderFlags"];
             id: components["schemas"]["market-api_OrderId"];
             instance_type: components["schemas"]["market-api_Ticker"];
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example order
+             * @enum {string}
+             */
+            object: "order";
             /**
              * Format: int64
              * @description Price in cents
@@ -2299,6 +2355,8 @@ export interface components {
         "market-api_OrderSide": "buy" | "sell";
         /** @enum {string} */
         "market-api_OrderStatus": "open" | "filled" | "cancelled" | "rejected";
+        /** @enum {string} */
+        "market-api_ProcurementMessage": "insufficient_balance" | "running";
         "market-api_ProcurementResponse": {
             /**
              * Format: int32
@@ -2319,7 +2377,12 @@ export interface components {
             /** @example proc_W9TRG */
             id: string;
             instance_type: components["schemas"]["market-api_Ticker"];
-            object: components["schemas"]["market-api_ObjectType"];
+            last_message: components["schemas"]["market-api_ProcurementMessage"];
+            /**
+             * @example procurement
+             * @enum {string}
+             */
+            object: "procurement";
             /**
              * Format: int32
              * @example 25
@@ -2417,7 +2480,11 @@ export interface components {
             amount_cents: number;
             /** @description Unique identifier for the transaction */
             id: components["schemas"]["market-api_TransactionId"];
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example transaction
+             * @enum {string}
+             */
+            object: "transaction";
             transaction_details: components["schemas"]["market-api_TransactionDetails"];
             /**
              * Format: int64
@@ -2535,7 +2602,7 @@ export interface components {
             message: string;
         };
         /** @enum {string} */
-        large_scale_inference_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        large_scale_inference_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required" | "service_unavailable";
         large_scale_inference_Model: {
             /** Format: date-time */
             created_at: string;
@@ -2628,7 +2695,7 @@ export interface components {
         /** @description string with format '"cont"_{base62_encoded_id}' used for referencing a ContractId resource. Never user-generated. */
         quoter_ContractId: string;
         /** @enum {string} */
-        quoter_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required";
+        quoter_ErrorType: "api_error" | "invalid_request_error" | "authentication_error" | "idempotency_error" | "conflict" | "not_found" | "request_timed_out" | "forbidden" | "not_implemented" | "upgrade_required" | "payment_required" | "service_unavailable";
         /**
          * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
          * @example NOW
@@ -4601,7 +4668,8 @@ export interface operations {
                      *           "horizon": 60,
                      *           "colocation_strategy": "colocate_pinned",
                      *           "actual_quantity": 5,
-                     *           "active_order_count": 2
+                     *           "active_order_count": 2,
+                     *           "last_message": "Running"
                      *         }
                      *       ],
                      *       "has_more": false
@@ -4815,7 +4883,8 @@ export interface operations {
                      *       "horizon": 60,
                      *       "colocation_strategy": "colocate_pinned",
                      *       "actual_quantity": 5,
-                     *       "active_order_count": 2
+                     *       "active_order_count": 2,
+                     *       "last_message": "Running"
                      *     } */
                     "application/json": components["schemas"]["market-api_ProcurementResponse"];
                 };
@@ -5168,8 +5237,10 @@ export interface operations {
                 content: {
                     /** @example {
                      *       "object": "balance",
-                     *       "available": 150000,
-                     *       "reserved": 180000,
+                     *       "available_cents": 150000,
+                     *       "current_cents": 180000,
+                     *       "current_overage_cents": 150000,
+                     *       "current_hold_cents": 180000,
                      *       "created_at": 1640995200,
                      *       "updated_at": 1640995200
                      *     } */
@@ -5318,7 +5389,7 @@ export interface operations {
                      *       ],
                      *       "has_more": false
                      *     } */
-                    "application/json": components["schemas"]["market-api_ListResponse"];
+                    "application/json": components["schemas"]["market-api_ListTransactionsResponse"];
                 };
             };
             /** @description Unauthorized - missing or invalid authentication token */
