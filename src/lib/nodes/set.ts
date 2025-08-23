@@ -25,17 +25,18 @@ async function setNodesAction(
     const client = await nodesClient();
     const spinner = ora("Updating nodes...").start();
 
-    const { data: allNodes } = await client.nodes.list();
+    // Use the API's names parameter to filter nodes directly
+    const { data: fetchedNodes } = await client.nodes.list({ names });
 
-    const nodesToUpdate: SFCNodes.Node[] = [];
+    // Check which names were not found
+    const foundNames = new Set(fetchedNodes.map((node) => node.name));
     const notFound: string[] = [];
+    const nodesToUpdate: SFCNodes.Node[] = fetchedNodes;
 
-    for (const nameOrId of names) {
-      const node = allNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
-      );
-      if (node) nodesToUpdate.push(node);
-      else notFound.push(nameOrId);
+    for (const name of names) {
+      if (!foundNames.has(name)) {
+        notFound.push(name);
+      }
     }
 
     // Filter nodes that have procurement_id (auto reserved nodes)
