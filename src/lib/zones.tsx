@@ -28,9 +28,16 @@ function formatDeliveryType(deliveryType: string): string {
 }
 
 function getCurrentAvailableCapacity(zone: ZoneInfo): number {
-  return zone.available_capacity?.sort(
+  const oldestShape = zone.available_capacity?.sort(
     (a, b) => a.start_timestamp - b.start_timestamp,
-  ).at(0)?.quantity ?? 0;
+  ).at(0);
+  if (
+    oldestShape?.start_timestamp &&
+    oldestShape.start_timestamp >= Math.floor(Date.now() / 1000)
+  ) {
+    return 0;
+  }
+  return oldestShape?.quantity ?? 0;
 }
 
 // Region conversion to short slugs
