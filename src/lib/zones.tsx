@@ -4,30 +4,17 @@ import Table from "cli-table3";
 import { cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import * as console from "node:console";
 import React from "react";
-import { getAuthToken, isLoggedIn } from "../helpers/config.ts";
+import { isLoggedIn } from "../helpers/config.ts";
+import { apiClient } from "../apiClient.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { getApiUrl } from "../helpers/urls.ts";
 import { isFeatureEnabled } from "./posthog.ts";
+import { components } from "../schema.ts";
 
-type ZoneInfo = {
-  object: string;
-  name: string;
-  available: boolean;
-  available_capacity: number;
-  region: string;
-  hardware_type: string;
-  interconnect_type: string;
-  delivery_type: string;
-};
-
-type ZonesListResponse = {
-  object: "list";
-  data: ZoneInfo[];
-};
+type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
 
 // Delivery type conversion similar to InstanceTypeMetadata pattern
 const DeliveryTypeMetadata: Record<string, { displayName: string }> = {
@@ -38,6 +25,12 @@ const DeliveryTypeMetadata: Record<string, { displayName: string }> = {
 
 function formatDeliveryType(deliveryType: string): string {
   return DeliveryTypeMetadata[deliveryType]?.displayName || deliveryType;
+}
+
+function getCurrentAvailableCapacity(zone: ZoneInfo): number {
+  return zone.available_capacity?.sort(
+    (a, b) => a.start_timestamp - b.start_timestamp,
+  ).at(0)?.quantity ?? 0;
 }
 
 // Region conversion to short slugs
@@ -91,14 +84,8 @@ async function listZonesAction(options: { json?: boolean }) {
     logLoginMessageAndQuit();
   }
 
-  const url = await getApiUrl("zones_list");
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await getAuthToken()}`,
-    },
-  });
+  const client = await apiClient();
+  const { data, response } = await client.GET("/v0/zones", {});
 
   // Following clig.dev: Handle errors gracefully with actionable messages
   if (!response.ok) {
@@ -119,8 +106,6 @@ async function listZonesAction(options: { json?: boolean }) {
         );
     }
   }
-
-  const data = (await response.json()) as ZonesListResponse;
 
   if (!data?.data) {
     return logAndQuit(
@@ -146,8 +131,10 @@ function displayZonesTable(zones: ZoneInfo[]) {
   // Sort zones so available ones come first, then alphabetically by name
   const sortedZones = [...zones].sort((a, b) => {
     // Available zones first (true comes before false)
-    if (a.available !== b.available) {
-      return b.available ? 1 : -1;
+    const aAvailable = getCurrentAvailableCapacity(a) > 0;
+    const bAvailable = getCurrentAvailableCapacity(b) > 0;
+    if (aAvailable !== bAvailable) {
+      return bAvailable ? 1 : -1;
     }
     // Then sort by name alphabetically
     return a.name.localeCompare(b.name);
@@ -169,9 +156,10 @@ function displayZonesTable(zones: ZoneInfo[]) {
   });
 
   sortedZones.forEach((zone) => {
-    const availableNodesText = zone.available_capacity > 0
-      ? green(zone.available_capacity.toString())
-      : red(zone.available_capacity.toString());
+    const available = getCurrentAvailableCapacity(zone);
+    const availableNodesText = available > 0
+      ? green(available.toString())
+      : red(available.toString());
 
     table.push([
       zone.name,
@@ -183,7 +171,9 @@ function displayZonesTable(zones: ZoneInfo[]) {
     ]);
   });
 
-  const availableZones = sortedZones.filter((zone) => zone.available);
+  const availableZones = sortedZones.filter((zone) =>
+    getCurrentAvailableCapacity(zone) > 0
+  );
   const availableZoneName = availableZones?.[0]?.name ?? "alamo";
   console.log(table.toString());
   console.log(
