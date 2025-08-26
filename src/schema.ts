@@ -299,6 +299,1701 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v0/admin/accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The account balance */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number | null;
+                    offset?: number | null;
+                    fuzzy_id?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The list of accounts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            data: {
+                                /** @enum {string} */
+                                object: "account";
+                                id: string;
+                                waitlist: boolean;
+                                /** @enum {string} */
+                                role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                                kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                                can_buy?: boolean;
+                                can_sell?: boolean;
+                                balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                                instant_deposit_limit?: number;
+                                is_legacy: boolean;
+                                users?: {
+                                    clerk_id: string;
+                                    full_name?: string;
+                                    avatar?: string;
+                                    emails: string[];
+                                }[];
+                            }[];
+                            has_more: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        clerk_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description The account details */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        kyc_level: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposit-limit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        amount: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        isWaitlist: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description The account details after waitlist status update */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "account";
+                            id: string;
+                            waitlist: boolean;
+                            /** @enum {string} */
+                            role: "admin" | "user" | "vendor" | "clops" | "sfcd";
+                            kyc: components["schemas"]["San_Francisco_Compute_Documentation_AccountKycLevel"];
+                            can_buy?: boolean;
+                            can_sell?: boolean;
+                            balance?: components["schemas"]["San_Francisco_Compute_Documentation_AccountBalance"];
+                            instant_deposit_limit?: number;
+                            is_legacy: boolean;
+                            users?: {
+                                clerk_id: string;
+                                full_name?: string;
+                                avatar?: string;
+                                emails: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts/has-connected": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check if the account has connected bank accounts */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            hasConnected: boolean;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "list";
+                            accounts: {
+                                /** @enum {string} */
+                                object: "bank_account";
+                                id: string;
+                                columnCounterpartyId: string;
+                                accountName: string;
+                                last4Digits: string;
+                                institutionPrimaryColor?: string;
+                                institutionLogoBase64?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        plaidAccessToken: string;
+                        selectedAccountIds: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            success: boolean;
+                            created: {
+                                /** @enum {string} */
+                                object: "bank_account";
+                                id: string;
+                                columnCounterpartyId: string;
+                                accountName: string;
+                                last4Digits: string;
+                                institutionPrimaryColor?: string;
+                                institutionLogoBase64?: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @example error
+                             * @enum {string}
+                             */
+                            object: "error";
+                            /**
+                             * @example bank-accounts.invalid_account_type
+                             * @enum {string}
+                             */
+                            code: "bank-accounts.invalid_account_type";
+                            /** @example Selected accounts must all be depository accounts. */
+                            message?: string;
+                            /** @example {} */
+                            details?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+                /** @description Service deprecated */
+                503: {
+                    headers: {
+                        /**
+                         * Format: integer
+                         * @description The timestamp of the deprecation
+                         * @example 1749772800
+                         */
+                        Deprecation?: unknown;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_ServiceDeprecatedError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/bank-accounts/debit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        bankAccountId: string;
+                        amountCents: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            /** @enum {boolean} */
+                            success: true;
+                            initiated: boolean;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+                /** @description Service deprecated */
+                503: {
+                    headers: {
+                        /**
+                         * Format: integer
+                         * @description The timestamp of the deprecation
+                         * @example 1749772800
+                         */
+                        Deprecation?: unknown;
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_ServiceDeprecatedError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/transfers/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ach: {
+                                incoming: {
+                                    volumeCents: number;
+                                    count: number;
+                                };
+                                outgoing: {
+                                    volumeCents: number;
+                                    count: number;
+                                };
+                            };
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/tokens/cli": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description CLI token created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Token"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        account: string;
+                        name: string;
+                        description?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Token created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Token"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Token details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Token"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Token not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get historical prices for a given instance type */
+        get: {
+            parameters: {
+                query?: {
+                    instance_type?: ("h100i" | "h100v" | "h200ki") | string;
+                    min_quantity?: number;
+                    max_quantity?: number;
+                    min_duration?: number | null;
+                    max_duration?: number | null;
+                    since_n_days_ago?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The historical prices for the given instance type */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["San_Francisco_Compute_Documentation_PriceHistoryItem"][];
+                            /**
+                             * @example true
+                             * @example false
+                             */
+                            has_more: boolean;
+                            /**
+                             * @example list
+                             * @enum {string}
+                             */
+                            object: "list";
+                        };
+                    };
+                };
+                /** @description The request is too far in past */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_PriceRequestTooFarInPastError"] | components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Account instant deposit limits */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "instant_deposit_limits";
+                            volume_used: number;
+                            volume_remaining: number;
+                            volume_per_period: number;
+                            period_duration: number;
+                            period_unit: string;
+                            limits_refresh_on: string;
+                        };
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountFrozenError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/checkout-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    amount_cents: string | number;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Stripe checkout session URL */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "url";
+                            checkoutUrl: string;
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountFrozenError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/instant-deposits/{instantDepositId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    instantDepositId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Instant deposit status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "success";
+                            success: boolean;
+                            completed: boolean;
+                            amount: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotAuthenticatedError"];
+                    };
+                };
+                /** @description Account frozen */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountFrozenError"];
+                    };
+                };
+                /** @description Account or deposit not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_NotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User metadata */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            account_id: string | null;
+                            is_org: boolean;
+                            primary_email: string;
+                            avatar: string | null;
+                            created_at: string;
+                            primary_phone: string | null;
+                            first_name: string | null;
+                            last_name: string | null;
+                            date_of_birth: string | null;
+                            ip_address: string | null;
+                            primary_address_street_1: string | null;
+                            primary_address_street_2: string | null;
+                            primary_address_region: string | null;
+                            primary_address_postal_code: string | null;
+                            primary_address_city: string | null;
+                            primary_address_country: string | null;
+                            business_name: string | null;
+                            business_address_street_1: string | null;
+                            business_address_street_2: string | null;
+                            business_address_region: string | null;
+                            business_address_postal_code: string | null;
+                            business_address_city: string | null;
+                            business_address_country: string | null;
+                            compute_usage_statement: string | null;
+                            business_primary_contact_id: string | null;
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kyc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        account_id?: string | null;
+                        is_org?: boolean;
+                        primary_email: string;
+                        avatar?: string | null;
+                        created_at?: string;
+                        primary_phone?: string | null;
+                        first_name?: string | null;
+                        last_name?: string | null;
+                        date_of_birth?: string | null;
+                        ip_address?: string | null;
+                        primary_address_street_1?: string | null;
+                        primary_address_street_2?: string | null;
+                        primary_address_region?: string | null;
+                        primary_address_postal_code?: string | null;
+                        primary_address_city?: string | null;
+                        primary_address_country?: string | null;
+                        business_name?: string | null;
+                        business_address_street_1?: string | null;
+                        business_address_street_2?: string | null;
+                        business_address_region?: string | null;
+                        business_address_postal_code?: string | null;
+                        business_address_city?: string | null;
+                        business_address_country?: string | null;
+                        compute_usage_statement?: string | null;
+                        business_primary_contact_id?: string | null;
+                        id_number?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Existing KYC verification result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "status";
+                            data: {
+                                status?: string;
+                                complete_outcome?: string;
+                            };
+                        };
+                    };
+                };
+                /** @description New KYC verification result */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "status";
+                            data: {
+                                status?: string;
+                                complete_outcome?: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/tax": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id_number: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYC verification result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "status";
+                            data: {
+                                status?: string;
+                                complete_outcome?: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+                /** @description Internal server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InternalServerError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kyb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        business_primary_contact_id: string;
+                        business_name: string;
+                        business_address_street_1: string;
+                        business_address_street_2?: string;
+                        business_address_city?: string;
+                        business_address_region?: string;
+                        business_address_postal_code?: string;
+                        business_address_country?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYB verification result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "status";
+                            data: {
+                                user: string;
+                                business: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/admin/accounts/{id}/compliance/kycb": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        id: string;
+                        account_id?: string | null;
+                        is_org?: boolean;
+                        primary_email: string;
+                        avatar?: string | null;
+                        created_at?: string;
+                        primary_phone?: string | null;
+                        first_name?: string | null;
+                        last_name?: string | null;
+                        date_of_birth?: string | null;
+                        ip_address?: string | null;
+                        primary_address_street_1?: string | null;
+                        primary_address_street_2?: string | null;
+                        primary_address_region?: string | null;
+                        primary_address_postal_code?: string | null;
+                        primary_address_city?: string | null;
+                        primary_address_country?: string | null;
+                        business_name: string;
+                        business_address_street_1: string;
+                        business_address_street_2?: string;
+                        business_address_region?: string;
+                        business_address_postal_code?: string;
+                        business_address_city?: string;
+                        business_address_country?: string;
+                        compute_usage_statement?: string | null;
+                        business_primary_contact_id: string;
+                        business_primary_contact_account_id: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description KYB verification result */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            object: "status";
+                            data: {
+                                user: string;
+                                business: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_InvalidRequestError"];
+                    };
+                };
+                /** @description Account not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v0/credentials": {
         parameters: {
             query?: never;
@@ -472,6 +2167,46 @@ export interface paths {
             cookie?: never;
         };
         get: operations["get_vms_ssh"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List zones
+         * @description List all available zones
+         */
+        get: operations["list_zones_handler"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v0/zones/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get zone by ID
+         * @description Get detailed information about a specific zone
+         */
+        get: operations["get_zone_handler"];
         put?: never;
         post?: never;
         delete?: never;
@@ -888,7 +2623,7 @@ export interface paths {
         };
         /**
          * Get transactions
-         * @description Lists transaction history
+         * @description Lists transaction history. Provide either `starting_after` or `ending_before` (not both) for cursor-based pagination.
          */
         get: operations["getTransactions"];
         put?: never;
@@ -1523,6 +3258,154 @@ export interface components {
                 newest_timestamp: string | null;
             };
         };
+        San_Francisco_Compute_Documentation_AccountKycLevel: "none" | "basic" | "core";
+        San_Francisco_Compute_Documentation_NotFoundError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example not_found
+             * @enum {string}
+             */
+            code: "not_found";
+            /** @example Not found. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        San_Francisco_Compute_Documentation_InvalidRequestError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example invalid_request
+             * @enum {string}
+             */
+            code: "invalid_request";
+            /** @example Invalid request */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        San_Francisco_Compute_Documentation_InternalServerError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example internal_server
+             * @enum {string}
+             */
+            code: "internal_server";
+            /** @example An unknown error has occurred. Our engineers have been notified. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        San_Francisco_Compute_Documentation_ServiceDeprecatedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example service_deprecated
+             * @enum {string}
+             */
+            code: "service_deprecated";
+            /** @example Service has been deprecated and is no longer available. */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        San_Francisco_Compute_Documentation_PriceHistoryItem: {
+            /** @enum {string} */
+            object: "price-history-item";
+            /**
+             * @description ISO 8601 datetime marking the start of the period.
+             * @example 2024-10-05T07:00:00.000Z
+             */
+            period_start: string;
+            /**
+             * @description ISO 8601 datetime marking the end of the period.
+             * @example 2024-10-06T06:59:59.999Z
+             */
+            period_end: string;
+            /** @enum {boolean} */
+            no_data: false;
+            gpu_hour: {
+                /** @description The minimum price per GPU hour for the period (in cents, 1 = $0.01). */
+                min: number;
+                /** @description The maximum price per GPU hour for the period (in cents, 1 = $0.01). */
+                max: number;
+                /** @description The average price per GPU hour for the period (in cents, 1 = $0.01). */
+                avg: number;
+            };
+        } | {
+            /** @enum {string} */
+            object: "price-history-item";
+            /**
+             * @description ISO 8601 datetime marking the start of the period.
+             * @example 2024-10-05T07:00:00.000Z
+             */
+            period_start: string;
+            /**
+             * @description ISO 8601 datetime marking the end of the period.
+             * @example 2024-10-06T06:59:59.999Z
+             */
+            period_end: string;
+            /** @enum {boolean} */
+            no_data: true;
+        };
+        San_Francisco_Compute_Documentation_PriceRequestTooFarInPastError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example price.historical_price_request_too_far_in_past
+             * @enum {string}
+             */
+            code: "price.historical_price_request_too_far_in_past";
+            /** @example Historical price request too far in past */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        San_Francisco_Compute_Documentation_NotAuthenticatedError: {
+            /**
+             * @example error
+             * @enum {string}
+             */
+            object: "error";
+            /**
+             * @example not_authenticated
+             * @enum {string}
+             */
+            code: "not_authenticated";
+            /** @example Not authenticated, did you pass an auth token? */
+            message?: string;
+            /** @example {} */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
         "SF_Compute_K8s_Orchestration_API_frontend_server.BaseCredentialResponse": {
             cluster?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo"];
             id?: string;
@@ -1625,6 +3508,15 @@ export interface components {
         };
         /** @enum {string} */
         "node-api_AcceleratorType": "H100" | "H200";
+        "node-api_AvailabilityRectangle": {
+            end_timestamp: components["schemas"]["node-api_UnixEpoch"];
+            /**
+             * Format: u-int64
+             * @description The number of nodes available during this time period
+             */
+            quantity: number;
+            start_timestamp: components["schemas"]["node-api_UnixEpoch"];
+        };
         "node-api_CreateNodesRequest": {
             /**
              * Format: u-int32
@@ -1662,11 +3554,13 @@ export interface components {
              */
             start_at?: number;
             /**
-             * @description Zone to create the nodes in. See Zone enum for valid values.
+             * @description Zone to create the nodes in
              * @example hayesvalley
              */
             zone: string;
         };
+        /** @enum {string} */
+        "node-api_DeliveryType": "K8s" | "VM";
         "node-api_ErrorContent": {
             details?: components["schemas"]["node-api_ErrorDetail"][];
             message: string;
@@ -1756,6 +3650,8 @@ export interface components {
              */
             max_price_per_node_hour: number;
         };
+        /** @enum {string} */
+        "node-api_InterconnectType": "Infiniband" | "None";
         "node-api_ListResponse_Node": {
             data: {
                 /**
@@ -1808,7 +3704,23 @@ export interface components {
                  */
                 updated_at?: number | null;
                 vms?: null | components["schemas"]["node-api_VmList"];
-                zone?: null | components["schemas"]["node-api_Zone"];
+                /** @example hayesvalley */
+                zone?: string | null;
+            }[];
+            /** @example list */
+            object: string;
+        };
+        "node-api_ListResponse_ZoneInfo": {
+            data: {
+                /** @description The available capacity on this cluster, in the
+                 *     shape of consequtive "availability rectangles". */
+                available_capacity: components["schemas"]["node-api_AvailabilityRectangle"][];
+                delivery_type: components["schemas"]["node-api_DeliveryType"];
+                hardware_type: components["schemas"]["node-api_AcceleratorType"];
+                interconnect_type: components["schemas"]["node-api_InterconnectType"];
+                name: string;
+                object: string;
+                region: components["schemas"]["node-api_Region"];
             }[];
             /** @example list */
             object: string;
@@ -1864,15 +3776,23 @@ export interface components {
              */
             updated_at?: number | null;
             vms?: null | components["schemas"]["node-api_VmList"];
-            zone?: null | components["schemas"]["node-api_Zone"];
+            /** @example hayesvalley */
+            zone?: string | null;
         };
         /** @enum {string} */
         "node-api_NodeType": "autoreserved" | "reserved";
+        /** @enum {string} */
+        "node-api_Region": "NorthAmerica" | "AsiaPacific" | "EuropeMiddleEastAfrica";
         /**
          * @description Node Status
          * @enum {string}
          */
         "node-api_Status": "pending" | "awaitingcapacity" | "running" | "released" | "terminated" | "deleted" | "failed" | "unknown";
+        /**
+         * Format: int64
+         * @description Unix timestamp in seconds since epoch
+         */
+        "node-api_UnixEpoch": number;
         "node-api_Vm": {
             /**
              * Format: int64
@@ -1907,11 +3827,17 @@ export interface components {
         };
         /** @enum {string} */
         "node-api_VmStatus": "Pending" | "Running" | "Destroyed" | "NodeFailure" | "Unspecified";
-        /**
-         * @description Choose from these zones when creating a node
-         * @enum {string}
-         */
-        "node-api_Zone": "hayesvalley" | "fishermanswharf";
+        "node-api_ZoneInfo": {
+            /** @description The available capacity on this cluster, in the
+             *     shape of consequtive "availability rectangles". */
+            available_capacity: components["schemas"]["node-api_AvailabilityRectangle"][];
+            delivery_type: components["schemas"]["node-api_DeliveryType"];
+            hardware_type: components["schemas"]["node-api_AcceleratorType"];
+            interconnect_type: components["schemas"]["node-api_InterconnectType"];
+            name: string;
+            object: string;
+            region: components["schemas"]["node-api_Region"];
+        };
         /** @description Response body for the account/me endpoint. */
         "market-api_AccountMeResponse": {
             /**
@@ -3029,6 +4955,144 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    list_zones_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of zones */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["node-api_ListResponse_ZoneInfo"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token",
+                     *         "request_id": "req_1234567890"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error",
+                     *         "request_id": "req_1234567890"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+        };
+    };
+    get_zone_handler: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Zone ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Zone information */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["node-api_ZoneInfo"];
+                };
+            };
+            /** @description Unauthorized request */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "authentication_error",
+                     *         "message": "Unauthorized: missing or invalid authentication token",
+                     *         "request_id": "req_1234567890"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "forbidden",
+                     *         "message": "You do not have permission to get zones"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Zone not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "not_found",
+                     *         "message": "Zone not found",
+                     *         "request_id": "req_1234567890"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /** @example {
+                     *       "error": {
+                     *         "type": "api_error",
+                     *         "message": "Internal server error",
+                     *         "request_id": "req_1234567890"
+                     *       }
+                     *     } */
+                    "application/json": components["schemas"]["node-api_ErrorObject"];
+                };
             };
         };
     };
@@ -5359,7 +7423,20 @@ export interface operations {
     };
     getTransactions: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Number of transactions to return (1-100, default 10) */
+                limit?: number;
+                /**
+                 * @description Cursor for forward pagination - returns transactions after this ID (exclusive)
+                 * @example tx_1234567890
+                 */
+                starting_after?: components["schemas"]["market-api_TransactionId"];
+                /**
+                 * @description Cursor for backward pagination - returns transactions before this ID (exclusive)
+                 * @example tx_1234567891
+                 */
+                ending_before?: components["schemas"]["market-api_TransactionId"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5392,12 +7469,32 @@ export interface operations {
                     "application/json": components["schemas"]["market-api_ListTransactionsResponse"];
                 };
             };
+            /** @description Invalid request parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
             /** @description Unauthorized - missing or invalid authentication token */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+                };
             };
         };
     };
