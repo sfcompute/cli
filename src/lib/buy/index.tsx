@@ -129,19 +129,19 @@ export function _registerBuy(program: Command) {
       `
 Examples:
   \x1b[2m# Buy 8 H100s for 1 hour at market price\x1b[0m
-  $ sf buy -n 8 -d 1h
+  $ sf buy --type h100v -n 8 -d 1h
 
   \x1b[2m# Buy 32 H100s for 6 hours starting in 3 hours\x1b[0m
-  $ sf buy -n 32 -d 6h -s +3h
+  $ sf buy --type h100v -n 32 -d 6h -s +3h
 
   \x1b[2m# Buy 64 H100s for 12 hours starting tomorrow at 9am\x1b[0m
-  $ sf buy -n 64 -d 12h -s "tomorrow at 9am"
+  $ sf buy --type h100v -n 64 -d 12h -s "tomorrow at 9am"
 
   \x1b[2m# Extend an existing contract that ends at 4pm by 4 hours\x1b[0m
-  $ sf buy -s 4pm -d 4h -colo <contract_id>
+  $ sf buy --type h100v -s 4pm -d 4h -colo <contract_id>
 
   \x1b[2m# Place a standing order at a specific price\x1b[0m
-  $ sf buy -n 16 -d 24h -p 1.50 --standing
+  $ sf buy --type h100v -n 16 -d 24h -p 1.50 --standing
 `,
     )
     .action(function buyOrderAction(options) {
