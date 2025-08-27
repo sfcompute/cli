@@ -21,7 +21,11 @@ import {
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
-import { roundEndDate } from "../../helpers/units.ts";
+import {
+  parseStartDate,
+  roundEndDate,
+  roundStartDate,
+} from "../../helpers/units.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 
 /**
@@ -179,6 +183,9 @@ async function createNodesAction(
         }
 
         // Add flexibility to duration for better quote matching (matches buy command logic)
+        const startsAt = options.start === "NOW"
+          ? "NOW"
+          : roundStartDate(parseStartDate(options.start));
         const minDurationSeconds = Math.max(
           1,
           durationSeconds - Math.ceil(durationSeconds * 0.1),
@@ -192,12 +199,8 @@ async function createNodesAction(
         const quote = await getQuote({
           instanceType: "h100v", // This should get ignored by the zone
           quantity: count,
-          minStartTime: typeof options.start === "string"
-            ? "NOW"
-            : options.start,
-          maxStartTime: typeof options.start === "string"
-            ? "NOW"
-            : options.start,
+          minStartTime: startsAt,
+          maxStartTime: startsAt,
           minDurationSeconds: minDurationSeconds,
           maxDurationSeconds: maxDurationSeconds,
           cluster: options.zone,
