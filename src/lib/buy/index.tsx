@@ -111,7 +111,9 @@ export function _registerBuy(program: Command) {
     .hook("preAction", (command) => {
       const { type, zone, cluster, colocate } = command.opts();
       if (!type && !zone && !cluster && !colocate) {
-        console.error(chalk.yellow("Must specify either --type, --zone, or --colocate"));
+        console.error(
+          chalk.yellow("Must specify either --type, --zone or --colocate"),
+        );
         command.help();
         process.exit(1);
       }
@@ -275,7 +277,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         props.options;
 
       setOrderProps({
-        type: type ?? "h100i", // We still need to pass something even if --zone is provided
+        type,
         price: pricePerGpuHour,
         size: accelerators / GPUS_PER_NODE,
         startAt,
@@ -313,7 +315,7 @@ function BuyOrderPreview(props: {
   size: number;
   startAt: Date | "NOW";
   endsAt: Date;
-  type: string;
+  type?: string;
 }) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
@@ -332,9 +334,10 @@ function BuyOrderPreview(props: {
   const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
     100;
 
-  const isSupportedType = props.type in InstanceTypeMetadata;
+  const isSupportedType = typeof props.type === "string" &&
+    props.type in InstanceTypeMetadata;
   const typeLabel = isSupportedType
-    ? InstanceTypeMetadata[props.type].displayName
+    ? InstanceTypeMetadata[props.type!]?.displayName
     : props.type;
 
   return (
@@ -365,19 +368,21 @@ function BuyOrderPreview(props: {
         head="size"
         value={`${props.size * GPUS_PER_NODE} gpus`}
       />
-      <Box>
-        <Box width={7}>
-          <Text dimColor>type</Text>
+      {typeLabel && (
+        <Box>
+          <Box width={7}>
+            <Text dimColor>type</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{typeLabel}</Text>
+            {isSupportedType && (
+              <Text dimColor>
+                ({props.type!})
+              </Text>
+            )}
+          </Box>
         </Box>
-        <Box gap={1}>
-          <Text>{typeLabel}</Text>
-          {isSupportedType && (
-            <Text dimColor>
-              ({props.type})
-            </Text>
-          )}
-        </Box>
-      </Box>
+      )}
       <Row
         headWidth={7}
         head="rate"
@@ -400,7 +405,7 @@ type BuyOrderProps = {
   size: number;
   startAt: Date | "NOW";
   endsAt: Date;
-  type: string;
+  type?: string;
   colocate?: string;
   yes?: boolean;
   standing?: boolean;
@@ -646,7 +651,7 @@ function BuyOrder(props: BuyOrderProps) {
 }
 
 export async function placeBuyOrder(options: {
-  instanceType: string;
+  instanceType?: string;
   totalPriceInCents: number;
   startsAt: Date | "NOW";
   endsAt: Date;
@@ -681,7 +686,7 @@ export async function placeBuyOrder(options: {
   }
 
   const body = {
-    side: "buy",
+    side: "buy" as const,
     instance_type: options.instanceType,
     quantity: options.numberNodes,
     start_at,
@@ -693,7 +698,7 @@ export async function placeBuyOrder(options: {
       ioc: !options.standing,
     },
     cluster: options.cluster,
-  } as const;
+  };
   const { data, error, response } = await api.POST("/v0/orders", {
     body,
   });
@@ -761,7 +766,7 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
   );
 
   return await getQuote({
-    instanceType: options.type ?? "h100i", // We still need to pass something even if --zone is provided
+    instanceType: options.type,
     quantity,
     minStartTime: startsAt,
     maxStartTime: startsAt,
@@ -773,7 +778,7 @@ async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
 }
 
 type QuoteOptions = {
-  instanceType: string;
+  instanceType?: string;
   quantity: number;
   minStartTime: Date | "NOW";
   maxStartTime: Date | "NOW";
