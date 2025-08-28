@@ -23,6 +23,7 @@ import {
   centsToDollarsFormatted,
   parseStartDate,
   parseStartDateOrNow,
+  roundDateUpToNextMinute,
   roundEndDate,
   roundStartDate,
 } from "../../helpers/units.ts";
@@ -733,12 +734,6 @@ export async function placeBuyOrder(options: {
   return data;
 }
 
-function roundDateUpToNextMinute(date: Date) {
-  const d = dayjs(date);
-  return d.second() === 0 && d.millisecond() === 0
-    ? d
-    : d.add(1, "minute").startOf("minute");
-}
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   const startTimeOrNow = parseStartDateOrNow(quote.start_at);
 
