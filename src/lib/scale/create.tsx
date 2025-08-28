@@ -4,6 +4,7 @@ import Spinner from "ink-spinner";
 import { Command, Option } from "@commander-js/extra-typings";
 import process from "node:process";
 import console from "node:console";
+import dayjs from "dayjs";
 
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -23,6 +24,7 @@ import {
   parsePriceArg,
   type Procurement,
 } from "./utils.ts";
+import { roundDateUpToNextMinute } from "../../helpers/units.ts";
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
 import ConfirmationMessage from "./ConfirmationMessage.tsx";
 
@@ -137,11 +139,16 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
           // Calculate market price from quote or use default
           limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
           if (quote) {
-            const quoteStart =
-              (quote.start_at === "NOW" ? new Date() : new Date(quote.start_at))
-                .getTime();
-            const quoteEnd = new Date(quote.end_at).getTime();
-            const quoteDurationHours = (quoteEnd - quoteStart) / 1000 / 60 / 60;
+            // from the market's perspective, "NOW" means at the beginning of the next minute.
+            // when the order duration is very short, this can cause the rate to be computed incorrectly
+            // if we implicitly assume it to mean `new Date()`.
+            const coercedStartTime = quote.start_at === "NOW"
+              ? roundDateUpToNextMinute(new Date())
+              : new Date(quote.start_at);
+            const durationSeconds = dayjs(quote.end_at).diff(
+              dayjs(coercedStartTime),
+            );
+            const quoteDurationHours = durationSeconds / 1000 / 60 / 60;
             limitPricePerGpuHourInCents = Math.ceil(
               DEFAULT_LIMIT_PRICE_MULTIPLIER *
                 (quote.price /
