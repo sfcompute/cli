@@ -33,7 +33,6 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
-import { Dayjs } from "dayjs";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -734,7 +733,6 @@ export async function placeBuyOrder(options: {
   return data;
 }
 
-
 function roundDateUpToNextMinute(date: Date) {
   const d = dayjs(date);
   return d.second() === 0 && d.millisecond() === 0
@@ -747,7 +745,9 @@ export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
   // from the market's perspective, "NOW" means at the beginning of the next minute.
   // when the order duration is very short, this can cause the rate to be computed incorrectly
   // if we implicitly assume it to mean `new Date()`.
-  const coercedStartTime = startTimeOrNow === "NOW" ? roundDateUpToNextMinute(new Date()) : startTimeOrNow;
+  const coercedStartTime = startTimeOrNow === "NOW"
+    ? roundDateUpToNextMinute(new Date())
+    : startTimeOrNow;
   const durationSeconds = dayjs(quote.end_at).diff(dayjs(coercedStartTime));
   const durationHours = durationSeconds / 3600 / 1000;
 
