@@ -132,7 +132,7 @@ const create = new Command("create")
     // Validate that timing flags are only used with reserved nodes
     if (
       auto &&
-      (typeof start !== "undefined" || typeof duration !== "undefined" ||
+      (start !== "NOW" || typeof duration !== "undefined" ||
         typeof end !== "undefined")
     ) {
       console.error(
