@@ -23,6 +23,7 @@ import {
   centsToDollarsFormatted,
   parseStartDate,
   parseStartDateOrNow,
+  roundDateUpToNextMinute,
   roundEndDate,
   roundStartDate,
 } from "../../helpers/units.ts";
@@ -734,9 +735,15 @@ export async function placeBuyOrder(options: {
 }
 
 export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
-  const durationSeconds = dayjs(quote.end_at).diff(
-    parseStartDate(quote.start_at),
-  );
+  const startTimeOrNow = parseStartDateOrNow(quote.start_at);
+
+  // from the market's perspective, "NOW" means at the beginning of the next minute.
+  // when the order duration is very short, this can cause the rate to be computed incorrectly
+  // if we implicitly assume it to mean `new Date()`.
+  const coercedStartTime = startTimeOrNow === "NOW"
+    ? roundDateUpToNextMinute(new Date())
+    : startTimeOrNow;
+  const durationSeconds = dayjs(quote.end_at).diff(dayjs(coercedStartTime));
   const durationHours = durationSeconds / 3600 / 1000;
 
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;

@@ -42,6 +42,13 @@ export function roundEndDate(endDate: Date): Date {
   return epochToDate(roundEpochUpToHour(dateToEpoch(endDate)));
 }
 
+export function roundDateUpToNextMinute(date: Date): Date {
+  const d = dayjs(date);
+  return d.second() === 0 && d.millisecond() === 0
+    ? d.toDate()
+    : d.add(1, "minute").startOf("minute").toDate();
+}
+
 function dateToEpoch(date: Date): number {
   return Math.ceil(date.getTime() / MILLS_PER_EPOCH);
 }
