@@ -152,17 +152,6 @@ export function pluralizeNodes(count: number) {
 }
 
 /**
- * Determine node type based on create command options
- * @param options Options object with duration and/or end properties
- * @returns "reserved" if duration or end is provided, "autoreserved" otherwise
- */
-export function determineNodeType(
-  options: { duration?: number; end?: Date },
-): "reserved" | "autoreserved" {
-  return (options.duration || options.end) ? "reserved" : "autoreserved";
-}
-
-/**
  * Validates that a price value is a positive number and meets a minimum threshold
  * @param val String value to validate
  * @param minimum Minimum allowed price (default: 0)
