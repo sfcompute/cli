@@ -1,3 +1,4 @@
+import React from "react";
 import { Command } from "@commander-js/extra-typings";
 import { gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
@@ -6,11 +7,7 @@ import ora from "ora";
 import { render } from "ink";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import {
-  createNodesTable,
-  jsonOption,
-  pluralizeNodes,
-} from "./utils.ts";
+import { createNodesTable, jsonOption, pluralizeNodes } from "./utils.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { NodesVerboseDisplay } from "./list.tsx";
@@ -50,7 +47,7 @@ async function getNodesAction(
 
     // Use the API's names parameter to filter nodes directly
     const spinner = ora("Fetching nodes...").start();
-    const { data: fetchedNodes } = await client.nodes.list({ names: nodeNames });
+    const { data: fetchedNodes } = await client.nodes.list({ name: nodeNames });
     spinner.stop();
 
     // Check which names were not found
