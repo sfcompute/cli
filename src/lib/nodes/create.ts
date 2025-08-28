@@ -1,4 +1,4 @@
-import { Command, CommanderError } from "@commander-js/extra-typings";
+import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
 import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
@@ -8,7 +8,6 @@ import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import {
   createNodesTable,
-  determineNodeType,
   durationOption,
   endOption,
   jsonOption,
@@ -74,6 +73,18 @@ const create = new Command("create")
   )
   .addOption(zoneOption)
   .addOption(maxPriceOption)
+  .addOption(
+    new Option(
+      "--reserved",
+      "Create reserved nodes. Reserved nodes have an explicit start and end time.",
+    ).conflicts("auto"),
+  )
+  .addOption(
+    new Option(
+      "--auto",
+      "Create auto-reserved nodes. Auto-reserved nodes self-extend until they are released.",
+    ).conflicts("reserved"),
+  )
   .addOption(startOption)
   .addOption(endOption.conflicts("duration"))
   .addOption(durationOption.conflicts("end"))
@@ -81,7 +92,8 @@ const create = new Command("create")
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
-    const { count, duration, end, zone } = command.opts();
+    const { count, start, duration, end, auto, reserved } = command
+      .opts();
 
     // Validate arguments
     if (names.length === 0 && !count) {
@@ -104,17 +116,41 @@ const create = new Command("create")
       }
     }
 
+    if (reserved && auto) {
+      console.error(red("Specify either --reserved or --auto, but not both\n"));
+      command.help();
+      process.exit(1);
+    }
+
     // Validate duration/end like buy command
-    if (end && duration) {
+    if (typeof end !== "undefined" && typeof duration !== "undefined") {
       console.error(red("Specify either --duration or --end, but not both\n"));
       command.help();
       process.exit(1);
     }
 
-    const isReserved = !!(duration || end);
-    if (!isReserved && !zone) {
+    // Validate that timing flags are only used with reserved nodes
+    if (
+      auto &&
+      (start !== "NOW" || typeof duration !== "undefined" ||
+        typeof end !== "undefined")
+    ) {
       console.error(
-        red("Must specify --zone when creating auto reserved nodes\n"),
+        red(
+          "Auto-reserved nodes start immediately and cannot have a start time, duration, or end time.\n",
+        ),
+      );
+      command.help();
+      process.exit(1);
+    }
+
+    if (
+      !auto && typeof duration === "undefined" && typeof end === "undefined"
+    ) {
+      console.error(
+        red(
+          "You must specify either --duration or --end to create a reserved node.\n",
+        ),
       );
       command.help();
       process.exit(1);
@@ -124,23 +160,23 @@ const create = new Command("create")
     "after",
     `
 Examples:\n
-  \x1b[2m# Create a single node with a specific name\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --max-price 12.50
+  \x1b[2m# Create a single reserved node (default behavior)\x1b[0m
+  $ sf nodes create --zone hayesvalley --max-price 12.50
 
-  \x1b[2m# Create multiple nodes with specific names\x1b[0m
-  $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --max-price 9.00
+  \x1b[2m# Create multiple auto-reserved nodes explicitly with a specific name\x1b[0m
+  $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --auto --max-price 9.00
 
-  \x1b[2m# Create 3 nodes with auto-generated names\x1b[0m
-  $ sf nodes create -n 3 --zone hayesvalley --max-price 10.00
+  \x1b[2m# Create 3 auto-reserved nodes with auto-generated names\x1b[0m
+  $ sf nodes create -n 3 --zone hayesvalley --auto --max-price 10.00
 
   \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z" -p 15.00
+  $ sf nodes create node-1 --zone hayesvalley --reserved --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z" -p 15.00
 
   \x1b[2m# Create a reserved node for 2 hours starting now\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --duration 2h -p 13.50
+  $ sf nodes create node-1 --zone hayesvalley --reserved --duration 2h -p 13.50
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --start "+1h" --duration 6h -p 11.25
+  $ sf nodes create node-1 --zone hayesvalley --reserved --start "+1h" --duration 6h -p 11.25
 `,
   )
   .action(createNodesAction);
@@ -152,8 +188,12 @@ async function createNodesAction(
   try {
     const client = await nodesClient();
     const count = options.count ?? names.length;
-    const nodeType = determineNodeType(options);
-    const isReserved = nodeType === "reserved";
+    // Because we validate that --reserved and --auto are mutually exclusive,
+    // we can use the presence of --auto to determine if the nodes are auto-reserved.
+    const isReserved = !options.auto;
+    const nodeType = options.auto
+      ? "autoreserved" as const
+      : "reserved" as const;
 
     // Only show pricing and get confirmation if not using --yes
     if (!options.yes) {
