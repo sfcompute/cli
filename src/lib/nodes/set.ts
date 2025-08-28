@@ -26,7 +26,7 @@ async function setNodesAction(
     const spinner = ora("Updating nodes...").start();
 
     // Use the API's names parameter to filter nodes directly
-    const { data: fetchedNodes } = await client.nodes.list({ names });
+    const { data: fetchedNodes } = await client.nodes.list({ name: names });
 
     // Check which names were not found
     const foundNames = new Set(fetchedNodes.map((node) => node.name));

@@ -60,7 +60,7 @@ async function extendNodeAction(
 
     // Use the API's names parameter to filter nodes directly
     const fetchSpinner = ora().start();
-    const { data: fetchedNodes } = await client.nodes.list({ names: nodeNames });
+    const { data: fetchedNodes } = await client.nodes.list({ name: nodeNames });
     fetchSpinner.stop();
 
     // Check which names were not found
