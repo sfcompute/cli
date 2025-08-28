@@ -9,6 +9,7 @@ import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { formatNullableDateRange } from "../../helpers/format-date.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
@@ -54,17 +55,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
       {vmsToShow.map((vm) => {
         const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
         const endDate = vm.end_at ? dayjs.unix(vm.end_at) : null;
-
-        let startEnd: string;
-        if (startDate && endDate) {
-          startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ${
-            endDate.format("HH:mm")
-          }`;
-        } else if (startDate) {
-          startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ?`;
-        } else {
-          startEnd = "Not available";
-        }
+        const startEnd = formatNullableDateRange(startDate, endDate);
 
         return (
           <Box key={vm.id}>

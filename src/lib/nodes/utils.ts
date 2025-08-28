@@ -14,6 +14,7 @@ import { parseDate } from "chrono-node";
 import { parseDurationArgument } from "../../helpers/duration.ts";
 import { parseStartDate, roundEndDate } from "../../helpers/units.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { formatNullableDateRange } from "../../helpers/format-date.ts";
 
 export function printNodeStatus(status: SFCNodes.Node["status"]): string {
   switch (status) {
@@ -114,16 +115,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
     const startDate = node.start_at ? dayjs.unix(node.start_at) : null;
     const endDate = node.end_at ? dayjs.unix(node.end_at) : null;
 
-    let startEnd: string;
-    if (startDate && endDate) {
-      startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ${
-        endDate.format("HH:mm")
-      }`;
-    } else if (startDate) {
-      startEnd = `${startDate.format("YYYY-MM-DD HH:mm")} → ?`;
-    } else {
-      startEnd = "Not available";
-    }
+    const startEnd = formatNullableDateRange(startDate, endDate);
 
     const maxPrice = node.max_price_per_node_hour
       ? (node.max_price_per_node_hour / 100).toFixed(2)
