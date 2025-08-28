@@ -290,8 +290,8 @@ export const maxPriceOption = new Option(
  */
 export const startOption = new Option(
   "-s, --start <start>",
-  "Start time (ISO 8601 format or relative time like '+1d', or 'now')",
-).argParser(parseStartDate).default("now");
+  "Start time (ISO 8601 format or relative time like '+1d', or 'NOW')",
+).argParser(parseStartDate).default("NOW");
 
 /**
  * Common --end option using same parser as buy command
