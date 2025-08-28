@@ -5,7 +5,7 @@ import list from "./list.tsx";
 import release from "./release.ts";
 import set from "./set.ts";
 import extend from "./extend.ts";
-import get from "./get.ts";
+import get from "./get.tsx";
 import { isFeatureEnabled } from "../posthog.ts";
 
 export async function registerNodes(program: Command) {
