@@ -91,7 +91,7 @@ export function _registerBuy(program: Command) {
     .option("-y, --yes", "Automatically confirm the order")
     .option(
       "-colo, --colocate <contract_id>",
-      "Colocate with existing contracts",
+      "Colocate with existing contracts. If provided, `-t`/`--type` will be ignored.",
     )
     .option(
       "-q, --quote",
@@ -132,19 +132,19 @@ export function _registerBuy(program: Command) {
       `
 Examples:
   \x1b[2m# Buy 8 H100s for 1 hour at market price\x1b[0m
-  $ sf buy -n 8 -d 1h
+  $ sf buy -t h100v -n 8 -d 1h
 
   \x1b[2m# Buy 32 H100s for 6 hours starting in 3 hours\x1b[0m
-  $ sf buy -n 32 -d 6h -s +3h
+  $ sf buy -t h100v -n 32 -d 6h -s +3h
 
   \x1b[2m# Buy 64 H100s for 12 hours starting tomorrow at 9am\x1b[0m
-  $ sf buy -n 64 -d 12h -s "tomorrow at 9am"
+  $ sf buy -t h100v -n 64 -d 12h -s "tomorrow at 9am"
 
   \x1b[2m# Extend an existing contract that ends at 4pm by 4 hours\x1b[0m
   $ sf buy -s 4pm -d 4h -colo <contract_id>
 
   \x1b[2m# Place a standing order at a specific price\x1b[0m
-  $ sf buy -n 16 -d 24h -p 1.50 --standing
+  $ sf buy -t h100v -n 16 -d 24h -p 1.50 --standing
 `,
     )
     .action(function buyOrderAction(options) {
@@ -311,13 +311,7 @@ export function getTotalPrice(
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
 
-function BuyOrderPreview(props: {
-  price: number;
-  size: number;
-  startAt: Date | "NOW";
-  endsAt: Date;
-  type?: string;
-}) {
+function BuyOrderPreview(props: BuyOrderProps) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
@@ -381,6 +375,28 @@ function BuyOrderPreview(props: {
                 ({props.type!})
               </Text>
             )}
+          </Box>
+        </Box>
+      )}
+      {props.cluster && (
+        <Box>
+          <Box width={7}>
+            <Text dimColor>zone</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{props.cluster}</Text>
+          </Box>
+        </Box>
+      )}
+      {props.colocate && (
+        <Box>
+          <Box>
+            <Box width={7}>
+              <Text dimColor>colocate with</Text>
+            </Box>
+          </Box>
+          <Box gap={1}>
+            <Text>{props.colocate}</Text>
           </Box>
         </Box>
       )}
