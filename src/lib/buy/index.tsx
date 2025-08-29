@@ -310,13 +310,7 @@ export function getTotalPrice(
   return Math.ceil(pricePerGpuHour * size * GPUS_PER_NODE * durationInHours);
 }
 
-function BuyOrderPreview(props: {
-  price: number;
-  size: number;
-  startAt: Date | "NOW";
-  endsAt: Date;
-  type?: string;
-}) {
+function BuyOrderPreview(props: BuyOrderProps) {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
@@ -380,6 +374,28 @@ function BuyOrderPreview(props: {
                 ({props.type!})
               </Text>
             )}
+          </Box>
+        </Box>
+      )}
+      {props.cluster && (
+        <Box>
+          <Box width={7}>
+            <Text dimColor>zone</Text>
+          </Box>
+          <Box gap={1}>
+            <Text>{props.cluster}</Text>
+          </Box>
+        </Box>
+      )}
+      {props.colocate && (
+        <Box>
+          <Box>
+            <Box width={7}>
+              <Text dimColor>colocate with</Text>
+            </Box>
+          </Box>
+          <Box gap={1}>
+            <Text>{props.colocate}</Text>
           </Box>
         </Box>
       )}
