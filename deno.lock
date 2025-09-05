@@ -7,7 +7,7 @@
     "npm:@commander-js/extra-typings@^12.1.0": "12.1.0_commander@12.1.0",
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.23__react@18.3.1_@types+react@18.3.23_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
-    "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.10": "0.1.0-alpha.10",
+    "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.12": "0.1.0-alpha.12",
     "npm:@types/ms@~0.7.34": "0.7.34",
     "npm:@types/node@*": "22.15.15",
     "npm:@types/react@^18.3.20": "18.3.23",
@@ -221,8 +221,8 @@
         "mute-stream"
       ]
     },
-    "@sfcompute/nodes-sdk-alpha@0.1.0-alpha.10": {
-      "integrity": "sha512-pyTNtWnwb78jvosb1gnOBWJTHUoUGjYv6N1vSSLrM/kT+Wc3L4gsE/tLzpD7z169xB9OIl23nht2Rj8o2pw8bQ=="
+    "@sfcompute/nodes-sdk-alpha@0.1.0-alpha.12": {
+      "integrity": "sha512-56pZGYZ8S7/xbANmxCuqfnZn9B8FBRiORYfE1mulKFNSXoUrmnHaY+SdZw22W/+HwbaV+hF4LQOGGoAu6znDzg=="
     },
     "@types/ms@0.7.34": {
       "integrity": "sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g=="
@@ -1190,7 +1190,7 @@
         "npm:@commander-js/extra-typings@^12.1.0",
         "npm:@inkjs/ui@2",
         "npm:@inquirer/prompts@^5.1.2",
-        "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.10",
+        "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.12",
         "npm:@types/ms@~0.7.34",
         "npm:@types/react@^18.3.20",
         "npm:@types/semver@^7.5.8",
