@@ -433,7 +433,7 @@ function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const [loadingMsg, setLoadingMsg] = useState<string | null>(
     "Placing order...",
   );
@@ -521,37 +521,28 @@ function BuyOrder(props: BuyOrderProps) {
   );
 
   useEffect(() => {
-    if (isLoading && intervalRef.current == null) {
-      intervalRef.current = setInterval(async () => {
-        if (!order) {
-          return;
-        }
-
-        const o = await getOrder(order.id);
-        if (!o) {
-          setLoadingMsg(
-            "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
-          );
-          return;
-        }
-        setOrder(o);
-
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        exit();
-        return;
-      }, 200);
+    if (!isLoading || !order?.id) {
+      return;
     }
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+    const pollForOrder = async () => {
+      const o = await getOrder(order.id);
+      if (!o) {
+        setLoadingMsg(
+          "Can't find order. This could be a network issue, try ctrl-c and running 'sf orders ls' to see if it was placed.",
+        );
+        // Schedule next poll
+        setTimeout(pollForOrder, 200);
+        return;
       }
+      setOrder(o);
+      // Success - don't schedule another poll, we're done
+      exit();
     };
-  }, [isLoading, order, exit]);
+
+    // Start the first poll
+    setTimeout(pollForOrder, 200);
+  }, [isLoading, order?.id, exit]);
 
   useEffect(() => {
     if (!isLoading && props.yes) {
