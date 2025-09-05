@@ -6,12 +6,12 @@ import Spinner from "ink-spinner";
 import ms from "ms";
 import console from "node:console";
 import process from "node:process";
-import { clearInterval, setInterval, setTimeout } from "node:timers";
+import { setTimeout } from "node:timers";
 import dayjs from "npm:dayjs@1.11.13";
 import duration from "npm:dayjs@1.11.13/plugin/duration.js";
 import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import parseDurationFromLibrary from "parse-duration";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
 import {
