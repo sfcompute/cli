@@ -1,5 +1,6 @@
 import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
+import { readFileSync } from "node:fs";
 import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
@@ -88,6 +89,28 @@ const create = new Command("create")
   .addOption(startOption)
   .addOption(endOption.conflicts("duration"))
   .addOption(durationOption.conflicts("end"))
+  .option(
+    "-u, --user-data <script>",
+    "cloud-init user data script to run during VM boot",
+  )
+  .addOption(
+    new Option(
+      "-U, --user-data-file <file>",
+      "Path to a cloud-init user data script to run during VM boot",
+    )
+      .conflicts("user-data")
+      .argParser((val) => {
+        try {
+          return readFileSync(val, "utf-8");
+        } catch {
+          throw new CommanderError(
+            1,
+            "INVALID_USER_DATA",
+            "Failed to read user data file. Please check that the file exists and is readable.",
+          );
+        }
+      }),
+  )
   .addOption(yesOption)
   .addOption(jsonOption)
   .hook("preAction", (command) => {
@@ -283,6 +306,12 @@ async function createNodesAction(
     const spinner = ora(`Creating ${formatNodeDescription(count, nodeType)}...`)
       .start();
 
+    const userData = (options.userData ?? options.userDataFile)
+      ? Array.from(
+        (new TextEncoder()).encode(options.userData ?? options.userDataFile),
+      )
+      : undefined;
+
     try {
       // Convert CLI options to SDK parameters
       const createParams: SFCNodes.NodeCreateParams = {
@@ -290,6 +319,7 @@ async function createNodesAction(
         max_price_per_node_hour: options.maxPrice * 100,
         names: names.length > 0 ? names : undefined,
         zone: options.zone,
+        cloud_init_user_data: userData,
       };
 
       // Handle start time (options.start comes from parseStartDateOrNow parser)
