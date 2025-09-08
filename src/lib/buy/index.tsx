@@ -285,7 +285,13 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (cluster) {
         const zoneMetadata = await getZoneMetadata(cluster);
         if (zoneMetadata) {
-          actualType = zoneMetadata.hardwareType;
+          const DeliveryTypeMetadata = {
+            "K8s": { displayName: "Kubernetes" },
+            "VM": { displayName: "Virtual Machine" }
+          };
+          
+          const deliveryDisplayName = DeliveryTypeMetadata[zoneMetadata.deliveryType]?.displayName || zoneMetadata.deliveryType;
+          actualType = `${deliveryDisplayName} (${zoneMetadata.hardwareType})`;
         }
       }
 
