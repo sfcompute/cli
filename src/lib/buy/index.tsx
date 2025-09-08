@@ -287,12 +287,10 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         if (zoneMetadata) {
           const DeliveryTypeMetadata = {
             "K8s": { displayName: "Kubernetes" },
-            "VM": { displayName: "Virtual Machine" },
+            "VM": { displayName: "Virtual Machine" }
           };
-
-          const deliveryDisplayName =
-            DeliveryTypeMetadata[zoneMetadata.deliveryType]?.displayName ||
-            zoneMetadata.deliveryType;
+          
+          const deliveryDisplayName = DeliveryTypeMetadata[zoneMetadata.deliveryType]?.displayName || zoneMetadata.deliveryType;
           actualType = `${deliveryDisplayName} (${zoneMetadata.hardwareType})`;
         }
       }
