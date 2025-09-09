@@ -1,5 +1,5 @@
 import boxen from "boxen";
-import chalk from "chalk";
+import { cyan, gray, yellow } from "jsr:@std/fmt/colors";
 import { execSync } from "node:child_process";
 import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
@@ -122,11 +122,11 @@ export async function checkVersion() {
 
   if (isPatchUpdate && !latestIsPrerelease) {
     console.log(
-      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
+      cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
       execSync("sf upgrade", { stdio: "inherit" });
-      console.log(chalk.gray("\n☁️☁️☁️\n"));
+      console.log(gray("\n☁️☁️☁️\n"));
 
       // Re-run the original command
       const args = process.argv.slice(2);
@@ -146,7 +146,7 @@ Latest version: ${latestVersion}
 Run 'sf upgrade' to update to the latest version
 `;
     console.log(
-      boxen(chalk.yellow(message), {
+      boxen(yellow(message), {
         padding: 1,
         borderColor: "yellow",
         borderStyle: "round",
