@@ -1,7 +1,7 @@
 import process from "node:process";
 import * as console from "node:console";
 import { confirm } from "@inquirer/prompts";
-import chalk from "chalk";
+import { gray, green, white, yellow } from "jsr:@std/fmt/colors";
 import type { Command } from "@commander-js/extra-typings";
 import dayjs from "npm:dayjs@1.11.13";
 import utc from "npm:dayjs@1.11.13/plugin/utc.js";
@@ -33,7 +33,7 @@ export function registerDev(program: Command) {
       const unixEpochSecondsNow = dayjs().unix();
       console.log(unixEpochSecondsNow);
       console.log(
-        chalk.green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A")),
+        green(dayjs().utc().format("dddd, MMMM D, YYYY h:mm:ss A")),
       );
 
       // process.exit(0);
@@ -115,7 +115,7 @@ function registerEpoch(program: Command) {
           const date = epochToDate(Number.parseInt(epochTimestamp));
           console.log(
             `${colorDiffedEpochs[i]} | ${
-              chalk.yellow(
+              yellow(
                 dayjs(date).format("hh:mm A MM-DD-YYYY"),
               )
             } Local`,
@@ -162,7 +162,7 @@ function colorDiffEpochs(epochStrings: string[]): string[] {
     const rest = num.slice(prefix.length);
 
     // return the string with appropriate coloring (gray for common prefix, white for the rest)
-    return chalk.gray(prefix) + chalk.white(rest);
+    return gray(prefix) + white(rest);
   });
 }
 

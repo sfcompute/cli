@@ -1,5 +1,5 @@
 import boxen from "boxen";
-import chalk from "chalk";
+import { yellow } from "jsr:@std/fmt/colors";
 import * as console from "node:console";
 
 type AppBanner = {
@@ -18,7 +18,7 @@ export const getAppBanner = async () => {
       const message = `${data.content}`;
 
       console.log(
-        boxen(chalk.yellow(message), {
+        boxen(yellow(message), {
           padding: 1,
           borderColor: "yellow",
           borderStyle: "round",
