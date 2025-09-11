@@ -22,7 +22,7 @@ import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
-import { registerVM } from "./lib/vm.ts";
+import { registerVM } from "./lib/vm/index.ts";
 import { registerScale } from "./lib/scale/index.tsx";
 import { registerZones } from "./lib/zones.tsx";
 import { registerNodes } from "./lib/nodes/index.ts";
