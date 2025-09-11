@@ -310,7 +310,7 @@ const upload = new Command("upload")
       });
       progressBar.stop();
 
-      finalizingSpinner = ora(`Finalizing upload (${parts} parts)...`).start();
+      finalizingSpinner = ora(`Validating upload...`).start();
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
       const file = await Deno.open(filePath, { read: true });
