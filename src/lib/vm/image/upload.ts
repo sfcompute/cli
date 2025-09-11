@@ -1,5 +1,5 @@
 import { Command } from "@commander-js/extra-typings";
-import { brightBlack, cyan, gray, red } from "jsr:@std/fmt/colors";
+import { brightBlack, cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import cliProgress from "cli-progress";
 import console from "node:console";
 import crypto from "node:crypto";
@@ -302,6 +302,12 @@ const upload = new Command("upload")
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
       }
+      progressBar.update(fileSize, {
+        spinner: green("✔"),
+        speed: lastSpeed || "0 B/s",
+        uploadedMB: (fileSize / (1024 * 1024)).toFixed(1),
+        totalMB: (fileSize / (1024 * 1024)).toFixed(1),
+      });
       progressBar.stop();
 
       finalizingSpinner = ora(`Finalizing upload (${parts} parts)...`).start();
