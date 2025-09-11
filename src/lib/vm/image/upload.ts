@@ -298,7 +298,6 @@ const upload = new Command("upload")
           }
         }
       }
-      const parts = totalParts;
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
       }
