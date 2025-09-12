@@ -46,7 +46,7 @@ export function ImageDisplay(
           value={
             <Box flexDirection="column" paddingRight={1}>
               <Text color="cyan">
-                Use curl or wget with If-Match header to download.
+                Use curl or wget to download.
               </Text>
               <Link url={image.download_url} fallback={false}>
                 {image.download_url}
