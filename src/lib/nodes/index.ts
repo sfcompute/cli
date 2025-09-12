@@ -1,6 +1,6 @@
 import { type Command } from "@commander-js/extra-typings";
 
-import create from "./create.ts";
+import { addCreate } from "./create.ts";
 import list from "./list.tsx";
 import release from "./release.ts";
 import set from "./set.ts";
@@ -45,7 +45,6 @@ $ sf nodes extend my-node-name --duration 3600 --max-price 12.50
 
   // Attach sub-commands
   nodes
-    .addCommand(create)
     .addCommand(list)
     .addCommand(extend)
     .addCommand(release)
@@ -54,4 +53,6 @@ $ sf nodes extend my-node-name --duration 3600 --max-price 12.50
     .action(() => {
       nodes.help();
     });
+
+  await addCreate(nodes);
 }
