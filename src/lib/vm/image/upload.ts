@@ -336,7 +336,7 @@ const upload = new Command("upload")
 
       const object = completeResponse.data;
       console.log(gray("\nNext steps:"));
-      console.log(`  sf vm image show ${cyan(object.image_id)}`);
+      console.log(`  sf vm images show ${cyan(object.image_id)}`);
     } catch (err) {
       // Clean up spinner timer
       if (spinnerTimer) {
