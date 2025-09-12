@@ -69,7 +69,11 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags = "procurements" | "zones" | "vm-provider";
+type FeatureFlags =
+  | "procurements"
+  | "zones"
+  | "vm-provider"
+  | "custom-vm-images";
 
 /**
  * Checks if a feature is enabled for the current user.

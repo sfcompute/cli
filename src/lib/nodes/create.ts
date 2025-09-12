@@ -7,6 +7,7 @@ import process from "node:process";
 import ora from "ora";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
+import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   durationOption,
@@ -206,7 +207,7 @@ Examples:\n
 
 async function createNodesAction(
   names: typeof create.args,
-  options: ReturnType<typeof create.opts>,
+  options: ReturnType<typeof create.opts> & { imageId?: string },
 ) {
   try {
     const client = await nodesClient();
@@ -320,6 +321,7 @@ async function createNodesAction(
         names: names.length > 0 ? names : undefined,
         zone: options.zone,
         cloud_init_user_data: userData,
+        image_id: options.imageId,
       };
 
       // Handle start time (options.start comes from parseStartDateOrNow parser)
@@ -400,6 +402,20 @@ async function createNodesAction(
   } catch (err) {
     handleNodesError(err);
   }
+}
+
+// Remove this once the feature flag is enabled by default
+export async function addCreate(program: Command) {
+  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
+  if (imagesEnabled) {
+    create.addOption(
+      new Option(
+        "-i, --image <image-id>",
+        "ID of the VM image to boot on the nodes. View available images with `sf vms images list`.",
+      ),
+    );
+  }
+  program.addCommand(create);
 }
 
 export default create;
