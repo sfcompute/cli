@@ -6,7 +6,6 @@ import Link from "ink-link";
 import console from "node:console";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
 import { Row } from "../../Row.tsx";
-import { formatDate } from "../../../helpers/format-date.ts";
 
 export function ImageDisplay(
   { image }: {
