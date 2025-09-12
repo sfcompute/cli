@@ -26,7 +26,7 @@ import {
   type Procurement,
 } from "./utils.ts";
 import console from "node:console";
-import chalk from "chalk";
+import { yellow } from "jsr:@std/fmt/colors";
 
 export async function updateProcurement({
   procurementId,
@@ -375,7 +375,7 @@ $ sf scale update <procurement_id...> -p 1.50
   .action((id, options) => {
     if (Object.keys(options).length === 0) {
       console.error(
-        chalk.yellow(
+        yellow(
           "No options provided. Please provide at least one option.\n",
         ),
       );
