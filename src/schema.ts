@@ -480,6 +480,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/vms/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Images
+         * @description List all VM Images for the authenticated account
+         */
+        get: operations["list_images"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vms/images/start_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["start_image_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vms/images/{image_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Image
+         * @description Get the download URL for a VM image by ID
+         */
+        get: operations["download_image"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/vms/images/{image_id}/complete_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["complete_image_upload"];
+        trace?: never;
+    };
+    "/v1/vms/images/{image_id}/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["create_image_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v0/zones": {
         parameters: {
             query?: never;
@@ -928,7 +1016,7 @@ export interface paths {
         };
         /**
          * Get transactions
-         * @description Lists transaction history. Provide either `starting_after` or `ending_before` (not both) for cursor-based pagination.
+         * @description Lists transaction history. Provide either `starting_after_cursor` or `ending_before_cursor` (not both) for cursor-based pagination.
          */
         get: operations["getTransactions"];
         put?: never;
@@ -1610,6 +1698,14 @@ export interface components {
             pubkey?: string;
             username?: string;
         };
+        /** @description Response body for completing a multipart upload */
+        vmorch_CompleteUploadResponse: {
+            /** @description The image ID */
+            image_id: string;
+            object: components["schemas"]["vmorch_ImageDiscriminator"];
+            /** @description Status of the upload verification */
+            upload_status: string;
+        };
         vmorch_GetInstancesResponse: {
             data: components["schemas"]["vmorch_VmInstance"][];
         };
@@ -1621,6 +1717,71 @@ export interface components {
         };
         vmorch_GetUserDataResponse: {
             script: components["schemas"]["vmorch_UserData"];
+        };
+        /**
+         * @example image
+         * @enum {string}
+         */
+        vmorch_ImageDiscriminator: "image";
+        /** @description Response body for image download presigned URL generation */
+        vmorch_ImageDownloadResponse: {
+            /** @description The presigned URL that can be used to download the image */
+            download_url: string;
+            /** @description Timestamp when the presigned URL expires (RFC 3339 format) */
+            expires_at: string;
+            /** @description The image ID */
+            image_id: string;
+            /** @description Human readable name of the image */
+            name: string;
+            /**
+             * @example image
+             * @enum {string}
+             */
+            object: "image";
+        };
+        /** @description Response body for individual image info (used in lists) */
+        vmorch_ImageInfo: {
+            /**
+             * Format: int64
+             * @description Creation timestamp as Unix timestamp in seconds
+             */
+            created_at: number;
+            /** @description The image ID */
+            image_id: string;
+            /** @description Client given name of the image */
+            name: string;
+            /**
+             * @example image
+             * @enum {string}
+             */
+            object: "image";
+            /** @description Upload status of the image */
+            upload_status: string;
+        };
+        /** @description Request body for image upload presigned URL generation */
+        vmorch_ImageUploadRequest: {
+            /**
+             * Format: int32
+             * @description part idx (1-based)
+             */
+            part_id: number;
+        };
+        /** @description Response body for image upload presigned URL generation */
+        vmorch_ImageUploadResponse: {
+            /** @description Timestamp when the presigned URL expires (RFC 3339 format) */
+            expires_at: string;
+            /** @description The presigned URL that can be used to upload the image part */
+            upload_url: string;
+        };
+        /** @description Response body for listing images */
+        vmorch_ListImagesResponse: {
+            data: components["schemas"]["vmorch_ImageInfo"][];
+            has_more: boolean;
+            /**
+             * @example list
+             * @enum {string}
+             */
+            object: "list";
         };
         vmorch_PostReplaceRequest: {
             vm_id: string;
@@ -1639,13 +1800,23 @@ export interface components {
             base64_encoded_key: string;
             key_type: string;
         };
+        /** @description Request body for starting a multipart upload */
+        vmorch_StartMultipartUploadRequest: {
+            /** @description Name of the image file */
+            name: string;
+        };
+        /** @description Response body for starting a multipart upload */
+        vmorch_StartMultipartUploadResponse: {
+            /** @description The image ID for the created image */
+            image_id: string;
+            object: components["schemas"]["vmorch_ImageDiscriminator"];
+        };
         /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
         vmorch_UserData: string | number[];
         vmorch_VmInstance: {
             cluster_id: string;
             current_status: string;
             id: string;
-            instance_group_id: string;
             last_updated_at: string;
         };
         vmorch_VmsLogChunk: {
@@ -1675,6 +1846,8 @@ export interface components {
             start_timestamp: components["schemas"]["node-api_UnixEpoch"];
         };
         "node-api_CreateNodesRequest": {
+            /** @description User script to be executed during the VM's boot process */
+            cloud_init_user_data?: number[];
             /**
              * Format: u-int32
              * @example 1
@@ -2204,7 +2377,6 @@ export interface components {
          *       "current_cents": 180000,
          *       "current_overage_cents": 0,
          *       "current_hold_cents": 0,
-         *       "created_at": 1640995200,
          *       "updated_at": 1640995200
          *     }
          */
@@ -2215,12 +2387,6 @@ export interface components {
              * @example 150000
              */
             available_balance_cents: number;
-            /**
-             * Format: int64
-             * @description When the balance was first created as a unix timestamp
-             * @example 1640995200
-             */
-            created_at: number;
             /**
              * Format: u-int64
              * @description Reserved balance in cents: sum(credit) - sum(debit)
@@ -2280,6 +2446,8 @@ export interface components {
              */
             current_balance_cents: number;
         };
+        /** @description string with format 'txc_base62_encoded_id' used for paginating a query to GET /v1/transactions */
+        "market-api_GetTransactionsCursor": string;
         /**
          * Format: date-time
          * @description An ISO 8601 datetime string
@@ -2379,8 +2547,6 @@ export interface components {
          * @example 2025-07-11T20:41:37.423Z
          */
         "market-api_NowOrISO8601DateTime": string;
-        /** @enum {string} */
-        "market-api_ObjectType": "balance" | "transaction" | "transaction_details" | "list";
         /** @description Configure more fine grained order behavior. */
         "market-api_OrderFlags": {
             /** @description If true, the order will be automatically cancelled if it doesn't
@@ -2525,36 +2691,50 @@ export interface components {
             card_brand: string;
             card_funding: string;
             card_last4: string;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example transaction_details
+             * @enum {string}
+             */
+            object: "transaction_details";
             receipt_url: string;
             /** @enum {string} */
             type: "stripe_card_payment";
         } | {
             description: string;
+            /**
+             * @example transaction_details
+             * @enum {string}
+             */
+            object: "transaction_details";
             /** @enum {string} */
-            type: "out_of_band_payment";
+            type: "manual_payment";
         } | {
             memo: string;
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example transaction_details
+             * @enum {string}
+             */
+            object: "transaction_details";
             /** @enum {string} */
             type: "credit_grant";
         } | {
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example transaction_details
+             * @enum {string}
+             */
+            object: "transaction_details";
             /** @enum {string} */
             type: "refund";
         } | {
-            object: components["schemas"]["market-api_ObjectType"];
+            /**
+             * @example transaction_details
+             * @enum {string}
+             */
+            object: "transaction_details";
             order_id: components["schemas"]["market-api_OrderId"];
             /** @enum {string} */
             type: "buy_order";
-        } | {
-            object: components["schemas"]["market-api_ObjectType"];
-            order_id: components["schemas"]["market-api_OrderId"];
-            /** @enum {string} */
-            type: "buy_order_hold";
         };
-        /** @description string with format '"tx"_{base62_encoded_id}' used for referencing a TransactionId resource. Never user-generated. */
-        "market-api_TransactionId": string;
         "market-api_TransactionResponse": {
             /**
              * Format: int64
@@ -2562,17 +2742,23 @@ export interface components {
              * @example 50000
              */
             amount_cents: number;
-            /** @description Unique identifier for the transaction */
-            id: components["schemas"]["market-api_TransactionId"];
+            /**
+             * Format: int64
+             * @description Balance immediately after this transaction took place, in cents (e.g., 50000 = $500.00).
+             */
+            balance: number;
+            /** @description Opaque cursor for use in pagination */
+            cursor: components["schemas"]["market-api_GetTransactionsCursor"];
+            /** @description Transaction details */
+            details: components["schemas"]["market-api_TransactionDetails"];
             /**
              * @example transaction
              * @enum {string}
              */
             object: "transaction";
-            transaction_details: components["schemas"]["market-api_TransactionDetails"];
             /**
              * Format: int64
-             * @description Time the transaction took place as Unix timestamp in seconds.
+             * @description Time the transaction took place as UNIX timestamp in seconds.
              * @example 1640995200
              */
             transaction_time: number;
@@ -2792,7 +2978,7 @@ export interface components {
             cluster?: string | null;
             colocate_with?: null | components["schemas"]["quoter_ContractId"];
             /** @description Instance type for buy orders: "h100i", "h100v", or "h200ki" */
-            instance_type: string;
+            instance_type?: string | null;
             /** @enum {string} */
             side: "buy";
         } | {
@@ -3097,6 +3283,246 @@ export interface operations {
                 };
             };
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_images: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of images */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["vmorch_ListImagesResponse"];
+                };
+            };
+            /** @description Node API features not enabled */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_image_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["vmorch_StartMultipartUploadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["vmorch_StartMultipartUploadResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    download_image: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VM image ID */
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["vmorch_ImageDownloadResponse"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    complete_image_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VM image ID */
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["vmorch_CompleteUploadResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    create_image_upload_url: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VM image ID */
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["vmorch_ImageUploadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["vmorch_ImageUploadResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5463,7 +5889,6 @@ export interface operations {
                      *       "current_cents": 180000,
                      *       "current_overage_cents": 150000,
                      *       "current_hold_cents": 180000,
-                     *       "created_at": 1640995200,
                      *       "updated_at": 1640995200
                      *     } */
                     "application/json": components["schemas"]["market-api_GetBalanceResponse"];
@@ -5585,15 +6010,25 @@ export interface operations {
                 /** @description Number of transactions to return (1-100, default 10) */
                 limit?: number;
                 /**
-                 * @description Cursor for forward pagination - returns transactions after this ID (exclusive)
-                 * @example tx_1234567890
+                 * @description Filter for transactions after this UNIX timestamp (exclusive)
+                 * @example 1640995200
                  */
-                starting_after?: components["schemas"]["market-api_TransactionId"];
+                after_time?: number;
                 /**
-                 * @description Cursor for backward pagination - returns transactions before this ID (exclusive)
-                 * @example tx_1234567891
+                 * @description Filter for transactions before this UNIX timestamp (exclusive)
+                 * @example 1640995200
                  */
-                ending_before?: components["schemas"]["market-api_TransactionId"];
+                before_time?: number;
+                /**
+                 * @description Cursor for forward pagination
+                 * @example 1640995200
+                 */
+                starting_after_cursor?: components["schemas"]["market-api_GetTransactionsCursor"];
+                /**
+                 * @description Cursor for backward pagination
+                 * @example 1640995200
+                 */
+                ending_before_cursor?: components["schemas"]["market-api_GetTransactionsCursor"];
             };
             header?: never;
             path?: never;
@@ -5612,12 +6047,11 @@ export interface operations {
                      *       "data": [
                      *         {
                      *           "object": "transaction",
-                     *           "id": "tx_1234567890",
                      *           "transaction_time": 1640995200,
                      *           "amount_cents": 25000,
-                     *           "transaction_details": {
-                     *             "type": "credit_grant",
+                     *           "details": {
                      *             "object": "transaction_details",
+                     *             "type": "credit_grant",
                      *             "memo": "Promotional credit"
                      *           }
                      *         }

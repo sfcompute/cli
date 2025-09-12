@@ -5,15 +5,10 @@ import { Shescape } from "shescape";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
-} from "../helpers/errors.ts";
-import { getApiUrl } from "../helpers/urls.ts";
-import { getAuthToken } from "../helpers/config.ts";
+} from "../../helpers/errors.ts";
+import { getApiUrl } from "../../helpers/urls.ts";
+import { getAuthToken } from "../../helpers/config.ts";
 import child_process from "node:child_process";
-
-type SshHostKey = {
-  keyType: string;
-  base64EncodedKey: string;
-};
 
 export function registerSsh(program: Command) {
   program
@@ -67,7 +62,10 @@ export function registerSsh(program: Command) {
       const data = (await response.json()) as {
         ssh_hostname: string;
         ssh_port: number;
-        ssh_host_keys: SshHostKey[] | undefined;
+        ssh_host_keys: {
+          keyType: string;
+          base64EncodedKey: string;
+        }[] | undefined;
       };
       const sshHostname = data.ssh_hostname;
       const sshPort = data.ssh_port;
