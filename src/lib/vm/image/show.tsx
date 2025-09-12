@@ -42,19 +42,6 @@ export function ImageDisplay(
             </Box>
           }
         />
-        {expiresAt && (
-          <Row
-            head="Expires: "
-            value={
-              <Box gap={1}>
-                <Text color={isExpired ? "red" : undefined}>
-                  {formatDate(expiresAt)}
-                </Text>
-                {isExpired && <Text dimColor>(Expired)</Text>}
-              </Box>
-            }
-          />
-        )}
         <Row
           head="URL: "
           value={
@@ -68,6 +55,19 @@ export function ImageDisplay(
             </Box>
           }
         />
+        {expiresAt && (
+          <Row
+            head="URL Expiry: "
+            value={
+              <Box gap={1}>
+                <Text color={isExpired ? "red" : undefined}>
+                  {expiresAt.toISOString()}
+                </Text>
+                {isExpired && <Text dimColor>(Expired)</Text>}
+              </Box>
+            }
+          />
+        )}
       </Box>
     </Box>
   );
