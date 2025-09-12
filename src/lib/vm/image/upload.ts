@@ -229,46 +229,38 @@ const upload = new Command("upload")
               resetPartProgress(part);
             }
 
-            let file: Deno.FsFile | undefined;
-            try {
-              // Open file and read the specific chunk
-              file = await Deno.open(filePath, { read: true });
-              await file.seek(start, Deno.SeekMode.Start);
+            using file = await Deno.open(filePath, { read: true });
+            await file.seek(start, Deno.SeekMode.Start);
 
-              // Read exactly the chunk we need
-              const buffer = new Uint8Array(chunkSize);
-              const bytesRead = await file.read(buffer) ?? 0;
-              const chunk = buffer.subarray(0, bytesRead);
+            // Read exactly the chunk we need
+            const buffer = new Uint8Array(chunkSize);
+            const bytesRead = await file.read(buffer) ?? 0;
+            const chunk = buffer.subarray(0, bytesRead);
 
-              // Track upload progress with axios
-              let lastUploadedBytes = 0;
+            // Track upload progress with axios
+            let lastUploadedBytes = 0;
 
-              const res = await axios.put(url, chunk, {
-                headers: {
-                  "Content-Type": "application/octet-stream",
-                  "Content-Length": chunk.length.toString(),
-                },
-                onUploadProgress: (progressEvent) => {
-                  const uploadedBytes = progressEvent.loaded || 0;
-                  const deltaBytes = uploadedBytes - lastUploadedBytes;
+            const res = await axios.put(url, chunk, {
+              headers: {
+                "Content-Type": "application/octet-stream",
+                "Content-Length": chunk.length.toString(),
+              },
+              onUploadProgress: (progressEvent) => {
+                const uploadedBytes = progressEvent.loaded || 0;
+                const deltaBytes = uploadedBytes - lastUploadedBytes;
 
-                  if (deltaBytes > 0) {
-                    updateProgress(part, deltaBytes);
-                    lastUploadedBytes = uploadedBytes;
-                  }
-                },
-                maxRedirects: 0,
-              });
+                if (deltaBytes > 0) {
+                  updateProgress(part, deltaBytes);
+                  lastUploadedBytes = uploadedBytes;
+                }
+              },
+              maxRedirects: 0,
+            });
 
-              if (res.status < 200 || res.status >= 300) {
-                throw new Error(
-                  `Part ${part} upload failed: ${res.status} ${res.statusText}`,
-                );
-              }
-            } catch (error) {
-              throw error;
-            } finally {
-              file?.close?.();
+            if (res.status < 200 || res.status >= 300) {
+              throw new Error(
+                `Part ${part} upload failed: ${res.status} ${res.statusText}`,
+              );
             }
           },
           {
@@ -303,7 +295,7 @@ const upload = new Command("upload")
       }
       progressBar.update(fileSize, {
         spinner: green("✔"),
-        speed: lastSpeed || "0 B/s",
+        speed: "0 B/s",
         uploadedMB: (fileSize / (1024 * 1024)).toFixed(1),
         totalMB: (fileSize / (1024 * 1024)).toFixed(1),
       });
@@ -312,18 +304,10 @@ const upload = new Command("upload")
       finalizingSpinner = ora(`Validating upload...`).start();
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
-      const file = await Deno.open(filePath, { read: true });
 
-      const reader = file.readable.getReader();
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          hash.update(value);
-        }
-      } finally {
-        reader.releaseLock();
-        file.close();
+      using file = await Deno.open(filePath, { read: true });
+      for await (const chunk of file.readable) {
+        hash.update(chunk);
       }
 
       const sha256Hash = hash.digest("hex");
