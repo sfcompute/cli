@@ -28,7 +28,6 @@ const upload = new Command("upload")
   )
   .action(async ({ name, file: filePath, concurrency: concurrencyLimit }) => {
     let preparingSpinner: Ora | undefined;
-    let urlsSpinner: Ora | undefined;
     let finalizingSpinner: Ora | undefined;
     let spinnerTimer: NodeJS.Timeout | undefined;
 
@@ -59,61 +58,29 @@ const upload = new Command("upload")
       const fileSize = fileInfo.size;
 
       // Calculate parts for progress tracking
+      // These magic numbers are not the hard limits, but we don't trust R2 to document them.
       const minChunk = 6 * 1024 * 1024; // 6 MiB
-      const chunkSize = Math.max(minChunk, Math.ceil(fileSize / 10));
+      const maxParts = 100;
+      const chunkSize = Math.max(
+        minChunk,
+        Math.ceil(fileSize / maxParts),
+        250 * 1024 * 1024,
+      ); // 250 MiB
       const totalParts = Math.ceil(fileSize / chunkSize);
 
-      // Calculate upload chunks and fetch presigned URLs in one loop
-      urlsSpinner = ora("Prefetching upload URLs...").start();
-
-      const uploadUrls: Array<
-        {
-          part: number;
-          url: string;
-          start: number;
-          end: number;
-          expiresAt: string;
-        }
-      > = [];
+      // Calculate upload parts metadata
+      const uploadParts: Array<{
+        part: number;
+        start: number;
+        end: number;
+      }> = [];
 
       for (let idx = 0; idx < totalParts; idx++) {
         const part = idx + 1;
         const start = idx * chunkSize;
         const end = Math.min(start + chunkSize, fileSize);
-
-        const response = await client.POST(
-          "/v1/vms/images/{image_id}/upload",
-          {
-            params: {
-              path: {
-                image_id: imageId,
-              },
-            },
-            body: {
-              part_id: part,
-            },
-          },
-        );
-
-        if (!response.response.ok || !response.data) {
-          const errorText = response.response.ok
-            ? "No data in response"
-            : await response.response.text();
-          throw new Error(
-            `Failed to get upload URL for part ${part}: ${response.response.status} ${response.response.statusText} - ${errorText}`,
-          );
-        }
-
-        uploadUrls.push({
-          part,
-          url: response.data.upload_url,
-          start,
-          end,
-          expiresAt: response.data.expires_at,
-        });
+        uploadParts.push({ part, start, end });
       }
-
-      urlsSpinner.succeed(`Prepared to upload ${totalParts} chunks`);
 
       // Create combined ora + progress bar with per-part progress tracking
       const startTime = Date.now();
@@ -211,17 +178,50 @@ const upload = new Command("upload")
 
       // Upload parts concurrently with specified concurrency limit
       const uploadPart = async (
-        { part, url, start, end, expiresAt: _expiresAt }: {
+        { part, start, end }: {
           part: number;
-          url: string;
           start: number;
           end: number;
-          expiresAt: string;
         },
       ) => {
         const chunkSize = end - start;
 
-        // Upload with async-retry to handle R2 read-after-write consistency issues
+        // Step 1: Fetch upload URL with retry
+        const url = await retry(
+          async () => {
+            const response = await client.POST(
+              "/v1/vms/images/{image_id}/upload",
+              {
+                params: {
+                  path: {
+                    image_id: imageId,
+                  },
+                },
+                body: {
+                  part_id: part,
+                },
+              },
+            );
+
+            if (!response.response.ok || !response.data) {
+              const errorText = response.response.ok
+                ? "No data in response"
+                : await response.response.text();
+              throw new Error(
+                `Failed to get upload URL for part ${part}: ${response.response.status} ${response.response.statusText} - ${errorText}`,
+              );
+            }
+
+            return response.data.upload_url;
+          },
+          {
+            retries: 3,
+            factor: 2,
+            randomize: true,
+          },
+        );
+
+        // Step 2: Upload the chunk with retry
         await retry(
           async (_: unknown, _attemptNumber: number) => {
             // Reset progress for this part on retry (except first attempt)
@@ -276,8 +276,8 @@ const upload = new Command("upload")
 
       // Process uploads with concurrency limit
       const results: number[] = [];
-      for (let i = 0; i < uploadUrls.length; i += concurrencyLimit) {
-        const batch = uploadUrls.slice(i, i + concurrencyLimit);
+      for (let i = 0; i < uploadParts.length; i += concurrencyLimit) {
+        const batch = uploadParts.slice(i, i + concurrencyLimit);
         const batchResults = await Promise.allSettled(
           batch.map(uploadPart),
         );
@@ -347,12 +347,6 @@ const upload = new Command("upload")
       if (preparingSpinner?.isSpinning) {
         preparingSpinner.fail(
           `Upload preparation failed: ${
-            err instanceof Error ? err.message : String(err)
-          }`,
-        );
-      } else if (urlsSpinner?.isSpinning) {
-        urlsSpinner.fail(
-          `Failed to get presigned URLs: ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
