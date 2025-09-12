@@ -1,5 +1,12 @@
 import { Command } from "@commander-js/extra-typings";
-import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
+import {
+  brightBlack,
+  cyan,
+  gray,
+  green,
+  red,
+  yellow,
+} from "jsr:@std/fmt/colors";
 import console from "node:console";
 import ora from "ora";
 import Table from "cli-table3";
@@ -54,7 +61,8 @@ Next Steps:\n
       }
 
       // Sort images by created_at (newest first)
-      const sortedImages = [...images].slice(0, 5).sort((a, b) => {
+      const imagesToShow = images.slice(0, 5);
+      const sortedImages = [...imagesToShow].sort((a, b) => {
         const aTime = a.created_at || 0;
         const bTime = b.created_at || 0;
         return bTime - aTime;
@@ -101,13 +109,20 @@ Next Steps:\n
           createdAt,
         ]);
       }
+      if (images.length > 5) {
+        table.push([
+          {
+            colSpan: 4,
+            content: brightBlack(
+              `${images.length - 5} older ${
+                images.length - 5 === 1 ? "image" : "images"
+              } not shown. Use sf vms images list --json to list all images.`,
+            ),
+          },
+        ]);
+      }
 
       console.log(table.toString());
-      console.log(
-        gray(
-          `Found ${images.length} ${images.length === 1 ? "image" : "images"}.`,
-        ),
-      );
 
       // Show next steps
       console.log(gray("\nNext steps:"));
@@ -115,7 +130,17 @@ Next Steps:\n
       // Always show how to get info for a specific image
       const firstImage = sortedImages[0];
       if (firstImage) {
-        console.log(`  sf vms images show ${firstImage.image_id}`);
+        console.log(`  sf vms images show ${cyan(firstImage.image_id)}`);
+      }
+      const firstCompletedImage = sortedImages.find(
+        (image) => image.upload_status === "completed",
+      );
+      if (firstCompletedImage) {
+        console.log(
+          `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${
+            cyan(firstCompletedImage.image_id)
+          }`,
+        );
       }
     } catch (err) {
       handleNodesError(err);
