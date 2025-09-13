@@ -184,8 +184,8 @@ const create = new Command("create")
     "after",
     `
 Examples:\n
-  \x1b[2m# Create a single reserved node (default behavior)\x1b[0m
-  $ sf nodes create --zone hayesvalley --max-price 12.50
+  \x1b[2m# Create a single reserved node(default type) that starts immediately\x1b[0m
+  $ sf nodes create -n 1 --zone hayesvalley --max-price 12.50 --duration 1h
 
   \x1b[2m# Create multiple auto-reserved nodes explicitly with a specific name\x1b[0m
   $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --auto --max-price 9.00
@@ -196,8 +196,8 @@ Examples:\n
   \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
   $ sf nodes create node-1 --zone hayesvalley --reserved --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z" -p 15.00
 
-  \x1b[2m# Create a reserved node for 2 hours starting now\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --reserved --duration 2h -p 13.50
+  \x1b[2m# Create a reserved node with custom user-data for 2 hours starting now \x1b[0m
+  $ sf nodes create node-1 --zone hayesvalley --reserved --user-data-file /path/to/cloud-init --duration 2h -p 13.50 
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
   $ sf nodes create node-1 --zone hayesvalley --reserved --start "+1h" --duration 6h -p 11.25
