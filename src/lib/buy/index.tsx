@@ -1,5 +1,5 @@
 import { type Command, Option } from "@commander-js/extra-typings";
-import { cyan, red, yellow } from "jsr:@std/fmt/colors";
+import { yellow } from "jsr:@std/fmt/colors";
 import { parseDate } from "chrono-node";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
