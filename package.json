@@ -23,7 +23,6 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "ink": "^5.2.0",
-    "ink-confirm-input": "^2.0.0",
     "ink-link": "^4.1.0",
     "ink-spinner": "^5.0.0",
     "ink-testing-library": "^4.0.0",
@@ -51,6 +50,9 @@
   },
   "peerDependencies": {
     "typescript": "^5.6.2"
+  },
+  "resolutions": {
+    "chalk": "^5.6.2"
   },
   "version": "0.21.6"
 }
