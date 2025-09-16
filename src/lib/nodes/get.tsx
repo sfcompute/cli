@@ -13,6 +13,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { NodesVerboseDisplay } from "./list.tsx";
 
 const get = new Command("get")
+  .alias("show")
   .description("Get detailed information about specific nodes")
   .showHelpAfterError()
   .argument("<names...>", "Node names to get information about")
@@ -60,8 +61,13 @@ async function getNodesAction(
       }
     }
 
+    if (options.json) {
+      console.log(JSON.stringify(fetchedNodes, null, 2));
+      return;
+    }
+
     if (notFound.length > 0) {
-      console.log(
+      console.error(
         red(
           `Could not find ${notFound.length === 1 ? "this" : "these"} ${
             pluralizeNodes(notFound.length)
@@ -69,19 +75,14 @@ async function getNodesAction(
         ),
       );
       for (const name of notFound) {
-        console.log(`  • ${name}`);
+        console.error(`  • ${name}`);
       }
-      console.log();
+      console.error();
     }
 
     if (fetchedNodes.length === 0) {
-      console.log("No nodes found.");
+      console.error("No nodes found.");
       process.exit(1);
-    }
-
-    if (options.json) {
-      console.log(JSON.stringify(fetchedNodes, null, 2));
-      return;
     }
 
     if (options.short) {
