@@ -311,7 +311,7 @@ const upload = new Command("upload")
       }
 
       const sha256Hash = hash.digest("hex");
-      const completeResponse = await client.PATCH(
+      const completeResponse = await client.PUT(
         "/v1/vms/images/{image_id}/complete_upload",
         {
           params: {
@@ -319,7 +319,6 @@ const upload = new Command("upload")
               image_id: imageId,
             },
           },
-          // @ts-ignore Schema not yet updated to include request body with sha256_hash
           body: {
             sha256_hash: sha256Hash,
           },
