@@ -305,29 +305,38 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         )}
       </Box>
 
-      <Box marginTop={1} paddingX={1}>
-        <Text>💰 Pricing:</Text>
-      </Box>
-      <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        {node.node_type === "autoreserved" && (
-          <>
-            <Row
-              head="Max Price: "
-              value={`$${pricePerHour.toFixed(2)}/hour`}
-            />
-          </>
-        )}
-        {node.node_type !== "autoreserved" && (
-          <>
-            <Row head="Price: " value={`$${pricePerHour.toFixed(2)}/hour`} />
+      {node.max_price_per_node_hour && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text>💰 Pricing:</Text>
+          </Box>
+          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+            {node.node_type === "autoreserved" && (
+              <>
+                <Row
+                  head="Max Price: "
+                  value={`$${pricePerHour.toFixed(2)}/hour`}
+                />
+              </>
+            )}
+            {node.node_type !== "autoreserved" && (
+              <>
+                <Row
+                  head="Price: "
+                  value={`$${pricePerHour.toFixed(2)}/hour`}
+                />
 
-            <Row
-              head="Total Cost: "
-              value={duration ? `$${totalCost.toFixed(2)}` : "Not available"}
-            />
-          </>
-        )}
-      </Box>
+                <Row
+                  head="Total Cost: "
+                  value={duration
+                    ? `$${totalCost.toFixed(2)}`
+                    : "Not available"}
+                />
+              </>
+            )}
+          </Box>
+        </>
+      )}
 
       {/* VMs Section - Show if node has VMs */}
       {node.vms?.data && node.vms.data.length > 0 && (
