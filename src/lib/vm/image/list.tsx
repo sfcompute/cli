@@ -61,7 +61,6 @@ Next Steps:\n
       }
 
       // Sort images by created_at (newest first)
-      // Sort images by created_at (newest first)
       const sortedImages = [...images].sort((a, b) => {
         const aTime = a.created_at || 0;
         const bTime = b.created_at || 0;
@@ -83,7 +82,7 @@ Next Steps:\n
         },
       });
 
-      for (const image of sortedImages) {
+      for (const image of imagesToShow) {
         const createdAt = image.created_at
           ? formatDate(new Date(image.created_at * 1000))
           : "Unknown";
