@@ -4,8 +4,18 @@ import { Command } from "@commander-js/extra-typings";
 import { Box, render, Text } from "ink";
 import Link from "ink-link";
 import console from "node:console";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import advanced from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
+import { brightBlack } from "jsr:@std/fmt/colors";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
 import { Row } from "../../Row.tsx";
+import { formatDate } from "../../../helpers/format-date.ts";
+
+dayjs.extend(utc);
+dayjs.extend(advanced);
+dayjs.extend(timezone);
 
 export function ImageDisplay(
   { image }: {
@@ -60,7 +70,11 @@ export function ImageDisplay(
             value={
               <Box gap={1}>
                 <Text color={isExpired ? "red" : undefined}>
-                  {expiresAt.toISOString()}
+                  {dayjs(expiresAt).format("YYYY-MM-DDTHH:mm:ssZ")} {
+                    brightBlack(
+                      `(${formatDate(dayjs(expiresAt).toDate())} ${dayjs(expiresAt).format("z")})`,
+                    )
+                  }
                 </Text>
                 {isExpired && <Text dimColor>(Expired)</Text>}
               </Box>
