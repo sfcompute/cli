@@ -10,9 +10,11 @@
     "boxen": "https://esm.sh/boxen@8.0.1",
     "chalk": "https://esm.sh/chalk@5.3.0",
     "dayjs": "https://esm.sh/dayjs@1.11.13",
+    "dayjs/plugin/advancedFormat": "https://esm.sh/dayjs@1.11.13/plugin/advancedFormat.js",
     "dayjs/plugin/duration": "https://esm.sh/dayjs@1.11.13/plugin/duration.js",
     "dayjs/plugin/relativeTime": "https://esm.sh/dayjs@1.11.13/plugin/relativeTime.js",
     "dayjs/plugin/utc": "https://esm.sh/dayjs@1.11.13/plugin/utc.js",
+    "dayjs/plugin/timezone": "https://esm.sh/dayjs@1.11.13/plugin/timezone.js",
     "tweetnacl": "https://esm.sh/tweetnacl@1.0.3",
     "tweetnacl-util": "https://esm.sh/tweetnacl-util@0.15.1",
     "yn": "https://esm.sh/yn"
