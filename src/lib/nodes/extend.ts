@@ -16,7 +16,8 @@ import {
 import SFCNodes from "@sfcompute/nodes-sdk-alpha";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-import { logAndQuit } from "../../helpers/errors.ts";
+import { formatDuration } from "date-fns/formatDuration";
+import { intervalToDuration } from "date-fns/intervalToDuration";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
@@ -59,7 +60,9 @@ async function extendNodeAction(
     const client = await nodesClient();
 
     // Use the API's names parameter to filter nodes directly
-    const fetchSpinner = ora().start();
+    const fetchSpinner = ora().start(
+      `Checking ${nodeNames.length} ${pluralizeNodes(nodeNames.length)}...`,
+    );
     const { data: fetchedNodes } = await client.nodes.list({ name: nodeNames });
     fetchSpinner.stop();
 
@@ -124,6 +127,16 @@ async function extendNodeAction(
       process.exit(1);
     }
 
+    const formattedDuration = formatDuration(
+      intervalToDuration({
+        start: 0,
+        end: options.duration! * 1000,
+      }),
+      {
+        delimiter: ", ",
+      },
+    );
+
     // Only show pricing and get confirmation if not using --yes
     if (!options.yes) {
       // Get quote for accurate pricing preview
@@ -144,30 +157,46 @@ async function extendNodeAction(
         durationSeconds + Math.ceil(durationSeconds * 0.1),
       );
 
-      const quote = await getQuote({
-        instanceType: "h100v",
-        quantity: extendableNodes.length,
-        minStartTime: "NOW",
-        maxStartTime: "NOW",
-        minDurationSeconds: minDurationSeconds,
-        maxDurationSeconds: maxDurationSeconds,
-      });
+      const quotes = await Promise.allSettled(
+        extendableNodes.map(async ({ node }) => {
+          return await getQuote({
+            instanceType: `${node.gpu_type.toLowerCase()}v` as const,
+            quantity: 8,
+            minStartTime: node.end_at ? new Date(node.end_at * 1000) : "NOW",
+            maxStartTime: node.end_at ? new Date(node.end_at * 1000) : "NOW",
+            minDurationSeconds: minDurationSeconds,
+            maxDurationSeconds: maxDurationSeconds,
+            cluster: node.zone ?? undefined,
+          });
+        }),
+      );
+
+      const filteredQuotes = quotes.filter((quote) =>
+        quote.status === "fulfilled"
+      );
 
       spinner.stop();
 
       let confirmationMessage = `Extend ${extendableNodes.length} ${
         pluralizeNodes(extendableNodes.length)
-      } for ${Math.round(durationSeconds / 3600 * 100) / 100} hours`;
+      } for ${formattedDuration}`;
 
-      if (quote) {
-        const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
+      // If there's only one node, show the price per node per hour
+      if (filteredQuotes.length === 1 && filteredQuotes[0].value) {
+        const pricePerGpuHour = getPricePerGpuHourFromQuote(
+          filteredQuotes[0].value,
+        );
         const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
         confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(2)}/node/hr`;
+      } else if (filteredQuotes.length > 1) {
+        const totalPrice = filteredQuotes.reduce((acc, quote) => {
+          return acc + (quote.value?.price ?? 0);
+        }, 0);
+        // If there's multiple nodes, show the total price, as nodes could be on different zones or have different hardware
+        confirmationMessage += ` for ~$${totalPrice / 100}`;
       } else {
-        logAndQuit(
-          red(
-            "No nodes available matching your requirements. This is likely due to insufficient capacity.",
-          ),
+        confirmationMessage = red(
+          "No nodes available matching your requirements. This is likely due to insufficient capacity. Attempt to extend anyway",
         );
       }
 
@@ -201,6 +230,11 @@ async function extendNodeAction(
       }
     }
 
+    if (options.json) {
+      console.log(JSON.stringify(results.map((r) => r.node), null, 2));
+      process.exit(0);
+    }
+
     if (results.length > 0) {
       spinner.succeed(
         `Successfully extended ${results.length} ${
@@ -221,19 +255,12 @@ async function extendNodeAction(
       }
     }
 
-    if (options.json) {
-      console.log(JSON.stringify(results.map((r) => r.node), null, 2));
-      process.exit(0);
-    }
-
     if (results.length > 0) {
       console.log(gray("\nExtended nodes:"));
       console.log(createNodesTable(results.map((r) => r.node)));
       console.log(
         gray(
-          `\nDuration extended by: ${options.duration} seconds (${
-            Math.round(options.duration! / 3600 * 100) / 100
-          } hours)`,
+          `\nDuration extended by ${formattedDuration}`,
         ),
       );
       console.log(gray(`Max price: $${options.maxPrice.toFixed(2)}/hour`));
