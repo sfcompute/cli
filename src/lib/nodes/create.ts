@@ -207,7 +207,7 @@ Examples:\n
 
 async function createNodesAction(
   names: typeof create.args,
-  options: ReturnType<typeof create.opts> & { imageId?: string },
+  options: ReturnType<typeof create.opts> & { image?: string },
 ) {
   try {
     const client = await nodesClient();
@@ -321,7 +321,7 @@ async function createNodesAction(
         names: names.length > 0 ? names : undefined,
         zone: options.zone,
         cloud_init_user_data: userData,
-        image_id: options.imageId,
+        image_id: options.image,
       };
 
       // Handle start time (options.start comes from parseStartDateOrNow parser)
