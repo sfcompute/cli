@@ -70,9 +70,6 @@ const logs = new Command("logs")
     `
 Examples:
 
-  \x1b[2m# Get logs for a specific vm \x1b[0m
-  $ sf vm logs --instance <instance_id>
-
   \x1b[2m# Get logs for a vm \x1b[0m
   $ sf vm logs --instance <instance_id>
 
