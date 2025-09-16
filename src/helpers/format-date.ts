@@ -46,7 +46,7 @@ export const formatDate = (date: Date): string => {
 
   // If it's today and we have time, just show the time
   if (thisDay && timeSuffix) {
-    return `${formatTimeWithLocale(date)}`;
+    return `Today, ${formatTimeWithLocale(date)}`;
   }
 
   // Standard date format

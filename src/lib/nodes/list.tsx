@@ -1,15 +1,21 @@
 import React from "react";
 import { Command } from "@commander-js/extra-typings";
-import { gray } from "jsr:@std/fmt/colors";
+import { brightBlack, gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import ora from "ora";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import advanced from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
 import { Box, render, Text } from "ink";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { formatNullableDateRange } from "../../helpers/format-date.ts";
+import {
+  formatDate,
+  formatNullableDateRange,
+} from "../../helpers/format-date.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
@@ -20,6 +26,10 @@ import {
   pluralizeNodes,
   printNodeType,
 } from "./utils.ts";
+
+dayjs.extend(utc);
+dayjs.extend(advanced);
+dayjs.extend(timezone);
 
 // Helper component to display VMs in a table format using Ink
 function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
@@ -96,21 +106,31 @@ function getActionsForNode(node: SFCNodes.Node) {
     0,
   );
 
+  if (lastVm?.image_id) {
+    nodeActions.push({
+      label: "Image",
+      command: `sf vms image show ${brightBlack(lastVm.image_id)}`,
+    });
+  }
+
   switch (node.status) {
     case "released":
       // Released nodes: can view logs/ssh until the node ends
       if (lastVm?.id) {
-        nodeActions.push(
-          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
-        );
         nodeActions.push({
           label: "SSH",
-          command: `sf vms ssh root@${lastVm.id}`,
+          command: `sf vms ssh root@${brightBlack(String(lastVm.id))}`,
         });
+        nodeActions.push(
+          {
+            label: "Logs",
+            command: `sf vms logs -i ${brightBlack(String(lastVm.id))}`,
+          },
+        );
       }
       nodeActions.push({
         label: "Delete",
-        command: `sf nodes delete ${node.name} (coming soon)`,
+        command: `sf nodes delete ${brightBlack(node.name)} (coming soon)`,
       });
       break;
 
@@ -124,8 +144,14 @@ function getActionsForNode(node: SFCNodes.Node) {
       // Running nodes
       if (lastVm?.id) {
         nodeActions.push(
-          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
-          { label: "SSH", command: `sf vms ssh root@${lastVm.id}` },
+          {
+            label: "SSH",
+            command: `sf vms ssh root@${brightBlack(lastVm.id)}`,
+          },
+          {
+            label: "Logs",
+            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+          },
         );
       }
 
@@ -134,12 +160,15 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "Extend",
-            command:
-              `sf nodes extend ${node.name} --duration 60 --max-price 12.00`,
+            command: `sf nodes extend ${
+              brightBlack(node.name)
+            } --duration 60 --max-price 12.00`,
           },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --yes (coming soon)`,
+            command: `sf nodes delete ${
+              brightBlack(node.name)
+            } --yes (coming soon)`,
           },
         );
       } else if (node.node_type === "autoreserved") {
@@ -147,12 +176,17 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "Update",
-            command: `sf nodes set ${node.name} --max-price 12.50`,
+            command: `sf nodes set ${brightBlack(node.name)} --max-price 12.50`,
           },
-          { label: "Release", command: `sf nodes release ${node.name}` },
+          {
+            label: "Release",
+            command: `sf nodes release ${brightBlack(node.name)}`,
+          },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --yes (coming soon)`,
+            command: `sf nodes delete ${
+              brightBlack(node.name)
+            } --yes (coming soon)`,
           },
         );
       }
@@ -163,7 +197,10 @@ function getActionsForNode(node: SFCNodes.Node) {
       // Pending/awaiting nodes
       if (lastVm?.id) {
         nodeActions.push(
-          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
+          {
+            label: "Logs",
+            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+          },
         );
       }
 
@@ -172,19 +209,26 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "Update",
-            command: `sf nodes set ${node.name} --max-price 12.50`,
+            command: `sf nodes set ${brightBlack(node.name)} --max-price 12.50`,
           },
-          { label: "Release", command: `sf nodes release ${node.name}` },
+          {
+            label: "Release",
+            command: `sf nodes release ${brightBlack(node.name)}`,
+          },
           {
             label: "Delete",
-            command: `sf nodes delete ${node.name} --yes (coming soon)`,
+            command: `sf nodes delete ${
+              brightBlack(node.name)
+            } --yes (coming soon)`,
           },
         );
       } else if (node.node_type === "reserved") {
         // Reserved nodes: can delete
         nodeActions.push({
           label: "Delete",
-          command: `sf nodes delete ${node.name} --yes (coming soon)`,
+          command: `sf nodes delete ${
+            brightBlack(node.name)
+          } --yes (coming soon)`,
         });
       }
       break;
@@ -193,16 +237,23 @@ function getActionsForNode(node: SFCNodes.Node) {
       // For unknown statuses, show basic actions if VM is available
       if (lastVm?.id) {
         nodeActions.push(
-          { label: "Logs", command: `sf vms logs ${lastVm.id}` },
-          { label: "SSH", command: `sf vms ssh root@${lastVm.id}` },
+          {
+            label: "SSH",
+            command: `sf vms ssh root@${brightBlack(lastVm.id)}`,
+          },
+          {
+            label: "Logs",
+            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+          },
         );
       }
       nodeActions.push({
         label: "Release",
-        command: `sf nodes release ${node.name}`,
+        command: `sf nodes release ${brightBlack(node.name)}`,
       });
       break;
   }
+
   return nodeActions;
 }
 
@@ -264,7 +315,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row
           head="Start: "
           value={startDate
-            ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            ? `${startDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+              brightBlack(
+                `(${formatDate(startDate.toDate())} ${startDate.format("z")})`,
+              )
+            }`
             : "Not specified"}
         />
         <Row
@@ -276,7 +331,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             ? "End (Rolling): "
             : "End: "}
           value={endDate
-            ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            ? `${endDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+              brightBlack(
+                `(${formatDate(endDate.toDate())} ${endDate.format("z")})`,
+              )
+            }`
             : "Not specified"}
         />
         {duration && (
@@ -287,29 +346,38 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         )}
       </Box>
 
-      <Box marginTop={1} paddingX={1}>
-        <Text>💰 Pricing:</Text>
-      </Box>
-      <Box marginLeft={3} flexDirection="column" paddingX={1}>
-        {node.node_type === "autoreserved" && (
-          <>
-            <Row
-              head="Max Price: "
-              value={`$${pricePerHour.toFixed(2)}/hour`}
-            />
-          </>
-        )}
-        {node.node_type !== "autoreserved" && (
-          <>
-            <Row head="Price: " value={`$${pricePerHour.toFixed(2)}/hour`} />
+      {node.max_price_per_node_hour && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text>💰 Pricing:</Text>
+          </Box>
+          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+            {node.node_type === "autoreserved" && (
+              <>
+                <Row
+                  head="Max Price: "
+                  value={`$${pricePerHour.toFixed(2)}/hour`}
+                />
+              </>
+            )}
+            {node.node_type !== "autoreserved" && (
+              <>
+                <Row
+                  head="Price: "
+                  value={`$${pricePerHour.toFixed(2)}/hour`}
+                />
 
-            <Row
-              head="Total Cost: "
-              value={duration ? `$${totalCost.toFixed(2)}` : "Not available"}
-            />
-          </>
-        )}
-      </Box>
+                <Row
+                  head="Total Cost: "
+                  value={duration
+                    ? `$${totalCost.toFixed(2)}`
+                    : "Not available"}
+                />
+              </>
+            )}
+          </Box>
+        </>
+      )}
 
       {/* VMs Section - Show if node has VMs */}
       {node.vms?.data && node.vms.data.length > 0 && (
@@ -321,6 +389,20 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             <VMTable vms={node.vms.data} />
           </Box>
         </Box>
+      )}
+
+      {node.vms?.data?.[0].image_id && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text>💾 Current VM Image:</Text>
+          </Box>
+          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+            <Row
+              head="ID: "
+              value={node.vms?.data?.[0].image_id}
+            />
+          </Box>
+        </>
       )}
 
       {/* Actions Section - Show based on available actions */}
