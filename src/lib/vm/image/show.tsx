@@ -70,11 +70,11 @@ export function ImageDisplay(
             value={
               <Box gap={1}>
                 <Text color={isExpired ? "red" : undefined}>
-                  {expiresAt.toISOString()} {
-                    brightBlack(
-                      `(${formatDate(dayjs(expiresAt).toDate())} ${dayjs(expiresAt).format("z")})`,
-                    )
-                  }
+                  {expiresAt.toISOString()} {brightBlack(
+                    `(${formatDate(dayjs(expiresAt).toDate())} ${
+                      dayjs(expiresAt).format("z")
+                    })`,
+                  )}
                 </Text>
                 {isExpired && <Text dimColor>(Expired)</Text>}
               </Box>
