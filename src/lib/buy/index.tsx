@@ -1,5 +1,5 @@
 import { type Command, Option } from "@commander-js/extra-typings";
-import chalk from "chalk";
+import { yellow } from "jsr:@std/fmt/colors";
 import { parseDate } from "chrono-node";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
@@ -82,7 +82,7 @@ export function _registerBuy(program: Command) {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
         console.error(
-          chalk.yellow("Specify either --duration or --end, but not both"),
+          yellow("Specify either --duration or --end, but not both"),
         );
         command.help();
         process.exit(1);
@@ -113,7 +113,7 @@ export function _registerBuy(program: Command) {
       const { type, zone, cluster, colocate } = command.opts();
       if (!type && !zone && !cluster && !colocate) {
         console.error(
-          chalk.yellow("Must specify either --type, --zone or --colocate"),
+          yellow("Must specify either --type, --zone or --colocate"),
         );
         command.help();
         process.exit(1);
