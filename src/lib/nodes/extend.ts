@@ -68,7 +68,9 @@ async function extendNodeAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) => n.name === nameOrId);
+      const node = fetchedNodes.find((n) =>
+        n.name === nameOrId || n.id === nameOrId
+      );
       if (node) {
         nodes.push({ name: nameOrId, node });
       } else {

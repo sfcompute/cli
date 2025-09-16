@@ -71,7 +71,9 @@ async function releaseNodesAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) => n.name === nameOrId);
+      const node = fetchedNodes.find((n) =>
+        n.name === nameOrId || n.id === nameOrId
+      );
       if (node) {
         foundNodes.push({ name: nameOrId, node });
       } else {
