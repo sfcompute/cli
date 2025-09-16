@@ -2,7 +2,6 @@ import { Command, CommanderError } from "@commander-js/extra-typings";
 import ora from "ora";
 import { gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
-import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { maxPriceOption, pluralizeNodes } from "./utils.ts";
@@ -31,7 +30,6 @@ async function setNodesAction(
     // Check which names were not found
     const foundNames = new Set(fetchedNodes.map((node) => node.name));
     const notFound: string[] = [];
-    const nodesToUpdate: SFCNodes.Node[] = fetchedNodes;
 
     for (const name of names) {
       if (!foundNames.has(name)) {
@@ -40,10 +38,10 @@ async function setNodesAction(
     }
 
     // Filter nodes that have procurement_id (auto reserved nodes)
-    const nodesWithProcurement = nodesToUpdate.filter((node) =>
+    const nodesWithProcurement = fetchedNodes.filter((node) =>
       node.procurement_id
     );
-    const nodesWithoutProcurement = nodesToUpdate.filter((node) =>
+    const nodesWithoutProcurement = fetchedNodes.filter((node) =>
       !node.procurement_id
     );
 
