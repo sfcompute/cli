@@ -746,7 +746,9 @@ export async function placeBuyOrder(options: {
   return data;
 }
 
-export function getPricePerGpuHourFromQuote(quote: NonNullable<Quote>) {
+export function getPricePerGpuHourFromQuote(
+  quote: Pick<NonNullable<Quote>, "start_at" | "end_at" | "price" | "quantity">,
+) {
   const startTimeOrNow = parseStartDateOrNow(quote.start_at);
 
   // from the market's perspective, "NOW" means at the beginning of the next minute.

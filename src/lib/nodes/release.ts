@@ -61,17 +61,17 @@ async function releaseNodesAction(
   try {
     const client = await nodesClient();
 
-    // Fetch and filter nodes for both dry run and confirmation
+    // Use the API's names parameter to filter nodes directly
     const spinner = ora("Fetching nodes to release...").start();
-    const { data: allNodes } = await client.nodes.list();
+    const { data: fetchedNodes } = await client.nodes.list({ name: nodeNames });
     spinner.stop();
 
-    // Filter nodes that match the provided names/IDs
+    // Check which names were not found
     const foundNodes: { name: string; node: SFCNodes.Node }[] = [];
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = allNodes.find((n) =>
+      const node = fetchedNodes.find((n) =>
         n.name === nameOrId || n.id === nameOrId
       );
       if (node) {

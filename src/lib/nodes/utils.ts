@@ -118,7 +118,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
     const startEnd = formatNullableDateRange(startDate, endDate);
 
     const maxPrice = node.max_price_per_node_hour
-      ? (node.max_price_per_node_hour / 100).toFixed(2)
+      ? `$${(node.max_price_per_node_hour / 100).toFixed(2)}/hr`
       : "N/A";
 
     const lastVm = node.vms?.data.sort((a, b) => b.updated_at - a.updated_at)
@@ -132,7 +132,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       node.gpu_type,
       node.zone || "N/A",
       startEnd,
-      `$${maxPrice}/hr`,
+      maxPrice,
     ]);
   }
 

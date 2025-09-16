@@ -2,7 +2,6 @@ import { Command, CommanderError } from "@commander-js/extra-typings";
 import ora from "ora";
 import { gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
-import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { maxPriceOption, pluralizeNodes } from "./utils.ts";
@@ -25,24 +24,24 @@ async function setNodesAction(
     const client = await nodesClient();
     const spinner = ora("Updating nodes...").start();
 
-    const { data: allNodes } = await client.nodes.list();
+    // Use the API's names parameter to filter nodes directly
+    const { data: fetchedNodes } = await client.nodes.list({ name: names });
 
-    const nodesToUpdate: SFCNodes.Node[] = [];
+    // Check which names were not found
+    const foundNames = new Set(fetchedNodes.map((node) => node.name));
     const notFound: string[] = [];
 
-    for (const nameOrId of names) {
-      const node = allNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
-      );
-      if (node) nodesToUpdate.push(node);
-      else notFound.push(nameOrId);
+    for (const name of names) {
+      if (!foundNames.has(name)) {
+        notFound.push(name);
+      }
     }
 
     // Filter nodes that have procurement_id (auto reserved nodes)
-    const nodesWithProcurement = nodesToUpdate.filter((node) =>
+    const nodesWithProcurement = fetchedNodes.filter((node) =>
       node.procurement_id
     );
-    const nodesWithoutProcurement = nodesToUpdate.filter((node) =>
+    const nodesWithoutProcurement = fetchedNodes.filter((node) =>
       !node.procurement_id
     );
 

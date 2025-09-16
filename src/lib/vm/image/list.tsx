@@ -61,12 +61,12 @@ Next Steps:\n
       }
 
       // Sort images by created_at (newest first)
-      const imagesToShow = images.slice(0, 5);
-      const sortedImages = [...imagesToShow].sort((a, b) => {
+      const sortedImages = [...images].sort((a, b) => {
         const aTime = a.created_at || 0;
         const bTime = b.created_at || 0;
         return bTime - aTime;
       });
+      const imagesToShow = sortedImages.slice(0, 5);
 
       // Create and display images table
       const table = new Table({
@@ -82,7 +82,7 @@ Next Steps:\n
         },
       });
 
-      for (const image of sortedImages) {
+      for (const image of imagesToShow) {
         const createdAt = image.created_at
           ? formatDate(new Date(image.created_at * 1000))
           : "Unknown";
