@@ -391,7 +391,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         </Box>
       )}
 
-      {node.vms?.data?.[0].image_id && (
+      {node.vms?.data?.[0]?.image_id && (
         <>
           <Box marginTop={1} paddingX={1}>
             <Text>💾 Current VM Image:</Text>
@@ -399,7 +399,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
           <Box marginLeft={3} flexDirection="column" paddingX={1}>
             <Row
               head="ID: "
-              value={node.vms?.data?.[0].image_id}
+              value={node.vms?.data?.[0]?.image_id}
             />
           </Box>
         </>
