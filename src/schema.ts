@@ -544,12 +544,12 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
+        put: operations["complete_image_upload"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["complete_image_upload"];
+        patch?: never;
         trace?: never;
     };
     "/v1/vms/images/{image_id}/upload": {
@@ -1053,7 +1053,7 @@ export interface paths {
         };
         get: operations["get_batch"];
         put?: never;
-        post?: never;
+        post: operations["archive_batch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1698,6 +1698,11 @@ export interface components {
             pubkey?: string;
             username?: string;
         };
+        /** @description Request body for completing a multipart upload */
+        vmorch_CompleteUploadRequest: {
+            /** @description SHA256 hash of the uploaded file for integrity verification */
+            sha256_hash: string;
+        };
         /** @description Response body for completing a multipart upload */
         vmorch_CompleteUploadResponse: {
             /** @description The image ID */
@@ -1738,6 +1743,8 @@ export interface components {
              * @enum {string}
              */
             object: "image";
+            /** @description SHA256 hash of the image file for integrity verification */
+            sha256_hash: string;
         };
         /** @description Response body for individual image info (used in lists) */
         vmorch_ImageInfo: {
@@ -1755,6 +1762,8 @@ export interface components {
              * @enum {string}
              */
             object: "image";
+            /** @description SHA256 hash of the image file for integrity verification */
+            sha256_hash?: string | null;
             /** @description Upload status of the image */
             upload_status: string;
         };
@@ -1860,6 +1869,11 @@ export interface components {
              *     If not provided, the node will be created as an autoreserved node.
              */
             end_at?: number | null;
+            /**
+             * @description Custom image ID to use for the VM instances
+             * @example vmi_1234567890abcdef
+             */
+            image_id?: string;
             /**
              * Format: int64
              * @description Max price per hour for a node in cents
@@ -2136,6 +2150,8 @@ export interface components {
             end_at: number | null;
             /** @example vm_myOZZXw4pfcp7H9DQOldd */
             id: string;
+            /** @example vmi_myOZZXw4pfcp7H9DQOldd */
+            image_id?: string | null;
             /** @example vm */
             object: string;
             /**
@@ -3444,7 +3460,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["vmorch_CompleteUploadRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -6177,6 +6197,45 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["large_scale_inference_Batch"];
                 };
+            };
+            /** @description Batch not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+                };
+            };
+        };
+    };
+    archive_batch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Batch identifier */
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Batch archived */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Batch not found */
             404: {
