@@ -1,15 +1,21 @@
 import React from "react";
 import { Command } from "@commander-js/extra-typings";
-import { gray } from "jsr:@std/fmt/colors";
+import { brightBlack, gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import ora from "ora";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import advanced from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
 import { Box, render, Text } from "ink";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { formatNullableDateRange } from "../../helpers/format-date.ts";
+import {
+  formatDate,
+  formatNullableDateRange,
+} from "../../helpers/format-date.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
@@ -20,6 +26,10 @@ import {
   pluralizeNodes,
   printNodeType,
 } from "./utils.ts";
+
+dayjs.extend(utc);
+dayjs.extend(advanced);
+dayjs.extend(timezone);
 
 // Helper component to display VMs in a table format using Ink
 function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
@@ -264,7 +274,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row
           head="Start: "
           value={startDate
-            ? `${startDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            ? `${startDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+              brightBlack(
+                `(${formatDate(startDate.toDate())} ${startDate.format("z")})`,
+              )
+            }`
             : "Not specified"}
         />
         <Row
@@ -276,7 +290,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             ? "End (Rolling): "
             : "End: "}
           value={endDate
-            ? `${endDate.format("YYYY-MM-DD HH:mm:ss")} UTC`
+            ? `${endDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+              brightBlack(
+                `(${formatDate(endDate.toDate())} ${endDate.format("z")})`,
+              )
+            }`
             : "Not specified"}
         />
         {duration && (
