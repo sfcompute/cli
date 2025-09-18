@@ -8,7 +8,6 @@ import extend from "./extend.ts";
 import get from "./get.tsx";
 
 export async function registerNodes(program: Command) {
-
   const nodes = program
     .command("nodes")
     .alias("node")
