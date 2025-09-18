@@ -262,9 +262,28 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       if (!pricePerGpuHour) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
-          return logAndQuit(
-            "No quote found for the desired order. Try with a different start date, duration, or price.",
-          );
+          // Build dynamic error message based on current parameters
+          let errorMessage = "No availability for this time period and quantity.\n\n";
+          // Use ANSI OSC 8 hyperlink format for terminals that support it
+          // Format: \x1b]8;;URL\x1b\\LINK_TEXT\x1b]8;;\x1b\\
+          const url = "https://sfcompute.com/dashboard/zones";
+          errorMessage += `Check current availability: \x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\ (2 min delay)\n`;
+
+          // Only suggest starting later if -s flag was not used (defaults to "NOW")
+          const showStartSuggestion = props.options.start === "NOW";
+          if (showStartSuggestion) {
+            errorMessage += "Try a different start time: sf buy -s +3h\n";
+          }
+
+          // Only suggest adjusting quantity if -n was specified and is larger than 8
+          const showQuantitySuggestion = props.options.accelerators > 8;
+          if (showQuantitySuggestion) {
+            // Use "Or" prefix only if there's another suggestion before this one
+            const prefix = showStartSuggestion ? "Or adjust" : "Try adjusting";
+            errorMessage += `${prefix} quantity: sf buy -n 8`;
+          }
+
+          return logAndQuit(errorMessage.trim());
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
