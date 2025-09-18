@@ -263,11 +263,13 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         const quote = await getQuoteFromParsedSfBuyOptions(props.options);
         if (!quote) {
           // Build dynamic error message based on current parameters
-          let errorMessage = "No availability for this time period and quantity.\n\n";
+          let errorMessage =
+            "No availability for this time period and quantity.\n\n";
           // Use ANSI OSC 8 hyperlink format for terminals that support it
           // Format: \x1b]8;;URL\x1b\\LINK_TEXT\x1b]8;;\x1b\\
           const url = "https://sfcompute.com/dashboard/zones";
-          errorMessage += `Check current availability: \x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\ (2 min delay)\n`;
+          errorMessage +=
+            `Check current availability: \x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\ (2 min delay)\n`;
 
           // Only suggest starting later if -s flag was not used (defaults to "NOW")
           const showStartSuggestion = props.options.start === "NOW";
