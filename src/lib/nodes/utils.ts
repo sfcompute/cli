@@ -121,8 +121,9 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       ? `$${(node.max_price_per_node_hour / 100).toFixed(2)}/hr`
       : "N/A";
 
-    const lastVm = node.vms?.data.sort((a, b) => b.updated_at - a.updated_at)
-      .at(0);
+    const lastVm = node.vms?.data?.sort((a, b) =>
+      (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
+    ).at(0);
 
     table.push([
       node.name,
