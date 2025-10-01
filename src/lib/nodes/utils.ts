@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { CommanderError, Option } from "@commander-js/extra-typings";
 import { parseDate } from "chrono-node";
 import { parseDurationArgument } from "../../helpers/duration.ts";
-import { parseStartDate, roundEndDate } from "../../helpers/units.ts";
+import { parseStartDateOrNow, roundEndDate } from "../../helpers/units.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatNullableDateRange } from "../../helpers/format-date.ts";
 
@@ -231,7 +231,7 @@ export function parseDuration(duration: string): number {
 export function parseEnd(value: string): Date {
   const parsed = parseDate(value);
   if (!parsed) logAndQuit(`Invalid end date: ${value}`);
-  return roundEndDate(parsed);
+  return parsed;
 }
 
 // ========================================
@@ -270,10 +270,10 @@ export const maxPriceOption = new Option(
 /**
  * Common --start option using same parser as buy command
  */
-export const startOption = new Option(
+export const startOrNowOption = new Option(
   "-s, --start <start>",
   "Start time (ISO 8601 format or relative time like '+1d', or 'NOW')",
-).argParser(parseStartDate).default("NOW");
+).argParser(parseStartDateOrNow).default("NOW" as const);
 
 /**
  * Common --end option using same parser as buy command
