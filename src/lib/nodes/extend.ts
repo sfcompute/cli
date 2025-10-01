@@ -149,13 +149,17 @@ async function extendNodeAction(
         }`,
       });
 
-      const selectedEndTime = selectedTime === "NOW"
-        ? new Date()
-        : selectedTime;
+      if (selectedTime === "NOW") {
+        console.error(red("You must extend to a future time"));
+        process.exit(1);
+      }
 
       // Update duration based on selected time
-      options.duration = Math.floor(
-        (selectedEndTime.getTime() - startTime.getTime()) / 1000,
+      options.duration = Math.max(
+        0,
+        Math.floor(
+          (selectedTime.getTime() - startTime.getTime()) / 1000,
+        ),
       );
     } else if (!isHourMultiple && options.yes) {
       // Round up to the next hour boundary
