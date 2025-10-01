@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { CommanderError, Option } from "@commander-js/extra-typings";
 import { parseDate } from "chrono-node";
 import { parseDurationArgument } from "../../helpers/duration.ts";
-import { parseStartDateOrNow, roundEndDate } from "../../helpers/units.ts";
+import { parseStartDateOrNow } from "../../helpers/units.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatNullableDateRange } from "../../helpers/format-date.ts";
 
