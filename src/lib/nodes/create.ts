@@ -249,7 +249,7 @@ async function createNodesAction(
       const startDate = options.start;
       if (typeof startDate !== "string") {
         createParams.start_at = Math.floor(startDate.getTime() / 1000);
-      } else if (isReserved) {
+      } else {
         createParams.start_at = Math.floor(new Date().getTime() / 1000);
       }
 
