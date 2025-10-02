@@ -286,10 +286,6 @@ async function redeployNodeAction(
         console.log(`  • ${error.name}: ${error.error}`);
       }
     }
-
-    if (results.length === 0 && errors.length === 0) {
-      spinner.fail("No nodes specified");
-    }
   } catch (err) {
     handleNodesError(err);
   }
