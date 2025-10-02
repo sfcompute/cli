@@ -23,7 +23,7 @@ const redeploy = new Command("redeploy")
   .argument("<names...>", "Node IDs or names to redeploy")
   .addOption(
     new Option(
-      "--image-id <imageId>",
+      "-i, --image-id <imageId>",
       "VM image ID to use for the new VM (inherits from current VM if not specified)",
     ),
   )
@@ -49,7 +49,7 @@ const redeploy = new Command("redeploy")
   )
   .addOption(
     new Option(
-      "--override-empty",
+      "-O, --override-empty",
       "If set, any configuration left empty will be cleared in the new VM (default: inherits from current VM)",
     ),
   )
