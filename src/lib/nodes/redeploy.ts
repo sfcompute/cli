@@ -73,12 +73,6 @@ Examples:\n
 
   \x1b[2m# Redeploy and clear inherited configuration\x1b[0m
   $ sf nodes redeploy my-node --override-empty
-
-  \x1b[2m# Skip confirmation prompt\x1b[0m
-  $ sf nodes redeploy my-node --yes
-
-  \x1b[2m# Output redeployed nodes in JSON format\x1b[0m
-  $ sf nodes redeploy my-node --json
 `,
   )
   .action(redeployNodeAction);

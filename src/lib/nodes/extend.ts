@@ -36,11 +36,8 @@ Examples:\n
   \x1b[2m# Extend a single node by 1 hour with max price $15/hour\x1b[0m
   $ sf nodes extend my-node --duration 1h --max-price 15.00
 
-  \x1b[2m# Extend multiple nodes by 4 hours with max price $12/hour\x1b[0m
-  $ sf nodes extend node-1 node-2 node-3 --duration 4h --max-price 12.00
-
-  \x1b[2m# Extend by node ID instead of name\x1b[0m
-  $ sf nodes extend node-abc123 --duration 2h --max-price 10.00
+  \x1b[2m# Extend multiple nodes by node ID instead of name\x1b[0m
+  $ sf nodes extend node-abc123 node-abc124 node-abc125 --duration 2h --max-price 10.00
 
   \x1b[2m# Extend with raw seconds\x1b[0m
   $ sf nodes extend my-node --duration 7200 --max-price 10.00
