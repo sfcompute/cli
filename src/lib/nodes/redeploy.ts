@@ -1,6 +1,6 @@
 import { Command, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { readFileSync } from "node:fs";
+import { createReadStream } from "node:fs";
 import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
@@ -41,7 +41,7 @@ const redeploy = new Command("redeploy")
       .conflicts("userData")
       .argParser((val) => {
         try {
-          return readFileSync(val, "utf-8");
+          return createReadStream(val, "utf-8");
         } catch {
           throw new Error(`Could not read file: ${val}`);
         }
@@ -160,11 +160,9 @@ async function redeployNodeAction(
     }
 
     // Prepare cloud-init user data if provided
-    const userData = (options.userData ?? options.userDataFile)
-      ? Array.from(
-        (new TextEncoder()).encode(options.userData ?? options.userDataFile),
-      )
-      : undefined;
+    const userData = options.userData
+      ? new File([options.userData], "user-data.txt")
+      : options.userDataFile;
 
     // Show nodes table and get confirmation for destructive action
     if (!options.yes) {
