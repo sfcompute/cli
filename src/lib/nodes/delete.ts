@@ -198,10 +198,6 @@ async function deleteNodesAction(
         );
       }
 
-      if (nodesToDelete.length === 0) {
-        console.log("No matching nodes found to delete.");
-      }
-
       return;
     }
 
@@ -288,10 +284,6 @@ async function deleteNodesAction(
         2,
       ));
       process.exit(0);
-    }
-
-    if (results.length === 0 && errors.length === 0) {
-      deleteSpinner.fail("No nodes specified");
     }
   } catch (err) {
     handleNodesError(err);
