@@ -6,6 +6,7 @@ import release from "./release.ts";
 import set from "./set.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
+import redeploy from "./redeploy.ts";
 import { isFeatureEnabled } from "../posthog.ts";
 
 export async function registerNodes(program: Command) {
@@ -39,6 +40,9 @@ $ sf nodes get my-node-name
 \x1b[2m# Release a node\x1b[0m
 $ sf nodes release my-node-name
 
+\x1b[2m# Redeploy a node with a new VM\x1b[0m
+$ sf nodes redeploy my-node-name
+
 \x1b[2m# Update the max price of an auto reserved node\x1b[0m
 $ sf nodes set my-node-name --max-price 12.50
 
@@ -53,6 +57,7 @@ $ sf nodes extend my-node-name --duration 3600 --max-price 12.50
     .addCommand(get)
     .addCommand(extend)
     .addCommand(release)
+    .addCommand(redeploy)
     .addCommand(set)
     // Add action to display help if no subcommand is provided
     .action(() => {
