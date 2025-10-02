@@ -1,8 +1,10 @@
 import { type Command } from "@commander-js/extra-typings";
+import console from "node:console";
 
 import { addCreate } from "./create.ts";
 import list from "./list.tsx";
 import release from "./release.ts";
+import deleteCommand from "./delete.ts";
 import set from "./set.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
