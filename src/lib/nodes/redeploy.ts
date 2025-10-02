@@ -41,7 +41,7 @@ const redeploy = new Command("redeploy")
       .conflicts("userData")
       .argParser((val) => {
         try {
-          return createReadStream(val, "utf-8");
+          return createReadStream(val);
         } catch {
           throw new Error(`Could not read file: ${val}`);
         }

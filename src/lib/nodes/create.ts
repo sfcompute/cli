@@ -110,7 +110,7 @@ const create = new Command("create")
       .conflicts("user-data")
       .argParser((val) => {
         try {
-          return createReadStream(val, "utf-8");
+          return createReadStream(val);
         } catch {
           throw new CommanderError(
             1,
