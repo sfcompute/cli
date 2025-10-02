@@ -147,7 +147,7 @@ export function registerSell(program: Command) {
             return await logSessionTokenExpiredAndQuit();
           case 403:
             return logAndQuit(
-              "Selling is not enabled on your account yet. Contact us at contact@sfcompute.com if you are interested.",
+              "Selling is not enabled on your account yet. Contact us at hello@sfcompute.com if you are interested.",
             );
           default:
             return logAndQuit(
