@@ -171,6 +171,7 @@ async function deleteNodesAction(
     const nodesToDelete = deletableNodes.map(({ node }) => node);
 
     if (nodesToDelete.length === 0) {
+      console.log("No nodes can be deleted.");
       process.exit(1);
     }
 
