@@ -155,6 +155,12 @@ function getActionsForNode(node: SFCNodes.Node) {
         );
       }
 
+      // Redeploy is available for all running nodes
+      nodeActions.push({
+        label: "Redeploy",
+        command: `sf nodes redeploy ${brightBlack(node.name)}`,
+      });
+
       if (node.node_type === "reserved") {
         // Reserved nodes: can extend or delete
         nodeActions.push(
