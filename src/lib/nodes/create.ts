@@ -1,11 +1,11 @@
 import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { readFileSync } from "node:fs";
+import { createReadStream } from "node:fs";
 import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
-import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import { type SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import advanced from "dayjs/plugin/advancedFormat";
@@ -110,7 +110,7 @@ const create = new Command("create")
       .conflicts("user-data")
       .argParser((val) => {
         try {
-          return readFileSync(val, "utf-8");
+          return createReadStream(val);
         } catch {
           throw new CommanderError(
             1,
@@ -227,11 +227,9 @@ async function createNodesAction(
       ? "autoreserved" as const
       : "reserved" as const;
 
-    const userData = (options.userData ?? options.userDataFile)
-      ? Array.from(
-        (new TextEncoder()).encode(options.userData ?? options.userDataFile),
-      )
-      : undefined;
+    const userData = options.userData
+      ? new File([options.userData], "user-data.txt")
+      : options.userDataFile;
 
     // Convert CLI options to SDK parameters
     const createParams: SFCNodes.NodeCreateParams = {
