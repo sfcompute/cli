@@ -5,11 +5,7 @@ import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
-import {
-  type SFCNodes,
-  toFile,
-  type Uploadable,
-} from "@sfcompute/nodes-sdk-alpha";
+import { type SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import advanced from "dayjs/plugin/advancedFormat";
