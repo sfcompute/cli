@@ -1,9 +1,10 @@
 import { Command } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { brightRed, gray, red } from "jsr:@std/fmt/colors";
+import { brightRed, cyan, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
+import dayjs from "dayjs";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
   createNodesTable,
@@ -18,6 +19,7 @@ import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "date-fns/formatDuration";
 import { intervalToDuration } from "date-fns/intervalToDuration";
+import { selectTime } from "../../helpers/units.ts";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
@@ -125,6 +127,43 @@ async function extendNodeAction(
 
     if (extendableNodes.length === 0) {
       process.exit(1);
+    }
+
+    // Check if duration is a multiple of an hour
+    const durationSeconds = options.duration!;
+    const isHourMultiple = durationSeconds % 3600 === 0;
+
+    if (!isHourMultiple && !options.yes) {
+      // Calculate the end time based on the first node's current end_at plus the duration
+      const referenceNode = extendableNodes[0].node;
+      const startTime = referenceNode.end_at
+        ? new Date(referenceNode.end_at * 1000)
+        : dayjs().add(1, "hour").startOf("hour").toDate();
+      const calculatedEndTime = new Date(
+        startTime.getTime() + durationSeconds * 1000,
+      );
+
+      const selectedTime = await selectTime(calculatedEndTime, {
+        message: `Nodes must be extended to an hour boundary. ${
+          cyan("Choose an end time:")
+        }`,
+      });
+
+      if (selectedTime === "NOW") {
+        console.error(red("You must extend to a future time"));
+        process.exit(1);
+      }
+
+      // Update duration based on selected time
+      options.duration = Math.max(
+        0,
+        Math.floor(
+          (selectedTime.getTime() - startTime.getTime()) / 1000,
+        ),
+      );
+    } else if (!isHourMultiple && options.yes) {
+      // Round up to the next hour boundary
+      options.duration = Math.ceil(durationSeconds / 3600) * 3600;
     }
 
     const formattedDuration = formatDuration(

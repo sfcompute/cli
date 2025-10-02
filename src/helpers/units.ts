@@ -1,6 +1,14 @@
 import * as chrono from "chrono-node";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { select } from "@inquirer/prompts";
+import { gray } from "jsr:@std/fmt/colors";
 import type { Nullable } from "../types/empty.ts";
+import { dateSameAcrossTimezones, formatDate } from "./format-date.ts";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // -- time
 
@@ -120,4 +128,104 @@ export function parseStartDate(startDate?: string | Date): Date {
   if (startDate instanceof Date) return startDate;
   const result = parseStartDateOrNow(startDate);
   return result === "NOW" ? new Date() : result;
+}
+
+// Adapted from @inquirer/prompts as the type is not exported
+type SelectChoice<Value> = {
+  value: Value;
+  name?: string;
+  description?: string;
+  short?: string;
+  disabled?: boolean | string;
+  type?: never;
+};
+
+/**
+ * Prompts the user to select a time on an hour boundary.
+ * Suggests the current hour or "Immediately" if in the past, and the next hour.
+ * @param date The date that needs to be rounded to an hour boundary
+ * @param config The configuration options for the select prompt
+ * @returns The selected date or "NOW" for immediate execution
+ */
+export async function selectTime(
+  date: Date,
+  config: Omit<Parameters<typeof select>[0], "choices">,
+): Promise<Date | "NOW"> {
+  const suggestedLower = dayjs(date).startOf("hour");
+  const suggestedHigher = dayjs(date).startOf("hour").add(1, "hour");
+
+  const choices: SelectChoice<Date | "NOW">[] = [];
+
+  const suggestedHigherUserTZ = `${
+    formatDate(suggestedHigher.toDate(), { forceIncludeTime: true })
+  } ${dayjs(suggestedHigher).format("z")}`;
+  const suggestedHigherUTC = `${
+    formatDate(suggestedHigher.utc(true).toDate(), {
+      today: suggestedHigher.toDate(),
+      showToday: dateSameAcrossTimezones(suggestedHigher.toDate()),
+      forceIncludeTime: true,
+    })
+  } UTC`;
+
+  // If the lower boundary is in the past, suggest "NOW"
+  if (suggestedLower.isBefore(dayjs(new Date()))) {
+    const immediatelyText = "Immediately";
+    const maxLength = Math.max(
+      immediatelyText.length,
+      suggestedHigherUserTZ.length,
+    );
+
+    choices.push({
+      name: `${immediatelyText.padEnd(maxLength)} ${
+        gray(
+          `${
+            formatDate(new Date(), { forceIncludeTime: true, showToday: false })
+          } ${dayjs(new Date()).format("z")}`,
+        )
+      }`,
+      value: "NOW",
+    });
+
+    choices.push({
+      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${
+        gray(`${suggestedHigherUTC}`)
+      }`,
+      value: suggestedHigher.toDate(),
+    });
+  } else {
+    const suggestedLowerUserTZ = `${
+      formatDate(suggestedLower.toDate(), { forceIncludeTime: true })
+    } ${dayjs(suggestedLower).format("z")}`;
+    const suggestedLowerUTC = `${
+      formatDate(suggestedLower.utc(true).toDate(), {
+        today: suggestedLower.toDate(),
+        showToday: dateSameAcrossTimezones(suggestedLower.toDate()),
+        forceIncludeTime: true,
+      })
+    } UTC`;
+
+    const maxLength = Math.max(
+      suggestedLowerUserTZ.length,
+      suggestedHigherUserTZ.length,
+    );
+
+    choices.push({
+      name: `${suggestedLowerUserTZ.padEnd(maxLength)} ${
+        gray(`${suggestedLowerUTC}`)
+      }`,
+      value: suggestedLower.toDate(),
+    });
+
+    choices.push({
+      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${
+        gray(`${suggestedHigherUTC}`)
+      }`,
+      value: suggestedHigher.toDate(),
+    });
+  }
+
+  return await select({
+    ...config,
+    choices,
+  });
 }

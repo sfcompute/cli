@@ -6,6 +6,10 @@ import console from "node:console";
 import process from "node:process";
 import ora from "ora";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import advanced from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
 
 import { isFeatureEnabled } from "../posthog.ts";
 import {
@@ -15,7 +19,7 @@ import {
   jsonOption,
   maxPriceOption,
   pluralizeNodes,
-  startOption,
+  startOrNowOption,
   yesOption,
   zoneOption,
 } from "./utils.ts";
@@ -24,10 +28,14 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import {
   parseStartDate,
-  roundEndDate,
   roundStartDate,
+  selectTime,
 } from "../../helpers/units.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
+
+dayjs.extend(utc);
+dayjs.extend(advanced);
+dayjs.extend(timezone);
 
 /**
  * Create a formatted node type description with count
@@ -87,7 +95,7 @@ const create = new Command("create")
       "Create auto-reserved nodes. Auto-reserved nodes self-extend until they are released.",
     ).conflicts("reserved"),
   )
-  .addOption(startOption)
+  .addOption(startOrNowOption)
   .addOption(endOption.conflicts("duration"))
   .addOption(durationOption.conflicts("end"))
   .option(
@@ -219,9 +227,95 @@ async function createNodesAction(
       ? "autoreserved" as const
       : "reserved" as const;
 
+    const userData = (options.userData ?? options.userDataFile)
+      ? Array.from(
+        (new TextEncoder()).encode(options.userData ?? options.userDataFile),
+      )
+      : undefined;
+
+    // Convert CLI options to SDK parameters
+    const createParams: SFCNodes.NodeCreateParams = {
+      desired_count: count,
+      max_price_per_node_hour: options.maxPrice * 100,
+      names: names.length > 0 ? names : undefined,
+      zone: options.zone,
+      cloud_init_user_data: userData,
+      image_id: options.image,
+      node_type: isReserved ? "reserved" : "autoreserved",
+    };
+
+    if (isReserved) {
+      // Handle start time (options.start comes from parseStartDateOrNow parser)
+      const startDate = options.start;
+      if (typeof startDate !== "string") {
+        createParams.start_at = Math.floor(startDate.getTime() / 1000);
+      } else {
+        createParams.start_at = Math.floor(new Date().getTime() / 1000);
+      }
+
+      // Check if the start date is "NOW" or on an hour boundary
+      const startDateIsValid = startDate === "NOW" ||
+        (dayjs(startDate).startOf("hour").isSame(dayjs(startDate)));
+
+      if (!startDateIsValid) {
+        if (!options.yes) {
+          options.start = await selectTime(startDate, {
+            message: `Start time must be "NOW" or on an hour boundary. ${
+              cyan("Choose a time:")
+            }`,
+          });
+        } else {
+          // Clamp down to "NOW" or lower hour
+          const suggestedLowerStart = dayjs(startDate).startOf("hour");
+          options.start = suggestedLowerStart < dayjs()
+            ? "NOW"
+            : suggestedLowerStart.toDate();
+        }
+      }
+      createParams.start_at = Math.floor(
+        (options.start === "NOW"
+          ? new Date().getTime()
+          : options.start.getTime()) /
+          1000,
+      );
+
+      // Handle end time and/or duration
+      if (options.end || options.duration) {
+        let endDate = options.end;
+        if (!endDate) {
+          endDate = new Date(
+            new Date(createParams.start_at! * 1000).getTime() +
+              (options.duration! * 1000),
+          );
+        }
+
+        const endDateIsValid = dayjs(endDate).isSame(
+          dayjs(endDate).startOf("hour"),
+        );
+        if (!endDateIsValid) {
+          if (!options.yes) {
+            const selectedTime = await selectTime(endDate, {
+              message: `End time must be on an hour boundary. ${
+                cyan("Choose a time:")
+              }`,
+            });
+            endDate = selectedTime === "NOW" ? new Date() : selectedTime;
+          } else {
+            const suggestedHigherEnd = dayjs(endDate).startOf("hour").add(
+              1,
+              "hour",
+            );
+            endDate = suggestedHigherEnd < dayjs()
+              ? new Date()
+              : suggestedHigherEnd.toDate();
+          }
+        }
+        createParams.end_at = Math.floor(endDate.getTime() / 1000);
+      }
+    }
+
     // Only show pricing and get confirmation if not using --yes
     if (!options.yes) {
-      // Determine node type and prepare confirmation message
       let confirmationMessage = `Create ${
         formatNodeDescription(count, nodeType)
       }`;
@@ -304,56 +398,11 @@ async function createNodesAction(
       if (!confirmed) process.exit(0);
     }
 
-    const spinner = ora(`Creating ${formatNodeDescription(count, nodeType)}...`)
-      .start();
-
-    const userData = (options.userData ?? options.userDataFile)
-      ? Array.from(
-        (new TextEncoder()).encode(options.userData ?? options.userDataFile),
-      )
-      : undefined;
+    const spinner = ora(
+      `Creating ${formatNodeDescription(count, nodeType)}...`,
+    ).start();
 
     try {
-      // Convert CLI options to SDK parameters
-      const createParams: SFCNodes.NodeCreateParams = {
-        desired_count: count,
-        max_price_per_node_hour: options.maxPrice * 100,
-        names: names.length > 0 ? names : undefined,
-        zone: options.zone,
-        cloud_init_user_data: userData,
-        image_id: options.image,
-      };
-
-      // Handle start time (options.start comes from parseStartDateOrNow parser)
-      const startDate = options.start;
-      if (typeof startDate !== "string") {
-        createParams.start_at = Math.floor(startDate.getTime() / 1000);
-      } else if (isReserved) {
-        createParams.start_at = Math.floor(new Date().getTime() / 1000);
-      }
-
-      // Handle end time vs duration
-      if (options.end) {
-        // End time provided - create reservation
-        createParams.end_at = Math.floor(options.end.getTime() / 1000);
-        createParams.node_type = "reserved";
-      } else if (options.duration) {
-        // Duration provided - calculate end time
-        const actualStartDate = typeof startDate === "string"
-          ? new Date()
-          : startDate;
-        const endDate = roundEndDate(
-          new Date(
-            actualStartDate.getTime() + (options.duration * 1000),
-          ),
-        );
-        createParams.end_at = Math.floor(endDate.getTime() / 1000);
-        createParams.node_type = "reserved";
-      } else {
-        // Neither provided - auto reserved
-        createParams.node_type = "autoreserved";
-      }
-
       const { data: createdNodes } = await client.nodes.create(createParams);
 
       spinner.succeed(

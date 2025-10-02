@@ -6,7 +6,10 @@ import {
   startOfDay,
 } from "date-fns";
 import { formatDateRange } from "little-date";
-import type { Dayjs } from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 const shortenAmPm = (text: string): string => {
   const shortened = (text || "").replace(/ AM/g, "am").replace(/ PM/g, "pm");
@@ -32,13 +35,20 @@ const formatTime = (date: Date, locale?: string): string => {
 const createFormatTime = (locale?: string) => (date: Date): string =>
   formatTime(date, locale);
 
-export const formatDate = (date: Date): string => {
-  const today = new Date();
+export const formatDate = (date: Date, {
+  today = new Date(),
+  showToday = true,
+  forceIncludeTime = false,
+}: {
+  showToday?: boolean;
+  forceIncludeTime?: boolean;
+  today?: Date;
+} = {}): string => {
   const thisYear = isSameYear(date, today);
   const thisDay = isSameDay(date, today);
   const formatTimeWithLocale = createFormatTime("en-US");
 
-  const timeSuffix = !isSameMinute(startOfDay(date), date)
+  const timeSuffix = !isSameMinute(startOfDay(date), date) || forceIncludeTime
     ? `, ${formatTimeWithLocale(date)}`
     : "";
 
@@ -46,7 +56,10 @@ export const formatDate = (date: Date): string => {
 
   // If it's today and we have time, just show the time
   if (thisDay && timeSuffix) {
-    return `Today, ${formatTimeWithLocale(date)}`;
+    if (showToday) {
+      return `Today, ${formatTimeWithLocale(date)}`;
+    }
+    return formatTimeWithLocale(date);
   }
 
   // Standard date format
@@ -83,4 +96,10 @@ export const formatNullableDateRange = (
   }
 
   return startEnd;
+};
+
+export const dateSameAcrossTimezones = (date: Date): boolean => {
+  const endDayUserTZ = dayjs(date);
+  const endDayUTC = dayjs(date).utc(true);
+  return endDayUserTZ.isSame(endDayUTC);
 };
