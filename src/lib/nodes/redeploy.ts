@@ -36,9 +36,13 @@ const redeploy = new Command("redeploy")
       .conflicts("userData")
       .argParser((val) => {
         try {
-          return createReadStream(val);
+          return readFileSync(val, "utf8");
         } catch {
-          throw new Error(`Could not read file: ${val}`);
+          throw new CommanderError(
+            1,
+            "INVALID_USER_DATA",
+            `Could not read file: ${val}`,
+          );
         }
       }),
   )
@@ -57,9 +61,6 @@ Examples:\n
   \x1b[2m# Redeploy a single node (inherits current VM configuration)\x1b[0m
   $ sf nodes redeploy my-node
 
-  \x1b[2m# Redeploy with a new VM image\x1b[0m
-  $ sf nodes redeploy my-node --image-id vmi_0000000000000000
-
   \x1b[2m# Redeploy multiple nodes\x1b[0m
   $ sf nodes redeploy node-1 node-2 node-3
 
@@ -74,7 +75,7 @@ Examples:\n
 
 async function redeployNodeAction(
   nodeNames: string[],
-  options: ReturnType<typeof redeploy.opts>,
+  options: ReturnType<typeof redeploy.opts> & { image?: string },
 ) {
   try {
     const client = await nodesClient();
@@ -149,9 +150,17 @@ async function redeployNodeAction(
     }
 
     // Prepare cloud-init user data if provided
-    const userData = options.userData
-      ? new File([options.userData], "user-data.txt")
-      : options.userDataFile;
+    const rawUserData = options.userData ?? options.userDataFile;
+    const wellFormedUserData = rawUserData?.isWellFormed()
+      ? rawUserData
+      : rawUserData
+      ? encodeURIComponent(rawUserData)
+      : undefined;
+    const encodedUserData = wellFormedUserData
+      ? btoa(
+        String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
+      )
+      : undefined;
 
     // Show nodes table and get confirmation for destructive action
     if (!options.yes) {
@@ -165,10 +174,10 @@ async function redeployNodeAction(
       }
 
       const configChanges: string[] = [];
-      if (options.imageId) {
-        configChanges.push(`  • New image: ${options.imageId}`);
+      if (options.image) {
+        configChanges.push(`  • New image: ${options.image}`);
       }
-      if (userData) {
+      if (encodedUserData) {
         configChanges.push(`  • Updated cloud-init user data`);
       }
       if (options.overrideEmpty) {
@@ -222,8 +231,8 @@ async function redeployNodeAction(
     ) {
       try {
         const redeployedNode = await client.nodes.redeploy(originalNode.id, {
-          image_id: options.imageId,
-          cloud_init_user_data: userData,
+          image_id: options.image,
+          cloud_init_user_data: encodedUserData,
           override_empty: options.overrideEmpty ?? false,
         });
 

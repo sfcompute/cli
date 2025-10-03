@@ -1,6 +1,6 @@
 import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { createReadStream } from "node:fs";
+import { readFileSync } from "node:fs";
 import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
@@ -110,7 +110,7 @@ const create = new Command("create")
       .conflicts("user-data")
       .argParser((val) => {
         try {
-          return createReadStream(val);
+          return readFileSync(val, "utf8");
         } catch {
           throw new CommanderError(
             1,
@@ -227,9 +227,17 @@ async function createNodesAction(
       ? "autoreserved" as const
       : "reserved" as const;
 
-    const userData = options.userData
-      ? new File([options.userData], "user-data.txt")
-      : options.userDataFile;
+    const rawUserData = options.userData ?? options.userDataFile;
+    const wellFormedUserData = rawUserData?.isWellFormed()
+      ? rawUserData
+      : rawUserData
+      ? encodeURIComponent(rawUserData)
+      : undefined;
+    const encodedUserData = wellFormedUserData
+      ? btoa(
+        String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
+      )
+      : undefined;
 
     // Convert CLI options to SDK parameters
     const createParams: SFCNodes.NodeCreateParams = {
@@ -237,7 +245,7 @@ async function createNodesAction(
       max_price_per_node_hour: options.maxPrice * 100,
       names: names.length > 0 ? names : undefined,
       zone: options.zone,
-      cloud_init_user_data: userData,
+      cloud_init_user_data: encodedUserData,
       image_id: options.image,
       node_type: isReserved ? "reserved" : "autoreserved",
     };
