@@ -1,6 +1,6 @@
-import { Command, Option } from "@commander-js/extra-typings";
+import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { createReadStream } from "node:fs";
+import { readFileSync } from "node:fs";
 import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
@@ -14,6 +14,7 @@ import {
   pluralizeNodes,
   yesOption,
 } from "./utils.ts";
+import { isFeatureEnabled } from "../posthog.ts";
 
 const redeploy = new Command("redeploy")
   .description(
@@ -21,12 +22,6 @@ const redeploy = new Command("redeploy")
   )
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to redeploy")
-  .addOption(
-    new Option(
-      "-i, --image-id <imageId>",
-      "VM image ID to use for the new VM (inherits from current VM if not specified)",
-    ),
-  )
   .addOption(
     new Option(
       "-u, --user-data <script>",
@@ -41,9 +36,13 @@ const redeploy = new Command("redeploy")
       .conflicts("userData")
       .argParser((val) => {
         try {
-          return createReadStream(val);
+          return readFileSync(val, "utf8");
         } catch {
-          throw new Error(`Could not read file: ${val}`);
+          throw new CommanderError(
+            1,
+            "INVALID_USER_DATA",
+            `Could not read file: ${val}`,
+          );
         }
       }),
   )
@@ -62,9 +61,6 @@ Examples:\n
   \x1b[2m# Redeploy a single node (inherits current VM configuration)\x1b[0m
   $ sf nodes redeploy my-node
 
-  \x1b[2m# Redeploy with a new VM image\x1b[0m
-  $ sf nodes redeploy my-node --image-id vmi_0000000000000000
-
   \x1b[2m# Redeploy multiple nodes\x1b[0m
   $ sf nodes redeploy node-1 node-2 node-3
 
@@ -79,7 +75,7 @@ Examples:\n
 
 async function redeployNodeAction(
   nodeNames: string[],
-  options: ReturnType<typeof redeploy.opts>,
+  options: ReturnType<typeof redeploy.opts> & { image?: string },
 ) {
   try {
     const client = await nodesClient();
@@ -154,9 +150,17 @@ async function redeployNodeAction(
     }
 
     // Prepare cloud-init user data if provided
-    const userData = options.userData
-      ? new File([options.userData], "user-data.txt")
-      : options.userDataFile;
+    const rawUserData = options.userData ?? options.userDataFile;
+    const wellFormedUserData = rawUserData?.isWellFormed?.()
+      ? rawUserData
+      : rawUserData
+      ? encodeURIComponent(rawUserData)
+      : undefined;
+    const encodedUserData = wellFormedUserData
+      ? btoa(
+        String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
+      )
+      : undefined;
 
     // Show nodes table and get confirmation for destructive action
     if (!options.yes) {
@@ -170,10 +174,10 @@ async function redeployNodeAction(
       }
 
       const configChanges: string[] = [];
-      if (options.imageId) {
-        configChanges.push(`  • New image: ${options.imageId}`);
+      if (options.image) {
+        configChanges.push(`  • New image: ${options.image}`);
       }
-      if (userData) {
+      if (encodedUserData) {
         configChanges.push(`  • Updated cloud-init user data`);
       }
       if (options.overrideEmpty) {
@@ -227,8 +231,8 @@ async function redeployNodeAction(
     ) {
       try {
         const redeployedNode = await client.nodes.redeploy(originalNode.id, {
-          image_id: options.imageId,
-          cloud_init_user_data: userData,
+          image_id: options.image,
+          cloud_init_user_data: encodedUserData,
           override_empty: options.overrideEmpty ?? false,
         });
 
@@ -281,6 +285,20 @@ async function redeployNodeAction(
   } catch (err) {
     handleNodesError(err);
   }
+}
+
+// Remove this once the feature flag is enabled by default
+export async function addRedeploy(program: Command) {
+  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
+  if (imagesEnabled) {
+    redeploy.addOption(
+      new Option(
+        "-i, --image <image-id>",
+        "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
+      ),
+    );
+  }
+  program.addCommand(redeploy);
 }
 
 export default redeploy;

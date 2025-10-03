@@ -8,7 +8,7 @@ import deleteCommand from "./delete.ts";
 import set from "./set.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
-import redeploy from "./redeploy.ts";
+import { addRedeploy } from "./redeploy.ts";
 import { isFeatureEnabled } from "../posthog.ts";
 
 export async function registerNodes(program: Command) {
@@ -25,7 +25,6 @@ export async function registerNodes(program: Command) {
     .addCommand(extend)
     .addCommand(release)
     .addCommand(deleteCommand)
-    .addCommand(redeploy)
     .addCommand(set);
 
   const baseHelpText = nodes.helpInformation();
@@ -89,4 +88,5 @@ $ sf nodes --help
     });
 
   await addCreate(nodes);
+  await addRedeploy(nodes);
 }
