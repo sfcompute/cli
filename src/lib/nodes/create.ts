@@ -228,7 +228,7 @@ async function createNodesAction(
       : "reserved" as const;
 
     const rawUserData = options.userData ?? options.userDataFile;
-    const wellFormedUserData = rawUserData?.isWellFormed()
+    const wellFormedUserData = rawUserData?.isWellFormed?.()
       ? rawUserData
       : rawUserData
       ? encodeURIComponent(rawUserData)
