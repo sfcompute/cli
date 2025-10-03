@@ -1,6 +1,6 @@
-import { Command, Option } from "@commander-js/extra-typings";
+import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { createReadStream } from "node:fs";
+import { readFileSync } from "node:fs";
 import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
@@ -14,6 +14,7 @@ import {
   pluralizeNodes,
   yesOption,
 } from "./utils.ts";
+import { isFeatureEnabled } from "../posthog.ts";
 
 const redeploy = new Command("redeploy")
   .description(
@@ -21,12 +22,6 @@ const redeploy = new Command("redeploy")
   )
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to redeploy")
-  .addOption(
-    new Option(
-      "-i, --image-id <imageId>",
-      "VM image ID to use for the new VM (inherits from current VM if not specified)",
-    ),
-  )
   .addOption(
     new Option(
       "-u, --user-data <script>",
@@ -281,6 +276,20 @@ async function redeployNodeAction(
   } catch (err) {
     handleNodesError(err);
   }
+}
+
+// Remove this once the feature flag is enabled by default
+export async function addRedeploy(program: Command) {
+  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
+  if (imagesEnabled) {
+    redeploy.addOption(
+      new Option(
+        "-i, --image <image-id>",
+        "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
+      ),
+    );
+  }
+  program.addCommand(redeploy);
 }
 
 export default redeploy;
