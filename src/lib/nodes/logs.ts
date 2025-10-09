@@ -131,7 +131,7 @@ Examples:
             spinner.fail(
               `Node ${
                 cyan(node)
-              } does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
+              } does not have a VM. VMs can take up to 5-10 minutes to spin up.`,
             );
             process.exit(1);
           }
