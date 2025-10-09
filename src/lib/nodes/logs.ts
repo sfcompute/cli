@@ -149,7 +149,7 @@ Examples:
 
       const client = await apiClient(await getAuthToken());
 
-      async function fetchLogs(query: VMLogsParams) {
+      const fetchLogs = async (query: VMLogsParams) => {
         const { response, data } = await client.GET("/v0/vms/logs2", {
           params: { query },
         });
@@ -164,7 +164,7 @@ Examples:
           );
         }
         return data;
-      }
+      };
 
       const params: VMLogsParams = {
         instance_id: vmId,
@@ -177,7 +177,7 @@ Examples:
       let incompleteLine = "";
       let lastTimestamp = "";
 
-      function processLogs(logs: VMLogsResponse) {
+      const processLogs = (logs: VMLogsResponse) => {
         for (const log of logs) {
           const timestamp = dayjs(log.realtime_timestamp).format(
             "YYYY-MM-DD HH:mm:ss",
@@ -200,15 +200,15 @@ Examples:
             }
           }
         }
-      }
+      };
 
-      function flushIncompleteLine() {
+      const flushIncompleteLine = () => {
         if (incompleteLine.length > 0) {
           console.log(
             `(instance ${vmId}) [${lastTimestamp}] ${incompleteLine}`,
           );
         }
-      }
+      };
 
       if (!options.follow) {
         const spinner = ora("Fetching logs...").start();
