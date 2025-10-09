@@ -20,6 +20,7 @@ import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
   createNodesTable,
+  getLastVM,
   getStatusColor,
   getVMStatusColor,
   jsonOption,
@@ -102,9 +103,7 @@ function getActionsForNode(node: SFCNodes.Node) {
   const nodeActions: { label: string; command: string }[] = [];
 
   // Get the last VM for logs/ssh commands
-  const lastVm = node.vms?.data?.sort((a, b) =>
-    (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
-  ).at(0);
+  const lastVm = getLastVM(node);
 
   if (lastVm?.image_id) {
     nodeActions.push({
