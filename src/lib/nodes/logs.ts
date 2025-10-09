@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import ora from "ora";
 import { cyan } from "jsr:@std/fmt/colors";
+import process from "node:process";
 
 import { getLastVM } from "./utils.ts";
 import { apiClient } from "../../apiClient.ts";
@@ -132,11 +133,7 @@ Examples:
                 cyan(node)
               } does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
             );
-            logAndQuit(
-              `Node ${
-                cyan(node)
-              } does not have a current VM. Deploy a VM first with: sf node replace ${node}`,
-            );
+            process.exit(1);
           }
 
           vmId = lastVm.id;
