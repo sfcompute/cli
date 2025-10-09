@@ -84,7 +84,7 @@ Examples:
   $ sf nodes logs my-node
 
   \x1b[2m# Get logs for a specific VM ID\x1b[0m
-  $ sf nodes logs -i v vm_xxxxxxxxxxxxxxxxxxxxx
+  $ sf nodes logs -i vm_xxxxxxxxxxxxxxxxxxxxx
 
   \x1b[2m# Get last 200 log lines for a node\x1b[0m
   $ sf nodes logs my-node --limit 200
