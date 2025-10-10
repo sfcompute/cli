@@ -10,6 +10,43 @@ import cliSpinners from "npm:cli-spinners";
 import axios from "axios";
 import { apiClient } from "../../../apiClient.ts";
 
+async function readChunk(
+  filePath: string,
+  start: number,
+  chunkSize: number,
+): Promise<Uint8Array> {
+  using file = await Deno.open(filePath, { read: true });
+  await file.seek(start, Deno.SeekMode.Start);
+
+  const buffer = new Uint8Array(chunkSize);
+  let totalBytesRead = 0;
+  let emptyReadCount = 0;
+  const maxEmptyReads = 100;
+
+  while (totalBytesRead < chunkSize) {
+    const bytesRead = await file.read(buffer.subarray(totalBytesRead));
+    if (bytesRead === null) {
+      // EOF reached
+      break;
+    }
+    if (bytesRead === 0) {
+      // No bytes read but not EOF, continue looping
+      emptyReadCount++;
+      if (emptyReadCount >= maxEmptyReads) {
+        throw new Error(
+          `Failed to read chunk: reached ${maxEmptyReads} consecutive empty reads without EOF`,
+        );
+      }
+      continue;
+    }
+    // Non-empty read, reset counter
+    emptyReadCount = 0;
+    totalBytesRead += bytesRead;
+  }
+
+  return buffer.subarray(0, totalBytesRead);
+}
+
 const upload = new Command("upload")
   .description("Upload a VM image file (multipart)")
   .requiredOption("-f, --file <file>", "Path to the image file")
@@ -229,13 +266,7 @@ const upload = new Command("upload")
               resetPartProgress(part);
             }
 
-            using file = await Deno.open(filePath, { read: true });
-            await file.seek(start, Deno.SeekMode.Start);
-
-            // Read exactly the chunk we need
-            const buffer = new Uint8Array(chunkSize);
-            const bytesRead = await file.read(buffer) ?? 0;
-            const chunk = buffer.subarray(0, bytesRead);
+            const chunk = await readChunk(filePath, start, chunkSize);
 
             // Track upload progress with axios
             let lastUploadedBytes = 0;
