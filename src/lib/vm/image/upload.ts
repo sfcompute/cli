@@ -20,6 +20,8 @@ async function readChunk(
 
   const buffer = new Uint8Array(chunkSize);
   let totalBytesRead = 0;
+  let emptyReadCount = 0;
+  const maxEmptyReads = 100;
 
   while (totalBytesRead < chunkSize) {
     const bytesRead = await file.read(buffer.subarray(totalBytesRead));
@@ -29,8 +31,16 @@ async function readChunk(
     }
     if (bytesRead === 0) {
       // No bytes read but not EOF, continue looping
+      emptyReadCount++;
+      if (emptyReadCount >= maxEmptyReads) {
+        throw new Error(
+          `Failed to read chunk: reached ${maxEmptyReads} consecutive empty reads without EOF`,
+        );
+      }
       continue;
     }
+    // Non-empty read, reset counter
+    emptyReadCount = 0;
     totalBytesRead += bytesRead;
   }
 
