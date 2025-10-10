@@ -38,11 +38,11 @@ A node is a compute instance that provides GPUs for your workloads. Nodes can be
 as reservations (with specific start/end times) or as procurements (auto reserved pricing).
 
 Examples:\n
-\x1b[2m# Create an auto reserved node\x1b[0m
-$ sf nodes create my-node-name --zone hayesvalley --max-price 12.50
+\x1b[2m# Create an auto reserved node (zone required for auto-reserved)\x1b[0m
+$ sf nodes create my-node-name --zone hayesvalley --auto --max-price 12.50
 
-\x1b[2m# Create multiple reserved nodes with auto-generated names\x1b[0m
-$ sf nodes create -n 2 -z hayesvalley --start +1h --duration 2d -p 15.00
+\x1b[2m# Create multiple reserved nodes (zone determined automatically)\x1b[0m
+$ sf nodes create -n 2 --reserved --start +1h --duration 2d -p 15.00
 
 \x1b[2m# List all nodes\x1b[0m
 $ sf nodes list
@@ -73,8 +73,8 @@ A node is a compute instance that provides GPUs for your workloads. Nodes can be
 as reservations (with specific start/end times) or as procurements (auto reserved pricing).
 
 Examples:\n
-\x1b[2m# Create a reserved node\x1b[0m
-$ sf nodes create my-node-name -z hayesvalley --start +1h --duration 2d -p 15.00
+\x1b[2m# Create a reserved node (zone determined automatically)\x1b[0m
+$ sf nodes create my-node-name --reserved --start +1h --duration 2d -p 15.00
 
 \x1b[2m# List all nodes\x1b[0m
 $ sf nodes list

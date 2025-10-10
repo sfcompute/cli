@@ -42,6 +42,7 @@ export type Quote =
     start_at: string;
     end_at: string;
     instance_type: string;
+    zone: string;
   }
   | {
     price: number;

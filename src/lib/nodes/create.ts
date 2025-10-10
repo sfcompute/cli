@@ -18,10 +18,10 @@ import {
   endOption,
   jsonOption,
   maxPriceOption,
+  optionalZoneOption,
   pluralizeNodes,
   startOrNowOption,
   yesOption,
-  zoneOption,
 } from "./utils.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -81,7 +81,7 @@ const create = new Command("create")
     "Number of nodes to create with auto-generated names",
     validateCount,
   )
-  .addOption(zoneOption)
+  .addOption(optionalZoneOption)
   .addOption(maxPriceOption)
   .addOption(
     new Option(
@@ -124,7 +124,7 @@ const create = new Command("create")
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
-    const { count, start, duration, end, auto, reserved } = command
+    const { count, start, duration, end, auto, reserved, zone } = command
       .opts();
 
     // Validate arguments
@@ -150,6 +150,15 @@ const create = new Command("create")
 
     if (reserved && auto) {
       console.error(red("Specify either --reserved or --auto, but not both\n"));
+      command.help();
+      process.exit(1);
+    }
+
+    // Validate zone requirement for auto-reserved nodes
+    if (auto && !zone) {
+      console.error(
+        red("Auto-reserved nodes require a --zone to be specified.\n"),
+      );
       command.help();
       process.exit(1);
     }
@@ -192,23 +201,23 @@ const create = new Command("create")
     "after",
     `
 Examples:\n
-  \x1b[2m# Create a single reserved node(default type) that starts immediately\x1b[0m
-  $ sf nodes create -n 1 --zone hayesvalley --max-price 12.50 --duration 1h
+  \x1b[2m# Create a single reserved node (zone determined automatically from quote)\x1b[0m
+  $ sf nodes create -n 1 --reserved --max-price 12.50 --duration 1h
 
-  \x1b[2m# Create multiple auto-reserved nodes explicitly with a specific name\x1b[0m
+  \x1b[2m# Create multiple auto-reserved nodes (zone required for auto-reserved)\x1b[0m
   $ sf nodes create node-1 node-2 node-3 --zone hayesvalley --auto --max-price 9.00
 
   \x1b[2m# Create 3 auto-reserved nodes with auto-generated names\x1b[0m
   $ sf nodes create -n 3 --zone hayesvalley --auto --max-price 10.00
 
-  \x1b[2m# Create a reserved node with specific start/end times\x1b[0m
+  \x1b[2m# Create a reserved node with specific start/end times in a specific zone\x1b[0m
   $ sf nodes create node-1 --zone hayesvalley --reserved --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z" -p 15.00
 
-  \x1b[2m# Create a reserved node with custom user-data for 2 hours starting now \x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --reserved --user-data-file /path/to/cloud-init --duration 2h -p 13.50 
+  \x1b[2m# Create a reserved node with custom user-data for 2 hours\x1b[0m
+  $ sf nodes create node-1 --reserved --user-data-file /path/to/cloud-init --duration 2h -p 13.50 
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --reserved --start "+1h" --duration 6h -p 11.25
+  $ sf nodes create node-1 --reserved --start "+1h" --duration 6h -p 11.25
 `,
   )
   .action(createNodesAction);
@@ -244,7 +253,7 @@ async function createNodesAction(
       desired_count: count,
       max_price_per_node_hour: options.maxPrice * 100,
       names: names.length > 0 ? names : undefined,
-      zone: options.zone,
+      zone: finalZone,
       cloud_init_user_data: encodedUserData,
       image_id: options.image,
       node_type: isReserved ? "reserved" : "autoreserved",
@@ -320,71 +329,103 @@ async function createNodesAction(
       }
     }
 
+    // Helper function to calculate quote parameters
+    const getQuoteParams = () => {
+      let durationSeconds: number = 3600; // Default 1 hour
+      if (options.duration) {
+        durationSeconds = options.duration;
+      } else if (options.end) {
+        const startDate = typeof options.start === "string"
+          ? new Date()
+          : options.start;
+        durationSeconds = Math.floor(
+          (options.end.getTime() - startDate.getTime()) / 1000,
+        );
+      }
+
+      const startsAt = options.start === "NOW"
+        ? "NOW"
+        : roundStartDate(parseStartDate(options.start));
+      const minDurationSeconds = Math.max(
+        1,
+        durationSeconds - Math.ceil(durationSeconds * 0.1),
+      );
+      const maxDurationSeconds = Math.max(
+        durationSeconds + 3600,
+        durationSeconds + Math.ceil(durationSeconds * 0.1),
+      );
+
+      return {
+        instanceType: "h100v" as const,
+        quantity: count,
+        minStartTime: startsAt,
+        maxStartTime: startsAt,
+        minDurationSeconds,
+        maxDurationSeconds,
+        cluster: options.zone,
+      };
+    };
+
+    // For reserved nodes, we need to get a quote to determine zone (if not provided) and pricing
+    let cachedQuote: Awaited<ReturnType<typeof getQuote>> | null = null;
+    let finalZone: string | undefined = options.zone;
+    
+    if (isReserved) {
+      // Get quote if we need zone or pricing confirmation
+      if (!options.zone || !options.yes) {
+        const spinner = ora(
+          `Getting quote for ${formatNodeDescription(count, nodeType)}...`,
+        ).start();
+
+        cachedQuote = await getQuote(getQuoteParams());
+
+        spinner.stop();
+
+        if (cachedQuote && "zone" in cachedQuote) {
+          // Extract zone from quote if not provided by user
+          if (!options.zone) {
+            finalZone = cachedQuote.zone;
+          }
+        } else {
+          if (!options.zone) {
+            logAndQuit(
+              red(
+                "Unable to determine zone for reserved nodes. Please specify a zone with --zone or try again later.",
+              ),
+            );
+          } else {
+            logAndQuit(
+              red(
+                "No nodes available matching your requirements. This is likely due to insufficient capacity.",
+              ),
+            );
+          }
+        }
+      }
+    }
+    
+    // Validate that we have a zone
+    if (!finalZone) {
+      logAndQuit(
+        red(
+          "Zone is required to create nodes. Please specify a zone with --zone.",
+        ),
+      );
+    }
+
     // Only show pricing and get confirmation if not using --yes
     if (!options.yes) {
       let confirmationMessage = `Create ${
         formatNodeDescription(count, nodeType)
       }`;
 
-      if (isReserved) {
-        // Reserved nodes - get quote for accurate pricing
-        const spinner = ora(
-          `Quoting ${formatNodeDescription(count, nodeType)}...`,
-        )
-          .start();
-
-        // Calculate duration for quote
-        let durationSeconds: number = 3600; // Default 1 hour
-        if (options.duration) {
-          durationSeconds = options.duration;
-        } else if (options.end) {
-          const startDate = typeof options.start === "string"
-            ? new Date()
-            : options.start;
-          durationSeconds = Math.floor(
-            (options.end.getTime() - startDate.getTime()) / 1000,
-          );
-        }
-
-        // Add flexibility to duration for better quote matching (matches buy command logic)
-        const startsAt = options.start === "NOW"
-          ? "NOW"
-          : roundStartDate(parseStartDate(options.start));
-        const minDurationSeconds = Math.max(
-          1,
-          durationSeconds - Math.ceil(durationSeconds * 0.1),
-        );
-        const maxDurationSeconds = Math.max(
-          durationSeconds + 3600,
-          durationSeconds + Math.ceil(durationSeconds * 0.1),
-        );
-
-        // Use default instance type h100i and zone if provided
-        const quote = await getQuote({
-          instanceType: "h100v", // This should get ignored by the zone
-          quantity: count,
-          minStartTime: startsAt,
-          maxStartTime: startsAt,
-          minDurationSeconds: minDurationSeconds,
-          maxDurationSeconds: maxDurationSeconds,
-          cluster: options.zone,
-        });
-
-        spinner.stop();
-
-        if (quote) {
-          const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-          const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
-          confirmationMessage += ` for ~$${
-            pricePerNodeHour.toFixed(2)
-          }/node/hr`;
-        } else {
-          logAndQuit(
-            red(
-              "No nodes available matching your requirements. This is likely due to insufficient capacity.",
-            ),
-          );
-        }
+      if (isReserved && cachedQuote) {
+        // Reserved nodes - show quote pricing
+        const pricePerGpuHour = getPricePerGpuHourFromQuote(cachedQuote);
+        const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
+        confirmationMessage += ` for ~$${
+          pricePerNodeHour.toFixed(2)
+        }/node/hr`;
       } else if (options.maxPrice) {
         // Auto Reserved nodes - show max price they're willing to pay
         confirmationMessage += ` for up to $${

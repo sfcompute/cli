@@ -252,12 +252,20 @@ export const yesOption = new Option(
 );
 
 /**
- * Common --zone option for zone selection
+ * Common --zone option for zone selection (required)
  */
 export const zoneOption = new Option(
   "-z, --zone <zone>",
   "Zone to create the nodes in",
 ).makeOptionMandatory();
+
+/**
+ * Common --zone option for zone selection (not required)
+ */
+export const optionalZoneOption = new Option(
+  "-z, --zone <zone>",
+  "Zone to create the nodes in",
+);
 
 /**
  * Common --max-price option for nodes commands
