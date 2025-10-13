@@ -398,12 +398,3 @@ export async function placeSellOrder(options: {
 
   return data;
 }
-
-export async function getOrder(orderId: string) {
-  const api = await apiClient();
-
-  const { data: order } = await api.GET("/v0/orders/{id}", {
-    params: { path: { id: orderId } },
-  });
-  return order;
-}

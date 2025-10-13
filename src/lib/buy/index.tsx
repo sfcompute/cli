@@ -866,11 +866,16 @@ export async function getQuote(options: QuoteOptions) {
 export async function getOrder(orderId: string) {
   const api = await apiClient();
 
-  const { data: order, error } = await api.GET("/v0/orders/{id}", {
+  const { data: order, error, response } = await api.GET("/v0/orders/{id}", {
     params: { path: { id: orderId } },
   });
 
   if (error) {
+    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    if (error?.code === "order.not_found" || response.status === 404) {
+      return undefined;
+    }
+
     return logAndQuit(`Failed to get order: ${error.message}`);
   }
 
