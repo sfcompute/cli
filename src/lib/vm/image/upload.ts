@@ -271,27 +271,51 @@ const upload = new Command("upload")
             // Track upload progress with axios
             let lastUploadedBytes = 0;
 
-            const res = await axios.put(url, chunk, {
-              headers: {
-                "Content-Type": "application/octet-stream",
-                "Content-Length": chunk.length.toString(),
-              },
-              onUploadProgress: (progressEvent) => {
-                const uploadedBytes = progressEvent.loaded || 0;
-                const deltaBytes = uploadedBytes - lastUploadedBytes;
+            try {
+              const res = await axios.put(url, chunk, {
+                headers: {
+                  "Content-Type": "application/octet-stream",
+                  "Content-Length": chunk.length.toString(),
+                },
+                onUploadProgress: (progressEvent) => {
+                  const uploadedBytes = progressEvent.loaded || 0;
+                  const deltaBytes = uploadedBytes - lastUploadedBytes;
 
-                if (deltaBytes > 0) {
-                  updateProgress(part, deltaBytes);
-                  lastUploadedBytes = uploadedBytes;
+                  if (deltaBytes > 0) {
+                    updateProgress(part, deltaBytes);
+                    lastUploadedBytes = uploadedBytes;
+                  }
+                },
+                maxRedirects: 0,
+              });
+
+              if (res.status < 200 || res.status >= 300) {
+                throw new Error(
+                  `Part ${part} upload failed: ${res.status} ${res.statusText}`,
+                );
+              }
+            } catch (err) {
+              // Log Cloudflare/R2 specific errors
+              if (axios.isAxiosError(err)) {
+                const cfRay = err.response?.headers?.["cf-ray"];
+                const cfCacheStatus = err.response?.headers
+                  ?.["cf-cache-status"];
+                console.error(gray(`\nPart ${part} upload error:`));
+                console.error(
+                  gray(
+                    `  Status: ${err.response?.status} ${
+                      err.response?.statusText || ""
+                    }`,
+                  ),
+                );
+                console.error(gray(`  Error code: ${err.code || "unknown"}`));
+                if (cfRay) console.error(gray(`  Cloudflare Ray ID: ${cfRay}`));
+                if (cfCacheStatus) {
+                  console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
                 }
-              },
-              maxRedirects: 0,
-            });
-
-            if (res.status < 200 || res.status >= 300) {
-              throw new Error(
-                `Part ${part} upload failed: ${res.status} ${res.statusText}`,
-              );
+                console.error(gray(`  Message: ${err.message}`));
+              }
+              throw err;
             }
           },
           {
@@ -307,23 +331,29 @@ const upload = new Command("upload")
 
       // Process uploads with concurrency limit
       const results: number[] = [];
-      for (let i = 0; i < uploadParts.length; i += concurrencyLimit) {
-        const batch = uploadParts.slice(i, i + concurrencyLimit);
-        const batchResults = await Promise.allSettled(
-          batch.map(uploadPart),
-        );
+      try {
+        for (let i = 0; i < uploadParts.length; i += concurrencyLimit) {
+          const batch = uploadParts.slice(i, i + concurrencyLimit);
+          const batchResults = await Promise.allSettled(
+            batch.map(uploadPart),
+          );
 
-        for (const result of batchResults) {
-          if (result.status === "fulfilled") {
-            results.push(result.value);
-          } else {
-            throw new Error(`Upload failed: ${result.reason}`);
+          for (const result of batchResults) {
+            if (result.status === "fulfilled") {
+              results.push(result.value);
+            } else {
+              throw new Error(`Upload failed: ${result.reason}`);
+            }
           }
         }
+      } finally {
+        // Always clean up timer, even on error
+        if (spinnerTimer) {
+          clearInterval(spinnerTimer);
+          spinnerTimer = undefined;
+        }
       }
-      if (spinnerTimer) {
-        clearInterval(spinnerTimer);
-      }
+
       progressBar.update(fileSize, {
         spinner: green("✔"),
         speed: "0 B/s",
@@ -371,6 +401,7 @@ const upload = new Command("upload")
       // Clean up spinner timer
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
+        spinnerTimer = undefined;
       }
 
       // Stop any running spinners on error
