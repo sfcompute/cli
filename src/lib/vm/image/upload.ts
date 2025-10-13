@@ -93,7 +93,13 @@ const upload = new Command("upload")
       // Get file info and open as stream
       const fileInfo = await Deno.stat(filePath);
       const fileSize = fileInfo.size;
-      console.log(gray(`File size: ${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB (${fileSize} bytes)`));
+      console.log(
+        gray(
+          `File size: ${
+            (fileSize / (1024 * 1024 * 1024)).toFixed(2)
+          } GB (${fileSize} bytes)`,
+        ),
+      );
 
       // Calculate parts for progress tracking
       // These magic numbers are not the hard limits, but we don't trust R2 to document them.
@@ -105,7 +111,13 @@ const upload = new Command("upload")
         250 * 1024 * 1024,
       ); // 250 MiB
       const totalParts = Math.ceil(fileSize / chunkSize);
-      console.log(gray(`Upload plan: ${totalParts} parts of ${(chunkSize / (1024 * 1024)).toFixed(1)} MB each`));
+      console.log(
+        gray(
+          `Upload plan: ${totalParts} parts of ${
+            (chunkSize / (1024 * 1024)).toFixed(1)
+          } MB each`,
+        ),
+      );
 
       // Calculate upload parts metadata
       const uploadParts: Array<{
@@ -265,7 +277,9 @@ const upload = new Command("upload")
           async (_: unknown, _attemptNumber: number) => {
             // Reset progress for this part on retry (except first attempt)
             if (_attemptNumber > 1) {
-              console.log(gray(`\nRetrying part ${part} (attempt ${_attemptNumber})`));
+              console.log(
+                gray(`\nRetrying part ${part} (attempt ${_attemptNumber})`),
+              );
               resetPartProgress(part);
             }
 
@@ -301,13 +315,22 @@ const upload = new Command("upload")
             } catch (err) {
               // Log Cloudflare/R2 specific errors
               if (axios.isAxiosError(err)) {
-                const cfRay = err.response?.headers?.['cf-ray'];
-                const cfCacheStatus = err.response?.headers?.['cf-cache-status'];
+                const cfRay = err.response?.headers?.["cf-ray"];
+                const cfCacheStatus = err.response?.headers
+                  ?.["cf-cache-status"];
                 console.error(gray(`\nPart ${part} upload error:`));
-                console.error(gray(`  Status: ${err.response?.status} ${err.response?.statusText || ''}`));
-                console.error(gray(`  Error code: ${err.code || 'unknown'}`));
+                console.error(
+                  gray(
+                    `  Status: ${err.response?.status} ${
+                      err.response?.statusText || ""
+                    }`,
+                  ),
+                );
+                console.error(gray(`  Error code: ${err.code || "unknown"}`));
                 if (cfRay) console.error(gray(`  Cloudflare Ray ID: ${cfRay}`));
-                if (cfCacheStatus) console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
+                if (cfCacheStatus) {
+                  console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
+                }
                 console.error(gray(`  Message: ${err.message}`));
               }
               throw err;
@@ -318,7 +341,9 @@ const upload = new Command("upload")
             factor: 2,
             randomize: true,
             onRetry: (err, attempt) => {
-              console.error(gray(`\nRetry ${attempt}/5 for part ${part}: ${err.message}`));
+              console.error(
+                gray(`\nRetry ${attempt}/5 for part ${part}: ${err.message}`),
+              );
             },
           },
         );
@@ -351,7 +376,7 @@ const upload = new Command("upload")
           spinnerTimer = undefined;
         }
       }
-      
+
       progressBar.update(fileSize, {
         spinner: green("✔"),
         speed: "0 B/s",
