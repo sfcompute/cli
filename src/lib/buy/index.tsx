@@ -412,11 +412,13 @@ function BuyOrderPreview(props: BuyOrderProps) {
 
 const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
 
-type Order = Omit<Awaited<ReturnType<typeof getOrder>>, "status"> & {
-  status:
-    | Awaited<ReturnType<typeof getOrder>>["status"]
-    | Awaited<ReturnType<typeof placeBuyOrder>>["status"];
-};
+type Order =
+  & Omit<NonNullable<Awaited<ReturnType<typeof getOrder>>>, "status">
+  & {
+    status:
+      | NonNullable<Awaited<ReturnType<typeof getOrder>>>["status"]
+      | NonNullable<Awaited<ReturnType<typeof placeBuyOrder>>>["status"];
+  };
 type BuyOrderProps = {
   price: number;
   size: number;
@@ -866,11 +868,16 @@ export async function getQuote(options: QuoteOptions) {
 export async function getOrder(orderId: string) {
   const api = await apiClient();
 
-  const { data: order, error } = await api.GET("/v0/orders/{id}", {
+  const { data: order, error, response } = await api.GET("/v0/orders/{id}", {
     params: { path: { id: orderId } },
   });
 
   if (error) {
+    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    if (error?.code === "order.not_found" || response.status === 404) {
+      return undefined;
+    }
+
     return logAndQuit(`Failed to get order: ${error.message}`);
   }
 
