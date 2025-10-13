@@ -287,7 +287,6 @@ const upload = new Command("upload")
                   }
                 },
                 maxRedirects: 0,
-                timeout: 300000, // 5 minute timeout per part
               });
 
               if (res.status < 200 || res.status >= 300) {
