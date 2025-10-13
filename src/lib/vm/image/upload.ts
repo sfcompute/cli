@@ -298,13 +298,22 @@ const upload = new Command("upload")
             } catch (err) {
               // Log Cloudflare/R2 specific errors
               if (axios.isAxiosError(err)) {
-                const cfRay = err.response?.headers?.['cf-ray'];
-                const cfCacheStatus = err.response?.headers?.['cf-cache-status'];
+                const cfRay = err.response?.headers?.["cf-ray"];
+                const cfCacheStatus = err.response?.headers
+                  ?.["cf-cache-status"];
                 console.error(gray(`\nPart ${part} upload error:`));
-                console.error(gray(`  Status: ${err.response?.status} ${err.response?.statusText || ''}`));
-                console.error(gray(`  Error code: ${err.code || 'unknown'}`));
+                console.error(
+                  gray(
+                    `  Status: ${err.response?.status} ${
+                      err.response?.statusText || ""
+                    }`,
+                  ),
+                );
+                console.error(gray(`  Error code: ${err.code || "unknown"}`));
                 if (cfRay) console.error(gray(`  Cloudflare Ray ID: ${cfRay}`));
-                if (cfCacheStatus) console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
+                if (cfCacheStatus) {
+                  console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
+                }
                 console.error(gray(`  Message: ${err.message}`));
               }
               throw err;
@@ -345,7 +354,7 @@ const upload = new Command("upload")
           spinnerTimer = undefined;
         }
       }
-      
+
       progressBar.update(fileSize, {
         spinner: green("✔"),
         speed: "0 B/s",
