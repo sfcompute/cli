@@ -412,11 +412,13 @@ function BuyOrderPreview(props: BuyOrderProps) {
 
 const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
 
-type Order = Omit<Awaited<ReturnType<typeof getOrder>>, "status"> & {
-  status:
-    | Awaited<ReturnType<typeof getOrder>>["status"]
-    | Awaited<ReturnType<typeof placeBuyOrder>>["status"];
-};
+type Order =
+  & Omit<NonNullable<Awaited<ReturnType<typeof getOrder>>>, "status">
+  & {
+    status:
+      | NonNullable<Awaited<ReturnType<typeof getOrder>>>["status"]
+      | NonNullable<Awaited<ReturnType<typeof placeBuyOrder>>>["status"];
+  };
 type BuyOrderProps = {
   price: number;
   size: number;
