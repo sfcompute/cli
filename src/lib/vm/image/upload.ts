@@ -72,30 +72,40 @@ const upload = new Command("upload")
       // Stage 0: Initialization
       const fileInfo = await Deno.stat(filePath);
       const fileSize = fileInfo.size;
-      console.error(`[DEBUG:init] Starting upload - file=${filePath}, size=${fileSize} bytes (${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB), concurrency=${concurrencyLimit}`);
+      console.error(
+        `[DEBUG:init] Starting upload - file=${filePath}, size=${fileSize} bytes (${
+          (fileSize / (1024 * 1024 * 1024)).toFixed(2)
+        } GB), concurrency=${concurrencyLimit}`,
+      );
 
       preparingSpinner = ora(`Preparing upload for ${name}...`).start();
       const client = await apiClient();
 
       // Stage 1: Start upload call
-      console.error(`[DEBUG:api.startUpload] Calling start_upload API for name=${name}`);
-      const startTime = Date.now();
+      console.error(
+        `[DEBUG:api.startUpload] Calling start_upload API for name=${name}`,
+      );
+      const apiStartTime = Date.now();
       const startResponse = await client.POST("/v1/vms/images/start_upload", {
         body: {
           name,
         },
       });
-      const startDuration = Date.now() - startTime;
+      const startDuration = Date.now() - apiStartTime;
 
       if (!startResponse.data) {
-        console.error(`[DEBUG:api.startUpload] FAILED - status=${startResponse.response.status}, duration=${startDuration}ms`);
+        console.error(
+          `[DEBUG:api.startUpload] FAILED - status=${startResponse.response.status}, duration=${startDuration}ms`,
+        );
         throw new Error(
           `Failed to start upload: ${startResponse.response.status} ${startResponse.response.statusText}`,
         );
       }
 
       const imageId = startResponse.data.image_id;
-      console.error(`[DEBUG:api.startUpload] SUCCESS - imageId=${imageId}, duration=${startDuration}ms`);
+      console.error(
+        `[DEBUG:api.startUpload] SUCCESS - imageId=${imageId}, duration=${startDuration}ms`,
+      );
       preparingSpinner.succeed(
         `Started upload for image ${cyan(name)} (${brightBlack(imageId)})`,
       );
@@ -110,9 +120,15 @@ const upload = new Command("upload")
         250 * 1024 * 1024,
       ); // 250 MiB
       const totalParts = Math.ceil(fileSize / chunkSize);
-      console.error(`[DEBUG:scheduler.queue] Calculated parts - totalParts=${totalParts}, chunkSize=${chunkSize} bytes (${(chunkSize / (1024 * 1024)).toFixed(2)} MB)`);
+      console.error(
+        `[DEBUG:scheduler.queue] Calculated parts - totalParts=${totalParts}, chunkSize=${chunkSize} bytes (${
+          (chunkSize / (1024 * 1024)).toFixed(2)
+        } MB)`,
+      );
       if (totalParts > 10000) {
-        console.error(`[DEBUG:scheduler.queue] WARNING: totalParts (${totalParts}) exceeds S3 limit of 10,000`);
+        console.error(
+          `[DEBUG:scheduler.queue] WARNING: totalParts (${totalParts}) exceeds S3 limit of 10,000`,
+        );
       }
 
       // Calculate upload parts metadata
@@ -128,7 +144,11 @@ const upload = new Command("upload")
         const end = Math.min(start + chunkSize, fileSize);
         uploadParts.push({ part, start, end });
       }
-      console.error(`[DEBUG:scheduler.queue] Queue ready - first part: ${JSON.stringify(uploadParts[0])}, last part: ${JSON.stringify(uploadParts[uploadParts.length - 1])}`);
+      console.error(
+        `[DEBUG:scheduler.queue] Queue ready - first part: ${
+          JSON.stringify(uploadParts[0])
+        }, last part: ${JSON.stringify(uploadParts[uploadParts.length - 1])}`,
+      );
 
       // Create combined ora + progress bar with per-part progress tracking
       const startTime = Date.now();
@@ -233,12 +253,16 @@ const upload = new Command("upload")
         },
       ) => {
         const chunkSize = end - start;
-        console.error(`[DEBUG:uploadPart] Part ${part} starting - byteRange=[${start}, ${end}), size=${chunkSize}`);
+        console.error(
+          `[DEBUG:uploadPart] Part ${part} starting - byteRange=[${start}, ${end}), size=${chunkSize}`,
+        );
 
         // Step 1: Fetch upload URL with retry
         const url = await retry(
-          async (bail, attemptNumber) => {
-            console.error(`[DEBUG:api.getPresignedUrl] Part ${part} - fetching URL (attempt ${attemptNumber})`);
+          async (bail: (err: Error) => void, attemptNumber: number) => {
+            console.error(
+              `[DEBUG:api.getPresignedUrl] Part ${part} - fetching URL (attempt ${attemptNumber})`,
+            );
             const urlFetchStart = Date.now();
             const response = await client.POST(
               "/v1/vms/images/{image_id}/upload",
@@ -259,21 +283,27 @@ const upload = new Command("upload")
               const errorText = response.response.ok
                 ? "No data in response"
                 : await response.response.text();
-              console.error(`[DEBUG:api.getPresignedUrl] Part ${part} FAILED - status=${response.response.status}, duration=${urlFetchDuration}ms, attempt=${attemptNumber}`);
+              console.error(
+                `[DEBUG:api.getPresignedUrl] Part ${part} FAILED - status=${response.response.status}, duration=${urlFetchDuration}ms, attempt=${attemptNumber}`,
+              );
               throw new Error(
                 `Failed to get upload URL for part ${part}: ${response.response.status} ${response.response.statusText} - ${errorText}`,
               );
             }
 
-            console.error(`[DEBUG:api.getPresignedUrl] Part ${part} SUCCESS - duration=${urlFetchDuration}ms, attempt=${attemptNumber}`);
+            console.error(
+              `[DEBUG:api.getPresignedUrl] Part ${part} SUCCESS - duration=${urlFetchDuration}ms, attempt=${attemptNumber}`,
+            );
             return response.data.upload_url;
           },
           {
             retries: 3,
             factor: 2,
             randomize: true,
-            onRetry: (err, attemptNumber) => {
-              console.error(`[DEBUG:retry] Part ${part} URL fetch retry ${attemptNumber} - error: ${err.message}`);
+            onRetry: (err: Error, attemptNumber: number) => {
+              console.error(
+                `[DEBUG:retry] Part ${part} URL fetch retry ${attemptNumber} - error: ${err.message}`,
+              );
             },
           },
         );
@@ -281,17 +311,26 @@ const upload = new Command("upload")
         // Step 2: Upload the chunk with retry
         await retry(
           async (_: unknown, attemptNumber: number) => {
-            console.error(`[DEBUG:r2.uploadPart] Part ${part} - starting upload to R2 (attempt ${attemptNumber})`);
+            console.error(
+              `[DEBUG:r2.uploadPart] Part ${part} - starting upload to R2 (attempt ${attemptNumber})`,
+            );
             // Reset progress for this part on retry (except first attempt)
             if (attemptNumber > 1) {
-              console.error(`[DEBUG:r2.uploadPart] Part ${part} - resetting progress for retry ${attemptNumber}`);
+              console.error(
+                `[DEBUG:r2.uploadPart] Part ${part} - resetting progress for retry ${attemptNumber}`,
+              );
               resetPartProgress(part);
             }
 
             const readStart = Date.now();
             const chunk = await readChunk(filePath, start, chunkSize);
             const readDuration = Date.now() - readStart;
-            console.error(`[DEBUG:fs.readPart] Part ${part} - read ${chunk.length} bytes in ${readDuration}ms (${((chunk.length / (1024 * 1024)) / (readDuration / 1000)).toFixed(2)} MB/s)`);
+            console.error(
+              `[DEBUG:fs.readPart] Part ${part} - read ${chunk.length} bytes in ${readDuration}ms (${
+                ((chunk.length / (1024 * 1024)) / (readDuration / 1000))
+                  .toFixed(2)
+              } MB/s)`,
+            );
 
             // Track upload progress with axios
             let lastUploadedBytes = 0;
@@ -315,10 +354,17 @@ const upload = new Command("upload")
                 // Log progress every 10 seconds
                 const now = Date.now();
                 if (now - lastProgressLog > 10000) {
-                  const percent = ((uploadedBytes / chunk.length) * 100).toFixed(1);
+                  const percent = ((uploadedBytes / chunk.length) * 100)
+                    .toFixed(1);
                   const elapsed = (now - uploadStart) / 1000;
                   const throughput = uploadedBytes / elapsed / (1024 * 1024);
-                  console.error(`[DEBUG:r2.uploadPartProgress] Part ${part} - ${percent}% (${(uploadedBytes / (1024 * 1024)).toFixed(1)}/${(chunk.length / (1024 * 1024)).toFixed(1)} MB), ${throughput.toFixed(2)} MB/s`);
+                  console.error(
+                    `[DEBUG:r2.uploadPartProgress] Part ${part} - ${percent}% (${
+                      (uploadedBytes / (1024 * 1024)).toFixed(1)
+                    }/${(chunk.length / (1024 * 1024)).toFixed(1)} MB), ${
+                      throughput.toFixed(2)
+                    } MB/s`,
+                  );
                   lastProgressLog = now;
                 }
               },
@@ -327,23 +373,34 @@ const upload = new Command("upload")
             });
 
             const uploadDuration = Date.now() - uploadStart;
-            const throughput = chunk.length / (uploadDuration / 1000) / (1024 * 1024);
+            const throughput = chunk.length / (uploadDuration / 1000) /
+              (1024 * 1024);
 
             if (res.status < 200 || res.status >= 300) {
-              console.error(`[DEBUG:r2.uploadPart] Part ${part} FAILED - status=${res.status}, duration=${uploadDuration}ms, attempt=${attemptNumber}`);
+              console.error(
+                `[DEBUG:r2.uploadPart] Part ${part} FAILED - status=${res.status}, duration=${uploadDuration}ms, attempt=${attemptNumber}`,
+              );
               throw new Error(
                 `Part ${part} upload failed: ${res.status} ${res.statusText}`,
               );
             }
 
-            console.error(`[DEBUG:r2.uploadPart] Part ${part} SUCCESS - uploaded ${chunk.length} bytes in ${uploadDuration}ms (${throughput.toFixed(2)} MB/s), ETag=${res.headers.etag || 'none'}, attempt=${attemptNumber}`);
+            console.error(
+              `[DEBUG:r2.uploadPart] Part ${part} SUCCESS - uploaded ${chunk.length} bytes in ${uploadDuration}ms (${
+                throughput.toFixed(2)
+              } MB/s), ETag=${
+                res.headers.etag || "none"
+              }, attempt=${attemptNumber}`,
+            );
           },
           {
             retries: 5,
             factor: 2,
             randomize: true,
-            onRetry: (err, attemptNumber) => {
-              console.error(`[DEBUG:retry] Part ${part} upload retry ${attemptNumber} - error: ${err.message}`);
+            onRetry: (err: Error, attemptNumber: number) => {
+              console.error(
+                `[DEBUG:retry] Part ${part} upload retry ${attemptNumber} - error: ${err.message}`,
+              );
             },
           },
         );
@@ -359,10 +416,16 @@ const upload = new Command("upload")
       for (let i = 0; i < uploadParts.length; i += concurrencyLimit) {
         batchId++;
         const batch = uploadParts.slice(i, i + concurrencyLimit);
-        const batchParts = batch.map(p => p.part);
-        console.error(`[DEBUG:scheduler.batch] Batch ${batchId} START - parts=[${batchParts[0]}..${batchParts[batchParts.length - 1]}] (${batchParts.length} parts), completed=${results.length}/${uploadParts.length}`);
+        const batchParts = batch.map((p) => p.part);
+        console.error(
+          `[DEBUG:scheduler.batch] Batch ${batchId} START - parts=[${
+            batchParts[0]
+          }..${
+            batchParts[batchParts.length - 1]
+          }] (${batchParts.length} parts), completed=${results.length}/${uploadParts.length}`,
+        );
         const batchStart = Date.now();
-        
+
         const batchResults = await Promise.allSettled(
           batch.map(uploadPart),
         );
@@ -375,12 +438,18 @@ const upload = new Command("upload")
             succeeded++;
           } else {
             failed++;
-            console.error(`[DEBUG:scheduler.batch] Batch ${batchId} - part FAILED: ${result.reason}`);
+            console.error(
+              `[DEBUG:scheduler.batch] Batch ${batchId} - part FAILED: ${result.reason}`,
+            );
             throw new Error(`Upload failed: ${result.reason}`);
           }
         }
         const batchDuration = Date.now() - batchStart;
-        console.error(`[DEBUG:scheduler.batch] Batch ${batchId} DONE - succeeded=${succeeded}, failed=${failed}, duration=${batchDuration}ms (${(batchDuration / 1000 / 60).toFixed(2)} min)`);
+        console.error(
+          `[DEBUG:scheduler.batch] Batch ${batchId} DONE - succeeded=${succeeded}, failed=${failed}, duration=${batchDuration}ms (${
+            (batchDuration / 1000 / 60).toFixed(2)
+          } min)`,
+        );
       }
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
@@ -395,7 +464,9 @@ const upload = new Command("upload")
 
       finalizingSpinner = ora(`Validating upload...`).start();
       // Calculate SHA256 hash for integrity verification using streaming
-      console.error(`[DEBUG:hash] Starting SHA256 calculation for ${fileSize} bytes`);
+      console.error(
+        `[DEBUG:hash] Starting SHA256 calculation for ${fileSize} bytes`,
+      );
       const hashStart = Date.now();
       const hash = crypto.createHash("sha256");
 
@@ -405,22 +476,35 @@ const upload = new Command("upload")
       for await (const chunk of file.readable) {
         hash.update(chunk);
         hashBytesProcessed += chunk.length;
-        
+
         // Log hash progress every 5 seconds
         const now = Date.now();
         if (now - lastHashLog > 5000) {
           const percent = ((hashBytesProcessed / fileSize) * 100).toFixed(1);
-          const throughput = hashBytesProcessed / ((now - hashStart) / 1000) / (1024 * 1024);
-          console.error(`[DEBUG:hash] Progress ${percent}% (${(hashBytesProcessed / (1024 * 1024 * 1024)).toFixed(2)}/${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB), ${throughput.toFixed(2)} MB/s`);
+          const throughput = hashBytesProcessed / ((now - hashStart) / 1000) /
+            (1024 * 1024);
+          console.error(
+            `[DEBUG:hash] Progress ${percent}% (${
+              (hashBytesProcessed / (1024 * 1024 * 1024)).toFixed(2)
+            }/${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB), ${
+              throughput.toFixed(2)
+            } MB/s`,
+          );
           lastHashLog = now;
         }
       }
 
       const sha256Hash = hash.digest("hex");
       const hashDuration = Date.now() - hashStart;
-      console.error(`[DEBUG:hash] Complete - sha256=${sha256Hash}, duration=${hashDuration}ms (${(hashDuration / 1000 / 60).toFixed(2)} min)`);
+      console.error(
+        `[DEBUG:hash] Complete - sha256=${sha256Hash}, duration=${hashDuration}ms (${
+          (hashDuration / 1000 / 60).toFixed(2)
+        } min)`,
+      );
 
-      console.error(`[DEBUG:api.completeUpload] Calling complete_upload with ${results.length} parts`);
+      console.error(
+        `[DEBUG:api.completeUpload] Calling complete_upload with ${results.length} parts`,
+      );
       const completeStart = Date.now();
       const completeResponse = await client.PUT(
         "/v1/vms/images/{image_id}/complete_upload",
@@ -438,13 +522,17 @@ const upload = new Command("upload")
       const completeDuration = Date.now() - completeStart;
 
       if (!completeResponse.data) {
-        console.error(`[DEBUG:api.completeUpload] FAILED - status=${completeResponse.response.status}, duration=${completeDuration}ms`);
+        console.error(
+          `[DEBUG:api.completeUpload] FAILED - status=${completeResponse.response.status}, duration=${completeDuration}ms`,
+        );
         throw new Error(
           `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}`,
         );
       }
 
-      console.error(`[DEBUG:api.completeUpload] SUCCESS - duration=${completeDuration}ms`);
+      console.error(
+        `[DEBUG:api.completeUpload] SUCCESS - duration=${completeDuration}ms`,
+      );
       finalizingSpinner.succeed(`Image uploaded and verified`);
 
       const object = completeResponse.data;
