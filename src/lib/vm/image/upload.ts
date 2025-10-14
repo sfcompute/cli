@@ -3,7 +3,7 @@ import { brightBlack, cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import cliProgress from "cli-progress";
 import console from "node:console";
 import crypto from "node:crypto";
-import { clearInterval, setInterval, setTimeout } from "node:timers";
+import { clearInterval, setInterval } from "node:timers";
 import retry from "async-retry";
 import ora, { type Ora } from "ora";
 import cliSpinners from "npm:cli-spinners";
