@@ -1,13 +1,13 @@
-import {Command} from "@commander-js/extra-typings";
-import {brightBlack, cyan, gray, green, red} from "jsr:@std/fmt/colors";
+import { Command } from "@commander-js/extra-typings";
+import { brightBlack, cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import cliProgress from "cli-progress";
 import console from "node:console";
 import crypto from "node:crypto";
-import {clearInterval, setInterval, setTimeout} from "node:timers";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import retry from "async-retry";
-import ora, {type Ora} from "ora";
+import ora, { type Ora } from "ora";
 import cliSpinners from "npm:cli-spinners";
-import {apiClient} from "../../../apiClient.ts";
+import { apiClient } from "../../../apiClient.ts";
 
 async function readChunk(
   filePath: string,
@@ -15,7 +15,7 @@ async function readChunk(
   length: number,
   onProgress?: (bytesRead: number) => void,
 ): Promise<Uint8Array> {
-  const file = await Deno.open(filePath, {read: true});
+  const file = await Deno.open(filePath, { read: true });
   try {
     await file.seek(start, Deno.SeekMode.Start);
 
@@ -62,7 +62,7 @@ const upload = new Command("upload")
     },
     1,
   )
-  .action(async ({name, file: filePath, concurrency: concurrencyLimit}) => {
+  .action(async ({ name, file: filePath, concurrency: concurrencyLimit }) => {
     let preparingSpinner: Ora | undefined;
     let finalizingSpinner: Ora | undefined;
     let spinnerTimer: NodeJS.Timeout | undefined;
@@ -95,14 +95,16 @@ const upload = new Command("upload")
       const fileSize = fileInfo.size;
 
       // Calculate parts for progress tracking
-      // These magic numbers are not the hard limits, but we don't trust R2 to document them.
-      const minChunk = 6 * 1024 * 1024; // 6 MiB
-      const maxParts = 100;
-      const chunkSize = Math.max(
-        minChunk,
-        Math.ceil(fileSize / maxParts),
-        250 * 1024 * 1024,
-      ); // 250 MiB
+      const minChunk = 5 * 1024 * 1024; // 5 MiB (R2 minimum)
+      const defaultChunk = 64 * 1024 * 1024; // 64 MiB
+      const maxParts = 10000; // R2 supports up to 10k parts
+
+      // For files smaller than default chunk, use the whole file as one part
+      // Otherwise use default chunk size, but ensure we don't exceed maxParts
+      const chunkSize = fileSize <= defaultChunk
+        ? Math.max(fileSize, minChunk)
+        : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
+
       const totalParts = Math.ceil(fileSize / chunkSize);
 
       // Calculate upload parts metadata
@@ -116,7 +118,7 @@ const upload = new Command("upload")
         const part = idx + 1;
         const start = idx * chunkSize;
         const end = Math.min(start + chunkSize, fileSize);
-        uploadParts.push({part, start, end});
+        uploadParts.push({ part, start, end });
       }
 
       // Create combined ora + progress bar with per-part progress tracking
@@ -205,7 +207,7 @@ const upload = new Command("upload")
 
       // Upload parts concurrently with specified concurrency limit
       const uploadPart = async (
-        {part, start, end}: {
+        { part, start, end }: {
           part: number;
           start: number;
           end: number;
@@ -347,7 +349,7 @@ const upload = new Command("upload")
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
 
-      using file = await Deno.open(filePath, {read: true});
+      using file = await Deno.open(filePath, { read: true });
       for await (const chunk of file.readable) {
         hash.update(chunk);
       }
@@ -395,12 +397,14 @@ const upload = new Command("upload")
       // Stop any running spinners on error
       if (preparingSpinner?.isSpinning) {
         preparingSpinner.fail(
-          `Upload preparation failed: ${err instanceof Error ? err.message : String(err)
+          `Upload preparation failed: ${
+            err instanceof Error ? err.message : String(err)
           }`,
         );
       } else if (finalizingSpinner?.isSpinning) {
         finalizingSpinner.fail(
-          `Failed to finalize upload: ${err instanceof Error ? err.message : String(err)
+          `Failed to finalize upload: ${
+            err instanceof Error ? err.message : String(err)
           }`,
         );
       } else {
