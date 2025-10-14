@@ -1,50 +1,49 @@
-import { Command } from "@commander-js/extra-typings";
-import { brightBlack, cyan, gray, green, red } from "jsr:@std/fmt/colors";
+import {Command} from "@commander-js/extra-typings";
+import {brightBlack, cyan, gray, green, red} from "jsr:@std/fmt/colors";
 import cliProgress from "cli-progress";
 import console from "node:console";
 import crypto from "node:crypto";
-import { clearInterval, setInterval } from "node:timers";
+import {clearInterval, setInterval, setTimeout} from "node:timers";
 import retry from "async-retry";
-import ora, { type Ora } from "ora";
+import ora, {type Ora} from "ora";
 import cliSpinners from "npm:cli-spinners";
-import axios from "axios";
-import { apiClient } from "../../../apiClient.ts";
+import {apiClient} from "../../../apiClient.ts";
 
 async function readChunk(
   filePath: string,
   start: number,
-  chunkSize: number,
+  length: number,
+  onProgress?: (bytesRead: number) => void,
 ): Promise<Uint8Array> {
-  using file = await Deno.open(filePath, { read: true });
-  await file.seek(start, Deno.SeekMode.Start);
+  const file = await Deno.open(filePath, {read: true});
+  try {
+    await file.seek(start, Deno.SeekMode.Start);
 
-  const buffer = new Uint8Array(chunkSize);
-  let totalBytesRead = 0;
-  let emptyReadCount = 0;
-  const maxEmptyReads = 100;
+    const buffer = new Uint8Array(length);
+    let offset = 0;
 
-  while (totalBytesRead < chunkSize) {
-    const bytesRead = await file.read(buffer.subarray(totalBytesRead));
-    if (bytesRead === null) {
-      // EOF reached
-      break;
-    }
-    if (bytesRead === 0) {
-      // No bytes read but not EOF, continue looping
-      emptyReadCount++;
-      if (emptyReadCount >= maxEmptyReads) {
-        throw new Error(
-          `Failed to read chunk: reached ${maxEmptyReads} consecutive empty reads without EOF`,
-        );
+    while (offset < length) {
+      const bytesRead = await file.read(buffer.subarray(offset));
+      if (bytesRead === null) {
+        // EOF reached
+        break;
       }
-      continue;
+      offset += bytesRead;
+      if (onProgress) {
+        onProgress(bytesRead);
+      }
     }
-    // Non-empty read, reset counter
-    emptyReadCount = 0;
-    totalBytesRead += bytesRead;
-  }
 
-  return buffer.subarray(0, totalBytesRead);
+    if (offset !== length) {
+      throw new Error(
+        `Short read: expected ${length} bytes, got ${offset} bytes`,
+      );
+    }
+
+    return buffer;
+  } finally {
+    file.close();
+  }
 }
 
 const upload = new Command("upload")
@@ -63,10 +62,11 @@ const upload = new Command("upload")
     },
     1,
   )
-  .action(async ({ name, file: filePath, concurrency: concurrencyLimit }) => {
+  .action(async ({name, file: filePath, concurrency: concurrencyLimit}) => {
     let preparingSpinner: Ora | undefined;
     let finalizingSpinner: Ora | undefined;
     let spinnerTimer: NodeJS.Timeout | undefined;
+    let progressBar: cliProgress.SingleBar | undefined;
 
     try {
       preparingSpinner = ora(`Preparing upload for ${name}...`).start();
@@ -116,7 +116,7 @@ const upload = new Command("upload")
         const part = idx + 1;
         const start = idx * chunkSize;
         const end = Math.min(start + chunkSize, fileSize);
-        uploadParts.push({ part, start, end });
+        uploadParts.push({part, start, end});
       }
 
       // Create combined ora + progress bar with per-part progress tracking
@@ -139,13 +139,13 @@ const upload = new Command("upload")
       const spinner = cliSpinners.dots;
       let spinnerIndex = 0;
 
-      const progressBar = new cliProgress.SingleBar({
+      progressBar = new cliProgress.SingleBar({
         format:
           `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
         hideCursor: true,
-        forceRedraw: true,
+        forceRedraw: false,
       });
 
       progressBar.start(fileSize, 0, {
@@ -155,26 +155,14 @@ const upload = new Command("upload")
         totalMB: (fileSize / (1024 * 1024)).toFixed(1),
       });
 
-      // Create a timer to animate the spinner at the correct interval
-      spinnerTimer = setInterval(() => {
-        spinnerIndex++;
-        const totalBytesUploaded = getTotalBytesUploaded();
-        // Force a redraw to animate the spinner
-        progressBar.update(totalBytesUploaded, {
-          spinner: spinner.frames[spinnerIndex % spinner.frames.length],
-          speed: lastSpeed || "0 B/s",
-          uploadedMB: (totalBytesUploaded / (1024 * 1024)).toFixed(1),
-          totalMB: (fileSize / (1024 * 1024)).toFixed(1),
-        });
-      }, spinner.interval);
+      // Throttle UI updates to 200ms
+      const UI_UPDATE_INTERVAL_MS = 200;
+      let lastUIUpdate = 0;
 
-      const updateProgress = (part: number, bytesUploaded: number) => {
-        const previousBytes = partProgress.get(part) || 0;
-        partProgress.set(part, previousBytes + bytesUploaded);
-
+      const renderProgress = () => {
         const totalBytesUploaded = getTotalBytesUploaded();
-        const elapsedTime = (Date.now() - startTime) / 1000; // seconds
-        const speed = totalBytesUploaded / elapsedTime; // bytes per second
+        const elapsedTime = (Date.now() - startTime) / 1000;
+        const speed = totalBytesUploaded / elapsedTime;
 
         // Format speed
         let speedStr: string;
@@ -186,7 +174,6 @@ const upload = new Command("upload")
           speedStr = `${speed.toFixed(0)} B/s`;
         }
 
-        // Store values for spinner animation
         lastSpeed = speedStr;
 
         progressBar.update(totalBytesUploaded, {
@@ -197,25 +184,28 @@ const upload = new Command("upload")
         });
       };
 
-      const resetPartProgress = (part: number) => {
-        const previousBytes = partProgress.get(part) || 0;
-        if (previousBytes > 0) {
-          partProgress.set(part, 0);
-
-          const totalBytesUploaded = getTotalBytesUploaded();
-          // Update progress bar to reflect the reset
-          progressBar.update(totalBytesUploaded, {
-            spinner: spinner.frames[spinnerIndex % spinner.frames.length],
-            speed: lastSpeed || "0 B/s",
-            uploadedMB: (totalBytesUploaded / (1024 * 1024)).toFixed(1),
-            totalMB: (fileSize / (1024 * 1024)).toFixed(1),
-          });
+      // Create a timer to animate the spinner and update progress
+      spinnerTimer = setInterval(() => {
+        spinnerIndex++;
+        const now = Date.now();
+        if (now - lastUIUpdate >= UI_UPDATE_INTERVAL_MS) {
+          renderProgress();
+          lastUIUpdate = now;
         }
+      }, spinner.interval);
+
+      const updateProgress = (part: number, bytesUploaded: number) => {
+        const previousBytes = partProgress.get(part) || 0;
+        partProgress.set(part, previousBytes + bytesUploaded);
+      };
+
+      const resetPartProgress = (part: number) => {
+        partProgress.set(part, 0);
       };
 
       // Upload parts concurrently with specified concurrency limit
       const uploadPart = async (
-        { part, start, end }: {
+        {part, start, end}: {
           part: number;
           start: number;
           end: number;
@@ -223,9 +213,15 @@ const upload = new Command("upload")
       ) => {
         const chunkSize = end - start;
 
-        // Step 1: Fetch upload URL with retry
-        const url = await retry(
-          async () => {
+        // Upload the chunk with retry, fetching fresh URL each attempt
+        await retry(
+          async (bail: (e: Error) => void, attemptNumber: number) => {
+            // Reset progress for this part on retry (except first attempt)
+            if (attemptNumber > 1) {
+              resetPartProgress(part);
+            }
+
+            // Fetch fresh upload URL for this attempt
             const response = await client.POST(
               "/v1/vms/images/{image_id}/upload",
               {
@@ -241,81 +237,66 @@ const upload = new Command("upload")
             );
 
             if (!response.response.ok || !response.data) {
+              const status = response.response.status;
               const errorText = response.response.ok
                 ? "No data in response"
-                : await response.response.text();
+                : await response.response.text().catch(() => "");
+
+              // Bail on non-transient 4xx errors (except 408 Request Timeout and 429 Too Many Requests)
+              if (
+                status >= 400 && status < 500 && status !== 408 &&
+                status !== 429
+              ) {
+                bail(
+                  new Error(
+                    `Failed to get upload URL for part ${part}: ${status} ${response.response.statusText} - ${errorText}`,
+                  ),
+                );
+                return;
+              }
+
               throw new Error(
-                `Failed to get upload URL for part ${part}: ${response.response.status} ${response.response.statusText} - ${errorText}`,
+                `Failed to get upload URL for part ${part}: ${status} ${response.response.statusText} - ${errorText}`,
               );
             }
 
-            return response.data.upload_url;
-          },
-          {
-            retries: 3,
-            factor: 2,
-            randomize: true,
-          },
-        );
+            const url = response.data.upload_url;
 
-        // Step 2: Upload the chunk with retry
-        await retry(
-          async (_: unknown, _attemptNumber: number) => {
-            // Reset progress for this part on retry (except first attempt)
-            if (_attemptNumber > 1) {
-              resetPartProgress(part);
-            }
+            // Read chunk from disk with progress tracking
+            const payload = await readChunk(
+              filePath,
+              start,
+              chunkSize,
+              (bytesRead) => {
+                updateProgress(part, bytesRead);
+              },
+            );
 
-            const chunk = await readChunk(filePath, start, chunkSize);
+            const res = await fetch(url, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/octet-stream",
+              },
+              body: payload,
+            });
 
-            // Track upload progress with axios
-            let lastUploadedBytes = 0;
-
-            try {
-              const res = await axios.put(url, chunk, {
-                headers: {
-                  "Content-Type": "application/octet-stream",
-                  "Content-Length": chunk.length.toString(),
-                },
-                onUploadProgress: (progressEvent) => {
-                  const uploadedBytes = progressEvent.loaded || 0;
-                  const deltaBytes = uploadedBytes - lastUploadedBytes;
-
-                  if (deltaBytes > 0) {
-                    updateProgress(part, deltaBytes);
-                    lastUploadedBytes = uploadedBytes;
-                  }
-                },
-                maxRedirects: 0,
-              });
-
-              if (res.status < 200 || res.status >= 300) {
-                throw new Error(
-                  `Part ${part} upload failed: ${res.status} ${res.statusText}`,
-                );
-              }
-            } catch (err) {
-              // Log Cloudflare/R2 specific errors
-              if (axios.isAxiosError(err)) {
-                const cfRay = err.response?.headers?.["cf-ray"];
-                const cfCacheStatus = err.response?.headers
-                  ?.["cf-cache-status"];
-                console.error(gray(`\nPart ${part} upload error:`));
-                console.error(
-                  gray(
-                    `  Status: ${err.response?.status} ${
-                      err.response?.statusText || ""
-                    }`,
+            if (!res.ok) {
+              // Bail on non-transient 4xx errors (except 408 and 429)
+              if (
+                res.status >= 400 && res.status < 500 && res.status !== 408 &&
+                res.status !== 429
+              ) {
+                bail(
+                  new Error(
+                    `Part ${part} upload failed: ${res.status} ${res.statusText}`,
                   ),
                 );
-                console.error(gray(`  Error code: ${err.code || "unknown"}`));
-                if (cfRay) console.error(gray(`  Cloudflare Ray ID: ${cfRay}`));
-                if (cfCacheStatus) {
-                  console.error(gray(`  CF Cache Status: ${cfCacheStatus}`));
-                }
-                console.error(gray(`  Message: ${err.message}`));
+                return;
               }
-              throw err;
+
+              throw new Error(
+                `Part ${part} upload failed: ${res.status} ${res.statusText}`,
+              );
             }
           },
           {
@@ -366,7 +347,7 @@ const upload = new Command("upload")
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
 
-      using file = await Deno.open(filePath, { read: true });
+      using file = await Deno.open(filePath, {read: true});
       for await (const chunk of file.readable) {
         hash.update(chunk);
       }
@@ -404,17 +385,22 @@ const upload = new Command("upload")
         spinnerTimer = undefined;
       }
 
+      // Stop progress bar
+      try {
+        progressBar?.stop();
+      } catch {
+        // Ignore if progress bar not started
+      }
+
       // Stop any running spinners on error
       if (preparingSpinner?.isSpinning) {
         preparingSpinner.fail(
-          `Upload preparation failed: ${
-            err instanceof Error ? err.message : String(err)
+          `Upload preparation failed: ${err instanceof Error ? err.message : String(err)
           }`,
         );
       } else if (finalizingSpinner?.isSpinning) {
         finalizingSpinner.fail(
-          `Failed to finalize upload: ${
-            err instanceof Error ? err.message : String(err)
+          `Failed to finalize upload: ${err instanceof Error ? err.message : String(err)
           }`,
         );
       } else {
