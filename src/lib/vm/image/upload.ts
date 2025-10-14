@@ -95,9 +95,9 @@ const upload = new Command("upload")
       const fileSize = fileInfo.size;
 
       // Calculate parts for progress tracking
-      const minChunk = 5 * 1024 * 1024; // 5 MiB (R2 minimum)
+      const minChunk = 5 * 1024 * 1024; // 5 MiB (minimum)
       const defaultChunk = 64 * 1024 * 1024; // 64 MiB
-      const maxParts = 10000; // R2 supports up to 10k parts
+      const maxParts = 10000; // object storage supports up to 10k parts
 
       // For files smaller than default chunk, use the whole file as one part
       // Otherwise use default chunk size, but ensure we don't exceed maxParts
@@ -123,8 +123,6 @@ const upload = new Command("upload")
 
       // Create combined ora + progress bar with per-part progress tracking
       const startTime = Date.now();
-      let lastSpeed = "0 B/s";
-
       // Track progress per part to handle retries correctly
       const partProgress = new Map<number, number>(); // part -> bytes uploaded
 
@@ -175,8 +173,6 @@ const upload = new Command("upload")
         } else {
           speedStr = `${speed.toFixed(0)} B/s`;
         }
-
-        lastSpeed = speedStr;
 
         progressBar.update(totalBytesUploaded, {
           spinner: spinner.frames[spinnerIndex % spinner.frames.length],
