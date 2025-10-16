@@ -324,10 +324,9 @@ async function createNodesAction(
 
       if (isReserved) {
         // Reserved nodes - get quote for accurate pricing
-        const spinner = ora({
-          text: `Quoting ${formatNodeDescription(count, nodeType)}...`,
-          discardStdin: false,
-        }).start();
+        const spinner = ora(
+          `Quoting ${formatNodeDescription(count, nodeType)}...`,
+        ).start();
 
         // Calculate duration for quote
         let durationSeconds: number = 3600; // Default 1 hour
@@ -368,10 +367,17 @@ async function createNodesAction(
 
         spinner.stop();
 
-        // Ensure stdin is ready for inquirer
-        if (process.stdin.isTTY && process.stdin.isPaused()) {
-          process.stdin.resume();
-          console.log("resumed stdin");
+        // Allow terminal state to settle and flush any buffered input
+        await new Promise(r => setTimeout(r, 30));
+        if (process.stdin.isTTY) {
+          const wasRaw = (process.stdin as any).isRaw ?? false;
+          try {
+            process.stdin.resume();
+            process.stdin.setRawMode(true);
+            while (process.stdin.read() !== null) { /* drain buffer */ }
+          } finally {
+            process.stdin.setRawMode(wasRaw);
+          }
         }
 
         if (quote) {
