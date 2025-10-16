@@ -1,17 +1,17 @@
-import { Command, CommanderError, Option } from "@commander-js/extra-typings";
-import { confirm } from "@inquirer/prompts";
-import { readFileSync } from "node:fs";
-import { cyan, gray, red, yellow } from "jsr:@std/fmt/colors";
+import {Command, CommanderError, Option} from "@commander-js/extra-typings";
+import {confirm} from "@inquirer/prompts";
+import {readFileSync} from "node:fs";
+import {cyan, gray, red, yellow} from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
-import { type SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import {type SFCNodes} from "@sfcompute/nodes-sdk-alpha";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
 
-import { isFeatureEnabled } from "../posthog.ts";
+import {isFeatureEnabled} from "../posthog.ts";
 import {
   createNodesTable,
   durationOption,
@@ -23,15 +23,15 @@ import {
   yesOption,
   zoneOption,
 } from "./utils.ts";
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { logAndQuit } from "../../helpers/errors.ts";
-import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
+import {handleNodesError, nodesClient} from "../../nodesClient.ts";
+import {logAndQuit} from "../../helpers/errors.ts";
+import {getPricePerGpuHourFromQuote, getQuote} from "../buy/index.tsx";
 import {
   parseStartDate,
   roundStartDate,
   selectTime,
 } from "../../helpers/units.ts";
-import { GPUS_PER_NODE } from "../constants.ts";
+import {GPUS_PER_NODE} from "../constants.ts";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
@@ -124,7 +124,7 @@ const create = new Command("create")
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
-    const { count, start, duration, end, auto, reserved } = command
+    const {count, start, duration, end, auto, reserved} = command
       .opts();
 
     // Validate arguments
@@ -139,8 +139,7 @@ const create = new Command("create")
     if (names.length > 0 && count) {
       if (names.length !== count) {
         console.error(red(
-          `You specified ${names.length} ${
-            names.length === 1 ? "node name" : "node names"
+          `You specified ${names.length} ${names.length === 1 ? "node name" : "node names"
           } but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`,
         ));
         command.help();
@@ -215,7 +214,7 @@ Examples:\n
 
 async function createNodesAction(
   names: typeof create.args,
-  options: ReturnType<typeof create.opts> & { image?: string },
+  options: ReturnType<typeof create.opts> & {image?: string},
 ) {
   try {
     const client = await nodesClient();
@@ -231,8 +230,8 @@ async function createNodesAction(
     const wellFormedUserData = rawUserData?.isWellFormed?.()
       ? rawUserData
       : rawUserData
-      ? encodeURIComponent(rawUserData)
-      : undefined;
+        ? encodeURIComponent(rawUserData)
+        : undefined;
     const encodedUserData = wellFormedUserData
       ? btoa(
         String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
@@ -266,9 +265,8 @@ async function createNodesAction(
       if (!startDateIsValid) {
         if (!options.yes) {
           options.start = await selectTime(startDate, {
-            message: `Start time must be "NOW" or on an hour boundary. ${
-              cyan("Choose a time:")
-            }`,
+            message: `Start time must be "NOW" or on an hour boundary. ${cyan("Choose a time:")
+              }`,
           });
         } else {
           // Clamp down to "NOW" or lower hour
@@ -282,7 +280,7 @@ async function createNodesAction(
         (options.start === "NOW"
           ? new Date().getTime()
           : options.start.getTime()) /
-          1000,
+        1000,
       );
 
       // Handle end time and/or duration
@@ -291,7 +289,7 @@ async function createNodesAction(
         if (!endDate) {
           endDate = new Date(
             new Date(createParams.start_at! * 1000).getTime() +
-              (options.duration! * 1000),
+            (options.duration! * 1000),
           );
         }
 
@@ -301,9 +299,8 @@ async function createNodesAction(
         if (!endDateIsValid) {
           if (!options.yes) {
             const selectedTime = await selectTime(endDate, {
-              message: `End time must be on an hour boundary. ${
-                cyan("Choose a time:")
-              }`,
+              message: `End time must be on an hour boundary. ${cyan("Choose a time:")
+                }`,
             });
             endDate = selectedTime === "NOW" ? new Date() : selectedTime;
           } else {
@@ -322,9 +319,8 @@ async function createNodesAction(
 
     // Only show pricing and get confirmation if not using --yes
     if (!options.yes) {
-      let confirmationMessage = `Create ${
-        formatNodeDescription(count, nodeType)
-      }`;
+      let confirmationMessage = `Create ${formatNodeDescription(count, nodeType)
+        }`;
 
       if (isReserved) {
         // Reserved nodes - get quote for accurate pricing
@@ -372,12 +368,17 @@ async function createNodesAction(
 
         spinner.stop();
 
+        // Ensure stdin is ready for inquirer
+        if (process.stdin.isTTY && process.stdin.isPaused()) {
+          process.stdin.resume();
+          console.log("resumed stdin");
+        }
+
         if (quote) {
           const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
           const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
-          confirmationMessage += ` for ~$${
-            pricePerNodeHour.toFixed(2)
-          }/node/hr`;
+          confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(2)
+            }/node/hr`;
         } else {
           logAndQuit(
             red(
@@ -387,9 +388,8 @@ async function createNodesAction(
         }
       } else if (options.maxPrice) {
         // Auto Reserved nodes - show max price they're willing to pay
-        confirmationMessage += ` for up to $${
-          options.maxPrice.toFixed(2)
-        }/node/hr`;
+        confirmationMessage += ` for up to $${options.maxPrice.toFixed(2)
+          }/node/hr`;
       }
 
       // Add node names at the end after a colon
@@ -409,12 +409,17 @@ async function createNodesAction(
     ).start();
 
     try {
-      const { data: createdNodes } = await client.nodes.create(createParams);
+      // TODO: Temporary debug - remove before production
+      console.log(
+        "DEBUG: Would create nodes with params:",
+        JSON.stringify(createParams, null, 2),
+      );
+      const createdNodes: any[] = [];
+      // const { data: createdNodes } = await client.nodes.create(createParams);
 
       spinner.succeed(
-        `Successfully created ${
-          formatNodeDescription(createdNodes.length, nodeType)
-        }`,
+        `Successfully created ${formatNodeDescription(createdNodes.length, nodeType)
+        } (DEBUG MODE)`,
       );
 
       if (options.json) {
@@ -438,8 +443,7 @@ async function createNodesAction(
           );
         } else {
           console.log(
-            `  sf nodes set ${
-              cyan(createdNodes?.[0]?.name ?? "my-node")
+            `  sf nodes set ${cyan(createdNodes?.[0]?.name ?? "my-node")
             } --max-price ${cyan("12.50")}`,
           );
         }
