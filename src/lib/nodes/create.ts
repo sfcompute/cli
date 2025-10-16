@@ -328,10 +328,10 @@ async function createNodesAction(
 
       if (isReserved) {
         // Reserved nodes - get quote for accurate pricing
-        const spinner = ora(
-          `Quoting ${formatNodeDescription(count, nodeType)}...`,
-        )
-          .start();
+        const spinner = ora({
+          text: `Quoting ${formatNodeDescription(count, nodeType)}...`,
+          discardStdin: false,
+        }).start();
 
         // Calculate duration for quote
         let durationSeconds: number = 3600; // Default 1 hour
