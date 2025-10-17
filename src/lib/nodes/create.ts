@@ -1,10 +1,10 @@
 import {Command, CommanderError, Option} from "@commander-js/extra-typings";
-import {confirm} from "@inquirer/prompts";
+import {Select, Confirm} from "@cliffy/prompt";
+import {blue} from "jsr:@std/fmt/colors";
 import {readFileSync} from "node:fs";
 import {cyan, gray, red, yellow} from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
-import ora from "ora";
 import {type SFCNodes} from "@sfcompute/nodes-sdk-alpha";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -29,8 +29,8 @@ import {getPricePerGpuHourFromQuote, getQuote} from "../buy/index.tsx";
 import {
   parseStartDate,
   roundStartDate,
-  selectTime,
 } from "../../helpers/units.ts";
+import {dateSameAcrossTimezones, formatDate} from "../../helpers/format-date.ts";
 import {GPUS_PER_NODE} from "../constants.ts";
 
 dayjs.extend(utc);
@@ -264,12 +264,46 @@ async function createNodesAction(
 
       if (!startDateIsValid) {
         if (!options.yes) {
-          options.start = await selectTime(startDate, {
-            message: `Start time must be "NOW" or on an hour boundary. ${cyan("Choose a time:")
-              }`,
+          // Inline selectTime to use same select instance
+          const suggestedLower = dayjs(startDate).startOf("hour");
+          const suggestedHigher = dayjs(startDate).startOf("hour").add(1, "hour");
+          const choices: Array<{name: string; value: Date | "NOW"}> = [];
+
+          const suggestedHigherUserTZ = `${formatDate(suggestedHigher.toDate(), {forceIncludeTime: true})} ${dayjs(suggestedHigher).format("z")}`;
+          const suggestedHigherUTC = `${formatDate(suggestedHigher.utc(true).toDate(), {today: suggestedHigher.toDate(), showToday: dateSameAcrossTimezones(suggestedHigher.toDate()), forceIncludeTime: true})} UTC`;
+
+          if (suggestedLower.isBefore(dayjs(new Date()))) {
+            const immediatelyText = "Immediately";
+            const maxLength = Math.max(immediatelyText.length, suggestedHigherUserTZ.length);
+
+            choices.push({
+              name: `${immediatelyText.padEnd(maxLength)} ${gray(`${formatDate(new Date(), {forceIncludeTime: true, showToday: false})} ${dayjs(new Date()).format("z")}`)}`,
+              value: "NOW",
+            });
+            choices.push({
+              name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${gray(`${suggestedHigherUTC}`)}`,
+              value: suggestedHigher.toDate(),
+            });
+          } else {
+            const suggestedLowerUserTZ = `${formatDate(suggestedLower.toDate(), {forceIncludeTime: true})} ${dayjs(suggestedLower).format("z")}`;
+            const suggestedLowerUTC = `${formatDate(suggestedLower.utc(true).toDate(), {today: suggestedLower.toDate(), showToday: dateSameAcrossTimezones(suggestedLower.toDate()), forceIncludeTime: true})} UTC`;
+            const maxLength = Math.max(suggestedLowerUserTZ.length, suggestedHigherUserTZ.length);
+
+            choices.push({
+              name: `${suggestedLowerUserTZ.padEnd(maxLength)} ${gray(`${suggestedLowerUTC}`)}`,
+              value: suggestedLower.toDate(),
+            });
+            choices.push({
+              name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${gray(`${suggestedHigherUTC}`)}`,
+              value: suggestedHigher.toDate(),
+            });
+          }
+
+          options.start = await Select.prompt({
+            message: `Start time must be "NOW" or on an hour boundary. ${cyan("Choose a time:")}`,
+            options: choices.map(c => ({name: c.name, value: c.value})),
           });
         } else {
-          // Clamp down to "NOW" or lower hour
           const suggestedLowerStart = dayjs(startDate).startOf("hour");
           options.start = suggestedLowerStart < dayjs()
             ? "NOW"
@@ -298,9 +332,44 @@ async function createNodesAction(
         );
         if (!endDateIsValid) {
           if (!options.yes) {
-            const selectedTime = await selectTime(endDate, {
-              message: `End time must be on an hour boundary. ${cyan("Choose a time:")
-                }`,
+            // Inline selectTime to use same select instance
+            const suggestedLower = dayjs(endDate).startOf("hour");
+            const suggestedHigher = dayjs(endDate).startOf("hour").add(1, "hour");
+            const choices: Array<{name: string; value: Date | "NOW"}> = [];
+
+            const suggestedHigherUserTZ = `${formatDate(suggestedHigher.toDate(), {forceIncludeTime: true})} ${dayjs(suggestedHigher).format("z")}`;
+            const suggestedHigherUTC = `${formatDate(suggestedHigher.utc(true).toDate(), {today: suggestedHigher.toDate(), showToday: dateSameAcrossTimezones(suggestedHigher.toDate()), forceIncludeTime: true})} UTC`;
+
+            if (suggestedLower.isBefore(dayjs(new Date()))) {
+              const immediatelyText = "Immediately";
+              const maxLength = Math.max(immediatelyText.length, suggestedHigherUserTZ.length);
+
+              choices.push({
+                name: `${immediatelyText.padEnd(maxLength)} ${gray(`${formatDate(new Date(), {forceIncludeTime: true, showToday: false})} ${dayjs(new Date()).format("z")}`)}`,
+                value: "NOW",
+              });
+              choices.push({
+                name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${gray(`${suggestedHigherUTC}`)}`,
+                value: suggestedHigher.toDate(),
+              });
+            } else {
+              const suggestedLowerUserTZ = `${formatDate(suggestedLower.toDate(), {forceIncludeTime: true})} ${dayjs(suggestedLower).format("z")}`;
+              const suggestedLowerUTC = `${formatDate(suggestedLower.utc(true).toDate(), {today: suggestedLower.toDate(), showToday: dateSameAcrossTimezones(suggestedLower.toDate()), forceIncludeTime: true})} UTC`;
+              const maxLength = Math.max(suggestedLowerUserTZ.length, suggestedHigherUserTZ.length);
+
+              choices.push({
+                name: `${suggestedLowerUserTZ.padEnd(maxLength)} ${gray(`${suggestedLowerUTC}`)}`,
+                value: suggestedLower.toDate(),
+              });
+              choices.push({
+                name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${gray(`${suggestedHigherUTC}`)}`,
+                value: suggestedHigher.toDate(),
+              });
+            }
+
+            const selectedTime = await Select.prompt({
+              message: `End time must be on an hour boundary. ${cyan("Choose a time:")}`,
+              options: choices.map(c => ({name: c.name, value: c.value})),
             });
             endDate = selectedTime === "NOW" ? new Date() : selectedTime;
           } else {
@@ -324,9 +393,7 @@ async function createNodesAction(
 
       if (isReserved) {
         // Reserved nodes - get quote for accurate pricing
-        const spinner = ora(
-          `Quoting ${formatNodeDescription(count, nodeType)}...`,
-        ).start();
+        console.log(gray(`Quoting ${formatNodeDescription(count, nodeType)}...`));
 
         // Calculate duration for quote
         let durationSeconds: number = 3600; // Default 1 hour
@@ -365,21 +432,6 @@ async function createNodesAction(
           cluster: options.zone,
         });
 
-        spinner.stop();
-
-        // Allow terminal state to settle and flush any buffered input
-        await new Promise(r => setTimeout(r, 30));
-        if (process.stdin.isTTY) {
-          const wasRaw = (process.stdin as any).isRaw ?? false;
-          try {
-            process.stdin.resume();
-            process.stdin.setRawMode(true);
-            while (process.stdin.read() !== null) { /* drain buffer */ }
-          } finally {
-            process.stdin.setRawMode(wasRaw);
-          }
-        }
-
         if (quote) {
           const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
           const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
@@ -403,29 +455,23 @@ async function createNodesAction(
         confirmationMessage += `: ${names.join(", ")}`;
       }
 
-      const confirmed = await confirm({
+      const answer = await Confirm.prompt({
         message: confirmationMessage + "?",
         default: false,
+        active: "y",
+        inactive: "N",
       });
-      if (!confirmed) process.exit(0);
+      if (!answer) process.exit(0);
     }
 
-    const spinner = ora(
-      `Creating ${formatNodeDescription(count, nodeType)}...`,
-    ).start();
+    console.log(gray(`Creating ${formatNodeDescription(count, nodeType)}...`));
 
     try {
-      // TODO: Temporary debug - remove before production
-      console.log(
-        "DEBUG: Would create nodes with params:",
-        JSON.stringify(createParams, null, 2),
-      );
-      const createdNodes: any[] = [];
-      // const { data: createdNodes } = await client.nodes.create(createParams);
+      const { data: createdNodes } = await client.nodes.create(createParams);
 
-      spinner.succeed(
+      console.log(
         `Successfully created ${formatNodeDescription(createdNodes.length, nodeType)
-        } (DEBUG MODE)`,
+        }`,
       );
 
       if (options.json) {
@@ -461,7 +507,7 @@ async function createNodesAction(
         create.help();
       }
     } catch (err) {
-      spinner.fail("Failed to create nodes");
+      console.error(red("Failed to create nodes"));
       throw err;
     }
   } catch (err) {
