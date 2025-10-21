@@ -466,7 +466,7 @@ export async function addCreate(program: Command) {
     create.addOption(
       new Option(
         "-i, --image <image-id>",
-        "ID of the VM image to boot on the nodes. View available images with `sf vms images list`.",
+        "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
       ),
     );
   }

@@ -1,4 +1,5 @@
 import { Command } from "@commander-js/extra-typings";
+import { isFeatureEnabled } from "../../posthog.ts";
 import upload from "./upload.ts";
 import show from "./show.tsx";
 import list from "./list.tsx";
@@ -13,13 +14,13 @@ const image = new Command("images")
     `
 Examples:\n
   \x1b[2m# Upload an image file\x1b[0m
-  $ sf vm image upload ./my-image.img
+  $ sf node image upload ./my-image.img
 
   \x1b[2m# List all images\x1b[0m
-  $ sf vm image list
+  $ sf node image list
 
   \x1b[2m# Show image details and download URL\x1b[0m
-  $ sf vm image show <image-id>
+  $ sf node image show <image-id>
 `,
   )
   .addCommand(list)
@@ -28,5 +29,12 @@ Examples:\n
   .action(() => {
     image.help();
   });
+
+export async function addImage(program: Command) {
+  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
+  if (imagesEnabled) {
+    program.addCommand(image);
+  }
+}
 
 export default image;

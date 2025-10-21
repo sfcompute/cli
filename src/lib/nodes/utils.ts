@@ -88,6 +88,13 @@ export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
   }
 }
 
+export function getLastVM(node: SFCNodes.Node) {
+  return node.current_vm ??
+    node.vms?.data?.sort((a, b) =>
+      (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
+    ).at(0);
+}
+
 /**
  * Creates a formatted table display of nodes
  * @param nodes Array of nodes to display
@@ -121,9 +128,7 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       ? `$${(node.max_price_per_node_hour / 100).toFixed(2)}/hr`
       : "N/A";
 
-    const lastVm = node.vms?.data?.sort((a, b) =>
-      (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
-    ).at(0);
+    const lastVm = getLastVM(node);
 
     table.push([
       node.name,

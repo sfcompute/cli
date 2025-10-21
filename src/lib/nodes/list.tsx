@@ -20,6 +20,7 @@ import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
   createNodesTable,
+  getLastVM,
   getStatusColor,
   getVMStatusColor,
   jsonOption,
@@ -102,14 +103,12 @@ function getActionsForNode(node: SFCNodes.Node) {
   const nodeActions: { label: string; command: string }[] = [];
 
   // Get the last VM for logs/ssh commands
-  const lastVm = node.vms?.data?.sort((a, b) =>
-    (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
-  ).at(0);
+  const lastVm = getLastVM(node);
 
   if (lastVm?.image_id) {
     nodeActions.push({
       label: "Image",
-      command: `sf vms image show ${brightBlack(lastVm.image_id)}`,
+      command: `sf nodes image show ${brightBlack(lastVm.image_id)}`,
     });
   }
 
@@ -119,12 +118,12 @@ function getActionsForNode(node: SFCNodes.Node) {
       if (lastVm?.id) {
         nodeActions.push({
           label: "SSH",
-          command: `sf vms ssh root@${brightBlack(String(lastVm.id))}`,
+          command: `sf nodes ssh root@${brightBlack(node.name)}`,
         });
         nodeActions.push(
           {
             label: "Logs",
-            command: `sf vms logs -i ${brightBlack(String(lastVm.id))}`,
+            command: `sf nodes logs ${brightBlack(node.name)}`,
           },
         );
       }
@@ -146,11 +145,11 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "SSH",
-            command: `sf vms ssh root@${brightBlack(lastVm.id)}`,
+            command: `sf nodes ssh root@${brightBlack(node.name)}`,
           },
           {
             label: "Logs",
-            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+            command: `sf nodes logs ${brightBlack(node.name)}`,
           },
         );
       }
@@ -205,7 +204,7 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "Logs",
-            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+            command: `sf nodes logs ${brightBlack(node.name)}`,
           },
         );
       }
@@ -245,11 +244,11 @@ function getActionsForNode(node: SFCNodes.Node) {
         nodeActions.push(
           {
             label: "SSH",
-            command: `sf vms ssh root@${brightBlack(lastVm.id)}`,
+            command: `sf nodes ssh root@${brightBlack(node.name)}`,
           },
           {
             label: "Logs",
-            command: `sf vms logs -i ${brightBlack(lastVm.id)}`,
+            command: `sf nodes logs ${brightBlack(node.name)}`,
           },
         );
       }
@@ -481,9 +480,8 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       );
 
       // Get actions from all nodes, deduplicated with newest nodes taking precedence
-      const nodesCommands: string[] = [];
-      const vmsCommands: string[] = [];
-      const seenNodesLabels = new Set<string>();
+      const allCommands: string[] = [];
+      const seenLabels = new Set<string>();
 
       // Sort nodes by created_at (newest first), fallback to index for consistent ordering
       const sortedNodes = [...nodes].sort((a, b) => {
@@ -493,38 +491,22 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       });
 
       // Collect actions from each node, with newer nodes taking precedence
-      // Limit to 3 nodes commands and 1 vms command
+      // Limit to 5 commands total, deduplicated by label
       for (const node of sortedNodes) {
         const nodeActions = getActionsForNode(node);
         for (const action of nodeActions) {
-          const isVmsCommand = action.command.includes("sf vms");
-
-          if (isVmsCommand) {
-            // Only add the first vms command we encounter (from newest node)
-            if (vmsCommands.length === 0) {
-              vmsCommands.push(action.command);
-            }
-          } else {
-            // For nodes commands, limit to 3 and deduplicate by label
-            if (
-              nodesCommands.length < 3 && !seenNodesLabels.has(action.label)
-            ) {
-              nodesCommands.push(action.command);
-              seenNodesLabels.add(action.label);
-            }
+          // Add command if we haven't seen this label and haven't reached the limit
+          if (allCommands.length < 5 && !seenLabels.has(action.label)) {
+            allCommands.push(action.command);
+            seenLabels.add(action.label);
           }
         }
       }
 
       // Print Next Steps section
-      if (nodesCommands.length > 0 || vmsCommands.length > 0) {
+      if (allCommands.length > 0) {
         console.log(gray("\nNext steps:"));
-        // Print nodes commands first
-        for (const command of nodesCommands) {
-          console.log(`  ${command}`);
-        }
-        // Then print vms commands
-        for (const command of vmsCommands) {
+        for (const command of allCommands) {
           console.log(`  ${command}`);
         }
       }
