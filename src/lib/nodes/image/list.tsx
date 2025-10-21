@@ -26,13 +26,13 @@ const list = new Command("list")
     `
 Next Steps:\n
   \x1b[2m# List all images\x1b[0m
-  $ sf vms images list
+  $ sf node images list
 
   \x1b[2m# Get detailed info for a specific image\x1b[0m
-  $ sf vms images show <image-id>
+  $ sf node images show <image-id>
 
   \x1b[2m# List images in JSON format\x1b[0m
-  $ sf vms images list --json
+  $ sf node images list --json
 `,
   )
   .action(async (options) => {
@@ -56,7 +56,7 @@ Next Steps:\n
       if (images.length === 0) {
         console.log("No images found.");
         console.log(gray("\nUpload your first image:"));
-        console.log("  sf vms images upload -f ./my-image.img -n my-image");
+        console.log("  sf node images upload -f ./my-image.img -n my-image");
         return;
       }
 
@@ -116,7 +116,7 @@ Next Steps:\n
             content: brightBlack(
               `${images.length - 5} older ${
                 images.length - 5 === 1 ? "image" : "images"
-              } not shown. Use sf vms images list --json to list all images.`,
+              } not shown. Use sf node images list --json to list all images.`,
             ),
           },
         ]);
@@ -130,7 +130,7 @@ Next Steps:\n
       // Always show how to get info for a specific image
       const firstImage = sortedImages[0];
       if (firstImage) {
-        console.log(`  sf vms images show ${cyan(firstImage.image_id)}`);
+        console.log(`  sf node images show ${cyan(firstImage.image_id)}`);
       }
       const firstCompletedImage = sortedImages.find(
         (image) => image.upload_status === "completed",
