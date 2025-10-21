@@ -193,7 +193,7 @@ Examples:
 
           incompleteLine = fullData.endsWith("\n") ? "" : lines.pop() || "";
 
-          const prefix = `(instance ${log.instance_id}) [${timestamp}]`;
+          const prefix = `[${timestamp}]`;
           for (const line of lines) {
             if (line.length > 0) {
               console.log(`${prefix} ${line}`);
@@ -205,7 +205,7 @@ Examples:
       const flushIncompleteLine = () => {
         if (incompleteLine.length > 0) {
           console.log(
-            `(instance ${vmId}) [${lastTimestamp}] ${incompleteLine}`,
+            `[${lastTimestamp}] ${incompleteLine}`,
           );
         }
       };
