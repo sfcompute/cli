@@ -72,7 +72,6 @@ const trackEvent = ({
 type FeatureFlags =
   | "procurements"
   | "zones"
-  | "vm-provider"
   | "custom-vm-images";
 
 /**
