@@ -1892,11 +1892,11 @@ export interface components {
             /** @default autoreserved */
             node_type: null | components["schemas"]["node-api_NodeType"];
             /**
-             * Format: int64
-             * @description Start time as Unix timestamp in seconds
-             * @example 1640995200
-             */
-            start_at?: number;
+            * Format: int64
+            * @description Start time as Unix timestamp in seconds
+            * @example 1640995200
+            */
+            start_at?: number | null;
             /**
              * @description Zone to create the nodes in
              * @example hayesvalley

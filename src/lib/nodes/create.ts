@@ -255,8 +255,6 @@ async function createNodesAction(
       const startDate = options.start;
       if (typeof startDate !== "string") {
         createParams.start_at = Math.floor(startDate.getTime() / 1000);
-      } else {
-        createParams.start_at = Math.floor(new Date().getTime() / 1000);
       }
 
       // Check if the start date is "NOW" or on an hour boundary
