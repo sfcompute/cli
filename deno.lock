@@ -1,9 +1,9 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/assert@^1.0.11": "1.0.15",
+    "jsr:@std/assert@^1.0.11": "1.0.11",
     "jsr:@std/fmt@*": "1.0.8",
-    "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/internal@^1.0.5": "1.0.12",
     "npm:@commander-js/extra-typings@^12.1.0": "12.1.0_commander@12.1.0",
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.26__react@18.3.1_@types+react@18.3.26_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
@@ -51,8 +51,8 @@
     "npm:yn@*": "5.1.0"
   },
   "jsr": {
-    "@std/assert@1.0.15": {
-      "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
+    "@std/assert@1.0.11": {
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -117,7 +117,7 @@
         "@inquirer/figures",
         "@inquirer/type@2.0.0",
         "@types/mute-stream",
-        "@types/node@22.18.12",
+        "@types/node@22.18.10",
         "@types/wrap-ansi",
         "ansi-escapes@4.3.2",
         "cli-width",
@@ -235,8 +235,8 @@
         "@types/node@24.2.0"
       ]
     },
-    "@types/node@22.18.12": {
-      "integrity": "sha512-BICHQ67iqxQGFSzfCFTT7MRQ5XcBjG5aeKh5Ok38UBbPe5fxTyE+aHFxwVrGyr8GNlqFMLKD1D3P2K/1ks8tog==",
+    "@types/node@22.18.10": {
+      "integrity": "sha512-anNG/V/Efn/YZY4pRzbACnKxNKoBng2VTFydVu8RRs5hQjikP8CQfaeAV59VFSCzKNp90mXiVXW2QzV56rwMrg==",
       "dependencies": [
         "undici-types@6.21.0"
       ]
@@ -1067,7 +1067,7 @@
     "https://esm.sh/camelcase@^8.0.0?target=denonext": "https://esm.sh/camelcase@8.0.0?target=denonext",
     "https://esm.sh/chalk@^5.3.0?target=denonext": "https://esm.sh/chalk@5.6.2?target=denonext",
     "https://esm.sh/cli-boxes@^3.0.0?target=denonext": "https://esm.sh/cli-boxes@3.0.0?target=denonext",
-    "https://esm.sh/emoji-regex@^10.3.0?target=denonext": "https://esm.sh/emoji-regex@10.6.0?target=denonext",
+    "https://esm.sh/emoji-regex@^10.3.0?target=denonext": "https://esm.sh/emoji-regex@10.5.0?target=denonext",
     "https://esm.sh/emoji-regex@^8.0.0?target=denonext": "https://esm.sh/emoji-regex@8.0.0?target=denonext",
     "https://esm.sh/get-east-asian-width@^1.0.0?target=denonext": "https://esm.sh/get-east-asian-width@1.4.0?target=denonext",
     "https://esm.sh/is-fullwidth-code-point@^3.0.0?target=denonext": "https://esm.sh/is-fullwidth-code-point@3.0.0?target=denonext",
@@ -1115,8 +1115,8 @@
     "https://esm.sh/dayjs@1.11.13/plugin/relativeTime.js": "48ccbeb4a6e19c6320f41edc1028ac85e7baf8cd434faebe65e3208ec70cea6b",
     "https://esm.sh/dayjs@1.11.13/plugin/timezone.js": "8885a15a7472e23b020957c28d9d49d3e5c00fd5b992bf5d733bfa4f952ed457",
     "https://esm.sh/dayjs@1.11.13/plugin/utc.js": "2e41a0673e6e7c7c962983f1680911ef6feb27ded6007bc7705787ac1b2637b7",
-    "https://esm.sh/emoji-regex@10.6.0/denonext/emoji-regex.mjs": "bec0264591b37a7132b080ed5586e3fc577392b1444230d973d7209d04f4f6e5",
-    "https://esm.sh/emoji-regex@10.6.0?target=denonext": "0b0ed0e68f224d09d771339aaf83dd19d31c149e6fb1213ea3a12ef8ee977188",
+    "https://esm.sh/emoji-regex@10.5.0/denonext/emoji-regex.mjs": "12f243696a48c88a1d760f38b8f6bc278d0551f83de923e57f1547e5263bc738",
+    "https://esm.sh/emoji-regex@10.5.0?target=denonext": "b784b44eceec32acf6cd4386e5ee6ab38e935d9fa7d2e9507841d79c1ba3f94c",
     "https://esm.sh/emoji-regex@8.0.0/denonext/emoji-regex.mjs": "3969ad7b107b6f585354a5019c24320e3d91d6bb70a96e2beead925247aed9dc",
     "https://esm.sh/emoji-regex@8.0.0?target=denonext": "60f2b0edb22d249525b4b284b0268e1d3a04a5e9dc4083e9e63c7372752e6de5",
     "https://esm.sh/get-east-asian-width@1.4.0/denonext/get-east-asian-width.mjs": "26d98853cab1abf823701e9f8594beab7b1d6e51a5c6d6cf151e653f7947796f",
