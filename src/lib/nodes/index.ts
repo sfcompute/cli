@@ -28,6 +28,10 @@ export async function registerNodes(program: Command) {
     .addCommand(ssh)
     .addCommand(logs);
 
+  await addImage(nodes);
+  await addCreate(nodes);
+  await addRedeploy(nodes);
+
   const baseHelpText = nodes.helpInformation();
 
   // Format short and verbose help text
@@ -35,7 +39,7 @@ export async function registerNodes(program: Command) {
     .addHelpText(
       "after",
       `
-A node is a compute instance that provides GPUs for your workloads. Nodes can be created 
+A node is a compute instance that provides GPUs for your workloads. Nodes can be created
 as reservations (with specific start/end times) or as procurements (auto reserved pricing).
 
 Examples:\n
@@ -85,7 +89,7 @@ $ sf nodes images --help
     // Add action to display help if no subcommand is provided
     .action(() => {
       console.log(`${baseHelpText}
-A node is a compute instance that provides GPUs for your workloads. Nodes can be created 
+A node is a compute instance that provides GPUs for your workloads. Nodes can be created
 as reservations (with specific start/end times) or as procurements (auto reserved pricing).
 
 Examples:\n
@@ -102,8 +106,4 @@ To see a full list of examples, run:
 $ sf nodes --help
 `);
     });
-
-  await addImage(nodes);
-  await addCreate(nodes);
-  await addRedeploy(nodes);
 }
