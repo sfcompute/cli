@@ -253,9 +253,6 @@ async function createNodesAction(
     if (isReserved) {
       // Handle start time (options.start comes from parseStartDateOrNow parser)
       const startDate = options.start;
-      if (typeof startDate !== "string") {
-        createParams.start_at = Math.floor(startDate.getTime() / 1000);
-      }
 
       // Check if the start date is "NOW" or on an hour boundary
       const startDateIsValid = startDate === "NOW" ||
@@ -276,20 +273,21 @@ async function createNodesAction(
             : suggestedLowerStart.toDate();
         }
       }
-      createParams.start_at = Math.floor(
-        (options.start === "NOW"
-          ? new Date().getTime()
-          : options.start.getTime()) /
-          1000,
-      );
+      // Pass undefined for "NOW" to avoid race conditions - the API will use current time
+      if (options.start !== "NOW") {
+        createParams.start_at = Math.floor(options.start.getTime() / 1000);
+      }
 
       // Handle end time and/or duration
       if (options.end || options.duration) {
         let endDate = options.end;
+        const endStartTime = typeof options.start === "string"
+          ? new Date()
+          : options.start;
         if (!endDate) {
+          // Use the actual start time (current time if "NOW", or the specified start)
           endDate = new Date(
-            new Date(createParams.start_at! * 1000).getTime() +
-              (options.duration! * 1000),
+            endStartTime.getTime() + (options.duration! * 1000),
           );
         }
 
