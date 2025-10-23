@@ -31,6 +31,7 @@ import {
   roundStartDate,
   selectTime,
 } from "../../helpers/units.ts";
+import { formatDate } from "../../helpers/format-date.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 
 dayjs.extend(utc);
@@ -253,9 +254,6 @@ async function createNodesAction(
     if (isReserved) {
       // Handle start time (options.start comes from parseStartDateOrNow parser)
       const startDate = options.start;
-      if (typeof startDate !== "string") {
-        createParams.start_at = Math.floor(startDate.getTime() / 1000);
-      }
 
       // Check if the start date is "NOW" or on an hour boundary
       const startDateIsValid = startDate === "NOW" ||
@@ -276,20 +274,21 @@ async function createNodesAction(
             : suggestedLowerStart.toDate();
         }
       }
-      createParams.start_at = Math.floor(
-        (options.start === "NOW"
-          ? new Date().getTime()
-          : options.start.getTime()) /
-          1000,
-      );
+      // Pass undefined for "NOW" to avoid race conditions - the API will use current time
+      if (options.start !== "NOW") {
+        createParams.start_at = Math.floor(options.start.getTime() / 1000);
+      }
 
       // Handle end time and/or duration
       if (options.end || options.duration) {
         let endDate = options.end;
+        const endStartTime = typeof options.start === "string"
+          ? new Date()
+          : options.start;
         if (!endDate) {
+          // Use the actual start time (current time if "NOW", or the specified start)
           endDate = new Date(
-            new Date(createParams.start_at! * 1000).getTime() +
-              (options.duration! * 1000),
+            endStartTime.getTime() + (options.duration! * 1000),
           );
         }
 
@@ -297,6 +296,19 @@ async function createNodesAction(
           dayjs(endDate).startOf("hour"),
         );
         if (!endDateIsValid) {
+          // If the start time was valid, show the user the start time so they're no confused about
+          // which time they're selecting
+          if (startDateIsValid) {
+            ora(
+              `Using start time: ${
+                cyan(
+                  `${formatDate(endStartTime, { forceIncludeTime: true })} ${
+                    dayjs(endStartTime).format("z")
+                  }`,
+                )
+              }`,
+            ).info();
+          }
           if (!options.yes) {
             const selectedTime = await selectTime(endDate, {
               message: `End time must be on an hour boundary. ${
