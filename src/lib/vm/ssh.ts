@@ -63,8 +63,8 @@ export function registerSsh(program: Command) {
         ssh_hostname: string;
         ssh_port: number;
         ssh_host_keys: {
-          keyType: string;
-          base64EncodedKey: string;
+          key_type: string;
+          base64_encoded_key: string;
         }[] | undefined;
       };
       const sshHostname = data.ssh_hostname;
@@ -86,9 +86,9 @@ export function registerSsh(program: Command) {
         let knownHostsCommand = ["/usr/bin/env", "printf", "%s %s %s\\n"];
         for (const sshHostKey of sshHostKeys) {
           knownHostsCommand = knownHostsCommand.concat([
-            sshHostname,
-            sshHostKey.keyType,
-            sshHostKey.base64EncodedKey,
+            `${vmId}.vms.sfcompute.dev`,
+            sshHostKey.key_type,
+            sshHostKey.base64_encoded_key,
           ]);
         }
         // Escape all characters for proper pass through
