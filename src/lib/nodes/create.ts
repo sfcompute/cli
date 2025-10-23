@@ -31,6 +31,7 @@ import {
   roundStartDate,
   selectTime,
 } from "../../helpers/units.ts";
+import { formatDate } from "../../helpers/format-date.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 
 dayjs.extend(utc);
@@ -295,6 +296,19 @@ async function createNodesAction(
           dayjs(endDate).startOf("hour"),
         );
         if (!endDateIsValid) {
+          // If the start time was valid, show the user the start time so they're no confused about
+          // which time they're selecting
+          if (startDateIsValid) {
+            ora(
+              `Using start time: ${
+                cyan(
+                  `${formatDate(endStartTime, { forceIncludeTime: true })} ${
+                    dayjs(endStartTime).format("z")
+                  }`,
+                )
+              }`,
+            ).info();
+          }
           if (!options.yes) {
             const selectedTime = await selectTime(endDate, {
               message: `End time must be on an hour boundary. ${
