@@ -1,8 +1,8 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@std/assert@^1.0.11": "1.0.15",
-    "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/assert@1.0.11": "1.0.11",
+    "jsr:@std/internal@^1.0.5": "1.0.12",
     "npm:@commander-js/extra-typings@^12.1.0": "12.1.0_commander@12.1.0",
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.26__react@18.3.1_@types+react@18.3.26_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
@@ -44,8 +44,8 @@
     "npm:yaml@2.6.1": "2.6.1"
   },
   "jsr": {
-    "@std/assert@1.0.15": {
-      "integrity": "d64018e951dbdfab9777335ecdb000c0b4e3df036984083be219ce5941e4703b",
+    "@std/assert@1.0.11": {
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -1157,7 +1157,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@std/assert@^1.0.11"
+      "jsr:@std/assert@1.0.11"
     ],
     "packageJson": {
       "dependencies": [
