@@ -1,11 +1,11 @@
-import { Command } from "@commander-js/extra-typings";
-import { confirm } from "@inquirer/prompts";
-import { brightRed, cyan, gray, red } from "jsr:@std/fmt/colors";
+import {Command} from "@commander-js/extra-typings";
+import {confirm} from "@inquirer/prompts";
+import {brightRed, cyan, gray, red} from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
 import ora from "ora";
 import dayjs from "dayjs";
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import {handleNodesError, nodesClient} from "../../nodesClient.ts";
 import {
   createNodesTable,
   jsonOption,
@@ -15,11 +15,11 @@ import {
   yesOption,
 } from "./utils.ts";
 import SFCNodes from "@sfcompute/nodes-sdk-alpha";
-import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
-import { GPUS_PER_NODE } from "../constants.ts";
-import { formatDuration } from "date-fns/formatDuration";
-import { intervalToDuration } from "date-fns/intervalToDuration";
-import { selectTime } from "../../helpers/units.ts";
+import {getPricePerGpuHourFromQuote, getQuote} from "../buy/index.tsx";
+import {GPUS_PER_NODE} from "../constants.ts";
+import {formatDuration} from "date-fns/formatDuration";
+import {intervalToDuration} from "date-fns/intervalToDuration";
+import {selectTime} from "../../helpers/units.ts";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
@@ -37,7 +37,7 @@ Examples:\n
   $ sf nodes extend my-node --duration 1h --max-price 15.00
 
   \x1b[2m# Extend multiple nodes by node ID instead of name\x1b[0m
-  $ sf nodes extend node-abc123 node-abc124 node-abc125 --duration 2h --max-price 10.00
+  $ sf nodes extend n_b1dc52505c6db142 n_c1ed52505c6db142 --duration 2h --max-price 10.00
 
   \x1b[2m# Extend with raw seconds\x1b[0m
   $ sf nodes extend my-node --duration 7200 --max-price 10.00
@@ -62,11 +62,11 @@ async function extendNodeAction(
     const fetchSpinner = ora().start(
       `Checking ${nodeNames.length} ${pluralizeNodes(nodeNames.length)}...`,
     );
-    const { data: fetchedNodes } = await client.nodes.list({ name: nodeNames });
+    const {data: fetchedNodes} = await client.nodes.list({name: nodeNames});
     fetchSpinner.stop();
 
     // Check which names were not found
-    const nodes: { name: string; node: SFCNodes.Node }[] = [];
+    const nodes: {name: string; node: SFCNodes.Node}[] = [];
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
@@ -74,7 +74,7 @@ async function extendNodeAction(
         n.name === nameOrId || n.id === nameOrId
       );
       if (node) {
-        nodes.push({ name: nameOrId, node });
+        nodes.push({name: nameOrId, node});
       } else {
         notFound.push(nameOrId);
       }
@@ -83,8 +83,7 @@ async function extendNodeAction(
     if (notFound.length > 0) {
       console.log(
         red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(notFound.length)
           }:`,
         ),
       );
@@ -95,24 +94,22 @@ async function extendNodeAction(
     }
 
     // Filter out auto reserved nodes (they can't be extended)
-    const autoReservedNodes = nodes.filter(({ node }) =>
+    const autoReservedNodes = nodes.filter(({node}) =>
       node.node_type === "autoreserved"
     );
-    const extendableNodes = nodes.filter(({ node }) =>
+    const extendableNodes = nodes.filter(({node}) =>
       node.node_type !== "autoreserved"
     );
 
     if (autoReservedNodes.length > 0) {
       console.log(
         red(
-          `Cannot extend ${
-            autoReservedNodes.length === 1 ? "this" : "these"
-          } auto reserved ${
-            pluralizeNodes(autoReservedNodes.length)
+          `Cannot extend ${autoReservedNodes.length === 1 ? "this" : "these"
+          } auto reserved ${pluralizeNodes(autoReservedNodes.length)
           } (they auto-extend):`,
         ),
       );
-      for (const { name } of autoReservedNodes) {
+      for (const {name} of autoReservedNodes) {
         console.log(`  • ${name}`);
       }
       console.log(
@@ -141,9 +138,8 @@ async function extendNodeAction(
       );
 
       const selectedTime = await selectTime(calculatedEndTime, {
-        message: `Nodes must be extended to an hour boundary. ${
-          cyan("Choose an end time:")
-        }`,
+        message: `Nodes must be extended to an hour boundary. ${cyan("Choose an end time:")
+          }`,
       });
 
       if (selectedTime === "NOW") {
@@ -177,8 +173,7 @@ async function extendNodeAction(
     if (!options.yes) {
       // Get quote for accurate pricing preview
       const spinner = ora(
-        `Quoting extending ${extendableNodes.length} ${
-          pluralizeNodes(extendableNodes.length)
+        `Quoting extending ${extendableNodes.length} ${pluralizeNodes(extendableNodes.length)
         }...`,
       ).start();
 
@@ -194,7 +189,7 @@ async function extendNodeAction(
       );
 
       const quotes = await Promise.allSettled(
-        extendableNodes.map(async ({ node }) => {
+        extendableNodes.map(async ({node}) => {
           return await getQuote({
             instanceType: `${node.gpu_type.toLowerCase()}v` as const,
             quantity: 8,
@@ -213,9 +208,8 @@ async function extendNodeAction(
 
       spinner.stop();
 
-      let confirmationMessage = `Extend ${extendableNodes.length} ${
-        pluralizeNodes(extendableNodes.length)
-      } for ${formattedDuration}`;
+      let confirmationMessage = `Extend ${extendableNodes.length} ${pluralizeNodes(extendableNodes.length)
+        } for ${formattedDuration}`;
 
       // If there's only one node, show the price per node per hour
       if (filteredQuotes.length === 1 && filteredQuotes[0].value) {
@@ -244,25 +238,24 @@ async function extendNodeAction(
     }
 
     const spinner = ora(
-      `Extending ${extendableNodes.length} ${
-        pluralizeNodes(extendableNodes.length)
+      `Extending ${extendableNodes.length} ${pluralizeNodes(extendableNodes.length)
       }...`,
     ).start();
 
-    const results: { name: string; node: SFCNodes.Node }[] = [];
-    const errors: { name: string; error: string }[] = [];
+    const results: {name: string; node: SFCNodes.Node}[] = [];
+    const errors: {name: string; error: string}[] = [];
 
-    for (const { name: nodeIdOrName, node: originalNode } of extendableNodes) {
+    for (const {name: nodeIdOrName, node: originalNode} of extendableNodes) {
       try {
         const extendedNode = await client.nodes.extend(originalNode.id, {
           duration_seconds: options.duration!,
           max_price_per_node_hour: Math.round(options.maxPrice * 100),
         });
 
-        results.push({ name: nodeIdOrName, node: extendedNode });
+        results.push({name: nodeIdOrName, node: extendedNode});
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Unknown error";
-        errors.push({ name: nodeIdOrName, error: errorMsg });
+        errors.push({name: nodeIdOrName, error: errorMsg});
       }
     }
 
@@ -273,8 +266,7 @@ async function extendNodeAction(
 
     if (results.length > 0) {
       spinner.succeed(
-        `Successfully extended ${results.length} ${
-          pluralizeNodes(results.length)
+        `Successfully extended ${results.length} ${pluralizeNodes(results.length)
         }`,
       );
     }
@@ -284,8 +276,7 @@ async function extendNodeAction(
         spinner.fail("Failed to extend any nodes");
       } else {
         spinner.warn(
-          `Extended ${results.length} ${
-            pluralizeNodes(results.length)
+          `Extended ${results.length} ${pluralizeNodes(results.length)
           }, but ${errors.length} failed`,
         );
       }
