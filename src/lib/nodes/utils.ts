@@ -6,15 +6,15 @@ import {
   red,
   yellow,
 } from "jsr:@std/fmt/colors";
-import type {SFCNodes} from "@sfcompute/nodes-sdk-alpha";
+import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
 import Table from "cli-table3";
 import dayjs from "dayjs";
-import {CommanderError, Option} from "@commander-js/extra-typings";
-import {parseDate} from "chrono-node";
-import {parseDurationArgument} from "../../helpers/duration.ts";
-import {parseStartDateOrNow} from "../../helpers/units.ts";
-import {logAndQuit} from "../../helpers/errors.ts";
-import {formatNullableDateRange} from "../../helpers/format-date.ts";
+import { CommanderError, Option } from "@commander-js/extra-typings";
+import { parseDate } from "chrono-node";
+import { parseDurationArgument } from "../../helpers/duration.ts";
+import { parseStartDateOrNow } from "../../helpers/units.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
+import { formatNullableDateRange } from "../../helpers/format-date.ts";
 
 export function printNodeStatus(status: SFCNodes.Node["status"]): string {
   switch (status) {
@@ -195,7 +195,8 @@ export function validateDuration(val: string, minimum = 3600): number {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Duration must be at least ${minimum} seconds (${Math.round(minimum / 3600)
+      `Duration must be at least ${minimum} seconds (${
+        Math.round(minimum / 3600)
       } hour${minimum === 3600 ? "" : "s"})`,
     );
   }
