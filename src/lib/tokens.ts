@@ -232,11 +232,10 @@ async function listTokensAction() {
     console.log(`${table.toString()}\n`);
 
     // prompt user that they can generate one
-    const base = getCommandBase();
     console.log(
       `${gray("Generate your first token with: ")}${
         magenta(
-          `${base} tokens create`,
+          `sf tokens create`,
         )
       }`,
     );
