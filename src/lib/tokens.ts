@@ -219,7 +219,7 @@ async function listTokensAction() {
   // show empty table if no tokens
   if (tokens.length === 0) {
     const table = new Table({
-      head: [gray("Access Tokens")],
+      head: [cyan("Access Tokens")],
       colWidths: [50],
     });
     table.push([
@@ -242,15 +242,15 @@ async function listTokensAction() {
   // display table
   const tokensTable = new Table({
     head: [
-      gray("Token ID"),
-      gray("Name"),
-      gray("Expires"),
+      cyan("Token ID"),
+      cyan("Name"),
+      cyan("Expires"),
     ],
     colWidths: [40, 15, 25],
   });
   for (const token of tokens) {
     tokensTable.push([
-      cyan(token.id),
+      white(token.id),
       token.name ? token.name : gray("(empty)"),
       white(formatDate(new Date(token.expires_at))),
     ]);
