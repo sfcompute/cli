@@ -5,6 +5,9 @@ import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
 import boxen from "npm:boxen@8.0.1";
 import console from "node:console";
 import process from "node:process";
+import ora from "ora";
+import { getContractRange } from "../contracts/utils.ts";
+import { apiClient } from "../../apiClient.ts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -41,7 +44,7 @@ ${
         boxen(
           `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
   \x1b[31mTo create, extend, and release specific machines directly, use \x1b[97msf nodes\x1b[31m.\x1b[0m
-  \x1b[31mTo "extend" a contract, use \x1b[97msf buy -colo <contract_id> -d <duration>\x1b[31m.\x1b[0m
+  \x1b[31mTo "extend" a contract, use \x1b[97msf buy -colo <contract_id> -s <contract_end_time> -d <duration>\x1b[31m.\x1b[0m
   \x1b[31mHowever, contracts don't map to specific machines, so you can't choose which will persist.\x1b[0m
   \x1b[31mWe strongly recommend using \x1b[97msf nodes\x1b[31m instead.\x1b[0m`,
           {
@@ -52,10 +55,32 @@ ${
       }
 `,
     )
-    .action(function extendAction(options) {
+    .action(async function extendAction(options) {
+      const spinner = ora().start(`Fetching contract ${options.contract}...`);
+      const api = await apiClient();
+
+      const { data: contract, response } = await api.GET("/v0/contracts/{id}", {
+        params: {
+          path: { id: options.contract },
+        },
+      });
+
+      const fetchFailed = !response.ok || !contract;
+      if (fetchFailed) {
+        spinner.fail(
+          `Failed to fetch contract ${options.contract}: ${response.statusText}`,
+        );
+      } else {
+        spinner.clear();
+      }
+
+      const contractRange = contract?.shape &&
+        getContractRange(contract?.shape);
+
       // Build the equivalent sf buy command
-      let equivalentCommand =
-        `sf buy -colo ${options.contract} -d ${options.duration}`;
+      let equivalentCommand = `sf buy -colo ${options.contract} -s ${
+        contractRange?.endsAt?.toISOString?.() ?? "<contract_end_time>"
+      } -d ${options.duration}`;
 
       if (options.price) {
         equivalentCommand += ` -p ${options.price}`;
@@ -82,6 +107,9 @@ ${
         },
       ));
 
+      if (fetchFailed) {
+        process.exit(1);
+      }
       process.exit(0);
     });
 }
