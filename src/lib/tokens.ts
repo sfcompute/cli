@@ -1,18 +1,17 @@
 import type { Command } from "@commander-js/extra-typings";
 import { confirm, input, select } from "@inquirer/prompts";
-import { gray, green, magenta, red, white } from "jsr:@std/fmt/colors";
+import { cyan, gray, green, magenta, red, white } from "jsr:@std/fmt/colors";
 import Table from "cli-table3";
-import dayjs from "dayjs";
 import * as console from "node:console";
 import process from "node:process";
 import ora from "ora";
-import { getCommandBase } from "../helpers/command.ts";
 import { getAuthToken, isLoggedIn } from "../helpers/config.ts";
 import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
 import { getApiUrl } from "../helpers/urls.ts";
+import { formatDate } from "../helpers/format-date.ts";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -138,7 +137,6 @@ async function createTokenAction() {
   // display token to user
   const data = await response.json();
   loadingSpinner.succeed(gray("Access token created 🎉"));
-  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   console.log(`${green(data.token)}\n`);
 
   // tell them they will set this in the Authorization header
@@ -170,13 +168,11 @@ async function createTokenAction() {
   console.log("\n");
 
   // tip user on other commands
-  const base = getCommandBase();
-
   const table = new Table({
     colWidths: [20, 30],
   });
-  table.push(["View All Tokens", magenta(`${base} tokens list`)]);
-  table.push(["Delete a Token", magenta(`${base} tokens delete`)]);
+  table.push(["View All Tokens", magenta("sf tokens list")]);
+  table.push(["Delete a Token", magenta("sf tokens delete")]);
 
   console.log(`${gray("And other commands you can try:")}`);
   console.log(table.toString());
@@ -232,11 +228,10 @@ async function listTokensAction() {
     console.log(`${table.toString()}\n`);
 
     // prompt user that they can generate one
-    const base = getCommandBase();
     console.log(
       `${gray("Generate your first token with: ")}${
         magenta(
-          `${base} tokens create`,
+          `sf tokens create`,
         )
       }`,
     );
@@ -249,29 +244,21 @@ async function listTokensAction() {
     head: [
       gray("Token ID"),
       gray("Name"),
-      //       gray("Last active"),
       gray("Expires"),
     ],
-    colWidths: [40, 15, 25, 25],
+    colWidths: [40, 15, 25],
   });
   for (const token of tokens) {
     tokensTable.push([
-      gray(token.id),
+      cyan(token.id),
       token.name ? token.name : gray("(empty)"),
-      //       green(formatDate(token.last_active_at)),
-      white(formatDate(token.expires_at)),
+      white(formatDate(new Date(token.expires_at))),
     ]);
   }
   console.log(tokensTable.toString());
 
   process.exit(0);
 }
-
-function formatDate(isoString: string): string {
-  return dayjs(isoString).format("MMM D, YYYY [at] h:mma").toLowerCase();
-}
-
-// --
 
 async function deleteTokenAction({
   id,
