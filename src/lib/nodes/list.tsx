@@ -129,7 +129,7 @@ function getActionsForNode(node: SFCNodes.Node) {
       }
       nodeActions.push({
         label: "Delete",
-        command: `sf nodes delete ${brightBlack(node.name)} (coming soon)`,
+        command: `sf nodes delete ${brightBlack(node.name)}`,
       });
       break;
 
@@ -173,7 +173,7 @@ function getActionsForNode(node: SFCNodes.Node) {
             label: "Delete",
             command: `sf nodes delete ${
               brightBlack(node.name)
-            } --yes (coming soon)`,
+            } --yes`,
           },
         );
       } else if (node.node_type === "autoreserved") {
@@ -191,7 +191,7 @@ function getActionsForNode(node: SFCNodes.Node) {
             label: "Delete",
             command: `sf nodes delete ${
               brightBlack(node.name)
-            } --yes (coming soon)`,
+            } --yes`,
           },
         );
       }
@@ -224,7 +224,7 @@ function getActionsForNode(node: SFCNodes.Node) {
             label: "Delete",
             command: `sf nodes delete ${
               brightBlack(node.name)
-            } --yes (coming soon)`,
+            } --yes`,
           },
         );
       } else if (node.node_type === "reserved") {
@@ -233,7 +233,7 @@ function getActionsForNode(node: SFCNodes.Node) {
           label: "Delete",
           command: `sf nodes delete ${
             brightBlack(node.name)
-          } --yes (coming soon)`,
+          } --yes`,
         });
       }
       break;
