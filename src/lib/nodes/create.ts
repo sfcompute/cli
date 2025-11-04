@@ -75,11 +75,11 @@ const create = new Command("create")
   .showHelpAfterError()
   .argument(
     "[names...]",
-    "Names of the nodes to create (must be unique across your account)",
+    "[Required: names or --count] Names of the nodes to create (must be unique across your account)",
   )
   .option(
     "-n, --count <number>",
-    "Number of nodes to create with auto-generated names",
+    "[Required: names or --count] Number of nodes to create with auto-generated names",
     validateCount,
   )
   .addOption(zoneOption)
@@ -87,7 +87,7 @@ const create = new Command("create")
   .addOption(
     new Option(
       "--reserved",
-      "Create reserved nodes. Reserved nodes have an explicit start and end time.",
+      "Create reserved nodes (default). Reserved nodes have an explicit start and end time.",
     ).conflicts("auto"),
   )
   .addOption(
@@ -192,6 +192,11 @@ const create = new Command("create")
   .addHelpText(
     "after",
     `
+Notes:
+  - Either provide node names as arguments OR use --count (one is required)
+  - For reserved nodes (default): either --duration or --end is required
+  - For auto-reserved nodes (--auto): --duration and --end are not allowed
+
 Examples:\n
   \x1b[2m# Create a single reserved node(default type) that starts immediately\x1b[0m
   $ sf nodes create -n 1 --zone hayesvalley --max-price 12.50 --duration 1h
@@ -206,7 +211,7 @@ Examples:\n
   $ sf nodes create node-1 --zone hayesvalley --reserved --start "2024-01-15T10:00:00Z" --end "2024-01-15T12:00:00Z" -p 15.00
 
   \x1b[2m# Create a reserved node with custom user-data for 2 hours starting now \x1b[0m
-  $ sf nodes create node-1 --zone hayesvalley --reserved --user-data-file /path/to/cloud-init --duration 2h -p 13.50 
+  $ sf nodes create node-1 --zone hayesvalley --reserved --user-data-file /path/to/cloud-init --duration 2h -p 13.50
 
   \x1b[2m# Create a reserved node starting in 1 hour for 6 hours\x1b[0m
   $ sf nodes create node-1 --zone hayesvalley --reserved --start "+1h" --duration 6h -p 11.25

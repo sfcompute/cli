@@ -37,7 +37,7 @@ Examples:\n
   $ sf nodes extend my-node --duration 1h --max-price 15.00
 
   \x1b[2m# Extend multiple nodes by node ID instead of name\x1b[0m
-  $ sf nodes extend node-abc123 node-abc124 node-abc125 --duration 2h --max-price 10.00
+  $ sf nodes extend n_b1dc52505c6db142 n_c1ed52505c6db142 --duration 2h --max-price 10.00
 
   \x1b[2m# Extend with raw seconds\x1b[0m
   $ sf nodes extend my-node --duration 7200 --max-price 10.00

@@ -261,7 +261,7 @@ export const yesOption = new Option(
  */
 export const zoneOption = new Option(
   "-z, --zone <zone>",
-  "Zone to create the nodes in",
+  "[Required] Zone for your nodes",
 ).makeOptionMandatory();
 
 /**
@@ -269,7 +269,7 @@ export const zoneOption = new Option(
  */
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
-  "Maximum price per node hour in dollars",
+  "[Required] Maximum price per node hour in dollars",
 ).argParser(validatePrice).makeOptionMandatory();
 
 /**
@@ -277,7 +277,7 @@ export const maxPriceOption = new Option(
  */
 export const startOrNowOption = new Option(
   "-s, --start <start>",
-  "Start time (ISO 8601 format or relative time like '+1d', or 'NOW')",
+  "Start time (ISO 8601 format:'2022-10-27T14:30:00Z' or relative time like '+1d', or 'NOW')",
 ).argParser(parseStartDateOrNow).default("NOW" as const);
 
 /**
@@ -285,7 +285,7 @@ export const startOrNowOption = new Option(
  */
 export const endOption = new Option(
   "-e, --end <end>",
-  "End time (ISO 8601 format or relative time like '+1d', rounded up to nearest hour)",
+  "End time (ISO 8601 format:'2022-10-27T14:30:00Z' or relative time like '+1d', rounded up to nearest hour)",
 ).argParser(parseEnd);
 
 /**
@@ -301,5 +301,5 @@ export const durationOption = new Option(
  */
 export const requiredDurationOption = new Option(
   "-d, --duration <duration>",
-  "Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour",
+  "[Required] Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour",
 ).argParser(parseDurationArgument).makeOptionMandatory();
