@@ -8,6 +8,7 @@ import retry from "async-retry";
 import ora, { type Ora } from "ora";
 import cliSpinners from "npm:cli-spinners";
 import { apiClient } from "../../../apiClient.ts";
+import { logAndQuit } from "../../../helpers/errors.ts";
 
 async function readChunk(
   filePath: string,
@@ -93,6 +94,16 @@ const upload = new Command("upload")
       // Get file info and open as stream
       const fileInfo = await Deno.stat(filePath);
       const fileSize = fileInfo.size;
+
+      // Check file size limit (128 GiB)
+      const maxFileSize = 128 * 1024 * 1024 * 1024; // 128 GiB in bytes
+      if (fileSize > maxFileSize) {
+        logAndQuit(
+          `File size exceeds maximum allowed size of 128 GiB. File size: ${
+            (fileSize / (1024 * 1024 * 1024)).toFixed(2)
+          } GiB`,
+        );
+      }
 
       // Calculate parts for progress tracking
       const minChunk = 5 * 1024 * 1024; // 5 MiB (minimum)
