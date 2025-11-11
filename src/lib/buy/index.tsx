@@ -45,10 +45,7 @@ export function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .showHelpAfterError()
-    .option(
-      "-t, --type <type>",
-      "Type of GPU",
-    )
+    .option("-t, --type <type>", "Type of GPU")
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
@@ -117,6 +114,12 @@ export function _registerBuy(program: Command) {
         );
         command.help();
         process.exit(1);
+      }
+      // let user know if they're using a zone or cluster and it's overriding the instance type
+      if (type && (zone || cluster)) {
+        console.warn(
+          `Warning: Zone '${zone}' takes precedence over instance type '${type}'`,
+        );
       }
     })
     .configureHelp({
@@ -277,8 +280,25 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       const { type, accelerators, colocate, yes, standing, cluster } =
         props.options;
 
+      // If the user specifies a cluster, use the hardware type of the zone
+      let actualType = type;
+      if (cluster) {
+        const zoneMetadata = await getZoneMetadata(cluster);
+        if (zoneMetadata) {
+          const DeliveryTypeMetadata = {
+            "K8s": { displayName: "Kubernetes" },
+            "VM": { displayName: "Virtual Machine" },
+          };
+
+          const deliveryDisplayName =
+            DeliveryTypeMetadata[zoneMetadata.deliveryType]?.displayName ||
+            zoneMetadata.deliveryType;
+          actualType = `${deliveryDisplayName} (${zoneMetadata.hardwareType})`;
+        }
+      }
+
       setOrderProps({
-        type,
+        type: actualType,
         price: pricePerGpuHour,
         size: accelerators / GPUS_PER_NODE,
         startAt,
@@ -370,11 +390,7 @@ function BuyOrderPreview(props: BuyOrderProps) {
           </Box>
           <Box gap={1}>
             <Text>{typeLabel}</Text>
-            {isSupportedType && (
-              <Text dimColor>
-                ({props.type!})
-              </Text>
-            )}
+            {isSupportedType && <Text dimColor>({props.type!})</Text>}
           </Box>
         </Box>
       )}
@@ -560,10 +576,7 @@ function BuyOrder(props: BuyOrderProps) {
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       )}
 
@@ -593,7 +606,8 @@ function BuyOrder(props: BuyOrderProps) {
             (order as Awaited<ReturnType<typeof getOrder>>) &&
             order.execution_price && (
             <Box flexDirection="column">
-              {order.start_at && order.end_at &&
+              {order.start_at &&
+                order.end_at &&
                 order.start_at !== order.end_at && (
                 <Row
                   headWidth={16}
@@ -601,8 +615,7 @@ function BuyOrder(props: BuyOrderProps) {
                   value={`~${
                     centsToDollarsFormatted(
                       Number(order.execution_price) /
-                        ((Number(order.quantity)) *
-                          GPUS_PER_NODE) /
+                        (Number(order.quantity) * GPUS_PER_NODE) /
                         dayjs(order.end_at).diff(
                           dayjs(order.start_at),
                           "hours",
@@ -621,7 +634,8 @@ function BuyOrder(props: BuyOrderProps) {
                   )
                 }`}
               />
-              {order.execution_price && Number(order.price) > 0 &&
+              {order.execution_price &&
+                Number(order.price) > 0 &&
                 Number(order.execution_price) > 0 &&
                 Number(order.execution_price) < Number(order.price) && (
                 <Row
@@ -882,4 +896,16 @@ export async function getOrder(orderId: string) {
   }
 
   return order;
+}
+
+async function getZoneMetadata(zoneName: string) {
+  const api = await apiClient();
+  const { data } = await api.GET("/v0/zones", {});
+  const zone = data?.data?.find((z) => z.name === zoneName);
+  return zone
+    ? {
+      deliveryType: zone.delivery_type, // "K8s" or "VM"
+      hardwareType: zone.hardware_type, // "h100i", "h100v", etc.
+    }
+    : null;
 }
