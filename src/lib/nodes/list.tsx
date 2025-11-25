@@ -32,11 +32,25 @@ dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
 
+// Extended VM type to include zone field for auto-reserved nodes
+type VMWithZone = NonNullable<SFCNodes.Node["vms"]>["data"][number] & {
+  zone?: string | null;
+};
+
 // Helper component to display VMs in a table format using Ink
-function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
+function VMTable({
+  vms,
+  nodeZone
+}: {
+  vms: VMWithZone[];
+  nodeZone?: string | null;
+}) {
   const sortedVms = vms.sort((a, b) => b.updated_at - a.updated_at);
   const vmsToShow = sortedVms.slice(0, 5);
   const remainingVms = sortedVms.length - 5;
+
+  // Show zone column only when node doesn't have a zone (auto-reserved nodes)
+  const showZoneColumn = !nodeZone;
 
   return (
     <Box flexDirection="column" padding={0}>
@@ -57,6 +71,11 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
         <Box width={15} padding={0}>
           <Text bold color="cyan">Status</Text>
         </Box>
+        {showZoneColumn && (
+          <Box width={20} padding={0}>
+            <Text bold color="cyan">Zone</Text>
+          </Box>
+        )}
         <Box width={30} padding={0}>
           <Text bold color="cyan">Start/End</Text>
         </Box>
@@ -76,6 +95,11 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
             <Box width={15} padding={0}>
               <Text>{getVMStatusColor(vm.status)}</Text>
             </Box>
+            {showZoneColumn && (
+              <Box width={20} padding={0}>
+                <Text>{vm.zone ?? "N/A"}</Text>
+              </Box>
+            )}
             <Box width={30} padding={0}>
               <Text>{startEnd}</Text>
             </Box>
@@ -383,7 +407,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             <Text color="cyan" bold>💿</Text>
           </Box>
           <Box marginTop={1}>
-            <VMTable vms={node.vms.data} />
+            <VMTable vms={node.vms.data as VMWithZone[]} nodeZone={node.zone} />
           </Box>
         </Box>
       )}
