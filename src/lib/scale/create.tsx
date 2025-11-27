@@ -4,7 +4,10 @@ import Spinner from "ink-spinner";
 import { Command, Option } from "@commander-js/extra-typings";
 import process from "node:process";
 import console from "node:console";
+import { setTimeout } from "node:timers";
+import boxen from "npm:boxen@8.0.1";
 import dayjs from "dayjs";
+import { pluralizeNodes } from "../nodes/utils.ts";
 
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -12,6 +15,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { getQuote } from "../buy/index.tsx";
+import { components } from "../../schema.ts";
 
 import {
   acceleratorsToNodes,
@@ -27,6 +31,44 @@ import {
 import { roundDateUpToNextMinute } from "../../helpers/units.ts";
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
 import ConfirmationMessage from "./ConfirmationMessage.tsx";
+
+type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
+
+function ScaleWarning(props: CreateProcurementCommandProps) {
+  const clusterName = props.zone || props.cluster;
+  const nodesRequired = acceleratorsToNodes(props.accelerators);
+
+  // Build the equivalent sf nodes create --auto command
+  let equivalentCommand = `sf nodes create -n ${nodesRequired} --auto`;
+
+  if (clusterName) {
+    equivalentCommand += ` -z ${clusterName}`;
+  }
+  if (props.price) {
+    // Convert from cents per GPU/hr to dollars per node/hr
+    const pricePerNodeHour = (props.price * GPUS_PER_NODE) / 100;
+    equivalentCommand += ` -p ${pricePerNodeHour.toFixed(2)}`;
+  }
+  if (props.yes) {
+    equivalentCommand += ` -y`;
+  }
+
+  const warningMessage = boxen(
+    `\x1b[31mWe're deprecating \x1b[97msf scale\x1b[31m.\x1b[0m
+\x1b[31mCreate auto reserved nodes using \x1b[97msf nodes\x1b[31m instead:\x1b[0m \x1b[97m${equivalentCommand}\x1b[0m
+\x1b[31mThe above command creates ${nodesRequired} self-extending ${
+      pluralizeNodes(nodesRequired)
+    } that ${
+      nodesRequired === 1 ? "maintains" : "maintain"
+    } capacity automatically.\x1b[0m`,
+    {
+      padding: 0.75,
+      borderColor: "red",
+    },
+  );
+
+  return <Text>{warningMessage}</Text>;
+}
 
 // TODO: When Ink supports React 19, use useTransition and startTransition
 function useCreateProcurement() {
@@ -85,15 +127,23 @@ function useCreateProcurement() {
   };
 }
 
-type CreateProcurementCommandProps = ReturnType<typeof create.opts>;
+type CreateProcurementCommandProps = ReturnType<typeof create.opts> & {
+  zoneInfo?: ZoneInfo;
+};
 
 function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const { exit } = useApp();
+  const clusterName = props.zone || props.cluster;
+  const isVM = props.type?.endsWith("v") ||
+    props.zoneInfo?.delivery_type === "VM";
+  const [scaleWarningState, setScaleWarningState] = useState<
+    "prompt" | "accepted" | "dismissed" | "not_applicable"
+  >(
+    isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable",
+  );
   const [confirmationMessage, setConfirmationMessage] = useState<
     React.ReactNode
   >();
-
-  const clusterName = props.zone || props.cluster;
 
   const nodesRequired = useMemo(
     () => acceleratorsToNodes(props.accelerators),
@@ -200,6 +250,22 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     createProcurement,
   } = useCreateProcurement();
 
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => exit(new Error(error)), 0);
+    } else if (result) {
+      setTimeout(() => exit(), 0);
+    }
+  }, [error, result, exit]);
+
+  const handleDismissScaleWarning = useCallback((submitValue: boolean) => {
+    if (!submitValue) {
+      exit();
+    } else {
+      setScaleWarningState("accepted");
+    }
+  }, [exit]);
+
   const handleSubmit = (submitValue: boolean) => {
     if (!submitValue) {
       exit();
@@ -248,18 +314,56 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     return (
       <Box flexDirection="column">
         <Text color="green">
-          Successfully created procurement for {props.accelerators} {props.type}
-          {" "}
-          instances!
+          Successfully created procurement for{" "}
+          {props.accelerators / GPUS_PER_NODE} {props.type} nodes!
         </Text>
         <ProcurementDisplay procurement={result} />
       </Box>
     );
   }
 
-  if (confirmationMessage && !props.yes) {
+  // Show deprecation warning first
+  if (scaleWarningState === "prompt" && !props.yes) {
     return (
-      <Box flexDirection="column">
+      <Box flexDirection="column" gap={1}>
+        <ScaleWarning {...props} />
+        <Text color="red">
+          Create a procurement anyway?{" "}
+          <Text color="white">
+            (y/N)
+          </Text>
+        </Text>
+        <ConfirmInput
+          isChecked={false}
+          onSubmit={handleDismissScaleWarning}
+        />
+      </Box>
+    );
+  }
+
+  // Show confirmation message after warning is dismissed
+  if (confirmationMessage && !props.yes && scaleWarningState === "accepted") {
+    return (
+      <Box flexDirection="column" gap={1}>
+        <ScaleWarning {...props} />
+        {confirmationMessage}
+        <Box>
+          <Text>Create procurement? (y/N)</Text>
+          <ConfirmInput
+            isChecked={false}
+            onSubmit={handleSubmit}
+          />
+        </Box>
+      </Box>
+    );
+  }
+
+  // Show confirmation for non-VM procurements (h100i, etc.)
+  if (
+    confirmationMessage && !props.yes && scaleWarningState === "not_applicable"
+  ) {
+    return (
+      <Box flexDirection="column" gap={1}>
         {confirmationMessage}
         <Box>
           <Text>Create procurement? (y/N)</Text>
@@ -354,12 +458,37 @@ $ sf scale create -n 8 --horizon '30m'
       process.exit(1);
     }
   })
-  .action((options) => {
-    render(
+  .action(async (options) => {
+    let zoneInfo: ZoneInfo | undefined;
+    const clusterName = options.zone || options.cluster;
+
+    if (clusterName) {
+      const api = await apiClient();
+      const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+        params: {
+          path: {
+            id: clusterName,
+          },
+        },
+      });
+      if (error) {
+        return logAndQuit(
+          `Failed to get zone: ${JSON.stringify(error, null, 2)}`,
+        );
+      }
+      if (!response.ok) {
+        return logAndQuit(`No zone found with slug: ${clusterName}`);
+      }
+      zoneInfo = data;
+    }
+
+    const { waitUntilExit } = render(
       <CreateProcurementCommand
         {...options}
+        zoneInfo={zoneInfo}
       />,
     );
+    await waitUntilExit();
   });
 
 export default create;
