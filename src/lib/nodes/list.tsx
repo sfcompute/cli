@@ -486,7 +486,7 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
         gray(
           `\nFound ${filteredNodes.length} ${
             pluralizeNodes(filteredNodes.length)
-          }. Use --verbose for detailed information, such as previous virtual machines.`,
+          } total. Use --verbose for detailed information, such as previous virtual machines.`,
         ),
       );
 
@@ -536,7 +536,7 @@ const list = new Command("list")
     "--limit <number>",
     "Limit the number of nodes to display",
     Number.parseInt,
-    10,
+    12,
   )
   .addOption(
     new Option("--status <status...>", "Filter by node status")
