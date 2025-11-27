@@ -2165,6 +2165,8 @@ export interface components {
              * @example 1640995200
              */
             updated_at: number;
+            /** @example hayesvalley */
+            zone?: string | null;
         };
         "node-api_VmList": {
             data: components["schemas"]["node-api_Vm"][];
