@@ -1,9 +1,9 @@
 import { type Command, Option } from "@commander-js/extra-typings";
 import { render } from "ink";
 import * as console from "node:console";
-import dayjs from "npm:dayjs@1.11.13";
-import duration from "npm:dayjs@1.11.13/plugin/duration.js";
-import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import React from "react";
 import { getAuthToken, isLoggedIn } from "../../helpers/config.ts";
 import { parseDurationArgument } from "../../helpers/duration.ts";

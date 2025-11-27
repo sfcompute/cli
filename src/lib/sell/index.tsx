@@ -1,8 +1,8 @@
 import type { Command } from "@commander-js/extra-typings";
 import { clearInterval, setInterval } from "node:timers";
-import dayjs from "npm:dayjs@1.11.13";
-import duration from "npm:dayjs@1.11.13/plugin/duration.js";
-import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { apiClient } from "../../apiClient.ts";
 import { components } from "../../schema.ts";
 import {

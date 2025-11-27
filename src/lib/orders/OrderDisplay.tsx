@@ -1,6 +1,6 @@
 import { Box, measureElement, Text, useInput } from "ink";
 import process from "node:process";
-import dayjs from "npm:dayjs@1.11.13";
+import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";

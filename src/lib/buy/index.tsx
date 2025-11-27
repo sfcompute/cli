@@ -7,9 +7,10 @@ import ms from "ms";
 import console from "node:console";
 import process from "node:process";
 import { setTimeout } from "node:timers";
-import dayjs from "npm:dayjs@1.11.13";
-import duration from "npm:dayjs@1.11.13/plugin/duration.js";
-import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import boxen from "npm:boxen@8.0.1";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import parseDurationFromLibrary from "parse-duration";
 import React, { useCallback, useEffect, useState } from "react";
 import invariant from "tiny-invariant";
@@ -34,10 +35,12 @@ import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
+import { components } from "../../schema.ts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
+type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
 export type SfBuyOptions = ReturnType<ReturnType<typeof _registerBuy>["opts"]>;
 
 export function _registerBuy(program: Command) {
@@ -234,6 +237,7 @@ export function QuoteComponent(props: { options: SfBuyOptions }) {
 
 export function QuoteAndBuy(props: { options: SfBuyOptions }) {
   const [orderProps, setOrderProps] = useState<BuyOrderProps | null>(null);
+  const [zone, setZone] = useState<ZoneInfo>();
 
   // submit a quote request, handle loading state
   useEffect(() => {
@@ -243,6 +247,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       let pricePerGpuHour = parsePricePerGpuHour(props.options.price);
       let startAt = start;
       let endsAt: Date;
+      let quoteZone: string | undefined;
       const coercedStart = parseStartDate(start);
       if (duration) {
         // If duration is set, calculate end from start + duration
@@ -268,14 +273,33 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-
         startAt = parseStartDateOrNow(quote.start_at);
-
         endsAt = dayjs(quote.end_at).toDate();
+        quoteZone = "zone" in quote ? quote.zone : undefined;
       }
 
       const { type, accelerators, colocate, yes, standing, cluster } =
         props.options;
+
+      if (cluster) {
+        const api = await apiClient();
+        const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+          params: {
+            path: {
+              id: cluster,
+            },
+          },
+        });
+        if (error) {
+          return logAndQuit(
+            `Failed to get zone: ${JSON.stringify(error, null, 2)}`,
+          );
+        }
+        if (!response.ok) {
+          return logAndQuit(`No zone found with slug: ${cluster}`);
+        }
+        setZone(data);
+      }
 
       setOrderProps({
         type,
@@ -286,7 +310,9 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         yes,
         standing,
         colocate,
-        cluster,
+        // If the user didn't specify a zone, use the zone from the quote
+        // This helps prevent price surprises/location mismatches
+        cluster: cluster ?? quoteZone,
       });
     })();
   }, [props.options]);
@@ -300,7 +326,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         </Box>
       </Box>
     )
-    : <BuyOrder {...orderProps} />;
+    : <BuyOrder {...orderProps} zone={zone} />;
 }
 
 export function getTotalPrice(
@@ -429,10 +455,60 @@ type BuyOrderProps = {
   yes?: boolean;
   standing?: boolean;
   cluster?: string;
+  zone?: ZoneInfo;
 };
+
+function VMWarning(props: BuyOrderProps) {
+  const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
+  const endDate = dayjs(roundEndDate(props.endsAt));
+  const realDuration = endDate.diff(startDate);
+  const realDurationString = ms(realDuration);
+
+  // Build the equivalent sf nodes command
+  let equivalentCommand = `sf nodes create -n ${props.size}`;
+
+  if (props.price) {
+    equivalentCommand += ` -p ${
+      (props.price * GPUS_PER_NODE / 100).toFixed(2)
+    }`;
+  }
+  if (props.startAt !== "NOW") {
+    const startFormatted = startDate.toISOString();
+    equivalentCommand += ` -s "${startFormatted}"`;
+  }
+  equivalentCommand += ` -d ${realDurationString}`;
+  if (props.yes) {
+    equivalentCommand += ` -y`;
+  }
+  if (props.cluster) {
+    equivalentCommand += ` -z ${props.cluster}`;
+  } else {
+    // TODO: add support for any-zone
+    // equivalentCommand += `--any-zone`;
+  }
+
+  const warningMessage = boxen(
+    `\x1b[31mWe're deprecating \x1b[97msf buy\x1b[31m for Virtual Machines.\x1b[0m
+\x1b[31mWe recommend you create a VM Node instead: \x1b[97m${equivalentCommand}\x1b[0m
+\x1b[31m\x1b[97msf nodes\x1b[31m allows you to create, extend, and release specific machines directly.\x1b[0m`,
+    {
+      padding: 0.75,
+      borderColor: "red",
+    },
+  );
+
+  return <Text>{warningMessage}</Text>;
+}
 
 function BuyOrder(props: BuyOrderProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { type, zone } = props;
+  const isVM = type?.endsWith("v") || zone?.delivery_type === "VM";
+  const [vmWarningState, setVmWarningState] = useState<
+    "prompt" | "accepted" | "dismissed" | "not_applicable"
+  >(
+    isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable",
+  );
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
@@ -522,6 +598,18 @@ function BuyOrder(props: BuyOrderProps) {
     [props, exit, submitOrder],
   );
 
+  const handleDismissVMWarning = useCallback((submitValue: boolean) => {
+    if (!submitValue) {
+      setIsLoading(false);
+      setResultMessage(
+        "VM order not placed. We recommend you use 'sf nodes create' instead.",
+      );
+      setTimeout(() => {
+        exit();
+      }, 0);
+    } else setVmWarningState("accepted");
+  }, [exit]);
+
   useEffect(() => {
     if (!isLoading || !order?.id) {
       return;
@@ -554,9 +642,47 @@ function BuyOrder(props: BuyOrderProps) {
 
   return (
     <Box gap={1} flexDirection="column">
-      <MemoizedBuyOrderPreview {...props} />
+      {(vmWarningState === "prompt" || vmWarningState === "accepted") && (
+        <Box gap={0.5} flexDirection="column">
+          <VMWarning {...props} />
+          {vmWarningState === "prompt" && (
+            <>
+              <Text color="red">
+                Place an order for a legacy VM anyway?{" "}
+                <Text color="white">
+                  (y/n)
+                </Text>
+              </Text>
 
-      {!isLoading && !props.yes && (
+              <ConfirmInput
+                isChecked={false}
+                onSubmit={handleDismissVMWarning}
+              />
+            </>
+          )}
+        </Box>
+      )}
+
+      {(vmWarningState === "dismissed" || vmWarningState === "not_applicable" ||
+        vmWarningState === "accepted") && (
+        <MemoizedBuyOrderPreview
+          {...props}
+        />
+      )}
+
+      {vmWarningState === "accepted" && !isLoading && !props.yes && (
+        <Box gap={1}>
+          <Text>Place order? (y/n)</Text>
+
+          <ConfirmInput
+            isChecked={false}
+            onSubmit={handleSubmit}
+          />
+        </Box>
+      )}
+
+      {(vmWarningState === "dismissed" ||
+        vmWarningState === "not_applicable") && !isLoading && !props.yes && (
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
@@ -836,11 +962,13 @@ export async function getQuote(options: QuoteOptions) {
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error}`);
+        return logAndQuit(`Bad Request: ${JSON.stringify(error, null, 2)}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       case 500:
-        return logAndQuit(`Failed to get quote: ${error}`);
+        return logAndQuit(
+          `Failed to get quote: ${JSON.stringify(error, null, 2)}`,
+        );
       default:
         return logAndQuit(`Failed to get quote: ${response.statusText}`);
     }

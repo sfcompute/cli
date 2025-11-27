@@ -3,8 +3,8 @@ import * as console from "node:console";
 import { confirm } from "@inquirer/prompts";
 import { gray, green, white, yellow } from "jsr:@std/fmt/colors";
 import type { Command } from "@commander-js/extra-typings";
-import dayjs from "npm:dayjs@1.11.13";
-import utc from "npm:dayjs@1.11.13/plugin/utc.js";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import {
   deleteConfig,
   getConfigPath,
