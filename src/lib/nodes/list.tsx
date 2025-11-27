@@ -477,9 +477,11 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
     }
 
     if (options.verbose) {
-      render(<NodesVerboseDisplay nodes={filteredNodes} />);
+      render(
+        <NodesVerboseDisplay nodes={filteredNodes.slice(0, options.limit)} />,
+      );
     } else {
-      console.log(createNodesTable(filteredNodes));
+      console.log(createNodesTable(filteredNodes, options.limit));
       console.log(
         gray(
           `\nFound ${filteredNodes.length} ${
@@ -530,6 +532,12 @@ const list = new Command("list")
   .description("List all compute nodes")
   .showHelpAfterError()
   .option("--verbose", "Show detailed information for each node")
+  .option(
+    "--limit <number>",
+    "Limit the number of nodes to display",
+    Number.parseInt,
+    10,
+  )
   .addOption(
     new Option("--status <status...>", "Filter by node status")
       .choices(VALID_STATES as (readonly SFCNodes.Status[])),
@@ -545,8 +553,11 @@ Next Steps:\n
   \x1b[2m# List all nodes with detailed information\x1b[0m
   $ sf nodes list --verbose
 
+  \x1b[2m# List up to 20 nodes\x1b[0m
+  $ sf nodes list --limit 20
+
   \x1b[2m# List pending or running nodes\x1b[0m
-  $ sf nodes list --status pending --state running
+  $ sf nodes list --status pending running
 
   \x1b[2m# List nodes in JSON format\x1b[0m
   $ sf nodes list --json
