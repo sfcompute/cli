@@ -95,12 +95,18 @@ export function getLastVM(node: SFCNodes.Node) {
     ).at(0);
 }
 
+export const DEFAULT_NODE_LS_LIMIT = 12 as const;
+
 /**
  * Creates a formatted table display of nodes
  * @param nodes Array of nodes to display
+ * @param limit Optional limit on number of nodes to display (default: show all)
  * @returns Formatted table string
  */
-export function createNodesTable(nodes: SFCNodes.Node[]): string {
+export function createNodesTable(
+  nodes: SFCNodes.Node[],
+  limit: number = DEFAULT_NODE_LS_LIMIT,
+): string {
   const table = new Table({
     head: [
       cyan("NAME"),
@@ -118,7 +124,9 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
     },
   });
 
-  for (const node of nodes) {
+  const nodesToShow = limit ? nodes.slice(0, limit) : nodes;
+
+  for (const node of nodesToShow) {
     const startDate = node.start_at ? dayjs.unix(node.start_at) : null;
     const endDate = node.end_at ? dayjs.unix(node.end_at) : null;
 
@@ -139,6 +147,19 @@ export function createNodesTable(nodes: SFCNodes.Node[]): string {
       node.zone || "N/A",
       startEnd,
       maxPrice,
+    ]);
+  }
+
+  if (limit && nodes.length > limit) {
+    table.push([
+      {
+        colSpan: 8,
+        content: brightBlack(
+          `${nodes.length - limit} older ${
+            pluralizeNodes(nodes.length - limit)
+          } not shown. Use sf nodes list --limit ${nodes.length} or sf nodes list --json to list all nodes.`,
+        ),
+      },
     ]);
   }
 

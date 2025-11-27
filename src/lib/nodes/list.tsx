@@ -1,5 +1,5 @@
 import React from "react";
-import { Command } from "@commander-js/extra-typings";
+import { Command, Option } from "@commander-js/extra-typings";
 import { brightBlack, gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import ora from "ora";
@@ -20,6 +20,7 @@ import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
   createNodesTable,
+  DEFAULT_NODE_LS_LIMIT,
   getLastVM,
   getStatusColor,
   getVMStatusColor,
@@ -31,6 +32,16 @@ import {
 dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
+
+// Valid node status values for filtering
+const VALID_STATES = [
+  "pending",
+  "awaitingcapacity",
+  "running",
+  "released",
+  "failed",
+  "terminated",
+] as const;
 
 // Helper component to display VMs in a table format using Ink
 function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
@@ -447,12 +458,19 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
 
     spinner.stop();
 
+    const filteredNodes = (options.status?.length)
+      ? nodes.filter((n) =>
+        options.status?.length &&
+        options.status.includes(n.status)
+      )
+      : nodes;
+
     if (options.json) {
-      console.log(JSON.stringify(nodes, null, 2));
+      console.log(JSON.stringify(filteredNodes, null, 2));
       return;
     }
 
-    if (nodes.length === 0) {
+    if (filteredNodes.length === 0) {
       console.log("No nodes found.");
       console.log(gray("\nCreate your first node:"));
       console.log("  sf nodes create my-first-node");
@@ -460,14 +478,16 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
     }
 
     if (options.verbose) {
-      render(<NodesVerboseDisplay nodes={nodes} />);
+      render(
+        <NodesVerboseDisplay nodes={filteredNodes.slice(0, options.limit)} />,
+      );
     } else {
-      console.log(createNodesTable(nodes));
+      console.log(createNodesTable(filteredNodes, options.limit));
       console.log(
         gray(
-          `\nFound ${nodes.length} ${
-            pluralizeNodes(nodes.length)
-          }. Use --verbose for detailed information, such as previous virtual machines.`,
+          `\nFound ${filteredNodes.length} ${
+            pluralizeNodes(filteredNodes.length)
+          } total. Use --verbose for detailed information, such as previous virtual machines.`,
         ),
       );
 
@@ -476,7 +496,7 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
       const seenLabels = new Set<string>();
 
       // Sort nodes by created_at (newest first), fallback to index for consistent ordering
-      const sortedNodes = [...nodes].sort((a, b) => {
+      const sortedNodes = [...filteredNodes].sort((a, b) => {
         const aTime = a.created_at || 0;
         const bTime = b.created_at || 0;
         return bTime - aTime; // Newest first
@@ -513,6 +533,16 @@ const list = new Command("list")
   .description("List all compute nodes")
   .showHelpAfterError()
   .option("--verbose", "Show detailed information for each node")
+  .option(
+    "--limit <number>",
+    "Limit the number of nodes to display",
+    Number.parseInt,
+    DEFAULT_NODE_LS_LIMIT,
+  )
+  .addOption(
+    new Option("--status <status...>", "Filter by node status")
+      .choices(VALID_STATES as (readonly SFCNodes.Status[])),
+  )
   .addOption(jsonOption)
   .addHelpText(
     "after",
@@ -523,6 +553,12 @@ Next Steps:\n
 
   \x1b[2m# List all nodes with detailed information\x1b[0m
   $ sf nodes list --verbose
+
+  \x1b[2m# List up to 100 nodes\x1b[0m
+  $ sf nodes list --limit 100
+
+  \x1b[2m# List pending or running nodes\x1b[0m
+  $ sf nodes list --status pending running
 
   \x1b[2m# List nodes in JSON format\x1b[0m
   $ sf nodes list --json
