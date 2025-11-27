@@ -40,7 +40,6 @@ const VALID_STATES = [
   "released",
   "failed",
   "terminated",
-  "deleted",
 ] as const;
 
 // Helper component to display VMs in a table format using Ink
@@ -458,10 +457,11 @@ async function listNodesAction(options: ReturnType<typeof list.opts>) {
 
     spinner.stop();
 
-    // Apply optional state filter if provided
-    const selectedStates = (options as unknown as { state?: string[] }).state;
-    const filteredNodes = Array.isArray(selectedStates) && selectedStates.length > 0
-      ? nodes.filter((n) => selectedStates.includes(n.status))
+    const filteredNodes = (options.status?.length)
+      ? nodes.filter((n) =>
+        options.status?.length &&
+        options.status.includes(n.status)
+      )
       : nodes;
 
     if (options.json) {
@@ -531,14 +531,8 @@ const list = new Command("list")
   .showHelpAfterError()
   .option("--verbose", "Show detailed information for each node")
   .addOption(
-    new Option("--state <state>", "Filter by node status")
-      .choices([...VALID_STATES] as unknown as string[])
-      .argParser((value: (typeof VALID_STATES)[number], previous?: string[]) => {
-        const acc = previous ?? [];
-        acc.push(value);
-        return acc;
-      })
-      .default([] as string[]),
+    new Option("--status <status...>", "Filter by node status")
+      .choices(VALID_STATES as (readonly SFCNodes.Status[])),
   )
   .addOption(jsonOption)
   .addHelpText(
@@ -552,7 +546,7 @@ Next Steps:\n
   $ sf nodes list --verbose
 
   \x1b[2m# List pending or running nodes\x1b[0m
-  $ sf nodes list --state pending --state running
+  $ sf nodes list --status pending --state running
 
   \x1b[2m# List nodes in JSON format\x1b[0m
   $ sf nodes list --json
