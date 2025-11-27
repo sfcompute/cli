@@ -95,6 +95,8 @@ export function getLastVM(node: SFCNodes.Node) {
     ).at(0);
 }
 
+export const DEFAULT_NODE_LS_LIMIT = 12 as const;
+
 /**
  * Creates a formatted table display of nodes
  * @param nodes Array of nodes to display
@@ -103,7 +105,7 @@ export function getLastVM(node: SFCNodes.Node) {
  */
 export function createNodesTable(
   nodes: SFCNodes.Node[],
-  limit?: number,
+  limit: number = DEFAULT_NODE_LS_LIMIT,
 ): string {
   const table = new Table({
     head: [

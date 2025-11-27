@@ -20,6 +20,7 @@ import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
   createNodesTable,
+  DEFAULT_NODE_LS_LIMIT,
   getLastVM,
   getStatusColor,
   getVMStatusColor,
@@ -536,7 +537,7 @@ const list = new Command("list")
     "--limit <number>",
     "Limit the number of nodes to display",
     Number.parseInt,
-    12,
+    DEFAULT_NODE_LS_LIMIT,
   )
   .addOption(
     new Option("--status <status...>", "Filter by node status")
