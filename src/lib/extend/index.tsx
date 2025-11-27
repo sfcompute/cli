@@ -1,7 +1,7 @@
 import { type Command } from "@commander-js/extra-typings";
-import dayjs from "npm:dayjs@1.11.13";
-import duration from "npm:dayjs@1.11.13/plugin/duration.js";
-import relativeTime from "npm:dayjs@1.11.13/plugin/relativeTime.js";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import boxen from "npm:boxen@8.0.1";
 import console from "node:console";
 import process from "node:process";
