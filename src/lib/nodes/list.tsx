@@ -553,8 +553,8 @@ Next Steps:\n
   \x1b[2m# List all nodes with detailed information\x1b[0m
   $ sf nodes list --verbose
 
-  \x1b[2m# List up to 20 nodes\x1b[0m
-  $ sf nodes list --limit 20
+  \x1b[2m# List up to 100 nodes\x1b[0m
+  $ sf nodes list --limit 100
 
   \x1b[2m# List pending or running nodes\x1b[0m
   $ sf nodes list --status pending running
