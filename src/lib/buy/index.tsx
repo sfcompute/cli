@@ -247,6 +247,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
       let pricePerGpuHour = parsePricePerGpuHour(props.options.price);
       let startAt = start;
       let endsAt: Date;
+      let quoteZone: string | undefined;
       const coercedStart = parseStartDate(start);
       if (duration) {
         // If duration is set, calculate end from start + duration
@@ -272,10 +273,9 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         }
 
         pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-
         startAt = parseStartDateOrNow(quote.start_at);
-
         endsAt = dayjs(quote.end_at).toDate();
+        quoteZone = "zone" in quote ? quote.zone : undefined;
       }
 
       const { type, accelerators, colocate, yes, standing, cluster } =
@@ -310,7 +310,9 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
         yes,
         standing,
         colocate,
-        cluster,
+        // If the user didn't specify a zone, use the zone from the quote
+        // This helps prevent price surprises/location mismatches
+        cluster: cluster ?? quoteZone,
       });
     })();
   }, [props.options]);
