@@ -9,6 +9,7 @@ import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
 import { Box, render, Text } from "ink";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import { formatDuration, intervalToDuration } from "date-fns";
 
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -27,6 +28,7 @@ import {
   jsonOption,
   pluralizeNodes,
   printNodeType,
+  printVMStatus,
 } from "./utils.ts";
 
 dayjs.extend(utc);
@@ -63,7 +65,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
         borderColor="gray"
       >
         <Box width={25} padding={0}>
-          <Text bold color="cyan">Virtual Machines</Text>
+          <Text bold color="cyan">Previous VMs</Text>
         </Box>
         <Box width={15} padding={0}>
           <Text bold color="cyan">Status</Text>
@@ -268,12 +270,24 @@ function getActionsForNode(node: SFCNodes.Node) {
 // Component for displaying a single node in verbose format
 function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
   // Convert Unix timestamps to dates and calculate duration
-  const startDate = node.start_at && dayjs.unix(node.start_at);
-  const endDate = node.end_at && dayjs.unix(node.end_at);
+  const startDate = node.start_at ? dayjs.unix(node.start_at) : null;
+  const endDate = node.end_at ? dayjs.unix(node.end_at) : null;
   let duration = endDate && startDate && endDate.diff(startDate, "hours");
   if (typeof duration === "number" && duration < 1) {
     duration = 1;
   }
+  const durationLabel = duration
+    ? formatDuration(
+      intervalToDuration({
+        start: 0,
+        end: duration * 60 * 60 * 1000,
+      }),
+      {
+        delimiter: ", ",
+        format: ["years", "months", "weeks", "days", "hours"],
+      },
+    )
+    : null;
   // Convert max_price_per_node_hour from cents to dollars
   const pricePerHour = node.max_price_per_node_hour
     ? (node.max_price_per_node_hour / 100)
@@ -284,6 +298,8 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
 
   // Get available actions for this node
   const nodeActions = getActionsForNode(node);
+
+  const lastVM = getLastVM(node);
 
   return (
     <Box
@@ -315,8 +331,41 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row head="Owner: " value={node.owner} />
       </Box>
 
+      {lastVM && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text bold color="cyan">Active VM:</Text>
+          </Box>
+          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+            <Row head="ID: " value={lastVM.id} />
+            <Row head="Status: " value={getVMStatusColor(lastVM.status)} />
+            <Row
+              head="Start: "
+              value={lastVM.start_at
+                ? dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                : "Not specified"}
+            />
+            <Row
+              head="End: "
+              value={lastVM.end_at
+                ? dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                : "Not specified"}
+            />
+            <Row head="Image: " value={lastVM.image_id ?? "Not specified"} />
+          </Box>
+        </>
+      )}
+
+      {node.vms?.data && node.vms.data.length > 1 && (
+        <Box flexDirection="column" gap={0} marginLeft={1} marginRight={2}>
+          <Box marginTop={1} paddingX={1}>
+          </Box>
+          <VMTable vms={node.vms.data.slice(1)} />
+        </Box>
+      )}
+
       <Box marginTop={1} paddingX={1}>
-        <Text>📅 Schedule:</Text>
+        <Text bold color="cyan">Schedule:</Text>
       </Box>
 
       <Box marginLeft={3} flexDirection="column" paddingX={1}>
@@ -349,7 +398,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         {duration && (
           <Row
             head="Duration: "
-            value={`${duration} hours`}
+            value={durationLabel}
           />
         )}
       </Box>
@@ -357,7 +406,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       {node.max_price_per_node_hour && (
         <>
           <Box marginTop={1} paddingX={1}>
-            <Text>💰 Pricing:</Text>
+            <Text bold color="cyan">Pricing:</Text>
           </Box>
           <Box marginLeft={3} flexDirection="column" paddingX={1}>
             {node.node_type === "autoreserved" && (
@@ -387,22 +436,10 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         </>
       )}
 
-      {/* VMs Section - Show if node has VMs */}
-      {node.vms?.data && node.vms.data.length > 0 && (
-        <Box flexDirection="row" gap={0}>
-          <Box marginTop={1} paddingX={1}>
-            <Text color="cyan" bold>💿</Text>
-          </Box>
-          <Box marginTop={1}>
-            <VMTable vms={node.vms.data} />
-          </Box>
-        </Box>
-      )}
-
       {node.vms?.data?.[0]?.image_id && (
         <>
           <Box marginTop={1} paddingX={1}>
-            <Text>💾 Current VM Image:</Text>
+            <Text bold color="cyan">Current VM Image:</Text>
           </Box>
           <Box marginLeft={3} flexDirection="column" paddingX={1}>
             <Row
@@ -417,7 +454,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       {nodeActions.length > 0 && (
         <>
           <Box marginTop={1} paddingX={1}>
-            <Text>🎯 Actions:</Text>
+            <Text bold color="cyan">Actions:</Text>
           </Box>
           <Box marginLeft={3} flexDirection="column" paddingX={1}>
             {nodeActions.map((action, index) => (
