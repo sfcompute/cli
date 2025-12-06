@@ -278,14 +278,6 @@ export const yesOption = new Option(
 );
 
 /**
- * Common --zone option for zone selection
- */
-export const zoneOption = new Option(
-  "-z, --zone <zone>",
-  "[Required] Zone for your nodes",
-).makeOptionMandatory();
-
-/**
  * Common --max-price option for nodes commands
  */
 export const maxPriceOption = new Option(
