@@ -21,7 +21,6 @@ import {
   pluralizeNodes,
   startOrNowOption,
   yesOption,
-  zoneOption,
 } from "./utils.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -82,7 +81,18 @@ const create = new Command("create")
     "[Required: names or --count] Number of nodes to create with auto-generated names",
     validateCount,
   )
-  .addOption(zoneOption)
+  .addOption(
+    new Option(
+      "-z, --zone <zone>",
+      "[Required: zone or --any-zone if --auto is provided] Zone for your nodes",
+    ).conflicts("any-zone"),
+  )
+  .addOption(
+    new Option(
+      "--any-zone",
+      "Use any zone that meets requirements",
+    ).conflicts("zone"),
+  )
   .addOption(maxPriceOption)
   .addOption(
     new Option(
@@ -125,41 +135,42 @@ const create = new Command("create")
   .addOption(jsonOption)
   .hook("preAction", (command) => {
     const names = command.args;
-    const { count, start, duration, end, auto, reserved } = command
-      .opts();
+    const { count, start, duration, end, auto, reserved, anyZone, zone } =
+      command
+        .opts();
 
     // Validate arguments
     if (names.length === 0 && !count) {
-      console.error(
+      command.error(
         red("Must specify either node names or use \`--count\` option\n"),
       );
-      command.help();
-      process.exit(1);
     }
 
     if (names.length > 0 && count) {
       if (names.length !== count) {
-        console.error(red(
+        command.error(red(
           `You specified ${names.length} ${
             names.length === 1 ? "node name" : "node names"
           } but \`--count\` is set to ${count}. The number of names must match the \`count\`.\n`,
         ));
-        command.help();
-        process.exit(1);
       }
     }
 
+    if (auto && !anyZone && !zone) {
+      command.error(red(
+        "If --auto is provided, you must specify a zone or use --any-zone\n",
+      ));
+    }
+
     if (reserved && auto) {
-      console.error(red("Specify either --reserved or --auto, but not both\n"));
-      command.help();
-      process.exit(1);
+      command.error(red(
+        "Specify either --reserved or --auto, but not both\n",
+      ));
     }
 
     // Validate duration/end like buy command
     if (typeof end !== "undefined" && typeof duration !== "undefined") {
-      console.error(red("Specify either --duration or --end, but not both\n"));
-      command.help();
-      process.exit(1);
+      command.error(red("Specify either --duration or --end, but not both\n"));
     }
 
     // Validate that timing flags are only used with reserved nodes
@@ -168,25 +179,21 @@ const create = new Command("create")
       (start !== "NOW" || typeof duration !== "undefined" ||
         typeof end !== "undefined")
     ) {
-      console.error(
+      command.error(
         red(
           "Auto-reserved nodes start immediately and cannot have a start time, duration, or end time.\n",
         ),
       );
-      command.help();
-      process.exit(1);
     }
 
     if (
       !auto && typeof duration === "undefined" && typeof end === "undefined"
     ) {
-      console.error(
+      command.error(
         red(
           "You must specify either --duration or --end to create a reserved node.\n",
         ),
       );
-      command.help();
-      process.exit(1);
     }
   })
   .addHelpText(
@@ -250,6 +257,7 @@ async function createNodesAction(
       desired_count: count,
       max_price_per_node_hour: options.maxPrice * 100,
       names: names.length > 0 ? names : undefined,
+      any_zone: options.anyZone ?? false,
       zone: options.zone,
       cloud_init_user_data: encodedUserData,
       image_id: options.image,
@@ -393,10 +401,13 @@ async function createNodesAction(
           confirmationMessage += ` for ~$${
             pricePerNodeHour.toFixed(2)
           }/node/hr`;
+          if ("zone" in quote) {
+            confirmationMessage += ` on ${cyan(quote.zone)}`;
+          }
         } else {
           logAndQuit(
             red(
-              "No nodes available matching your requirements. This is likely due to insufficient capacity.",
+              "No capacity available matching your hardware and pricing requirements. You can view zone capacity at https://sfcompute.com/dashboard/zones.",
             ),
           );
         }
@@ -405,6 +416,11 @@ async function createNodesAction(
         confirmationMessage += ` for up to $${
           options.maxPrice.toFixed(2)
         }/node/hr`;
+        if (options.zone) {
+          confirmationMessage += ` on ${cyan(options.zone)}`;
+        } else {
+          confirmationMessage += ` on any matching zone`;
+        }
       }
 
       // Add node names at the end after a colon
