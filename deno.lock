@@ -107,7 +107,7 @@
         "@inquirer/figures",
         "@inquirer/type@2.0.0",
         "@types/mute-stream",
-        "@types/node@22.19.1",
+        "@types/node@22.19.2",
         "@types/wrap-ansi",
         "ansi-escapes@4.3.2",
         "cli-width",
@@ -225,8 +225,8 @@
         "@types/node@24.2.0"
       ]
     },
-    "@types/node@22.19.1": {
-      "integrity": "sha512-LCCV0HdSZZZb34qifBsyWlUmok6W7ouER+oQIGBScS8EsZsQbrtFTUrDX4hOl+CS6p7cnNC4td+qrSVGSCTUfQ==",
+    "@types/node@22.19.2": {
+      "integrity": "sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==",
       "dependencies": [
         "undici-types@6.21.0"
       ]
