@@ -311,7 +311,12 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row head="Type: " value={printNodeType(node.node_type)} />
         <Row head="Status: " value={getStatusColor(node.status)} />
         <Row head="GPU: " value={node.gpu_type} />
-        <Row head="Zone: " value={node.zone ?? "Not specified"} />
+        <Row
+          head="Zone: "
+          value={node.zone ?? node.node_type === "autoreserved"
+            ? "Any matching zone"
+            : "Not specified"}
+        />
         <Row head="Owner: " value={node.owner} />
       </Box>
 
