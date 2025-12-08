@@ -144,7 +144,7 @@ export function createNodesTable(
       getStatusColor(node.status),
       lastVm?.id ?? "",
       node.gpu_type,
-      node.zone || "N/A",
+      node.zone || (node.node_type === "autoreserved" ? "Any matching" : "N/A"),
       startEnd,
       maxPrice,
     ]);
@@ -276,14 +276,6 @@ export const yesOption = new Option(
   "-y, --yes",
   "Skip confirmation prompt",
 );
-
-/**
- * Common --zone option for zone selection
- */
-export const zoneOption = new Option(
-  "-z, --zone <zone>",
-  "[Required] Zone for your nodes",
-).makeOptionMandatory();
 
 /**
  * Common --max-price option for nodes commands
