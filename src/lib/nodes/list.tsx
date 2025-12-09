@@ -520,20 +520,6 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         </>
       )}
 
-      {node.vms?.data?.[0]?.image_id && (
-        <>
-          <Box marginTop={1} paddingX={1}>
-            <Text bold color="cyan">Current VM Image:</Text>
-          </Box>
-          <Box marginLeft={2} flexDirection="column" paddingX={1}>
-            <Row
-              head="ID: "
-              value={node.vms?.data?.[0]?.image_id}
-            />
-          </Box>
-        </>
-      )}
-
       {/* Actions Section - Show based on available actions */}
       {nodeActions.length > 0 && (
         <>
