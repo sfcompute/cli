@@ -347,16 +347,35 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             <Row
               head="Start: "
               value={lastVM.start_at
-                ? dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                ? `${
+                  dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                } ${
+                  brightBlack(
+                    `(${formatDate(dayjs.unix(lastVM.start_at).toDate())} ${
+                      dayjs.unix(lastVM.start_at).format("z")
+                    })`,
+                  )
+                }`
                 : "Not specified"}
             />
             <Row
               head="End: "
               value={lastVM.end_at
-                ? dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                ? `${
+                  dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                } ${
+                  brightBlack(
+                    `(${formatDate(dayjs.unix(lastVM.end_at).toDate())} ${
+                      dayjs.unix(lastVM.end_at).format("z")
+                    })`,
+                  )
+                }`
                 : "Not specified"}
             />
-            <Row head="Image: " value={lastVM.image_id ?? "Not specified"} />
+            <Row
+              head="Image: "
+              value={lastVM.image_id ?? "Default SFC Image"}
+            />
           </Box>
         </>
       )}
