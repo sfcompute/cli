@@ -444,7 +444,11 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Box flexDirection="column" gap={0} marginLeft={1} marginRight={2}>
           <Box marginTop={1} paddingX={1}>
           </Box>
-          <VMTable vms={node.vms.data.slice(1)} />
+          <VMTable
+            vms={node.vms.data.filter((vm) =>
+              vm.id !== lastVM?.id
+            )}
+          />
         </Box>
       )}
 
