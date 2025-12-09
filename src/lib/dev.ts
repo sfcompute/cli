@@ -55,7 +55,7 @@ function registerConfig(program: Command) {
   const configCmd = program
     .command("config")
     .description("Manage cli config file.")
-    .option("-rm, --remove", "Remove config file");
+    .option("--rm, --remove", "Remove config file");
 
   // sf config
   // sf config [-rm, --remove]

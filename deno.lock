@@ -4,7 +4,7 @@
     "jsr:@std/assert@1.0.11": "1.0.11",
     "jsr:@std/fmt@*": "1.0.8",
     "jsr:@std/internal@^1.0.5": "1.0.12",
-    "npm:@commander-js/extra-typings@^12.1.0": "12.1.0_commander@12.1.0",
+    "npm:@commander-js/extra-typings@14": "14.0.0_commander@14.0.2",
     "npm:@inkjs/ui@2": "2.0.0_ink@5.2.1__@types+react@18.3.27__react@18.3.1_@types+react@18.3.27_react@18.3.1",
     "npm:@inquirer/prompts@^5.1.2": "5.5.0",
     "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.27": "0.1.0-alpha.27",
@@ -20,7 +20,7 @@
     "npm:cli-progress@^3.12.0": "3.12.0",
     "npm:cli-spinners@*": "3.3.0",
     "npm:cli-table3@0.6.5": "0.6.5",
-    "npm:commander@^12.1.0": "12.1.0",
+    "npm:commander@^14.0.2": "14.0.2",
     "npm:date-fns@^4.1.0": "4.1.0",
     "npm:dayjs@^1.11.19": "1.11.19",
     "npm:dotenv@^16.4.5": "16.6.1",
@@ -77,8 +77,8 @@
     "@colors/colors@1.5.0": {
       "integrity": "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ=="
     },
-    "@commander-js/extra-typings@12.1.0_commander@12.1.0": {
-      "integrity": "sha512-wf/lwQvWAA0goIghcb91dQYpkLBcyhOhQNqG/VgWhnKzgt+UOMvra7EX/2fv70arm5RW+PUHoQHHDa6/p77Eqg==",
+    "@commander-js/extra-typings@14.0.0_commander@14.0.2": {
+      "integrity": "sha512-hIn0ncNaJRLkZrxBIp5AsW/eXEHNKYQBh0aPdoUqNgD+Io3NIykQqpKFyKcuasZhicGaEZJX/JBSIkZ4e5x8Dg==",
       "dependencies": [
         "commander"
       ]
@@ -420,8 +420,8 @@
         "delayed-stream"
       ]
     },
-    "commander@12.1.0": {
-      "integrity": "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA=="
+    "commander@14.0.2": {
+      "integrity": "sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ=="
     },
     "convert-to-spaces@2.0.1": {
       "integrity": "sha512-rcQ1bsQO9799wq24uE5AM2tAILy4gXGIK/njFWcVQkGNZ96edlpY+A7bjwvzjYvLDyzmG1MmMLZhpcsb+klNMQ=="
@@ -1173,7 +1173,7 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@commander-js/extra-typings@^12.1.0",
+        "npm:@commander-js/extra-typings@14",
         "npm:@inkjs/ui@2",
         "npm:@inquirer/prompts@^5.1.2",
         "npm:@sfcompute/nodes-sdk-alpha@0.1.0-alpha.27",
@@ -1186,7 +1186,7 @@
         "npm:chrono-node@^2.9.0",
         "npm:cli-progress@^3.12.0",
         "npm:cli-table3@0.6.5",
-        "npm:commander@^12.1.0",
+        "npm:commander@^14.0.2",
         "npm:date-fns@^4.1.0",
         "npm:dayjs@^1.11.19",
         "npm:dotenv@^16.4.5",
