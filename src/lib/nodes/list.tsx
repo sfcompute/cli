@@ -330,7 +330,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row
           head="Zone: "
           value={node.zone ?? node.node_type === "autoreserved"
-            ? "Any matching zone"
+            ? (lastVM?.zone
+              ? `Any matching (${cyan(lastVM?.zone)})`
+              : "Any matching")
             : "Not specified"}
         />
         <Row head="Owner: " value={node.owner} />
