@@ -1,6 +1,6 @@
 import React from "react";
 import { Command, Option } from "@commander-js/extra-typings";
-import { brightBlack, gray } from "jsr:@std/fmt/colors";
+import { brightBlack, cyan, gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import ora from "ora";
 import dayjs from "dayjs";
@@ -9,6 +9,7 @@ import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
 import { Box, render, Text } from "ink";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import { formatDuration, intervalToDuration } from "date-fns";
 
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -51,52 +52,111 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
 
   return (
     <Box flexDirection="column" padding={0}>
-      {/* Header */}
-      <Box
-        padding={0}
-        marginY={0}
-        borderStyle="single"
-        borderBottom
-        borderTop={false}
-        borderLeft={false}
-        borderRight={false}
-        borderColor="gray"
-      >
-        <Box width={25} padding={0}>
-          <Text bold color="cyan">Virtual Machines</Text>
+      {/* Build table as columns */}
+      <Box flexDirection="row" padding={0}>
+        {/* Column 1: VM IDs */}
+        <Box flexDirection="column" width={27} padding={0}>
+          <Box
+            padding={0}
+            borderStyle="single"
+            borderBottom
+            borderTop={false}
+            borderLeft={false}
+            borderRight={false}
+            borderColor="gray"
+          >
+            <Text bold color="cyan">Previous VMs</Text>
+          </Box>
+          {vmsToShow.map((vm) => (
+            <Box key={vm.id} padding={0} paddingLeft={2}>
+              <Text>{vm.id}</Text>
+            </Box>
+          ))}
         </Box>
-        <Box width={15} padding={0}>
-          <Text bold color="cyan">Status</Text>
+
+        {/* Column 2: Status */}
+        <Box
+          flexDirection="column"
+          flexGrow={1}
+          flexShrink={0}
+          paddingRight={1}
+          padding={0}
+        >
+          <Box
+            padding={0}
+            borderStyle="single"
+            borderBottom
+            borderTop={false}
+            borderLeft={false}
+            borderRight={false}
+            borderColor="gray"
+            marginRight={-1}
+          >
+            <Text bold color="cyan">Status</Text>
+          </Box>
+          {vmsToShow.map((vm) => (
+            <Box key={vm.id} padding={0}>
+              <Text>{getVMStatusColor(vm.status)}</Text>
+            </Box>
+          ))}
         </Box>
-        <Box width={30} padding={0}>
-          <Text bold color="cyan">Start/End</Text>
+
+        {/* Column 3: Zone */}
+        <Box
+          flexDirection="column"
+          flexShrink={0}
+          flexGrow={1}
+          paddingRight={1}
+          padding={0}
+        >
+          <Box
+            padding={0}
+            borderStyle="single"
+            borderBottom
+            borderTop={false}
+            borderLeft={false}
+            borderRight={false}
+            borderColor="gray"
+            marginRight={-1}
+          >
+            <Text bold color="cyan">Zone</Text>
+          </Box>
+          {vmsToShow.map((vm) => (
+            <Box key={vm.id} padding={0}>
+              <Text>{vm.zone}</Text>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Column 4: Start/End */}
+        <Box flexDirection="column" flexGrow={2} padding={0}>
+          <Box
+            padding={0}
+            borderStyle="single"
+            borderBottom
+            borderTop={false}
+            borderLeft={false}
+            borderRight={false}
+            borderColor="gray"
+          >
+            <Text bold color="cyan">Start/End</Text>
+          </Box>
+          {vmsToShow.map((vm) => {
+            const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
+            const endDate = vm.end_at ? dayjs.unix(vm.end_at) : null;
+            const startEnd = formatNullableDateRange(startDate, endDate);
+            return (
+              <Box key={vm.id} padding={0}>
+                <Text>{startEnd}</Text>
+              </Box>
+            );
+          })}
         </Box>
       </Box>
 
-      {/* VM rows */}
-      {vmsToShow.map((vm) => {
-        const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
-        const endDate = vm.end_at ? dayjs.unix(vm.end_at) : null;
-        const startEnd = formatNullableDateRange(startDate, endDate);
-
-        return (
-          <Box key={vm.id}>
-            <Box width={25} padding={0}>
-              <Text>{vm.id}</Text>
-            </Box>
-            <Box width={15} padding={0}>
-              <Text>{getVMStatusColor(vm.status)}</Text>
-            </Box>
-            <Box width={30} padding={0}>
-              <Text>{startEnd}</Text>
-            </Box>
-          </Box>
-        );
-      })}
-
       {/* Show message if there are more VMs */}
       {remainingVms > 0 && (
-        <Box gap={1}>
+        <Box gap={1} marginTop={1} marginLeft={2}>
           <Text color="gray">
             {remainingVms} past {remainingVms === 1 ? "VM" : "VMs"} not shown.
           </Text>
@@ -268,12 +328,24 @@ function getActionsForNode(node: SFCNodes.Node) {
 // Component for displaying a single node in verbose format
 function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
   // Convert Unix timestamps to dates and calculate duration
-  const startDate = node.start_at && dayjs.unix(node.start_at);
-  const endDate = node.end_at && dayjs.unix(node.end_at);
+  const startDate = node.start_at ? dayjs.unix(node.start_at) : null;
+  const endDate = node.end_at ? dayjs.unix(node.end_at) : null;
   let duration = endDate && startDate && endDate.diff(startDate, "hours");
   if (typeof duration === "number" && duration < 1) {
     duration = 1;
   }
+  const durationLabel = duration
+    ? formatDuration(
+      intervalToDuration({
+        start: 0,
+        end: duration * 60 * 60 * 1000,
+      }),
+      {
+        delimiter: ", ",
+        format: ["years", "months", "weeks", "days", "hours"],
+      },
+    )
+    : null;
   // Convert max_price_per_node_hour from cents to dollars
   const pricePerHour = node.max_price_per_node_hour
     ? (node.max_price_per_node_hour / 100)
@@ -284,6 +356,8 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
 
   // Get available actions for this node
   const nodeActions = getActionsForNode(node);
+
+  const lastVM = getLastVM(node);
 
   return (
     <Box
@@ -313,18 +387,76 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row head="GPU: " value={node.gpu_type} />
         <Row
           head="Zone: "
-          value={node.zone ?? node.node_type === "autoreserved"
-            ? "Any matching zone"
-            : "Not specified"}
+          value={node.zone ?? (node.node_type === "autoreserved"
+            ? (lastVM?.zone
+              ? `Any matching (${cyan(lastVM?.zone)})`
+              : "Any matching")
+            : "Not specified")}
         />
         <Row head="Owner: " value={node.owner} />
       </Box>
 
+      {lastVM && (
+        <>
+          <Box marginTop={1} paddingX={1}>
+            <Text bold color="cyan">Active VM:</Text>
+          </Box>
+          <Box marginLeft={2} flexDirection="column" paddingX={1}>
+            <Row head="ID: " value={lastVM.id} />
+            <Row head="Status: " value={getVMStatusColor(lastVM.status)} />
+            <Row
+              head="Start: "
+              value={lastVM.start_at
+                ? `${
+                  dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                } ${
+                  brightBlack(
+                    `(${formatDate(dayjs.unix(lastVM.start_at).toDate())} ${
+                      dayjs.unix(lastVM.start_at).format("z")
+                    })`,
+                  )
+                }`
+                : "Not specified"}
+            />
+            <Row
+              head="End: "
+              value={lastVM.end_at
+                ? `${
+                  dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                } ${
+                  brightBlack(
+                    `(${formatDate(dayjs.unix(lastVM.end_at).toDate())} ${
+                      dayjs.unix(lastVM.end_at).format("z")
+                    })`,
+                  )
+                }`
+                : "Not specified"}
+            />
+            <Row
+              head="Image: "
+              value={lastVM.image_id ?? "Default SFC Image"}
+            />
+          </Box>
+        </>
+      )}
+
+      {node.vms?.data && node.vms.data.length > 1 && (
+        <Box flexDirection="column" gap={0} marginLeft={1} marginRight={2}>
+          <Box marginTop={1} paddingX={1}>
+          </Box>
+          <VMTable
+            vms={node.vms.data.filter((vm) =>
+              vm.id !== lastVM?.id
+            )}
+          />
+        </Box>
+      )}
+
       <Box marginTop={1} paddingX={1}>
-        <Text>📅 Schedule:</Text>
+        <Text bold color="cyan">Schedule:</Text>
       </Box>
 
-      <Box marginLeft={3} flexDirection="column" paddingX={1}>
+      <Box marginLeft={2} flexDirection="column" paddingX={1}>
         <Row
           head="Start: "
           value={startDate
@@ -354,7 +486,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         {duration && (
           <Row
             head="Duration: "
-            value={`${duration} hours`}
+            value={durationLabel}
           />
         )}
       </Box>
@@ -362,9 +494,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       {node.max_price_per_node_hour && (
         <>
           <Box marginTop={1} paddingX={1}>
-            <Text>💰 Pricing:</Text>
+            <Text bold color="cyan">Pricing:</Text>
           </Box>
-          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+          <Box marginLeft={2} flexDirection="column" paddingX={1}>
             {node.node_type === "autoreserved" && (
               <>
                 <Row
@@ -392,39 +524,13 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         </>
       )}
 
-      {/* VMs Section - Show if node has VMs */}
-      {node.vms?.data && node.vms.data.length > 0 && (
-        <Box flexDirection="row" gap={0}>
-          <Box marginTop={1} paddingX={1}>
-            <Text color="cyan" bold>💿</Text>
-          </Box>
-          <Box marginTop={1}>
-            <VMTable vms={node.vms.data} />
-          </Box>
-        </Box>
-      )}
-
-      {node.vms?.data?.[0]?.image_id && (
-        <>
-          <Box marginTop={1} paddingX={1}>
-            <Text>💾 Current VM Image:</Text>
-          </Box>
-          <Box marginLeft={3} flexDirection="column" paddingX={1}>
-            <Row
-              head="ID: "
-              value={node.vms?.data?.[0]?.image_id}
-            />
-          </Box>
-        </>
-      )}
-
       {/* Actions Section - Show based on available actions */}
       {nodeActions.length > 0 && (
         <>
           <Box marginTop={1} paddingX={1}>
-            <Text>🎯 Actions:</Text>
+            <Text bold color="cyan">Actions:</Text>
           </Box>
-          <Box marginLeft={3} flexDirection="column" paddingX={1}>
+          <Box marginLeft={2} flexDirection="column" paddingX={1}>
             {nodeActions.map((action, index) => (
               <Row
                 key={index}
