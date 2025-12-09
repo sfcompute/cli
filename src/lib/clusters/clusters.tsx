@@ -361,9 +361,7 @@ function UserAddedDisplay(props: {
 
         // Once ready, sync or print config before exiting
         await kubeconfigAction({ print: props.print });
-        setTimeout(() => {
-          exit();
-        }, 0);
+        setTimeout(exit, 0);
       }
     }, 500);
     return () => clearInterval(interval);
@@ -464,7 +462,10 @@ async function addClusterUserAction({
   }
 
   // Render UI that waits for the user to become ready, then sync/print config
-  render(<UserAddedDisplay id={data.id} username={username} print={print} />);
+  const { waitUntilExit } = render(
+    <UserAddedDisplay id={data.id} username={username} print={print} />,
+  );
+  await waitUntilExit();
 }
 
 async function removeClusterUserAction({

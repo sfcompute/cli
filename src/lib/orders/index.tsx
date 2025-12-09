@@ -232,7 +232,10 @@ export function registerOrders(program: Command) {
       if (options.json) {
         console.log(JSON.stringify(sortedOrders, null, 2));
       } else {
-        render(<OrderDisplay orders={sortedOrders} />);
+        const { waitUntilExit } = render(
+          <OrderDisplay orders={sortedOrders} />,
+        );
+        await waitUntilExit();
       }
     });
 

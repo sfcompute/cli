@@ -150,7 +150,7 @@ Examples:
   $ sf buy -t h100v -n 16 -d 24h -p 1.50 --standing
 `,
     )
-    .action(function buyOrderAction(options) {
+    .action(async function buyOrderAction(options) {
       /*
        * Flow is:
        * 1. If --quote, get quote and exit
@@ -166,9 +166,15 @@ Examples:
       };
 
       if (normalizedOptions.quote) {
-        render(<QuoteComponent options={normalizedOptions} />);
+        const { waitUntilExit } = render(
+          <QuoteComponent options={normalizedOptions} />,
+        );
+        await waitUntilExit();
       } else {
-        render(<QuoteAndBuy options={normalizedOptions} />);
+        const { waitUntilExit } = render(
+          <QuoteAndBuy options={normalizedOptions} />,
+        );
+        await waitUntilExit();
       }
     });
 }
@@ -214,14 +220,16 @@ export function parsePricePerGpuHour(price?: string) {
 export function QuoteComponent(props: { options: SfBuyOptions }) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { exit } = useApp();
 
   useEffect(() => {
     (async () => {
       const quote = await getQuoteFromParsedSfBuyOptions(props.options);
       if (quote) setQuote(quote);
       setIsLoading(false);
+      setTimeout(exit, 0);
     })();
-  }, [props.options]);
+  }, [props.options, exit]);
 
   return isLoading
     ? (
@@ -604,9 +612,7 @@ function BuyOrder(props: BuyOrderProps) {
       setResultMessage(
         "VM order not placed. We recommend you use 'sf nodes create' instead.",
       );
-      setTimeout(() => {
-        exit();
-      }, 0);
+      setTimeout(exit, 0);
     } else setVmWarningState("accepted");
   }, [exit]);
 
@@ -626,8 +632,8 @@ function BuyOrder(props: BuyOrderProps) {
         return;
       }
       setOrder(o);
-      // Success - don't schedule another poll, we're done
-      exit();
+      // Exit after render, regardless of order status
+      setTimeout(exit, 0);
     };
 
     // Start the first poll

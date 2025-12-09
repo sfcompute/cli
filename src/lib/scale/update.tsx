@@ -8,6 +8,7 @@ import React, {
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import { Command } from "@commander-js/extra-typings";
+import { setTimeout } from "node:timers";
 
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
@@ -241,6 +242,12 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const { isLoading, error, results, updateProcurements } =
     useUpdateProcurements();
 
+  useEffect(() => {
+    if (results && !isLoading) {
+      setTimeout(exit, 0);
+    }
+  }, [results, isLoading, exit]);
+
   const handleSubmit = useCallback((submitValue: boolean) => {
     if (!submitValue || !successfulProcurements) {
       exit();
@@ -372,7 +379,7 @@ $ sf scale update <procurement_id...> -p 1.50
     parsePriceArg,
   )
   .option("-y, --yes", "Automatically confirm the command.")
-  .action((id, options) => {
+  .action(async (id, options) => {
     if (Object.keys(options).length === 0) {
       console.error(
         yellow(
@@ -382,12 +389,13 @@ $ sf scale update <procurement_id...> -p 1.50
       update.help();
       return;
     }
-    render(
+    const { waitUntilExit } = render(
       <UpdateProcurementCommand
         {...options}
         ids={parseIds(id)}
       />,
     );
+    await waitUntilExit();
   });
 
 export default update;
