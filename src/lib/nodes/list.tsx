@@ -156,7 +156,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
 
       {/* Show message if there are more VMs */}
       {remainingVms > 0 && (
-        <Box gap={1} marginTop={1}>
+        <Box gap={1} marginTop={1} marginLeft={2}>
           <Text color="gray">
             {remainingVms} past {remainingVms === 1 ? "VM" : "VMs"} not shown.
           </Text>
