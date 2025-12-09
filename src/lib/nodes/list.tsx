@@ -65,7 +65,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
             borderRight={false}
             borderColor="gray"
           >
-            <Text bold color="cyan">Previous VMs</Text>
+            <Text bold color="cyan">VM History</Text>
           </Box>
           {vmsToShow.map((vm) => (
             <Box key={vm.id} padding={0} paddingLeft={2}>
@@ -123,7 +123,7 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
           </Box>
           {vmsToShow.map((vm) => (
             <Box key={vm.id} padding={0}>
-              <Text>{vm.zone}</Text>
+              <Text>{cyan(vm.zone)}</Text>
             </Box>
           ))}
         </Box>
@@ -380,20 +380,24 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
       </Box>
 
       {/* Basic Information */}
-      <Box paddingX={1} flexDirection="column">
-        <Row head="ID: " value={node.id} />
-        <Row head="Type: " value={printNodeType(node.node_type)} />
-        <Row head="Status: " value={getStatusColor(node.status)} />
-        <Row head="GPU: " value={node.gpu_type} />
-        <Row
-          head="Zone: "
-          value={node.zone ?? (node.node_type === "autoreserved"
-            ? (lastVM?.zone
-              ? `Any matching (${cyan(lastVM?.zone)})`
-              : "Any matching")
-            : "Not specified")}
-        />
-        <Row head="Owner: " value={node.owner} />
+      <Box flexDirection="row">
+        <Box paddingX={1} flexDirection="column" flexGrow={1}>
+          <Row head="ID: " value={node.id} />
+          <Row head="Type: " value={printNodeType(node.node_type)} />
+          <Row head="Status: " value={getStatusColor(node.status)} />
+        </Box>
+        <Box paddingX={1} flexDirection="column" flexGrow={1}>
+          <Row head="GPU: " value={node.gpu_type} />
+          <Row
+            head="Zone: "
+            value={node.zone ?? (node.node_type === "autoreserved"
+              ? (lastVM?.zone
+                ? `Any matching ${cyan(`(${lastVM?.zone})`)}`
+                : "Any matching")
+              : "Not specified")}
+          />
+          <Row head="Owner: " value={node.owner} />
+        </Box>
       </Box>
 
       {lastVM && (
@@ -404,16 +408,19 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
           <Box marginLeft={2} flexDirection="column" paddingX={1}>
             <Row head="ID: " value={lastVM.id} />
             <Row head="Status: " value={getVMStatusColor(lastVM.status)} />
+            <Row head="Zone: " value={cyan(lastVM.zone)} />
+            <Row
+              head="Image: "
+              value={lastVM.image_id ?? "Default SFC Image"}
+            />
             <Row
               head="Start: "
               value={lastVM.start_at
-                ? `${
-                  dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                ? `${formatDate(dayjs.unix(lastVM.start_at).toDate())} ${
+                  dayjs.unix(lastVM.start_at).format("z")
                 } ${
                   brightBlack(
-                    `(${formatDate(dayjs.unix(lastVM.start_at).toDate())} ${
-                      dayjs.unix(lastVM.start_at).format("z")
-                    })`,
+                    dayjs.unix(lastVM.start_at).format("YYYY-MM-DDTHH:mm:ssZ"),
                   )
                 }`
                 : "Not specified"}
@@ -421,20 +428,14 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             <Row
               head="End: "
               value={lastVM.end_at
-                ? `${
-                  dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ")
+                ? `${formatDate(dayjs.unix(lastVM.end_at).toDate())} ${
+                  dayjs.unix(lastVM.end_at).format("z")
                 } ${
                   brightBlack(
-                    `(${formatDate(dayjs.unix(lastVM.end_at).toDate())} ${
-                      dayjs.unix(lastVM.end_at).format("z")
-                    })`,
+                    dayjs.unix(lastVM.end_at).format("YYYY-MM-DDTHH:mm:ssZ"),
                   )
                 }`
                 : "Not specified"}
-            />
-            <Row
-              head="Image: "
-              value={lastVM.image_id ?? "Default SFC Image"}
             />
           </Box>
         </>
@@ -445,9 +446,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
           <Box marginTop={1} paddingX={1}>
           </Box>
           <VMTable
-            vms={node.vms.data.filter((vm) =>
-              vm.id !== lastVM?.id
-            )}
+            vms={node.vms.data}
           />
         </Box>
       )}
@@ -460,9 +459,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
         <Row
           head="Start: "
           value={startDate
-            ? `${startDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+            ? `${formatDate(startDate.toDate())} ${startDate.format("z")} ${
               brightBlack(
-                `(${formatDate(startDate.toDate())} ${startDate.format("z")})`,
+                startDate.format("YYYY-MM-DDTHH:mm:ssZ"),
               )
             }`
             : "Not specified"}
@@ -476,9 +475,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             ? "End (Rolling): "
             : "End: "}
           value={endDate
-            ? `${endDate.format("YYYY-MM-DDTHH:mm:ssZ")} ${
+            ? `${formatDate(endDate.toDate())} ${endDate.format("z")} ${
               brightBlack(
-                `(${formatDate(endDate.toDate())} ${endDate.format("z")})`,
+                endDate.format("YYYY-MM-DDTHH:mm:ssZ"),
               )
             }`
             : "Not specified"}
