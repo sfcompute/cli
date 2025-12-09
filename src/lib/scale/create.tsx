@@ -425,7 +425,7 @@ $ sf scale create -n 8 --horizon '30m'
   )
   .addOption(
     new Option(
-      "-cs, --colocation-strategy <colocation-strategy>",
+      "-s, --colocation-strategy <strategy>",
       `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
     ).choices([
       "anywhere",
