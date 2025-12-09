@@ -93,7 +93,7 @@ export function _registerBuy(program: Command) {
     })
     .option("-y, --yes", "Automatically confirm the order")
     .option(
-      "-colo, --colocate <contract_id>",
+      "--colo, --colocate <contract_id>",
       "Colocate with existing contracts. If provided, `-t`/`--type` will be ignored.",
     )
     .option(
