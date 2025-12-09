@@ -1,5 +1,5 @@
 import type { Command } from "@commander-js/extra-typings";
-import { clearInterval, setInterval } from "node:timers";
+import { clearInterval, setInterval, setTimeout } from "node:timers";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -103,7 +103,8 @@ export function registerSell(program: Command) {
       };
 
       // Render the SellOrder component
-      render(<SellOrder {...orderDetails} />);
+      const { waitUntilExit } = render(<SellOrder {...orderDetails} />);
+      await waitUntilExit();
     });
 }
 
@@ -214,6 +215,9 @@ function SellOrder(props: {
 
         const o = await getOrder(order!.id);
         setOrder(o);
+        if (o) {
+          setTimeout(exit, 0);
+        }
       }, 200);
     }
 

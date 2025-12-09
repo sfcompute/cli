@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Box, render, Text } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import { Command } from "@commander-js/extra-typings";
+import { setTimeout } from "node:timers";
 
 import { apiClient } from "../../apiClient.ts";
 
@@ -42,6 +43,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   const [failedFetches, setFailedFetches] = useState<
     { id: string; message: string }[]
   >([]);
+  const { exit } = useApp();
 
   useEffect(() => {
     async function fetchInfo() {
@@ -89,10 +91,11 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         );
       } finally {
         setIsLoading(false);
+        setTimeout(exit, 0);
       }
     }
     fetchInfo();
-  }, [props.type, props.ids]);
+  }, [props.type, props.ids, exit]);
 
   if (isLoading) {
     return (
@@ -176,9 +179,12 @@ $ sf scale list -t h100i
   .description("Show active and disabled procurements")
   .argument("[ID...]", "Show a specific procurement by ID")
   .option("-t, --type <type>", "Show procurements of a specific node type")
-  .action((ids, options) => {
+  .action(async (ids, options) => {
     const parsedIds = parseIds(ids);
-    render(<ProcurementsList {...options} ids={parsedIds} />);
+    const { waitUntilExit } = render(
+      <ProcurementsList {...options} ids={parsedIds} />,
+    );
+    await waitUntilExit();
   });
 
 export default show;

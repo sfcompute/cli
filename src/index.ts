@@ -59,7 +59,7 @@ await registerZones(program);
 registerDev(program);
 
 if (IS_TRACKING_DISABLED) {
-  program.parse(process.argv);
+  await program.parseAsync(process.argv);
 } else {
   // Add global process exit handlers to ensure analytics cleanup
   let isShuttingDown = false;
@@ -151,7 +151,7 @@ if (IS_TRACKING_DISABLED) {
   }
 
   try {
-    program.parse(process.argv);
+    await program.parseAsync(process.argv);
 
     // Add cleanup only when the process would naturally exit but PostHog keeps it alive
     // This only triggers when the event loop empties (command is done) but process doesn't exit
