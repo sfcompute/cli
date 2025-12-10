@@ -30,8 +30,10 @@ async function getVMDeprecationWarning() {
     return yellow(
       boxen(
         `You have \x1b[1m\x1b[33m${numNodesWithVMs} ${
-          pluralizeNodes(numNodesWithVMs)
-        }\x1b[0m\x1b[33m with active or previous VMs.
+          // Capitalize the first letter of the word
+          ((word) => word.charAt(0).toUpperCase() + word.slice(1))(
+            pluralizeNodes(numNodesWithVMs),
+          )}\x1b[0m\x1b[33m with active or previous VMs.
 Managing VM Nodes with deprecated \x1b[37msf vm\x1b[33m commands may cause undefined behavior.
 Use \x1b[37msf nodes\x1b[33m to create, extend and release specific machines directly.`,
         {
