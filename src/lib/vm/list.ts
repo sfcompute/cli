@@ -75,7 +75,7 @@ const list = new Command("list")
         return;
       }
       logAndQuit(
-        "You have no VMs. Buy a VM with: \n  $ sf buy -t h100v -d 1h -n 8",
+        "You have no legacy VMs. Buy a VM with: \n  $ sf nodes create --help",
       );
     }
 
