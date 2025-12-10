@@ -51,7 +51,7 @@ registerUpgrade(program);
 await registerScale(program);
 registerClusters(program);
 registerMe(program);
-registerVM(program);
+await registerVM(program);
 await registerNodes(program);
 await registerZones(program);
 
