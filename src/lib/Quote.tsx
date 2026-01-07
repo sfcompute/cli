@@ -25,6 +25,7 @@ export default function QuoteDisplay(props: { quote: Quote }) {
 
   return (
     <Box flexDirection="column" paddingBottom={1}>
+      <Row headWidth={10} head="zone" value={props.quote.zone ?? "N/A"} />
       <Row
         headWidth={10}
         head="rate"
@@ -42,6 +43,7 @@ export type Quote =
     start_at: string;
     end_at: string;
     instance_type: string;
+    zone?: string;
   }
   | {
     price: number;
@@ -49,5 +51,6 @@ export type Quote =
     start_at: string;
     end_at: string;
     contract_id: string;
+    zone?: string;
   }
   | null;
