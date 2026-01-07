@@ -29,6 +29,7 @@ export interface HydratedOrder {
   execution_price?: number;
   cancelled: boolean;
   status: OrderStatus;
+  cluster?: string;
 }
 
 export type PlaceSellOrderParameters = {

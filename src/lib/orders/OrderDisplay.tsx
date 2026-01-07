@@ -51,6 +51,7 @@ function Order(props: { order: HydratedOrder }) {
           props.order.quantity * GPUS_PER_NODE
         } gpus)`}
       />
+      <Row headWidth={7} head="zone" value={props.order.cluster ?? "N/A"} />
       <Row
         headWidth={7}
         head="price"
