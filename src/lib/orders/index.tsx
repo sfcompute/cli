@@ -62,6 +62,7 @@ export function registerOrders(program: Command) {
       ),
     )
     .option("-t, --type <type>", "Filter by instance type")
+    .option("-v, --verbose", "Show verbose output")
     .addOption(
       new Option(
         "--public",
@@ -233,7 +234,7 @@ export function registerOrders(program: Command) {
         console.log(JSON.stringify(sortedOrders, null, 2));
       } else {
         const { waitUntilExit } = render(
-          <OrderDisplay orders={sortedOrders} />,
+          <OrderDisplay orders={sortedOrders} expanded={options.verbose} />,
         );
         await waitUntilExit();
       }
