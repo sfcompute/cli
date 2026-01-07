@@ -119,6 +119,11 @@ export function ContractDisplay(props: { contract: Contract }) {
             )}
           </Box>
         </Box>
+        <Row
+          headWidth={COLUMN_WIDTH}
+          head="Zone"
+          value={props.contract.zone ?? "N/A"}
+        />
         {props.contract.colocate_with.length > 0 && (
           <Row
             headWidth={COLUMN_WIDTH}

@@ -20,6 +20,7 @@ export interface ActiveContract extends BaseContract {
   };
   colocate_with: string[];
   cluster_id?: string;
+  zone?: string;
 }
 
 export type Contract = PendingContract | ActiveContract;
