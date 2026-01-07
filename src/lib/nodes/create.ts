@@ -403,6 +403,7 @@ async function createNodesAction(
           }/node/hr`;
           if ("zone" in quote) {
             confirmationMessage += ` on ${cyan(quote.zone)}`;
+            createParams.zone ||= quote.zone;
           }
         } else {
           logAndQuit(
