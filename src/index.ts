@@ -10,7 +10,6 @@ import { loadConfig, saveConfig } from "./helpers/config.ts";
 import { getApiUrl } from "./helpers/urls.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
-import { registerClusters } from "./lib/clusters/clusters.tsx";
 import { registerContracts } from "./lib/contracts/index.tsx";
 import { registerDev } from "./lib/dev.ts";
 import { registerLogin } from "./lib/login.ts";
@@ -42,7 +41,6 @@ registerBalance(program);
 registerTokens(program);
 registerUpgrade(program);
 registerScale(program);
-registerClusters(program);
 registerMe(program);
 await registerVM(program);
 
