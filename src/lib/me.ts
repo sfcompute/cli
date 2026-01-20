@@ -1,5 +1,5 @@
-import type { Command } from "@commander-js/extra-typings";
 import * as console from "node:console";
+import type { Command } from "@commander-js/extra-typings";
 import { isLoggedIn, loadConfig } from "../helpers/config.ts";
 import {
   logAndQuit,
@@ -51,8 +51,7 @@ export async function getLoggedInAccountId(tokenOverride?: string) {
     logAndQuit("Failed to fetch account info");
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as { id: string };
 
-  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
   return data.id;
 }

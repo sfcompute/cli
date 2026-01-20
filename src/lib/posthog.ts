@@ -46,7 +46,6 @@ const trackEvent = ({
           Authorization: `Bearer ${config.auth_token}`,
         },
       });
-      // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
       const data = (await response.json()) as any;
       if (data.id) {
         exchangeAccountId = data.id;
@@ -69,10 +68,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags =
-  | "procurements"
-  | "zones"
-  | "custom-vm-images";
+type FeatureFlags = "procurements" | "zones" | "custom-vm-images";
 
 /**
  * Checks if a feature is enabled for the current user.
