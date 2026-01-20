@@ -39,7 +39,7 @@ Examples:
   $ sf nodes ssh root@my-node
 
   \x1b[2m# SSH with a specific username to a VM ID\x1b[0m
-  $ sf nodes ssh root@vm_xxxxxxxxxxxxxxxxxxxxx
+  $ sf nodes ssh jenson@vm_xxxxxxxxxxxxxxxxxxxxx
 `,
   )
   .action(async (destination, options) => {
