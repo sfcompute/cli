@@ -1,3 +1,4 @@
+import * as fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -22,8 +23,8 @@ export async function saveFeatureFlags(flags: FeatureFlagCache): Promise<void> {
   const configDir = join(homedir(), ".sfcompute");
 
   try {
-    await Deno.mkdir(configDir, { recursive: true });
-    await Deno.writeTextFile(cachePath, JSON.stringify(flags, null, 2));
+    await fs.mkdir(configDir, { recursive: true });
+    await fs.writeFile(cachePath, JSON.stringify(flags, null, 2));
   } catch {
     // Silent error
   }
@@ -33,7 +34,7 @@ export async function loadFeatureFlags(): Promise<FeatureFlagCache> {
   const cachePath = getFeatureFlagCachePath();
 
   try {
-    const cacheData = await Deno.readTextFile(cachePath);
+    const cacheData = await fs.readFile(cachePath, "utf-8");
     return JSON.parse(cacheData);
   } catch {
     return {};
@@ -81,7 +82,7 @@ export async function cacheFeatureFlag(
 export async function clearFeatureFlags(): Promise<void> {
   const cachePath = getFeatureFlagCachePath();
   try {
-    await Deno.remove(cachePath);
+    await fs.unlink(cachePath);
   } catch {
     // Silent error if file doesn't exist
   }

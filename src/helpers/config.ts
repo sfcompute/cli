@@ -1,5 +1,6 @@
-import { unlinkSync } from "node:fs";
 import * as console from "node:console";
+import { unlinkSync } from "node:fs";
+import * as fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
@@ -37,8 +38,8 @@ export async function saveConfig(
 
   try {
     // Ensure config directory exists
-    await Deno.mkdir(configDir, { recursive: true });
-    await Deno.writeTextFile(configPath, configData);
+    await fs.mkdir(configDir, { recursive: true });
+    await fs.writeFile(configPath, configData);
 
     return { success: true };
   } catch (error) {
@@ -92,10 +93,13 @@ export function getConfigPath(): string {
 async function configFileExists(): Promise<boolean> {
   const configPath = getConfigPath();
   try {
-    await Deno.stat(configPath);
+    await fs.stat(configPath);
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return false;
+    }
+    throw error;
   }
 }
 
@@ -107,7 +111,7 @@ async function readConfigFile(): Promise<Config | EmptyObject> {
 
   const configPath = getConfigPath();
   try {
-    const configData = await Deno.readTextFile(configPath);
+    const configData = await fs.readFile(configPath, "utf-8");
     const config = JSON.parse(configData);
     if (typeof config === "object" && config !== null) {
       return config;

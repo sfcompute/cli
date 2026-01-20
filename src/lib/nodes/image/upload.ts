@@ -1,12 +1,15 @@
-import { Command } from "@commander-js/extra-typings";
-import { brightBlack, cyan, gray, green, red } from "jsr:@std/fmt/colors";
-import cliProgress from "cli-progress";
 import console from "node:console";
 import crypto from "node:crypto";
+import fs from "node:fs";
+import { open, stat } from "node:fs/promises";
+import process from "node:process";
 import { clearInterval, setInterval } from "node:timers";
+import { Command } from "@commander-js/extra-typings";
 import retry from "async-retry";
+import chalk from "chalk";
+import cliProgress from "cli-progress";
+import cliSpinners from "cli-spinners";
 import ora, { type Ora } from "ora";
-import cliSpinners from "npm:cli-spinners";
 import { apiClient } from "../../../apiClient.ts";
 import { logAndQuit } from "../../../helpers/errors.ts";
 
@@ -16,16 +19,19 @@ async function readChunk(
   length: number,
   onProgress?: (bytesRead: number) => void,
 ): Promise<Uint8Array> {
-  const file = await Deno.open(filePath, { read: true });
+  const fileHandle = await open(filePath, "r");
   try {
-    await file.seek(start, Deno.SeekMode.Start);
-
     const buffer = new Uint8Array(length);
     let offset = 0;
 
     while (offset < length) {
-      const bytesRead = await file.read(buffer.subarray(offset));
-      if (bytesRead === null) {
+      const { bytesRead } = await fileHandle.read(
+        buffer,
+        offset,
+        length - offset,
+        start + offset,
+      );
+      if (bytesRead === 0) {
         // EOF reached
         break;
       }
@@ -43,7 +49,7 @@ async function readChunk(
 
     return buffer;
   } finally {
-    file.close();
+    await fileHandle.close();
   }
 }
 
@@ -55,7 +61,7 @@ const upload = new Command("upload")
     "-c, --concurrency <number>",
     "Number of parts to upload concurrently",
     (value) => {
-      const parsed = parseInt(value, 10);
+      const parsed = Number.parseInt(value, 10);
       if (isNaN(parsed) || parsed < 1) {
         throw new Error("Concurrency must be a positive integer");
       }
@@ -88,20 +94,20 @@ const upload = new Command("upload")
 
       const imageId = startResponse.data.image_id;
       preparingSpinner.succeed(
-        `Started upload for image ${cyan(name)} (${brightBlack(imageId)})`,
+        `Started upload for image ${chalk.cyan(name)} (${chalk.blackBright(imageId)})`,
       );
 
       // Get file info and open as stream
-      const fileInfo = await Deno.stat(filePath);
+      const fileInfo = await stat(filePath);
       const fileSize = fileInfo.size;
 
       // Check file size limit (128 GiB)
       const maxFileSize = 128 * 1024 * 1024 * 1024; // 128 GiB in bytes
       if (fileSize > maxFileSize) {
         logAndQuit(
-          `File size exceeds maximum allowed size of 128 GiB. File size: ${
-            (fileSize / (1024 * 1024 * 1024)).toFixed(2)
-          } GiB`,
+          `File size exceeds maximum allowed size of 128 GiB. File size: ${(
+            fileSize / (1024 * 1024 * 1024)
+          ).toFixed(2)} GiB`,
         );
       }
 
@@ -112,9 +118,10 @@ const upload = new Command("upload")
 
       // For files smaller than default chunk, use the whole file as one part
       // Otherwise use default chunk size, but ensure we don't exceed maxParts
-      const chunkSize = fileSize <= defaultChunk
-        ? Math.max(fileSize, minChunk)
-        : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
+      const chunkSize =
+        fileSize <= defaultChunk
+          ? Math.max(fileSize, minChunk)
+          : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
 
       const totalParts = Math.ceil(fileSize / chunkSize);
 
@@ -151,8 +158,7 @@ const upload = new Command("upload")
       let spinnerIndex = 0;
 
       progressBar = new cliProgress.SingleBar({
-        format:
-          `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
+        format: `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
         hideCursor: true,
@@ -185,7 +191,7 @@ const upload = new Command("upload")
           speedStr = `${speed.toFixed(0)} B/s`;
         }
 
-        progressBar.update(totalBytesUploaded, {
+        progressBar?.update(totalBytesUploaded, {
           spinner: spinner.frames[spinnerIndex % spinner.frames.length],
           speed: speedStr,
           uploadedMB: (totalBytesUploaded / (1024 * 1024)).toFixed(1),
@@ -213,13 +219,15 @@ const upload = new Command("upload")
       };
 
       // Upload parts concurrently with specified concurrency limit
-      const uploadPart = async (
-        { part, start, end }: {
-          part: number;
-          start: number;
-          end: number;
-        },
-      ) => {
+      const uploadPart = async ({
+        part,
+        start,
+        end,
+      }: {
+        part: number;
+        start: number;
+        end: number;
+      }) => {
         const chunkSize = end - start;
 
         // Upload the chunk with retry, fetching fresh URL each attempt
@@ -253,7 +261,9 @@ const upload = new Command("upload")
 
               // Bail on non-transient 4xx errors (except 408 Request Timeout and 429 Too Many Requests)
               if (
-                status >= 400 && status < 500 && status !== 408 &&
+                status >= 400 &&
+                status < 500 &&
+                status !== 408 &&
                 status !== 429
               ) {
                 bail(
@@ -286,13 +296,15 @@ const upload = new Command("upload")
               headers: {
                 "Content-Type": "application/octet-stream",
               },
-              body: payload,
+              body: payload as unknown as BodyInit,
             });
 
             if (!res.ok) {
               // Bail on non-transient 4xx errors (except 408 and 429)
               if (
-                res.status >= 400 && res.status < 500 && res.status !== 408 &&
+                res.status >= 400 &&
+                res.status < 500 &&
+                res.status !== 408 &&
                 res.status !== 429
               ) {
                 bail(
@@ -324,9 +336,7 @@ const upload = new Command("upload")
       try {
         for (let i = 0; i < uploadParts.length; i += concurrencyLimit) {
           const batch = uploadParts.slice(i, i + concurrencyLimit);
-          const batchResults = await Promise.allSettled(
-            batch.map(uploadPart),
-          );
+          const batchResults = await Promise.allSettled(batch.map(uploadPart));
 
           for (const result of batchResults) {
             if (result.status === "fulfilled") {
@@ -345,7 +355,7 @@ const upload = new Command("upload")
       }
 
       progressBar.update(fileSize, {
-        spinner: green("✔"),
+        spinner: chalk.green("✔"),
         speed: "0 B/s",
         uploadedMB: (fileSize / (1024 * 1024)).toFixed(1),
         totalMB: (fileSize / (1024 * 1024)).toFixed(1),
@@ -356,8 +366,8 @@ const upload = new Command("upload")
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
 
-      using file = await Deno.open(filePath, { read: true });
-      for await (const chunk of file.readable) {
+      const fileStream = fs.createReadStream(filePath);
+      for await (const chunk of fileStream) {
         hash.update(chunk);
       }
 
@@ -385,8 +395,8 @@ const upload = new Command("upload")
       finalizingSpinner.succeed(`Image uploaded and verified`);
 
       const object = completeResponse.data;
-      console.log(gray("\nNext steps:"));
-      console.log(`  sf nodes images show ${cyan(object.image_id)}`);
+      console.log(chalk.gray("\nNext steps:"));
+      console.log(`  sf nodes images show ${chalk.cyan(object.image_id)}`);
     } catch (err) {
       // Clean up spinner timer
       if (spinnerTimer) {
@@ -416,10 +426,10 @@ const upload = new Command("upload")
         );
       } else {
         console.error(
-          `\n${red("✗")} ${err instanceof Error ? err.message : String(err)}`,
+          `\n${chalk.red("✗")} ${err instanceof Error ? err.message : String(err)}`,
         );
       }
-      Deno.exit(1);
+      process.exit(1);
     }
   });
 
