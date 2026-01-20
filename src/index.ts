@@ -26,138 +26,142 @@ import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm/index.ts";
 import { registerZones } from "./lib/zones.tsx";
 
-const program = new Command();
+async function main() {
+  const program = new Command();
 
-if (!process.argv.includes("--json")) {
-  await Promise.all([checkVersion(), getAppBanner()]);
-}
-
-program
-  .name("sf")
-  .description("The San Francisco Compute command line tool.")
-  .version(pkg.version);
-
-// commands
-registerLogin(program);
-registerBuy(program);
-registerExtend(program);
-registerOrders(program);
-registerContracts(program);
-registerSell(program);
-registerBalance(program);
-registerTokens(program);
-registerUpgrade(program);
-await registerScale(program);
-registerMe(program);
-await registerVM(program);
-await registerNodes(program);
-await registerZones(program);
-
-// (development commands)
-registerDev(program);
-
-if (IS_TRACKING_DISABLED) {
-  await program.parseAsync(process.argv);
-} else {
-  // Add global process exit handlers to ensure analytics cleanup
-  let isShuttingDown = false;
-  const ensureAnalyticsShutdown = async () => {
-    if (!isShuttingDown) {
-      isShuttingDown = true;
-      try {
-        await analytics.shutdown();
-      } catch (_err) {
-        // Silently ignore analytics shutdown errors
-      }
-    }
-  };
-
-  process.on("beforeExit", ensureAnalyticsShutdown);
-  process.on("SIGINT", async () => {
-    await ensureAnalyticsShutdown();
-    process.exit(130);
-  });
-  process.on("SIGTERM", async () => {
-    await ensureAnalyticsShutdown();
-    process.exit(0);
-  });
-
-  const config = await loadConfig();
-  let exchangeAccountId = config.account_id;
-
-  if (!exchangeAccountId) {
-    const response = await fetch(await getApiUrl("me"), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.auth_token}`,
-      },
-    });
-
-    const data = (await response.json()) as any;
-    if (data.id) {
-      exchangeAccountId = data.id;
-      saveConfig({ ...config, account_id: data.id });
-    }
+  if (!process.argv.includes("--json")) {
+    await Promise.all([checkVersion(), getAppBanner()]);
   }
 
-  program.exitOverride((error) => {
-    let isError = true;
+  program
+    .name("sf")
+    .description("The San Francisco Compute command line tool.")
+    .version(pkg.version);
 
-    switch (error.code) {
-      case "commander.helpDisplayed":
-      case "commander.help":
-      case "commander.version":
-        isError = false;
-        break;
-    }
+  // commands
+  registerLogin(program);
+  registerBuy(program);
+  registerExtend(program);
+  registerOrders(program);
+  registerContracts(program);
+  registerSell(program);
+  registerBalance(program);
+  registerTokens(program);
+  registerUpgrade(program);
+  await registerScale(program);
+  registerMe(program);
+  await registerVM(program);
+  await registerNodes(program);
+  await registerZones(program);
 
-    process.exit(isError ? 1 : 0);
-  });
+  // (development commands)
+  registerDev(program);
 
-  if (exchangeAccountId) {
-    const args = process.argv.slice(2).reduce((acc, arg, i, arr) => {
-      if (arg.startsWith("--")) {
-        const key = arg.slice(2);
-        const nextArg = arr[i + 1];
-        if (nextArg && !nextArg.startsWith("-")) {
-          (acc as Record<string, string | number | boolean>)[key] = isNaN(
-            Number(nextArg),
-          )
-            ? nextArg
-            : Number(nextArg);
-        } else {
-          (acc as Record<string, boolean>)[key] = true;
+  if (IS_TRACKING_DISABLED) {
+    await program.parseAsync(process.argv);
+  } else {
+    // Add global process exit handlers to ensure analytics cleanup
+    let isShuttingDown = false;
+    const ensureAnalyticsShutdown = async () => {
+      if (!isShuttingDown) {
+        isShuttingDown = true;
+        try {
+          await analytics.shutdown();
+        } catch (_err) {
+          // Silently ignore analytics shutdown errors
         }
       }
-      return acc;
-    }, {});
+    };
 
-    analytics.track({
-      event: `${process.argv[2] || "unknown"}${
-        process.argv[3] ? "_" + process.argv[3] : ""
-      }`,
-      properties: {
-        ...args,
-        shell: process.env.SHELL,
-        os: os.platform(),
-        cliVersion: program.version(),
-        argsRaw: process.argv.slice(2).join(" "),
-      },
+    process.on("beforeExit", ensureAnalyticsShutdown);
+    process.on("SIGINT", async () => {
+      await ensureAnalyticsShutdown();
+      process.exit(130);
     });
-  }
-
-  try {
-    await program.parseAsync(process.argv);
-
-    // Add cleanup only when the process would naturally exit but PostHog keeps it alive
-    // This only triggers when the event loop empties (command is done) but process doesn't exit
-    process.on("beforeExit", async () => {
+    process.on("SIGTERM", async () => {
       await ensureAnalyticsShutdown();
       process.exit(0);
     });
-  } catch (err) {
-    console.log(err);
-    process.exit(1);
+
+    const config = await loadConfig();
+    let exchangeAccountId = config.account_id;
+
+    if (!exchangeAccountId) {
+      const response = await fetch(await getApiUrl("me"), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.auth_token}`,
+        },
+      });
+
+      const data = (await response.json()) as any;
+      if (data.id) {
+        exchangeAccountId = data.id;
+        saveConfig({ ...config, account_id: data.id });
+      }
+    }
+
+    program.exitOverride((error) => {
+      let isError = true;
+
+      switch (error.code) {
+        case "commander.helpDisplayed":
+        case "commander.help":
+        case "commander.version":
+          isError = false;
+          break;
+      }
+
+      process.exit(isError ? 1 : 0);
+    });
+
+    if (exchangeAccountId) {
+      const args = process.argv.slice(2).reduce((acc, arg, i, arr) => {
+        if (arg.startsWith("--")) {
+          const key = arg.slice(2);
+          const nextArg = arr[i + 1];
+          if (nextArg && !nextArg.startsWith("-")) {
+            (acc as Record<string, string | number | boolean>)[key] = isNaN(
+              Number(nextArg),
+            )
+              ? nextArg
+              : Number(nextArg);
+          } else {
+            (acc as Record<string, boolean>)[key] = true;
+          }
+        }
+        return acc;
+      }, {});
+
+      analytics.track({
+        event: `${process.argv[2] || "unknown"}${
+          process.argv[3] ? "_" + process.argv[3] : ""
+        }`,
+        properties: {
+          ...args,
+          shell: process.env.SHELL,
+          os: os.platform(),
+          cliVersion: program.version(),
+          argsRaw: process.argv.slice(2).join(" "),
+        },
+      });
+    }
+
+    try {
+      await program.parseAsync(process.argv);
+
+      // Add cleanup only when the process would naturally exit but PostHog keeps it alive
+      // This only triggers when the event loop empties (command is done) but process doesn't exit
+      process.on("beforeExit", async () => {
+        await ensureAnalyticsShutdown();
+        process.exit(0);
+      });
+    } catch (err) {
+      console.log(err);
+      process.exit(1);
+    }
   }
 }
+
+main();
