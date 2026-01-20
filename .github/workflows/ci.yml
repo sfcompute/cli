@@ -16,7 +16,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+      - uses: biomejs/setup-biome@v2
       - run: npm ci
-      - run: npm run lint
+      - run: biome ci .
       - run: npm run check
       - run: npm test
