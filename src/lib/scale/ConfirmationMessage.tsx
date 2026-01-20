@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Text } from "ink";
 
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
@@ -7,9 +6,9 @@ import { Row } from "../Row.tsx";
 import { formatDuration } from "../orders/index.tsx";
 
 import {
-  formatColocationStrategy,
   MIN_CONTRACT_MINUTES,
-  Procurement,
+  type Procurement,
+  formatColocationStrategy,
 } from "./utils.ts";
 
 export default function ConfirmationMessage(props: {
@@ -24,8 +23,8 @@ export default function ConfirmationMessage(props: {
   const horizonInMilliseconds = props.horizonMinutes
     ? Math.max(props.horizonMinutes, MIN_CONTRACT_MINUTES) * 60 * 1000
     : undefined;
-  const isSupportedType = typeof props.type === "string" &&
-    props.type in InstanceTypeMetadata;
+  const isSupportedType =
+    typeof props.type === "string" && props.type in InstanceTypeMetadata;
   const typeLabel = isSupportedType
     ? InstanceTypeMetadata[props.type!].displayName
     : props.type;
@@ -40,8 +39,8 @@ export default function ConfirmationMessage(props: {
       <Row
         headWidth={30}
         head="Type"
-        value={isSupportedType
-          ? (
+        value={
+          isSupportedType ? (
             <Box
               gap={1}
               minWidth={props.quote ? 30 : undefined}
@@ -50,36 +49,44 @@ export default function ConfirmationMessage(props: {
               <Text>{typeLabel}</Text>
               <Text dimColor>({props.type})</Text>
             </Box>
+          ) : (
+            "unchanged"
           )
-          : "unchanged"}
+        }
       />
       <Row
         headWidth={30}
         head="GPUs"
-        value={props.accelerators !== undefined
-          ? `${props.accelerators}`
-          : "unchanged"}
+        value={
+          props.accelerators !== undefined
+            ? `${props.accelerators}`
+            : "unchanged"
+        }
       />
       <Row
         headWidth={30}
         head="Limit Price"
-        value={props.pricePerGpuHourInCents !== undefined
-          ? (
+        value={
+          props.pricePerGpuHourInCents !== undefined ? (
             <Box gap={1} minWidth={30} justifyContent="space-between">
               <Text>
                 ${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr
               </Text>
               {props.quote && <Text dimColor>(1.5x market)</Text>}
             </Box>
+          ) : (
+            "unchanged"
           )
-          : "unchanged"}
+        }
       />
       <Row
         headWidth={30}
         head="Horizon"
-        value={horizonInMilliseconds
-          ? formatDuration(horizonInMilliseconds)
-          : "unchanged"}
+        value={
+          horizonInMilliseconds
+            ? formatDuration(horizonInMilliseconds)
+            : "unchanged"
+        }
       />
       {props.colocationStrategy && (
         <Row

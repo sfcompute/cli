@@ -1,29 +1,28 @@
-import type { Command } from "@commander-js/extra-typings";
 import { clearInterval, setInterval, setTimeout } from "node:timers";
+import type { Command } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Box, render, useApp } from "ink";
+import { Text } from "ink";
+import Spinner from "ink-spinner";
+import ms from "ms";
+import parseDurationFromLibrary from "parse-duration";
+import { useCallback, useEffect, useState } from "react";
+import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
-import { components } from "../../schema.ts";
+import { isLoggedIn } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import parseDurationFromLibrary from "parse-duration";
-import { Box, render, useApp } from "ink";
-import { parseStartDate } from "../../helpers/units.ts";
-import { GPUS_PER_NODE } from "../constants.ts";
-import { useCallback, useEffect, useState } from "react";
-import { Text } from "ink";
-import ConfirmInput from "../ConfirmInput.tsx";
-import React from "react";
-import { Row } from "../Row.tsx";
-import ms from "ms";
-import Spinner from "ink-spinner";
-import invariant from "tiny-invariant";
 import { getContract } from "../../helpers/fetchers.ts";
-import { isLoggedIn } from "../../helpers/config.ts";
+import { parseStartDate } from "../../helpers/units.ts";
+import type { components } from "../../schema.ts";
+import ConfirmInput from "../ConfirmInput.tsx";
+import { Row } from "../Row.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
 
 type SellOrderFlags = components["schemas"]["market-api_OrderFlags"];
 
@@ -236,10 +235,7 @@ function SellOrder(props: {
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       )}
 
@@ -300,8 +296,8 @@ function SellOrderPreview(props: {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
-    100;
+  const totalPrice =
+    getTotalPrice(props.price, props.size, realDurationHours) / 100;
 
   return (
     <Box flexDirection="column">
@@ -351,9 +347,10 @@ export async function placeSellOrder(options: {
   endsAt: Date;
   flags?: SellOrderFlags;
 }) {
-  const realDurationHours = dayjs(options.endsAt).diff(
-    dayjs(options.startAt === "NOW" ? new Date() : options.startAt),
-  ) /
+  const realDurationHours =
+    dayjs(options.endsAt).diff(
+      dayjs(options.startAt === "NOW" ? new Date() : options.startAt),
+    ) /
     3600 /
     1000;
   const totalPrice = getTotalPrice(
@@ -373,9 +370,8 @@ export async function placeSellOrder(options: {
       price: totalPrice,
       contract_id: options.contractId,
       quantity: options.quantity,
-      start_at: options.startAt === "NOW"
-        ? "NOW"
-        : options.startAt.toISOString(),
+      start_at:
+        options.startAt === "NOW" ? "NOW" : options.startAt.toISOString(),
       end_at: options.endsAt.toISOString(),
       flags: options.flags || {},
     },
@@ -406,7 +402,11 @@ export async function placeSellOrder(options: {
 export async function getOrder(orderId: string) {
   const api = await apiClient();
 
-  const { data: order, error, response } = await api.GET("/v0/orders/{id}", {
+  const {
+    data: order,
+    error,
+    response,
+  } = await api.GET("/v0/orders/{id}", {
     params: { path: { id: orderId } },
   });
 
