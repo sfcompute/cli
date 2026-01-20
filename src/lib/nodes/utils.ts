@@ -1,20 +1,13 @@
-import {
-  brightBlack,
-  cyan,
-  gray,
-  green,
-  red,
-  yellow,
-} from "jsr:@std/fmt/colors";
+import { CommanderError, Option } from "@commander-js/extra-typings";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
+import { parseDate } from "chrono-node";
 import Table from "cli-table3";
 import dayjs from "dayjs";
-import { CommanderError, Option } from "@commander-js/extra-typings";
-import { parseDate } from "chrono-node";
 import { parseDurationArgument } from "../../helpers/duration.ts";
-import { parseStartDateOrNow } from "../../helpers/units.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatNullableDateRange } from "../../helpers/format-date.ts";
+import { parseStartDateOrNow } from "../../helpers/units.ts";
 
 export function printNodeStatus(status: SFCNodes.Node["status"]): string {
   switch (status) {
@@ -32,16 +25,16 @@ export function getStatusColor(status: SFCNodes.Node["status"]): string {
   switch (status) {
     case "pending":
     case "awaitingcapacity":
-      return yellow(statusText);
+      return chalk.yellow(statusText);
     case "running":
-      return green(statusText);
+      return chalk.green(statusText);
     case "released":
-      return cyan(statusText);
+      return chalk.cyan(statusText);
     case "failed":
     case "terminated":
-      return red(statusText);
+      return chalk.red(statusText);
     case "deleted":
-      return gray(statusText);
+      return chalk.gray(statusText);
     case "unknown":
     default:
       return statusText;
@@ -63,15 +56,15 @@ export function getVMStatusColor(status: string): string {
 
   switch (status) {
     case "Pending":
-      return yellow(statusText);
+      return chalk.yellow(statusText);
     case "Running":
-      return green(statusText);
+      return chalk.green(statusText);
     case "Destroyed":
-      return brightBlack(statusText);
+      return chalk.blackBright(statusText);
     case "NodeFailure":
-      return red(statusText);
+      return chalk.red(statusText);
     case "Unspecified":
-      return gray(statusText);
+      return chalk.gray(statusText);
     default:
       return statusText;
   }
@@ -89,10 +82,14 @@ export function printNodeType(nodeType: SFCNodes.Node["node_type"]) {
 }
 
 export function getLastVM(node: SFCNodes.Node) {
-  return node.current_vm ??
-    node.vms?.data?.sort((a, b) =>
-      (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at)
-    ).at(0);
+  return (
+    node.current_vm ??
+    node.vms?.data
+      ?.sort(
+        (a, b) => (b.start_at ?? b.updated_at) - (a.start_at ?? a.updated_at),
+      )
+      .at(0)
+  );
 }
 
 export const DEFAULT_NODE_LS_LIMIT = 12 as const;
@@ -109,14 +106,14 @@ export function createNodesTable(
 ): string {
   const table = new Table({
     head: [
-      cyan("NAME"),
-      cyan("TYPE"),
-      cyan("STATUS"),
-      cyan("CURRENT VM"),
-      cyan("GPU"),
-      cyan("ZONE"),
-      cyan("START/END"),
-      cyan("MAX PRICE"),
+      chalk.cyan("NAME"),
+      chalk.cyan("TYPE"),
+      chalk.cyan("STATUS"),
+      chalk.cyan("CURRENT VM"),
+      chalk.cyan("GPU"),
+      chalk.cyan("ZONE"),
+      chalk.cyan("START/END"),
+      chalk.cyan("MAX PRICE"),
     ],
     style: {
       head: [],
@@ -145,11 +142,11 @@ export function createNodesTable(
       lastVm?.id ?? "",
       node.gpu_type,
       node.zone ||
-      (node.node_type === "autoreserved"
-        ? (lastVm?.zone
-          ? `Any matching (${brightBlack(lastVm.zone)})`
-          : "Any matching")
-        : "N/A"),
+        (node.node_type === "autoreserved"
+          ? lastVm?.zone
+            ? `Any matching (${chalk.blackBright(lastVm.zone)})`
+            : "Any matching"
+          : "N/A"),
       startEnd,
       maxPrice,
     ]);
@@ -159,10 +156,10 @@ export function createNodesTable(
     table.push([
       {
         colSpan: 8,
-        content: brightBlack(
-          `${nodes.length - limit} older ${
-            pluralizeNodes(nodes.length - limit)
-          } not shown. Use sf nodes list --limit ${nodes.length} or sf nodes list --json to list all nodes.`,
+        content: chalk.blackBright(
+          `${nodes.length - limit} older ${pluralizeNodes(
+            nodes.length - limit,
+          )} not shown. Use sf nodes list --limit ${nodes.length} or sf nodes list --json to list all nodes.`,
         ),
       },
     ]);
@@ -172,7 +169,7 @@ export function createNodesTable(
 }
 
 export function pluralizeNodes(count: number) {
-  return count === 1 ? "node" as const : "nodes" as const;
+  return count === 1 ? ("node" as const) : ("nodes" as const);
 }
 
 /**
@@ -183,7 +180,7 @@ export function pluralizeNodes(count: number) {
  * @throws CommanderError if invalid
  */
 export function validatePrice(val: string, minimum = 0): number {
-  const parsed = parseFloat(val);
+  const parsed = Number.parseFloat(val);
   if (isNaN(parsed) || parsed <= 0) {
     throw new CommanderError(
       1,
@@ -209,7 +206,7 @@ export function validatePrice(val: string, minimum = 0): number {
  * @throws CommanderError if invalid
  */
 export function validateDuration(val: string, minimum = 3600): number {
-  const parsed = parseInt(val, 10);
+  const parsed = Number.parseInt(val, 10);
   if (isNaN(parsed)) {
     throw new CommanderError(
       1,
@@ -221,9 +218,9 @@ export function validateDuration(val: string, minimum = 3600): number {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Duration must be at least ${minimum} seconds (${
-        Math.round(minimum / 3600)
-      } hour${minimum === 3600 ? "" : "s"})`,
+      `Duration must be at least ${minimum} seconds (${Math.round(
+        minimum / 3600,
+      )} hour${minimum === 3600 ? "" : "s"})`,
     );
   }
   return parsed;
@@ -277,10 +274,7 @@ export const jsonOption = new Option("-j, --json", "Output in JSON format");
 /**
  * Common --yes option to skip confirmation prompts
  */
-export const yesOption = new Option(
-  "-y, --yes",
-  "Skip confirmation prompt",
-);
+export const yesOption = new Option("-y, --yes", "Skip confirmation prompt");
 
 /**
  * Common --max-price option for nodes commands
@@ -288,7 +282,9 @@ export const yesOption = new Option(
 export const maxPriceOption = new Option(
   "-p, --max-price <price>",
   "[Required] Maximum price per node hour in dollars",
-).argParser(validatePrice).makeOptionMandatory();
+)
+  .argParser(validatePrice)
+  .makeOptionMandatory();
 
 /**
  * Common --start option using same parser as buy command
@@ -296,7 +292,9 @@ export const maxPriceOption = new Option(
 export const startOrNowOption = new Option(
   "-s, --start <start>",
   "Start time (ISO 8601 format:'2022-10-27T14:30:00Z' or relative time like '+1d', or 'NOW')",
-).argParser(parseStartDateOrNow).default("NOW" as const);
+)
+  .argParser(parseStartDateOrNow)
+  .default("NOW" as const);
 
 /**
  * Common --end option using same parser as buy command
@@ -320,4 +318,6 @@ export const durationOption = new Option(
 export const requiredDurationOption = new Option(
   "-d, --duration <duration>",
   "[Required] Duration (e.g., '1h', '30m', '2d', 3600) - rounded up to the nearest hour",
-).argParser(parseDurationArgument).makeOptionMandatory();
+)
+  .argParser(parseDurationArgument)
+  .makeOptionMandatory();

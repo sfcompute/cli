@@ -1,16 +1,17 @@
-import type { Command } from "@commander-js/extra-typings";
-import { Box, render, Text } from "ink";
-import Table from "cli-table3";
-import { cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import * as console from "node:console";
-import React from "react";
-import { isLoggedIn } from "../helpers/config.ts";
+import type { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
+import Table from "cli-table3";
+import dayjs from "dayjs";
+import { Box, render, Text } from "ink";
 import { apiClient } from "../apiClient.ts";
+import { isLoggedIn } from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
+import type { components } from "../schema.ts";
 import { isFeatureEnabled } from "./posthog.ts";
 import { components } from "../schema.ts";
 

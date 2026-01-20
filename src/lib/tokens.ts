@@ -1,17 +1,17 @@
-import type { Command } from "@commander-js/extra-typings";
-import { confirm, input, select } from "@inquirer/prompts";
-import { cyan, gray, green, magenta, red, white } from "jsr:@std/fmt/colors";
-import Table from "cli-table3";
 import * as console from "node:console";
 import process from "node:process";
+import type { Command } from "@commander-js/extra-typings";
+import { confirm, input, select } from "@inquirer/prompts";
+import chalk from "chalk";
+import Table from "cli-table3";
 import ora from "ora";
 import { getAuthToken, isLoggedIn } from "../helpers/config.ts";
 import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { getApiUrl } from "../helpers/urls.ts";
 import { formatDate } from "../helpers/format-date.ts";
+import { getApiUrl } from "../helpers/urls.ts";
 
 export const TOKEN_EXPIRATION_SECONDS = {
   IN_7_DAYS: 7 * 24 * 60 * 60,
@@ -94,15 +94,13 @@ async function createTokenAction() {
 
   // collect name & description
   const name = await input({
-    message: `Name your token ${gray("(optional, ↵ to skip)")}:`,
+    message: `Name your token ${chalk.gray("(optional, ↵ to skip)")}:`,
     default: "",
   });
   const description = await input({
-    message: `Description for your token ${
-      gray(
-        "(optional, ↵ to skip)",
-      )
-    }:`,
+    message: `Description for your token ${chalk.gray(
+      "(optional, ↵ to skip)",
+    )}:`,
     default: "",
   });
 
@@ -135,34 +133,33 @@ async function createTokenAction() {
   }
 
   // display token to user
-  const data = await response.json();
-  loadingSpinner.succeed(gray("Access token created 🎉"));
-  console.log(`${green(data.token)}\n`);
+  const data = (await response.json()) as TokenObject;
+  loadingSpinner.succeed(chalk.gray("Access token created 🎉"));
+  console.log(`${chalk.green(data.token)}\n`);
 
   // tell them they will set this in the Authorization header
   console.log(
-    `${gray(`Pass this in the 'Authorization' header of API requests:`)}`,
+    `${chalk.gray(`Pass this in the 'Authorization' header of API requests:`)}`,
   );
   console.log(
     [
-      gray("{ "),
-      white("Authorization"),
-      gray(": "),
-      green('"Bearer '),
-      magenta("<token>"),
-      green('"'),
-      gray(" }"),
+      chalk.gray("{ "),
+      chalk.white("Authorization"),
+      chalk.gray(": "),
+      chalk.green('"Bearer '),
+      chalk.magenta("<token>"),
+      chalk.green('"'),
+      chalk.gray(" }"),
     ].join(""),
   );
   console.log("\n");
 
   // give them a sample curl
   const pingUrl = await getApiUrl("ping");
-  console.log(`${gray("Here is a sample curl to get your started:")}`);
+  console.log(`${chalk.gray("Here is a sample curl to get your started:")}`);
   console.log(
-    white(
-      // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
-      `curl --request GET --url ${pingUrl} --header 'Authorization: Bearer ${data.token}'`,
+    chalk.white(
+      `curl --request GET --url ${pingUrl} --header 'Authorization: Bearer ${data.token as string}'`,
     ),
   );
   console.log("\n");
@@ -171,10 +168,10 @@ async function createTokenAction() {
   const table = new Table({
     colWidths: [20, 30],
   });
-  table.push(["View All Tokens", magenta("sf tokens list")]);
-  table.push(["Delete a Token", magenta("sf tokens delete")]);
+  table.push(["View All Tokens", chalk.magenta("sf tokens list")]);
+  table.push(["Delete a Token", chalk.magenta("sf tokens delete")]);
 
-  console.log(`${gray("And other commands you can try:")}`);
+  console.log(`${chalk.gray("And other commands you can try:")}`);
   console.log(table.toString());
 
   process.exit(0);
@@ -212,14 +209,13 @@ async function listTokensAction() {
   loadingSpinner.stop(); // hide spinner
 
   // show account tokens
-  const responseBody = await response.json();
-  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
-  const tokens = responseBody.data as Array<TokenObject>;
+  const responseBody = (await response.json()) as { data: Array<TokenObject> };
+  const tokens = responseBody.data;
 
   // show empty table if no tokens
   if (tokens.length === 0) {
     const table = new Table({
-      head: [cyan("Access Tokens")],
+      head: [chalk.cyan("Access Tokens")],
       colWidths: [50],
     });
     table.push([
@@ -229,11 +225,9 @@ async function listTokensAction() {
 
     // prompt user that they can generate one
     console.log(
-      `${gray("Generate your first token with: ")}${
-        magenta(
-          `sf tokens create`,
-        )
-      }`,
+      `${chalk.gray("Generate your first token with: ")}${chalk.magenta(
+        `sf tokens create`,
+      )}`,
     );
 
     process.exit(0);
@@ -241,18 +235,14 @@ async function listTokensAction() {
 
   // display table
   const tokensTable = new Table({
-    head: [
-      cyan("Token ID"),
-      cyan("Name"),
-      cyan("Expires"),
-    ],
+    head: [chalk.cyan("Token ID"), chalk.cyan("Name"), chalk.cyan("Expires")],
     colWidths: [40, 15, 25],
   });
   for (const token of tokens) {
     tokensTable.push([
-      white(token.id),
-      token.name ? token.name : gray("(empty)"),
-      white(formatDate(new Date(token.expires_at))),
+      chalk.white(token.id),
+      token.name ? token.name : chalk.gray("(empty)"),
+      chalk.white(formatDate(new Date(token.expires_at))),
     ]);
   }
   console.log(tokensTable.toString());
@@ -274,27 +264,23 @@ async function deleteTokenAction({
 
   if (yes) {
     await deleteTokenById(id);
-    console.log(`${green("✓")} Token deleted successfully`);
+    console.log(`${chalk.green("✓")} Token deleted successfully`);
     process.exit(0);
   }
 
   const deleteTokenConfirmed = await confirm({
-    message: `Are you sure you want to delete this token? ${
-      gray(
-        "(it will stop working immediately.)",
-      )
-    }`,
+    message: `Are you sure you want to delete this token? ${chalk.gray(
+      "(it will stop working immediately.)",
+    )}`,
     default: false,
   });
   if (!deleteTokenConfirmed) {
     process.exit(0);
   } else {
     const verySureConfirmed = await confirm({
-      message: `${red("Very sure?")} ${
-        gray(
-          "(just double-checking)",
-        )
-      }`,
+      message: `${chalk.red("Very sure?")} ${chalk.gray(
+        "(just double-checking)",
+      )}`,
       default: false,
     });
 
@@ -320,8 +306,7 @@ async function deleteTokenById(id: string) {
       await logSessionTokenExpiredAndQuit();
     }
 
-    const error = await response.json();
-    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
+    const error = (await response.json()) as { code?: string };
     if (error.code === "token.not_found") {
       loadingSpinner.fail("Token not found");
       process.exit(1);
@@ -335,7 +320,7 @@ async function deleteTokenById(id: string) {
   }
 
   loadingSpinner.stop();
-  console.log(gray("Token deleted. 🧼"));
+  console.log(chalk.gray("Token deleted. 🧼"));
 
   process.exit(0);
 }

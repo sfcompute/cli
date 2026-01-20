@@ -1,12 +1,12 @@
-import { Command, CommanderError } from "@commander-js/extra-typings";
-import ora from "ora";
-import { gray } from "jsr:@std/fmt/colors";
 import console from "node:console";
+import { Command, CommanderError } from "@commander-js/extra-typings";
+import chalk from "chalk";
+import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { maxPriceOption, pluralizeNodes } from "./utils.ts";
-import { updateProcurement } from "../scale/update.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { updateProcurement } from "../scale/update.tsx";
+import { maxPriceOption, pluralizeNodes } from "./utils.ts";
 
 async function setNodesAction(
   names: string[],
@@ -38,11 +38,11 @@ async function setNodesAction(
     }
 
     // Filter nodes that have procurement_id (auto reserved nodes)
-    const nodesWithProcurement = fetchedNodes.filter((node) =>
-      node.procurement_id
+    const nodesWithProcurement = fetchedNodes.filter(
+      (node) => node.procurement_id,
     );
-    const nodesWithoutProcurement = fetchedNodes.filter((node) =>
-      !node.procurement_id
+    const nodesWithoutProcurement = fetchedNodes.filter(
+      (node) => !node.procurement_id,
     );
 
     if (nodesWithProcurement.length === 0) {
@@ -54,9 +54,11 @@ async function setNodesAction(
       );
     }
 
-    const results: Array<
-      { name: string; maxPrice: number; procurementId: string }
-    > = [];
+    const results: Array<{
+      name: string;
+      maxPrice: number;
+      procurementId: string;
+    }> = [];
     const errors: Array<{ name: string; error: string }> = [];
     const priceInCents = Math.round(options.maxPrice * 100);
 
@@ -80,15 +82,15 @@ async function setNodesAction(
     // Conclude spinner based on results
     if (results.length > 0 && errors.length === 0) {
       spinner.succeed(
-        `Successfully updated ${results.length} ${
-          pluralizeNodes(results.length)
-        }`,
+        `Successfully updated ${results.length} ${pluralizeNodes(
+          results.length,
+        )}`,
       );
     } else if (results.length > 0 && errors.length > 0) {
       spinner.warn(
-        `Updated ${results.length} ${
-          pluralizeNodes(results.length)
-        }, but ${errors.length} failed`,
+        `Updated ${results.length} ${pluralizeNodes(
+          results.length,
+        )}, but ${errors.length} failed`,
       );
     } else {
       spinner.fail("Failed to update any nodes");
@@ -96,32 +98,32 @@ async function setNodesAction(
 
     // Show outcome lists
     if (results.length > 0) {
-      console.log(gray("\nUpdated nodes:"));
+      console.log(chalk.gray("\nUpdated nodes:"));
       for (const result of results) {
         console.log(
-          `  • ${result.name}: Max price set to $${
-            result.maxPrice.toFixed(2)
-          }/GPU/hr`,
+          `  • ${result.name}: Max price set to $${result.maxPrice.toFixed(
+            2,
+          )}/GPU/hr`,
         );
       }
     }
 
     if (errors.length > 0) {
-      console.log(gray("\nFailed to update:"));
+      console.log(chalk.gray("\nFailed to update:"));
       for (const error of errors) {
         console.log(`  • ${error.name}: ${error.error}`);
       }
     }
 
     if (nodesWithoutProcurement.length > 0) {
-      console.log(gray("\nReserved nodes (cannot update pricing):"));
+      console.log(chalk.gray("\nReserved nodes (cannot update pricing):"));
       for (const node of nodesWithoutProcurement) {
         console.log(`  • ${node.name} (${node.node_type})`);
       }
     }
 
     if (notFound.length > 0) {
-      console.log(gray("\nNodes not found:"));
+      console.log(chalk.gray("\nNodes not found:"));
       for (const name of notFound) {
         console.log(`  • ${name}`);
       }

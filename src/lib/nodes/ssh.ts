@@ -1,19 +1,19 @@
-import { Command } from "@commander-js/extra-typings";
+import child_process from "node:child_process";
 import console from "node:console";
 import process from "node:process";
-import { Shescape } from "shescape";
-import child_process from "node:child_process";
+import { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
 import ora from "ora";
-import { cyan } from "jsr:@std/fmt/colors";
+import { Shescape } from "shescape";
 
-import { jsonOption } from "./utils.ts";
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { getAuthToken } from "../../helpers/config.ts";
+import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import { jsonOption } from "./utils.ts";
 
 const ssh = new Command("ssh")
   .description(`SSH into a VM on a node.
@@ -76,13 +76,13 @@ Examples:
 
         try {
           const node = await client.nodes.get(nodeOrVmId);
-          spinner.succeed(`Node found for name ${cyan(nodeOrVmId)}.`);
+          spinner.succeed(`Node found for name ${chalk.cyan(nodeOrVmId)}.`);
 
           if (!node?.current_vm) {
             spinner.fail(
-              `Node ${
-                cyan(nodeOrVmId)
-              } does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
+              `Node ${chalk.cyan(
+                nodeOrVmId,
+              )} does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
             );
             process.exit(1);
           }
@@ -90,9 +90,9 @@ Examples:
           vmId = node.current_vm.id;
         } catch {
           spinner.info(
-            `No node found for name ${
-              cyan(nodeOrVmId)
-            }. Interpreting as VM ID...`,
+            `No node found for name ${chalk.cyan(
+              nodeOrVmId,
+            )}. Interpreting as VM ID...`,
           );
           vmId = nodeOrVmId;
         }
@@ -119,9 +119,9 @@ Examples:
         }
 
         sshSpinner.fail(
-          `Failed to retrieve SSH information for ${
-            cyan(vmId)
-          }: ${response.statusText}`,
+          `Failed to retrieve SSH information for ${chalk.cyan(
+            vmId,
+          )}: ${response.statusText}`,
         );
         process.exit(1);
       }
@@ -129,10 +129,12 @@ Examples:
       const data = (await response.json()) as {
         ssh_hostname: string;
         ssh_port: number;
-        ssh_host_keys: {
-          key_type: string;
-          base64_encoded_key: string;
-        }[] | undefined;
+        ssh_host_keys:
+          | {
+              key_type: string;
+              base64_encoded_key: string;
+            }[]
+          | undefined;
       };
       sshSpinner.succeed("SSH information fetched successfully.");
 
@@ -203,7 +205,7 @@ Examples:
         console.log(`Executing (${shell} style output): ${shell_cmd}`);
       }
 
-      // Ideally this would use `@alphahydrae/exec` but `deno compile` doesn't
+      // Ideally this would use `@alphahydrae/exec` but `pkg` doesn't
       // support ffi modules.
       const result = child_process.spawnSync(cmd[0], cmd.slice(1), {
         stdio: "inherit",

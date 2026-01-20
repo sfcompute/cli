@@ -1,10 +1,10 @@
-import { Command } from "@commander-js/extra-typings";
-import { confirm } from "@inquirer/prompts";
-import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
-import ora from "ora";
+import { Command } from "@commander-js/extra-typings";
+import { confirm } from "@inquirer/prompts";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
+import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
@@ -16,9 +16,7 @@ import {
 } from "./utils.ts";
 
 const release = new Command("release")
-  .description(
-    "Release compute nodes (stop a node from auto-renewing)",
-  )
+  .description("Release compute nodes (stop a node from auto-renewing)")
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to release")
   .addOption(yesOption)
@@ -71,8 +69,8 @@ async function releaseNodesAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
+      const node = fetchedNodes.find(
+        (n) => n.name === nameOrId || n.id === nameOrId,
       );
       if (node) {
         foundNodes.push({ name: nameOrId, node });
@@ -83,10 +81,10 @@ async function releaseNodesAction(
 
     if (notFound.length > 0) {
       console.log(
-        red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
-          }:`,
+        chalk.red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(
+            notFound.length,
+          )}:`,
         ),
       );
       for (const name of notFound) {
@@ -101,16 +99,16 @@ async function releaseNodesAction(
       "pending",
       "awaitingcapacity",
     ] as SFCNodes.Node["status"][];
-    const nonReleasableNodes = foundNodes.filter(({ node }) =>
-      !releasableStatuses.includes(node.status)
+    const nonReleasableNodes = foundNodes.filter(
+      ({ node }) => !releasableStatuses.includes(node.status),
     );
     const releasableNodes = foundNodes.filter(({ node }) =>
-      releasableStatuses.includes(node.status)
+      releasableStatuses.includes(node.status),
     );
 
     if (nonReleasableNodes.length > 0) {
       console.log(
-        red(
+        chalk.red(
           `Cannot release ${
             nonReleasableNodes.length === 1 ? "this" : "these"
           } ${pluralizeNodes(nonReleasableNodes.length)}:`,
@@ -120,7 +118,7 @@ async function releaseNodesAction(
         console.log(`  • ${name} (${printNodeStatus(node.status)})`);
       }
       console.log(
-        brightRed(
+        chalk.redBright(
           `\nOnly nodes with status 'Running', 'Pending', or 'Awaiting Capacity' can be released.\n`,
         ),
       );
@@ -134,11 +132,7 @@ async function releaseNodesAction(
 
     if (options.dryRun) {
       if (options.json) {
-        console.log(JSON.stringify(
-          nodesToRelease,
-          null,
-          2,
-        ));
+        console.log(JSON.stringify(nodesToRelease, null, 2));
         process.exit(0);
       }
 
@@ -147,10 +141,10 @@ async function releaseNodesAction(
       if (nodesToRelease.length > 0) {
         console.log(createNodesTable(nodesToRelease));
         console.log(
-          gray(
-            `\nWould release ${nodesToRelease.length} ${
-              pluralizeNodes(nodesToRelease.length)
-            }.`,
+          chalk.gray(
+            `\nWould release ${nodesToRelease.length} ${pluralizeNodes(
+              nodesToRelease.length,
+            )}.`,
           ),
         );
       }
@@ -166,9 +160,9 @@ async function releaseNodesAction(
     if (!options.yes) {
       if (nodesToRelease.length > 0) {
         console.log(
-          `The following ${
-            pluralizeNodes(nodesToRelease.length)
-          } will be released:`,
+          `The following ${pluralizeNodes(
+            nodesToRelease.length,
+          )} will be released:`,
         );
         console.log(createNodesTable(nodesToRelease));
       }
@@ -184,9 +178,9 @@ async function releaseNodesAction(
       }
 
       const confirmed = await confirm({
-        message: `Release ${nodesToRelease.length} ${
-          pluralizeNodes(nodesToRelease.length)
-        }? This action cannot be undone.`,
+        message: `Release ${nodesToRelease.length} ${pluralizeNodes(
+          nodesToRelease.length,
+        )}? This action cannot be undone.`,
         default: false,
       });
       if (!confirmed) {
@@ -196,11 +190,10 @@ async function releaseNodesAction(
     }
 
     const releaseSpinner = ora(
-      `Releasing ${nodesToRelease.length} ${
-        pluralizeNodes(nodesToRelease.length)
-      }...`,
-    )
-      .start();
+      `Releasing ${nodesToRelease.length} ${pluralizeNodes(
+        nodesToRelease.length,
+      )}...`,
+    ).start();
 
     const results: { name: string; status: string }[] = [];
     const errors: { name: string; error: string }[] = [];
@@ -227,23 +220,19 @@ async function releaseNodesAction(
         releaseSpinner.fail("Failed to release any nodes");
       } else {
         releaseSpinner.warn(
-          `Released ${results.length} ${
-            pluralizeNodes(results.length)
-          }, but ${errors.length} failed`,
+          `Released ${results.length} ${pluralizeNodes(
+            results.length,
+          )}, but ${errors.length} failed`,
         );
       }
-      console.error(gray("\nFailed to release:"));
+      console.error(chalk.gray("\nFailed to release:"));
       for (const error of errors) {
         console.error(`  • ${error.name}: ${error.error}`);
       }
     }
 
     if (options.json) {
-      console.log(JSON.stringify(
-        results,
-        null,
-        2,
-      ));
+      console.log(JSON.stringify(results, null, 2));
       process.exit(0);
     }
 

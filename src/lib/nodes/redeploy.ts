@@ -1,25 +1,23 @@
+import console from "node:console";
+import { readFileSync } from "node:fs";
+import process from "node:process";
 import { Command, CommanderError, Option } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import { readFileSync } from "node:fs";
-import { brightRed, gray, red } from "jsr:@std/fmt/colors";
-import console from "node:console";
-import process from "node:process";
-import ora from "ora";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
+import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   jsonOption,
   pluralizeNodes,
   yesOption,
 } from "./utils.ts";
-import { isFeatureEnabled } from "../posthog.ts";
 
 const redeploy = new Command("redeploy")
-  .description(
-    "Redeploy nodes by replacing their current VMs with new ones",
-  )
+  .description("Redeploy nodes by replacing their current VMs with new ones")
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to redeploy")
   .addOption(
@@ -92,8 +90,8 @@ async function redeployNodeAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
+      const node = fetchedNodes.find(
+        (n) => n.name === nameOrId || n.id === nameOrId,
       );
       if (node) {
         foundNodes.push({ name: nameOrId, node });
@@ -104,10 +102,10 @@ async function redeployNodeAction(
 
     if (notFound.length > 0) {
       console.log(
-        red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
-          }:`,
+        chalk.red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(
+            notFound.length,
+          )}:`,
         ),
       );
       for (const name of notFound) {
@@ -120,16 +118,16 @@ async function redeployNodeAction(
     const redeployableStatuses = [
       "running" as const,
     ] as SFCNodes.Node["status"][];
-    const nonRedeployableNodes = foundNodes.filter(({ node }) =>
-      !redeployableStatuses.includes(node.status)
+    const nonRedeployableNodes = foundNodes.filter(
+      ({ node }) => !redeployableStatuses.includes(node.status),
     );
     const redeployableNodes = foundNodes.filter(({ node }) =>
-      redeployableStatuses.includes(node.status)
+      redeployableStatuses.includes(node.status),
     );
 
     if (nonRedeployableNodes.length > 0) {
       console.log(
-        red(
+        chalk.red(
           `Cannot redeploy ${
             nonRedeployableNodes.length === 1 ? "this" : "these"
           } ${pluralizeNodes(nonRedeployableNodes.length)} (not running):`,
@@ -138,11 +136,7 @@ async function redeployNodeAction(
       for (const { name } of nonRedeployableNodes) {
         console.log(`  • ${name}`);
       }
-      console.log(
-        brightRed(
-          `\nOnly running nodes can be redeployed.\n`,
-        ),
-      );
+      console.log(chalk.redBright(`\nOnly running nodes can be redeployed.\n`));
     }
 
     if (redeployableNodes.length === 0) {
@@ -154,21 +148,21 @@ async function redeployNodeAction(
     const wellFormedUserData = rawUserData?.isWellFormed?.()
       ? rawUserData
       : rawUserData
-      ? encodeURIComponent(rawUserData)
-      : undefined;
+        ? encodeURIComponent(rawUserData)
+        : undefined;
     const encodedUserData = wellFormedUserData
       ? btoa(
-        String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
-      )
+          String.fromCodePoint(...new TextEncoder().encode(wellFormedUserData)),
+        )
       : undefined;
 
     // Show nodes table and get confirmation for destructive action
     if (!options.yes) {
       if (redeployableNodes.length > 0) {
         console.log(
-          `The following ${
-            pluralizeNodes(redeployableNodes.length)
-          } will be redeployed:`,
+          `The following ${pluralizeNodes(
+            redeployableNodes.length,
+          )} will be redeployed:`,
         );
         console.log(createNodesTable(redeployableNodes.map((n) => n.node)));
       }
@@ -206,9 +200,9 @@ async function redeployNodeAction(
       );
 
       const confirmed = await confirm({
-        message: `Redeploy ${redeployableNodes.length} ${
-          pluralizeNodes(redeployableNodes.length)
-        }? This action cannot be undone.`,
+        message: `Redeploy ${redeployableNodes.length} ${pluralizeNodes(
+          redeployableNodes.length,
+        )}? This action cannot be undone.`,
         default: false,
       });
       if (!confirmed) {
@@ -218,17 +212,18 @@ async function redeployNodeAction(
     }
 
     const spinner = ora(
-      `Redeploying ${redeployableNodes.length} ${
-        pluralizeNodes(redeployableNodes.length)
-      }...`,
+      `Redeploying ${redeployableNodes.length} ${pluralizeNodes(
+        redeployableNodes.length,
+      )}...`,
     ).start();
 
     const results: { name: string; node: SFCNodes.Node }[] = [];
     const errors: { name: string; error: string }[] = [];
 
-    for (
-      const { name: nodeIdOrName, node: originalNode } of redeployableNodes
-    ) {
+    for (const {
+      name: nodeIdOrName,
+      node: originalNode,
+    } of redeployableNodes) {
       try {
         const redeployedNode = await client.nodes.redeploy(originalNode.id, {
           image_id: options.image,
@@ -244,15 +239,21 @@ async function redeployNodeAction(
     }
 
     if (options.json) {
-      console.log(JSON.stringify(results.map((r) => r.node), null, 2));
+      console.log(
+        JSON.stringify(
+          results.map((r) => r.node),
+          null,
+          2,
+        ),
+      );
       process.exit(0);
     }
 
     if (results.length > 0) {
       spinner.succeed(
-        `Successfully redeployed ${results.length} ${
-          pluralizeNodes(results.length)
-        }`,
+        `Successfully redeployed ${results.length} ${pluralizeNodes(
+          results.length,
+        )}`,
       );
     }
 
@@ -261,23 +262,23 @@ async function redeployNodeAction(
         spinner.fail("Failed to redeploy any nodes");
       } else {
         spinner.warn(
-          `Redeployed ${results.length} ${
-            pluralizeNodes(results.length)
-          }, but ${errors.length} failed`,
+          `Redeployed ${results.length} ${pluralizeNodes(
+            results.length,
+          )}, but ${errors.length} failed`,
         );
       }
     }
 
     if (results.length > 0) {
-      console.log(gray("\nRedeployed nodes:"));
+      console.log(chalk.gray("\nRedeployed nodes:"));
       console.log(createNodesTable(results.map((r) => r.node)));
       console.log(
-        gray("\nNew VMs are being provisioned on these nodes."),
+        chalk.gray("\nNew VMs are being provisioned on these nodes."),
       );
     }
 
     if (errors.length > 0) {
-      console.log(gray("\nFailed to redeploy:"));
+      console.log(chalk.gray("\nFailed to redeploy:"));
       for (const error of errors) {
         console.log(`  • ${error.name}: ${error.error}`);
       }
