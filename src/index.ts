@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
-import { Command } from "@commander-js/extra-typings";
 import * as console from "node:console";
 import os from "node:os";
 import process from "node:process";
+import { Command } from "@commander-js/extra-typings";
 import pkg from "../package.json" with { type: "json" };
 import { checkVersion } from "./checkVersion.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";
@@ -11,20 +11,20 @@ import { getApiUrl } from "./helpers/urls.ts";
 import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
-import { registerExtend } from "./lib/extend/index.tsx";
 import { registerContracts } from "./lib/contracts/index.tsx";
 import { registerDev } from "./lib/dev.ts";
+import { registerExtend } from "./lib/extend/index.tsx";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
+import { registerNodes } from "./lib/nodes/index.ts";
 import { registerOrders } from "./lib/orders/index.tsx";
-import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
+import { IS_TRACKING_DISABLED, analytics } from "./lib/posthog.ts";
+import { registerScale } from "./lib/scale/index.tsx";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm/index.ts";
-import { registerScale } from "./lib/scale/index.tsx";
 import { registerZones } from "./lib/zones.tsx";
-import { registerNodes } from "./lib/nodes/index.ts";
 
 const program = new Command();
 
@@ -94,7 +94,6 @@ if (IS_TRACKING_DISABLED) {
       },
     });
 
-    // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
     const data = (await response.json()) as any;
     if (data.id) {
       exchangeAccountId = data.id;
@@ -123,8 +122,8 @@ if (IS_TRACKING_DISABLED) {
         const nextArg = arr[i + 1];
         if (nextArg && !nextArg.startsWith("-")) {
           (acc as Record<string, string | number | boolean>)[key] = isNaN(
-              Number(nextArg),
-            )
+            Number(nextArg),
+          )
             ? nextArg
             : Number(nextArg);
         } else {

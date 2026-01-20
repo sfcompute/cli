@@ -1,5 +1,5 @@
-import process from "node:process";
 import * as console from "node:console";
+import process from "node:process";
 import { clearAuthFromConfig } from "./config.ts";
 
 export function logAndQuit(message: string): never {

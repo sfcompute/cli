@@ -1,20 +1,20 @@
-import type { Command } from "@commander-js/extra-typings";
 import { exec } from "node:child_process";
 import * as console from "node:console";
 import process from "node:process";
 import { setTimeout } from "node:timers";
+import type { Command } from "@commander-js/extra-typings";
 import ora from "ora";
 import { saveConfig } from "../helpers/config.ts";
 import { clearScreen } from "../helpers/prompt.ts";
 import { getWebAppUrl } from "../helpers/urls.ts";
 
+import { randomInt } from "node:crypto";
 // We're using Axios here because there's a bug
 // where the fetch API in Bun isn't passing the body
 // through redirects correctly
 import axios from "axios";
 import { clearFeatureFlags } from "../helpers/feature-flags.ts";
 import { getLoggedInAccountId } from "./me.ts";
-import { randomInt } from "node:crypto";
 
 export function registerLogin(program: Command) {
   program
