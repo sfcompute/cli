@@ -36,16 +36,10 @@ const ssh = new Command("ssh")
 Examples:
 
   \x1b[2m# SSH into a node's current VM\x1b[0m
-  $ sf nodes ssh my-node
+  $ sf nodes ssh root@my-node
 
-  \x1b[2m# SSH with a specific username\x1b[0m
-  $ sf nodes ssh jenson@my-node
-
-  \x1b[2m# SSH directly to a VM ID\x1b[0m
-  $ sf nodes ssh vm_xxxxxxxxxxxxxxxxxxxxx
-
-  \x1b[2m# SSH with username to a VM ID\x1b[0m
-  $ sf nodes ssh huang@vm_xxxxxxxxxxxxxxxxxxxxx
+  \x1b[2m# SSH with a specific username to a VM ID\x1b[0m
+  $ sf nodes ssh root@vm_xxxxxxxxxxxxxxxxxxxxx
 `,
   )
   .action(async (destination, options) => {
