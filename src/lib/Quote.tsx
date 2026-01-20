@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Text } from "ink";
 import { Row } from "./Row.tsx";
 import { getPricePerGpuHourFromQuote } from "./buy/index.tsx";
@@ -38,19 +37,19 @@ export default function QuoteDisplay(props: { quote: Quote }) {
 
 export type Quote =
   | {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    instance_type: string;
-    zone?: string;
-  }
+      price: number;
+      quantity: number;
+      start_at: string;
+      end_at: string;
+      instance_type: string;
+      zone?: string;
+    }
   | {
-    price: number;
-    quantity: number;
-    start_at: string;
-    end_at: string;
-    contract_id: string;
-    zone?: string;
-  }
+      price: number;
+      quantity: number;
+      start_at: string;
+      end_at: string;
+      contract_id: string;
+      zone?: string;
+    }
   | null;

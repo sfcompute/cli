@@ -1,15 +1,13 @@
 import parseDuration from "parse-duration";
 
+import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { dollarsToCents } from "../../helpers/units.ts";
-import { apiClient } from "../../apiClient.ts";
 import type { paths } from "../../schema.ts";
 
 import { GPUS_PER_NODE } from "../constants.ts";
 export type Procurement =
-  paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
-    "application/json"
-  ]["data"][number];
+  paths["/v0/procurements"]["get"]["responses"]["200"]["content"]["application/json"]["data"][number];
 export type ColocationStrategyName = Procurement["colocation_strategy"]["type"];
 
 export const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265 as const; // Example default price
@@ -71,9 +69,7 @@ export async function getProcurement({
   });
 
   if (!res.response.ok) {
-    throw new Error(
-      res.error?.message || "Failed to get procurement",
-    );
+    throw new Error(res.error?.message || "Failed to get procurement");
   }
 
   return res.data ?? null;

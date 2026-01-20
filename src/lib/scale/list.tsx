@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { Box, render, Text, useApp } from "ink";
-import Spinner from "ink-spinner";
-import { Command } from "@commander-js/extra-typings";
 import { setTimeout } from "node:timers";
+import { Command } from "@commander-js/extra-typings";
+import { Box, Text, render, useApp } from "ink";
+import Spinner from "ink-spinner";
+import { useEffect, useState } from "react";
 
 import { apiClient } from "../../apiClient.ts";
 
-import { getProcurement, parseIds, type Procurement } from "./utils.ts";
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
+import { type Procurement, getProcurement, parseIds } from "./utils.ts";
 
 async function listProcurements() {
   const client = await apiClient();
   const procurements: Procurement[] = [];
   let hasMore = true;
   while (hasMore) {
-    const { response, data: listObject, error } = await client.GET(
-      "/v0/procurements",
-      {
-        query: {
-          limit: 100,
-          offset: procurements.length,
-        },
+    const {
+      response,
+      data: listObject,
+      error,
+    } = await client.GET("/v0/procurements", {
+      query: {
+        limit: 100,
+        offset: procurements.length,
       },
-    );
+    });
 
     if (!response.ok) {
       throw new Error(error?.message || "Failed to list procurements");
@@ -65,11 +66,12 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
             } else {
               failed.push({
                 id: ids[idx],
-                message: result.status === "rejected"
-                  ? (result.reason instanceof Error
-                    ? result.reason.message
-                    : String(result.reason))
-                  : "Unknown error",
+                message:
+                  result.status === "rejected"
+                    ? result.reason instanceof Error
+                      ? result.reason.message
+                      : String(result.reason)
+                    : "Unknown error",
               });
             }
           });

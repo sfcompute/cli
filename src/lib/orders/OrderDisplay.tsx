@@ -1,6 +1,6 @@
-import { Box, measureElement, Text, useInput } from "ink";
 import process from "node:process";
 import dayjs from "dayjs";
+import { Box, Text, measureElement, useInput } from "ink";
 import React, { useEffect } from "react";
 import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
@@ -10,8 +10,8 @@ import type { HydratedOrder } from "./types.ts";
 export function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour = order.price /
-    (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
+  const pricePerGPUHour =
+    order.price / (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
   const durationFormatted = formatDuration(duration);
 
   const executedPriceDollarsPerGPUHour =
@@ -94,23 +94,21 @@ function OrderMinimal(props: {
 
       <Box width={18}>
         {executedPriceDollarsPerGPUHour &&
-            executedPriceDollarsPerGPUHour.toFixed(2) !==
-              pricePerGPUHour.toFixed(2)
-          ? (
-            <>
-              <Text strikethrough dimColor>
-                ${pricePerGPUHour.toFixed(2)}
-                <Text dimColor>/gpu/hr</Text>
-              </Text>
-              <Text>${executedPriceDollarsPerGPUHour.toFixed(2)}</Text>
-            </>
-          )
-          : (
-            <Text>
+        executedPriceDollarsPerGPUHour.toFixed(2) !==
+          pricePerGPUHour.toFixed(2) ? (
+          <>
+            <Text strikethrough dimColor>
               ${pricePerGPUHour.toFixed(2)}
               <Text dimColor>/gpu/hr</Text>
             </Text>
-          )}
+            <Text>${executedPriceDollarsPerGPUHour.toFixed(2)}</Text>
+          </>
+        ) : (
+          <Text>
+            ${pricePerGPUHour.toFixed(2)}
+            <Text dimColor>/gpu/hr</Text>
+          </Text>
+        )}
       </Box>
       <Box width={44}>
         <Box width={8}>
@@ -188,17 +186,17 @@ export function OrderDisplay(props: {
     );
   }
 
-  const orders = activeTab === "all"
-    ? props.orders
-    : props.orders.filter((order) => order.side === activeTab);
+  const orders =
+    activeTab === "all"
+      ? props.orders
+      : props.orders.filter((order) => order.side === activeTab);
 
   const { sellOrdersCount, buyOrdersCount } = React.useMemo(() => {
     return {
       sellOrdersCount: props.orders.filter((order) => order.side === "sell")
         .length,
-      buyOrdersCount: props.orders.filter((order) =>
-        order.side === "buy"
-      ).length,
+      buyOrdersCount: props.orders.filter((order) => order.side === "buy")
+        .length,
     };
   }, [props.orders]);
 
@@ -212,22 +210,17 @@ export function OrderDisplay(props: {
         buyOrdersCount={buyOrdersCount}
       >
         {orders.map((order) => {
-          return props.expanded
-            ? <Order order={order} key={order.id} />
-            : (
-              <OrderMinimal
-                order={order}
-                key={order.id}
-                activeTab={activeTab}
-              />
-            );
+          return props.expanded ? (
+            <Order order={order} key={order.id} />
+          ) : (
+            <OrderMinimal order={order} key={order.id} activeTab={activeTab} />
+          );
         })}
 
         {orders.length === 0 && (
           <Box>
             <Text>
-              There are 0 outstanding {activeTab === "all" ? "" : activeTab}
-              {" "}
+              There are 0 outstanding {activeTab === "all" ? "" : activeTab}{" "}
               orders right now.
             </Text>
           </Box>
@@ -341,23 +334,22 @@ export function ScrollArea({
   const innerRef = React.useRef(null);
   const canScrollUp = state.scrollTop > 0 && orders.length > 0;
   const numberOfOrdersAboveScrollArea = state.scrollTop;
-  const dateRangeAboveScrollArea = orders.length > 0
-    ? `${formatDateTime(orders[0].start_at)} → ${
-      formatDateTime(
-        orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0",
-      )
-    }`
-    : "";
-  const numberOfOrdersBelowScrollArea = orders.length -
-    (state.scrollTop + state.height);
-  const dateRangeBelowScrollArea = orders.length > 0
-    ? `${
-      formatDateTime(
-        orders[state.scrollTop + state.height]?.start_at || "0",
-      )
-    } → ${formatDateTime(orders[orders.length - 1].end_at)}`
-    : "";
-  const canScrollDown = state.scrollTop + state.height < state.innerHeight &&
+  const dateRangeAboveScrollArea =
+    orders.length > 0
+      ? `${formatDateTime(orders[0].start_at)} → ${formatDateTime(
+          orders[numberOfOrdersAboveScrollArea - 1]?.end_at || "0",
+        )}`
+      : "";
+  const numberOfOrdersBelowScrollArea =
+    orders.length - (state.scrollTop + state.height);
+  const dateRangeBelowScrollArea =
+    orders.length > 0
+      ? `${formatDateTime(
+          orders[state.scrollTop + state.height]?.start_at || "0",
+        )} → ${formatDateTime(orders[orders.length - 1].end_at)}`
+      : "";
+  const canScrollDown =
+    state.scrollTop + state.height < state.innerHeight &&
     numberOfOrdersBelowScrollArea >= 0;
 
   useEffect(() => {

@@ -1,6 +1,6 @@
-import { Command, CommanderError } from "@commander-js/extra-typings";
 import console from "node:console";
 import { setTimeout } from "node:timers";
+import { Command, CommanderError } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -10,15 +10,13 @@ import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { paths } from "../../schema.ts";
+import type { paths } from "../../schema.ts";
 
 dayjs.extend(utc);
 
 type VMLogsParams = paths["/v0/vms/logs2"]["get"]["parameters"]["query"];
 type VMLogsResponse =
-  paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"][
-    "application/json"
-  ]["data"];
+  paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"]["application/json"]["data"];
 
 function formatTimestampToISO(timestamp: string): string {
   const date = dayjs(timestamp);
@@ -41,7 +39,8 @@ const logs = new Command("logs")
     (val) => {
       const parsedValue = Number(val);
       if (
-        Number.isNaN(parsedValue) || !Number.isInteger(parsedValue) ||
+        Number.isNaN(parsedValue) ||
+        !Number.isInteger(parsedValue) ||
         parsedValue <= 0
       ) {
         throw new CommanderError(

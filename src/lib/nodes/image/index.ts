@@ -1,8 +1,8 @@
 import { Command } from "@commander-js/extra-typings";
 import { isFeatureEnabled } from "../../posthog.ts";
-import upload from "./upload.ts";
-import show from "./show.tsx";
 import list from "./list.tsx";
+import show from "./show.tsx";
+import upload from "./upload.ts";
 
 const image = new Command("images")
   .alias("os")
