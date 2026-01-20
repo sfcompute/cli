@@ -1,6 +1,8 @@
-import { Argument, Command } from "@commander-js/extra-typings";
+import { spawnSync } from "node:child_process";
 import * as console from "node:console";
+import * as fs from "node:fs";
 import process from "node:process";
+import { Argument, Command } from "@commander-js/extra-typings";
 
 const program = new Command();
 
@@ -17,7 +19,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    )
+    ),
   );
   switch (type) {
     case "major":
@@ -34,76 +36,74 @@ function bumpVersion(
 }
 
 async function getLocalVersion() {
-  const packageJson = await Deno.readTextFile("package.json");
+  const packageJson = fs.readFileSync("package.json", "utf-8");
   return JSON.parse(packageJson).version;
 }
 
 async function saveVersion(version: string) {
-  const packageJson = await Deno.readTextFile("package.json");
+  const packageJson = fs.readFileSync("package.json", "utf-8");
   const packageObj = JSON.parse(packageJson);
   packageObj.version = version;
   // Ensure exactly one newline at the end of the file
-  await Deno.writeTextFile(
-    "package.json",
-    `${JSON.stringify(packageObj, null, 2)}\n`,
-  );
+  fs.writeFileSync("package.json", `${JSON.stringify(packageObj, null, 2)}\n`);
 }
 
-const COMPILE_TARGETS: string[] = [
-  "x86_64-unknown-linux-gnu",
-  "aarch64-unknown-linux-gnu",
-  "x86_64-apple-darwin",
-  "aarch64-apple-darwin",
+// Map pkg targets to output names (keeping original names for backward compatibility)
+const COMPILE_TARGETS: { pkgTarget: string; outputName: string }[] = [
+  { pkgTarget: "node20-linux-x64", outputName: "x86_64-unknown-linux-gnu" },
+  { pkgTarget: "node20-linux-arm64", outputName: "aarch64-unknown-linux-gnu" },
+  { pkgTarget: "node20-macos-x64", outputName: "x86_64-apple-darwin" },
+  { pkgTarget: "node20-macos-arm64", outputName: "aarch64-apple-darwin" },
 ];
 
 async function compileDistribution() {
-  for (const target of COMPILE_TARGETS) {
-    const result = await new Deno.Command("deno", {
-      args: [
-        "compile",
-        "-A",
-        "--target",
-        target,
-        "--output",
-        `dist/sf-${target}`,
-        "./src/index.ts",
-      ],
-    }).output();
+  // Create dist directory
+  fs.mkdirSync("./dist", { recursive: true });
 
-    if (!result.success) {
-      console.error(new TextDecoder().decode(result.stderr));
-      logAndError(`Failed to compile for ${target}`);
+  for (const { pkgTarget, outputName } of COMPILE_TARGETS) {
+    const result = spawnSync("npx", [
+      "pkg",
+      ".",
+      "--target",
+      pkgTarget,
+      "--output",
+      `dist/sf-${outputName}`,
+    ]);
+
+    if (result.status !== 0) {
+      console.error(result.stderr?.toString() ?? "");
+      logAndError(`Failed to compile for ${pkgTarget}`);
     }
-    console.log(`✅ Compiled for ${target}`);
+    console.log(`✅ Compiled for ${outputName}`);
 
-    const zipFileName = `dist/sf-${target}.zip`;
-    const zipResult = await new Deno.Command("zip", {
-      args: ["-j", zipFileName, `dist/sf-${target}`],
-    }).output();
+    const zipFileName = `dist/sf-${outputName}.zip`;
+    const zipResult = spawnSync("zip", [
+      "-j",
+      zipFileName,
+      `dist/sf-${outputName}`,
+    ]);
 
-    if (!zipResult.success) {
-      console.error(zipResult.stderr);
-      logAndError(`Failed to zip the binary for ${target}`);
+    if (zipResult.status !== 0) {
+      console.error(zipResult.stderr?.toString() ?? "");
+      logAndError(`Failed to zip the binary for ${outputName}`);
     }
-    console.log(`✅ Zipped binary for ${target}`);
+    console.log(`✅ Zipped binary for ${outputName}`);
   }
 }
 
 async function asyncSpawn(cmds: string[]) {
   console.log("cmds", cmds);
-  const result = await new Deno.Command(cmds[0], {
-    args: cmds.slice(1),
-  }).output();
+  const result = spawnSync(cmds[0], cmds.slice(1));
 
   return {
-    exitCode: result.success ? 0 : 1,
+    exitCode: result.status ?? 1,
   };
 }
 async function createRelease(version: string) {
   // Verify zip files are valid before creating release
-  const distFiles = Array.from(Deno.readDirSync("./dist"));
+  const distFiles = fs.readdirSync("./dist", { withFileTypes: true });
   const zipFiles = distFiles
-    .filter((entry) => entry.isFile)
+    .filter((entry) => entry.isFile())
     .filter((entry) => entry.name.endsWith(".zip"))
     .map((entry) => `./dist/${entry.name}`);
 
@@ -111,11 +111,9 @@ async function createRelease(version: string) {
 
   // Verify each zip file is valid
   for (const zipFile of zipFiles) {
-    const verifyResult = await new Deno.Command("unzip", {
-      args: ["-t", zipFile],
-    }).output();
+    const verifyResult = spawnSync("unzip", ["-t", zipFile]);
 
-    if (!verifyResult.success) {
+    if (verifyResult.status !== 0) {
       logAndError(`Invalid zip file: ${zipFile}`);
     }
     console.log(`✅ Verified zip file: ${zipFile}`);
@@ -170,13 +168,7 @@ async function createRelease(version: string) {
 }
 
 async function cleanDist() {
-  try {
-    await Deno.remove("./dist", { recursive: true });
-  } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) {
-      throw error;
-    }
-  }
+  fs.rmSync("./dist", { recursive: true, force: true });
 }
 
 program
@@ -185,22 +177,18 @@ program
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices(
-      [
-        "major",
-        "minor",
-        "patch",
-        "prerelease",
-      ] as const,
-    ),
+    new Argument("type").choices([
+      "major",
+      "minor",
+      "patch",
+      "prerelease",
+    ] as const),
   )
   .action(async (type) => {
     try {
-      const ghCheckResult = await new Deno.Command("which", {
-        args: ["gh"],
-      }).output();
+      const ghCheckResult = spawnSync("which", ["gh"]);
 
-      if (!ghCheckResult.success) {
+      if (ghCheckResult.status !== 0) {
         console.error(
           `The 'gh' command is not installed. Please install it.
 
