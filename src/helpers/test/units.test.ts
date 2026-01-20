@@ -1,14 +1,11 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.112.0/testing/asserts.ts";
+import { expect, test } from "vitest";
 import {
   type Cents,
   centsToDollarsFormatted,
   priceWholeToCents,
 } from "../units.ts";
 
-Deno.test("price whole to cents", () => {
+test("price whole to cents", () => {
   const inputToExpectedValids = [
     // formatted as USD
     ["$0", 0],
@@ -56,22 +53,21 @@ Deno.test("price whole to cents", () => {
   for (const [input, centsExpected] of inputToExpectedValids) {
     const { cents, invalid } = priceWholeToCents(input);
 
-    assertEquals(cents !== null, true);
-    assertEquals(cents, centsExpected);
-    assert(invalid === false);
+    expect(cents !== null).toBe(true);
+    expect(cents).toEqual(centsExpected);
+    expect(invalid === false).toBe(true);
   }
 
   const invalidPrices = [null, undefined, [], {}];
   for (const input of invalidPrices) {
-    // deno-lint-ignore no-explicit-any -- we pass in invalid types on purpose for testing here
     const { cents, invalid } = priceWholeToCents(input as any);
 
-    assertEquals(cents, null);
-    assertEquals(invalid, true);
+    expect(cents).toBeNull();
+    expect(invalid).toBe(true);
   }
 });
 
-Deno.test("cents to dollars formatted", () => {
+test("cents to dollars formatted", () => {
   const inputToExpectedValids = [
     // whole
     [0, "$0.00"],
@@ -91,6 +87,6 @@ Deno.test("cents to dollars formatted", () => {
   for (const [input, expected] of inputToExpectedValids) {
     const result = centsToDollarsFormatted(input as Cents);
 
-    assertEquals(result, expected);
+    expect(result).toEqual(expected);
   }
 });
