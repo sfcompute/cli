@@ -27,7 +27,7 @@ const ssh = new Command("ssh")
   .addOption(jsonOption)
   .argument(
     "<destination>",
-    "root@HOST The (optional) username, and node name/ID or VM ID to SSH into",
+    "[user@]hostname - Node name/ID or VM ID to SSH into",
   )
   .allowExcessArguments(false)
   .addHelpText(
