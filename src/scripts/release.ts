@@ -202,13 +202,18 @@ program
       "prerelease",
     ] as const),
   )
-  .option("--no-commit", "Dry run: build only, skip version bump, git commit, and GitHub release")
+  .option(
+    "--no-commit",
+    "Dry run: build only, skip version bump, git commit, and GitHub release",
+  )
   .action(async (type, options) => {
     try {
       const noCommit = !options.commit;
 
       if (!noCommit && !type) {
-        console.error("error: type argument is required when not using --no-commit");
+        console.error(
+          "error: type argument is required when not using --no-commit",
+        );
         process.exit(1);
       }
 
