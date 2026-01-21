@@ -29,23 +29,20 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Type check
-        run: npm run check
+        run: bun run check
 
       - name: Run tests
-        run: npm test
+        run: bun test
 
       - name: Configure Git
         run: |
@@ -56,4 +53,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx tsx src/scripts/release.ts ${{ inputs.version_type }}
+          bun run src/scripts/release.ts ${{ inputs.version_type }}
