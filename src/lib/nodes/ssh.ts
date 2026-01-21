@@ -16,7 +16,12 @@ import { getApiUrl } from "../../helpers/urls.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 
 const ssh = new Command("ssh")
-  .description("SSH into a VM on a node")
+  .description(`SSH into a VM on a node.
+
+Runs \`ssh\` with host keys from the API, forgoing the need to manually accept keys on first connect.
+Keys are fetched asynchronously from the VM's SSH server and may take a moment to populate.
+
+Standard \`ssh\` behavior applies (e.g. defaults to your current username).`)
   .showHelpAfterError()
   .option("-q, --quiet", "Quiet mode", false)
   .option(
@@ -27,8 +32,9 @@ const ssh = new Command("ssh")
   .addOption(jsonOption)
   .argument(
     "<destination>",
-    "[user@]hostname - The (optional) username, and node name/ID or VM ID to SSH into",
+    "Node name, Node ID, or VM ID to SSH into.\nFollows \`ssh\` behavior (i.e. root@node or jenson@node).",
   )
+  .usage("[options] [user@]<destination>")
   .allowExcessArguments(false)
   .addHelpText(
     "after",
