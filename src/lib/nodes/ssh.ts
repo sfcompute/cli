@@ -16,7 +16,12 @@ import { getApiUrl } from "../../helpers/urls.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 
 const ssh = new Command("ssh")
-  .description("SSH into a VM on a node")
+  .description(`SSH into a VM on a node.
+
+Runs \`ssh\` with host keys from the API, forgoing the need to manually accept keys on first connect.
+Keys are fetched asynchronously from the VM's SSH server and may take a moment to populate.
+
+Standard \`ssh\` behavior applies (e.g. defaults to your current username).`)
   .showHelpAfterError()
   .option("-q, --quiet", "Quiet mode", false)
   .option(
@@ -27,8 +32,9 @@ const ssh = new Command("ssh")
   .addOption(jsonOption)
   .argument(
     "<destination>",
-    "USERNAME@HOST The (optional) username, and node name/ID or VM ID to SSH into",
+    "Node name, Node ID, or VM ID to SSH into.\nFollows \`ssh\` behavior (i.e. root@node or jenson@node).",
   )
+  .usage("[options] [user@]<destination>")
   .allowExcessArguments(false)
   .addHelpText(
     "after",
@@ -36,16 +42,13 @@ const ssh = new Command("ssh")
 Examples:
 
   \x1b[2m# SSH into a node's current VM\x1b[0m
-  $ sf nodes ssh my-node
+  $ sf nodes ssh root@my-node
 
   \x1b[2m# SSH with a specific username\x1b[0m
   $ sf nodes ssh jenson@my-node
-
+  
   \x1b[2m# SSH directly to a VM ID\x1b[0m
-  $ sf nodes ssh vm_xxxxxxxxxxxxxxxxxxxxx
-
-  \x1b[2m# SSH with username to a VM ID\x1b[0m
-  $ sf nodes ssh huang@vm_xxxxxxxxxxxxxxxxxxxxx
+  $ sf nodes ssh root@vm_xxxxxxxxxxxxxxxxxxxxx
 `,
   )
   .action(async (destination, options) => {
