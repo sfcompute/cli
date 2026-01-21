@@ -329,7 +329,7 @@ export async function submitOrderCancellationByIdAction(orderId: string) {
     method: "DELETE",
     body: JSON.stringify({}),
     headers: {
-      "Content-ype": "application/json",
+      "Content-Type": "application/json",
       Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
