@@ -6,8 +6,8 @@ import process from "node:process";
 import { Command } from "@commander-js/extra-typings";
 import pkg from "../package.json" with { type: "json" };
 import { checkVersion } from "./checkVersion.ts";
+import { apiClient } from "./apiClient.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";
-import { getApiUrl } from "./helpers/urls.ts";
 import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerBuy } from "./lib/buy/index.tsx";
@@ -87,16 +87,9 @@ async function main() {
     let exchangeAccountId = config.account_id;
 
     if (!exchangeAccountId) {
-      const response = await fetch(await getApiUrl("me"), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${config.auth_token}`,
-        },
-      });
-
-      const data = (await response.json()) as any;
-      if (data.id) {
+      const client = await apiClient(config.auth_token);
+      const { data } = await client.GET("/v0/me");
+      if (data?.id) {
         exchangeAccountId = data.id;
         saveConfig({ ...config, account_id: data.id });
       }
