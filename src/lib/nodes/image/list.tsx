@@ -1,15 +1,8 @@
-import { Command } from "@commander-js/extra-typings";
-import {
-  brightBlack,
-  cyan,
-  gray,
-  green,
-  red,
-  yellow,
-} from "jsr:@std/fmt/colors";
 import console from "node:console";
-import ora from "ora";
+import { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
 import Table from "cli-table3";
+import ora from "ora";
 
 import { getAuthToken } from "../../../helpers/config.ts";
 import { logAndQuit } from "../../../helpers/errors.ts";
@@ -55,7 +48,7 @@ Next Steps:\n
 
       if (images.length === 0) {
         console.log("No images found.");
-        console.log(gray("\nUpload your first image:"));
+        console.log(chalk.gray("\nUpload your first image:"));
         console.log("  sf node images upload -f ./my-image.img -n my-image");
         return;
       }
@@ -71,10 +64,10 @@ Next Steps:\n
       // Create and display images table
       const table = new Table({
         head: [
-          cyan("NAME"),
-          cyan("ID"),
-          cyan("STATUS"),
-          cyan("CREATED"),
+          chalk.cyan("NAME"),
+          chalk.cyan("ID"),
+          chalk.cyan("STATUS"),
+          chalk.cyan("CREATED"),
         ],
         style: {
           head: [],
@@ -90,30 +83,25 @@ Next Steps:\n
         const status = (() => {
           switch (image.upload_status) {
             case "started":
-              return green("Started");
+              return chalk.green("Started");
             case "uploading":
-              return yellow("Uploading");
+              return chalk.yellow("Uploading");
             case "completed":
-              return cyan("Completed");
+              return chalk.cyan("Completed");
             case "failed":
-              return red("Failed");
+              return chalk.red("Failed");
             default:
-              return gray("Unknown");
+              return chalk.gray("Unknown");
           }
         })();
 
-        table.push([
-          image.name,
-          image.image_id,
-          status,
-          createdAt,
-        ]);
+        table.push([image.name, image.image_id, status, createdAt]);
       }
       if (images.length > 5) {
         table.push([
           {
             colSpan: 4,
-            content: brightBlack(
+            content: chalk.blackBright(
               `${images.length - 5} older ${
                 images.length - 5 === 1 ? "image" : "images"
               } not shown. Use sf node images list --json to list all images.`,
@@ -125,21 +113,21 @@ Next Steps:\n
       console.log(table.toString());
 
       // Show next steps
-      console.log(gray("\nNext steps:"));
+      console.log(chalk.gray("\nNext steps:"));
 
       // Always show how to get info for a specific image
       const firstImage = sortedImages[0];
       if (firstImage) {
-        console.log(`  sf node images show ${cyan(firstImage.image_id)}`);
+        console.log(`  sf node images show ${chalk.cyan(firstImage.image_id)}`);
       }
       const firstCompletedImage = sortedImages.find(
         (image) => image.upload_status === "completed",
       );
       if (firstCompletedImage) {
         console.log(
-          `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${
-            cyan(firstCompletedImage.image_id)
-          }`,
+          `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${chalk.cyan(
+            firstCompletedImage.image_id,
+          )}`,
         );
       }
     } catch (err) {

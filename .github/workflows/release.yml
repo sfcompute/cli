@@ -29,22 +29,20 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version-file: .tool-versions
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Check formatting
-        run: deno fmt --check
+      - name: Install dependencies
+        run: bun install
 
-      - name: Run linter
-        run: deno lint
+      - name: Lint
+        run: bun run lint
 
       - name: Type check
-        run: deno check --config deno.json ./src/index.ts
+        run: bun run check
 
       - name: Run tests
-        run: deno test --allow-all
+        run: bun test
 
       - name: Configure Git
         run: |
@@ -55,4 +53,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          deno run --allow-all src/scripts/release.ts ${{ inputs.version_type }}
+          bun run src/scripts/release.ts ${{ inputs.version_type }}

@@ -1,6 +1,6 @@
+import process from "node:process";
 import { Command } from "@commander-js/extra-typings";
 import { confirm } from "@inquirer/prompts";
-import process from "node:process";
 import ora from "ora";
 
 import { getAuthToken } from "../../helpers/config.ts";
@@ -17,8 +17,7 @@ const replace = new Command("replace")
   .action(async (options) => {
     if (!options.yes) {
       const replaceConfirmed = await confirm({
-        message:
-          `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
+        message: `Are you sure you want to replace VM instance ${options.id}? (You cannot undo this action)`,
         default: false,
       });
       if (!replaceConfirmed) {
@@ -52,13 +51,10 @@ const replace = new Command("replace")
       logSupportCTAAndQuit();
     }
 
-    const {
-      replaced,
-      replaced_by,
-    }: {
+    const { replaced, replaced_by } = (await response.json()) as {
       replaced: string;
       replaced_by: string;
-    } = await response.json();
+    };
     if (!replaced || !replaced_by) {
       loadingSpinner.fail("Invalid API response format");
       logSupportCTAAndQuit();

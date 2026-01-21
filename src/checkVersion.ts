@@ -1,11 +1,11 @@
-import boxen from "boxen";
-import { cyan, gray, yellow } from "jsr:@std/fmt/colors";
 import { execSync } from "node:child_process";
 import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
+import boxen from "boxen";
+import chalk from "chalk";
 import semver from "semver";
 import pkg from "../package.json" with { type: "json" };
 
@@ -122,11 +122,11 @@ export async function checkVersion() {
 
   if (isPatchUpdate && !latestIsPrerelease) {
     console.log(
-      cyan(`Automatically upgrading ${version} → ${latestVersion}`),
+      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
       execSync("sf upgrade", { stdio: "inherit" });
-      console.log(gray("\n☁️☁️☁️\n"));
+      console.log(chalk.gray("\n☁️☁️☁️\n"));
 
       // Re-run the original command
       const args = process.argv.slice(2);
@@ -146,7 +146,7 @@ Latest version: ${latestVersion}
 Run 'sf upgrade' to update to the latest version
 `;
     console.log(
-      boxen(yellow(message), {
+      boxen(chalk.yellow(message), {
         padding: 1,
         borderColor: "yellow",
         borderStyle: "round",

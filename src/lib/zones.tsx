@@ -1,26 +1,25 @@
-import type { Command } from "@commander-js/extra-typings";
-import { Box, render, Text } from "ink";
-import Table from "cli-table3";
-import { cyan, gray, green, red } from "jsr:@std/fmt/colors";
 import * as console from "node:console";
-import React from "react";
-import { isLoggedIn } from "../helpers/config.ts";
+import type { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
+import Table from "cli-table3";
+import { Box, render, Text } from "ink";
 import { apiClient } from "../apiClient.ts";
+import { isLoggedIn } from "../helpers/config.ts";
 import {
   logAndQuit,
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
+import type { components } from "../schema.ts";
 import { isFeatureEnabled } from "./posthog.ts";
-import { components } from "../schema.ts";
 
 type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
 
 // Delivery type conversion similar to InstanceTypeMetadata pattern
 const DeliveryTypeMetadata: Record<string, { displayName: string }> = {
-  "K8s": { displayName: "Kubernetes" },
-  "K8sNamespace": { displayName: "Kubernetes" },
-  "VM": { displayName: "Virtual Machine" },
+  K8s: { displayName: "Kubernetes" },
+  K8sNamespace: { displayName: "Kubernetes" },
+  VM: { displayName: "Virtual Machine" },
 } as const;
 
 function formatDeliveryType(deliveryType: string): string {
@@ -28,9 +27,9 @@ function formatDeliveryType(deliveryType: string): string {
 }
 
 function getCurrentAvailableCapacity(zone: ZoneInfo): number {
-  const oldestShape = zone.available_capacity?.sort(
-    (a, b) => a.start_timestamp - b.start_timestamp,
-  ).at(0);
+  const oldestShape = zone.available_capacity
+    ?.sort((a, b) => a.start_timestamp - b.start_timestamp)
+    .at(0);
   if (
     oldestShape?.start_timestamp &&
     oldestShape.start_timestamp >= Math.floor(Date.now() / 1000)
@@ -42,9 +41,9 @@ function getCurrentAvailableCapacity(zone: ZoneInfo): number {
 
 // Region conversion to short slugs
 const RegionMetadata: Record<string, { slug: string }> = {
-  "NorthAmerica": { slug: "North America" },
-  "AsiaPacific": { slug: "Asia" },
-  "EuropeMiddleEastAfrica": { slug: "EMEA" },
+  NorthAmerica: { slug: "North America" },
+  AsiaPacific: { slug: "Asia" },
+  EuropeMiddleEastAfrica: { slug: "EMEA" },
 } as const;
 
 function formatRegion(region: string): string {
@@ -83,7 +82,7 @@ Note: This is an early access feature (v0) that may change at any time.
 
 async function listZonesAction(options: { json?: boolean }) {
   console.error(
-    `\x1b[33mNote: This is an early access feature (v0) and may change at any time.\x1b[0m\n`,
+    "\x1b[33mNote: This is an early access feature (v0) and may change at any time.\x1b[0m\n",
   );
 
   const loggedIn = await isLoggedIn();
@@ -149,12 +148,12 @@ function displayZonesTable(zones: ZoneInfo[]) {
 
   const table = new Table({
     head: [
-      cyan("Zone"),
-      cyan("Delivery Type"),
-      cyan("Available Nodes"),
-      cyan("GPU Type"),
-      cyan("Interconnect"),
-      cyan("Region"),
+      chalk.cyan("Zone"),
+      chalk.cyan("Delivery Type"),
+      chalk.cyan("Available Nodes"),
+      chalk.cyan("GPU Type"),
+      chalk.cyan("Interconnect"),
+      chalk.cyan("Region"),
     ],
     style: {
       head: [],
@@ -164,9 +163,10 @@ function displayZonesTable(zones: ZoneInfo[]) {
 
   sortedZones.forEach((zone) => {
     const available = getCurrentAvailableCapacity(zone);
-    const availableNodesText = available > 0
-      ? green(available.toString())
-      : red(available.toString());
+    const availableNodesText =
+      available > 0
+        ? chalk.green(available.toString())
+        : chalk.red(available.toString());
 
     table.push([
       zone.name,
@@ -178,17 +178,19 @@ function displayZonesTable(zones: ZoneInfo[]) {
     ]);
   });
 
-  const availableZones = sortedZones.filter((zone) =>
-    getCurrentAvailableCapacity(zone) > 0
+  const availableZones = sortedZones.filter(
+    (zone) => getCurrentAvailableCapacity(zone) > 0,
   );
   const availableZoneName = availableZones?.[0]?.name ?? "alamo";
   console.log(table.toString());
   console.log(
-    `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`,
+    `\n${chalk.gray("Use zone names when placing orders or configuring nodes.")}\n`,
   );
-  console.log(gray("Examples:"));
-  console.log(`  sf buy --zone ${green(availableZoneName)}`);
-  console.log(`  sf scale create -n 16 --zone ${green(availableZoneName)}`);
+  console.log(chalk.gray("Examples:"));
+  console.log(`  sf buy --zone ${chalk.green(availableZoneName)}`);
+  console.log(
+    `  sf scale create -n 16 --zone ${chalk.green(availableZoneName)}`,
+  );
 }
 
 function EmptyZonesDisplay() {

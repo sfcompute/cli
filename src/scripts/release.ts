@@ -1,6 +1,9 @@
-import { Argument, Command } from "@commander-js/extra-typings";
+#!/usr/bin/env node
+import { spawnSync } from "node:child_process";
 import * as console from "node:console";
+import * as fs from "node:fs";
 import process from "node:process";
+import { Argument, Command } from "@commander-js/extra-typings";
 
 const program = new Command();
 
@@ -17,7 +20,8 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    )
+      10,
+    ),
   );
   switch (type) {
     case "major":
@@ -33,56 +37,72 @@ function bumpVersion(
   }
 }
 
-async function getLocalVersion() {
-  const packageJson = await Deno.readTextFile("package.json");
+function getLocalVersion() {
+  const packageJson = fs.readFileSync("package.json", "utf-8");
   return JSON.parse(packageJson).version;
 }
 
-async function saveVersion(version: string) {
-  const packageJson = await Deno.readTextFile("package.json");
+function saveVersion(version: string) {
+  const packageJson = fs.readFileSync("package.json", "utf-8");
   const packageObj = JSON.parse(packageJson);
   packageObj.version = version;
   // Ensure exactly one newline at the end of the file
-  await Deno.writeTextFile(
-    "package.json",
-    `${JSON.stringify(packageObj, null, 2)}\n`,
-  );
+  fs.writeFileSync("package.json", `${JSON.stringify(packageObj, null, 2)}\n`);
 }
 
 const COMPILE_TARGETS: string[] = [
-  "x86_64-unknown-linux-gnu",
-  "aarch64-unknown-linux-gnu",
-  "x86_64-apple-darwin",
-  "aarch64-apple-darwin",
+  "node22-linux-x64",
+  "node22-linux-arm64",
+  "node22-macos-x64",
+  "node22-macos-arm64",
 ];
 
 async function compileDistribution() {
+  // Clean and create dist directory
+  fs.rmSync("./dist", { recursive: true, force: true });
+  fs.mkdirSync("./dist", { recursive: true });
+
+  // Bundle with tsup first
+  console.log("Bundling with tsup...");
+  const tsupResult = spawnSync("npx", ["tsup"], { stdio: "inherit" });
+
+  if (tsupResult.status !== 0) {
+    logAndError("Failed to bundle with tsup");
+  }
+  console.log("✅ Bundle created at dist/index.cjs");
+
+  // Compile for each target using @yao-pkg/pkg
+  // Note: segfaults on macOS arm64 were fixed by polyfilling Intl.Segmenter
+  // See: https://github.com/yao-pkg/pkg-fetch/issues/134
   for (const target of COMPILE_TARGETS) {
-    const result = await new Deno.Command("deno", {
-      args: [
-        "compile",
-        "-A",
+    const result = spawnSync(
+      "npx",
+      [
+        "@yao-pkg/pkg",
+        "dist/index.cjs",
         "--target",
         target,
         "--output",
         `dist/sf-${target}`,
-        "./src/index.ts",
       ],
-    }).output();
+      { stdio: "inherit" },
+    );
 
-    if (!result.success) {
-      console.error(new TextDecoder().decode(result.stderr));
+    if (result.status !== 0) {
+      console.error(result.stderr?.toString() ?? "");
       logAndError(`Failed to compile for ${target}`);
     }
     console.log(`✅ Compiled for ${target}`);
 
     const zipFileName = `dist/sf-${target}.zip`;
-    const zipResult = await new Deno.Command("zip", {
-      args: ["-j", zipFileName, `dist/sf-${target}`],
-    }).output();
+    const zipResult = spawnSync("zip", [
+      "-j",
+      zipFileName,
+      `dist/sf-${target}`,
+    ]);
 
-    if (!zipResult.success) {
-      console.error(zipResult.stderr);
+    if (zipResult.status !== 0) {
+      console.error(zipResult.stderr?.toString() ?? "");
       logAndError(`Failed to zip the binary for ${target}`);
     }
     console.log(`✅ Zipped binary for ${target}`);
@@ -91,19 +111,17 @@ async function compileDistribution() {
 
 async function asyncSpawn(cmds: string[]) {
   console.log("cmds", cmds);
-  const result = await new Deno.Command(cmds[0], {
-    args: cmds.slice(1),
-  }).output();
+  const result = spawnSync(cmds[0], cmds.slice(1));
 
   return {
-    exitCode: result.success ? 0 : 1,
+    exitCode: result.status ?? 1,
   };
 }
 async function createRelease(version: string) {
   // Verify zip files are valid before creating release
-  const distFiles = Array.from(Deno.readDirSync("./dist"));
+  const distFiles = fs.readdirSync("./dist", { withFileTypes: true });
   const zipFiles = distFiles
-    .filter((entry) => entry.isFile)
+    .filter((entry) => entry.isFile())
     .filter((entry) => entry.name.endsWith(".zip"))
     .map((entry) => `./dist/${entry.name}`);
 
@@ -111,11 +129,9 @@ async function createRelease(version: string) {
 
   // Verify each zip file is valid
   for (const zipFile of zipFiles) {
-    const verifyResult = await new Deno.Command("unzip", {
-      args: ["-t", zipFile],
-    }).output();
+    const verifyResult = spawnSync("unzip", ["-t", zipFile]);
 
-    if (!verifyResult.success) {
+    if (verifyResult.status !== 0) {
       logAndError(`Invalid zip file: ${zipFile}`);
     }
     console.log(`✅ Verified zip file: ${zipFile}`);
@@ -169,14 +185,8 @@ async function createRelease(version: string) {
   console.log("✅ Pushed to origin main");
 }
 
-async function cleanDist() {
-  try {
-    await Deno.remove("./dist", { recursive: true });
-  } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) {
-      throw error;
-    }
-  }
+function cleanDist() {
+  fs.rmSync("./dist", { recursive: true, force: true });
 }
 
 program
@@ -185,30 +195,41 @@ program
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices(
-      [
-        "major",
-        "minor",
-        "patch",
-        "prerelease",
-      ] as const,
-    ),
+    new Argument("[type]").choices([
+      "major",
+      "minor",
+      "patch",
+      "prerelease",
+    ] as const),
   )
-  .action(async (type) => {
+  .option(
+    "--no-commit",
+    "Dry run: build only, skip version bump, git commit, and GitHub release",
+  )
+  .action(async (type, options) => {
     try {
-      const ghCheckResult = await new Deno.Command("which", {
-        args: ["gh"],
-      }).output();
+      const noCommit = !options.commit;
 
-      if (!ghCheckResult.success) {
+      if (!noCommit && !type) {
         console.error(
-          `The 'gh' command is not installed. Please install it.
+          "error: type argument is required when not using --no-commit",
+        );
+        process.exit(1);
+      }
+
+      if (!noCommit) {
+        const ghCheckResult = spawnSync("which", ["gh"]);
+
+        if (ghCheckResult.status !== 0) {
+          console.error(
+            `The 'gh' command is not installed. Please install it.
 
   $ brew install gh
 
   `,
-        );
-        process.exit(1);
+          );
+          process.exit(1);
+        }
       }
 
       process.on("SIGINT", () => {
@@ -223,10 +244,24 @@ program
 
       await cleanDist();
       const version = await getLocalVersion();
-      const bumpedVersion = bumpVersion(version, type);
-      await saveVersion(bumpedVersion);
+      const bumpedVersion = type ? bumpVersion(version, type) : version;
+
+      if (noCommit) {
+        if (type) {
+          console.log(`🔍 Dry run: would bump version to ${bumpedVersion}`);
+        }
+      } else {
+        await saveVersion(bumpedVersion);
+      }
+
       await compileDistribution();
-      await createRelease(bumpedVersion);
+
+      if (noCommit) {
+        console.log("🔍 Dry run: skipping GitHub release and git commit");
+        console.log(`✅ Dry run complete. Binaries available in ./dist`);
+      } else {
+        await createRelease(bumpedVersion);
+      }
     } catch (err) {
       console.error(err);
     }

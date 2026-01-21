@@ -1,11 +1,11 @@
 import process from "node:process";
 import { PostHog } from "posthog-node";
+import { apiClient } from "../apiClient.ts";
 import { loadConfig, saveConfig } from "../helpers/config.ts";
 import {
   cacheFeatureFlag,
   getCachedFeatureFlag,
 } from "../helpers/feature-flags.ts";
-import { getApiUrl } from "../helpers/urls.ts";
 
 const postHogClient = new PostHog(
   "phc_ErsIQYNj6gPFTkHfupfuUGeKjabwtk3WTPdkTDktbU4",
@@ -39,18 +39,11 @@ const trackEvent = ({
     let exchangeAccountId = config.account_id;
 
     if (!exchangeAccountId) {
-      const response = await fetch(await getApiUrl("me"), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${config.auth_token}`,
-        },
-      });
-      // deno-lint-ignore no-explicit-any -- Deno has narrower types for fetch responses, but we know this code works atm.
-      const data = (await response.json()) as any;
-      if (data.id) {
+      const client = await apiClient(config.auth_token);
+      const { data } = await client.GET("/v0/me");
+      if (data?.id) {
         exchangeAccountId = data.id;
-        saveConfig({ ...config, account_id: data.id });
+        await saveConfig({ ...config, account_id: data.id });
       }
     }
 
@@ -69,10 +62,7 @@ const trackEvent = ({
   }
 };
 
-type FeatureFlags =
-  | "procurements"
-  | "zones"
-  | "custom-vm-images";
+type FeatureFlags = "procurements" | "zones" | "custom-vm-images";
 
 /**
  * Checks if a feature is enabled for the current user.

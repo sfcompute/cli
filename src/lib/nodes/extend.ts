@@ -1,11 +1,17 @@
-import { Command } from "@commander-js/extra-typings";
-import { confirm } from "@inquirer/prompts";
-import { brightRed, cyan, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
-import ora from "ora";
+import { Command } from "@commander-js/extra-typings";
+import { confirm } from "@inquirer/prompts";
+import type SFCNodes from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
+import { formatDuration } from "date-fns/formatDuration";
+import { intervalToDuration } from "date-fns/intervalToDuration";
 import dayjs from "dayjs";
+import ora from "ora";
+import { selectTime } from "../../helpers/units.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
 import {
   createNodesTable,
   jsonOption,
@@ -14,12 +20,6 @@ import {
   requiredDurationOption,
   yesOption,
 } from "./utils.ts";
-import SFCNodes from "@sfcompute/nodes-sdk-alpha";
-import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
-import { GPUS_PER_NODE } from "../constants.ts";
-import { formatDuration } from "date-fns/formatDuration";
-import { intervalToDuration } from "date-fns/intervalToDuration";
-import { selectTime } from "../../helpers/units.ts";
 
 const extend = new Command("extend")
   .description("Extend the duration of reserved nodes and update their pricing")
@@ -70,8 +70,8 @@ async function extendNodeAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
+      const node = fetchedNodes.find(
+        (n) => n.name === nameOrId || n.id === nameOrId,
       );
       if (node) {
         nodes.push({ name: nameOrId, node });
@@ -82,10 +82,10 @@ async function extendNodeAction(
 
     if (notFound.length > 0) {
       console.log(
-        red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
-          }:`,
+        chalk.red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(
+            notFound.length,
+          )}:`,
         ),
       );
       for (const name of notFound) {
@@ -95,29 +95,29 @@ async function extendNodeAction(
     }
 
     // Filter out auto reserved nodes (they can't be extended)
-    const autoReservedNodes = nodes.filter(({ node }) =>
-      node.node_type === "autoreserved"
+    const autoReservedNodes = nodes.filter(
+      ({ node }) => node.node_type === "autoreserved",
     );
-    const extendableNodes = nodes.filter(({ node }) =>
-      node.node_type !== "autoreserved"
+    const extendableNodes = nodes.filter(
+      ({ node }) => node.node_type !== "autoreserved",
     );
 
     if (autoReservedNodes.length > 0) {
       console.log(
-        red(
+        chalk.red(
           `Cannot extend ${
             autoReservedNodes.length === 1 ? "this" : "these"
-          } auto reserved ${
-            pluralizeNodes(autoReservedNodes.length)
-          } (they auto-extend):`,
+          } auto reserved ${pluralizeNodes(
+            autoReservedNodes.length,
+          )} (they auto-extend):`,
         ),
       );
       for (const { name } of autoReservedNodes) {
         console.log(`  • ${name}`);
       }
       console.log(
-        brightRed(
-          `\nTo configure auto reserved nodes, use the \`sf nodes set\` command.`,
+        chalk.redBright(
+          "\nTo configure auto reserved nodes, use the `sf nodes set` command.",
         ),
       );
     }
@@ -141,22 +141,20 @@ async function extendNodeAction(
       );
 
       const selectedTime = await selectTime(calculatedEndTime, {
-        message: `Nodes must be extended to an hour boundary. ${
-          cyan("Choose an end time:")
-        }`,
+        message: `Nodes must be extended to an hour boundary. ${chalk.cyan(
+          "Choose an end time:",
+        )}`,
       });
 
       if (selectedTime === "NOW") {
-        console.error(red("You must extend to a future time"));
+        console.error(chalk.red("You must extend to a future time"));
         process.exit(1);
       }
 
       // Update duration based on selected time
       options.duration = Math.max(
         0,
-        Math.floor(
-          (selectedTime.getTime() - startTime.getTime()) / 1000,
-        ),
+        Math.floor((selectedTime.getTime() - startTime.getTime()) / 1000),
       );
     } else if (!isHourMultiple && options.yes) {
       // Round up to the next hour boundary
@@ -177,9 +175,9 @@ async function extendNodeAction(
     if (!options.yes) {
       // Get quote for accurate pricing preview
       const spinner = ora(
-        `Quoting extending ${extendableNodes.length} ${
-          pluralizeNodes(extendableNodes.length)
-        }...`,
+        `Quoting extending ${extendableNodes.length} ${pluralizeNodes(
+          extendableNodes.length,
+        )}...`,
       ).start();
 
       // Add flexibility to duration for better quote matching (matches buy command logic)
@@ -207,15 +205,15 @@ async function extendNodeAction(
         }),
       );
 
-      const filteredQuotes = quotes.filter((quote) =>
-        quote.status === "fulfilled"
+      const filteredQuotes = quotes.filter(
+        (quote) => quote.status === "fulfilled",
       );
 
       spinner.stop();
 
-      let confirmationMessage = `Extend ${extendableNodes.length} ${
-        pluralizeNodes(extendableNodes.length)
-      } for ${formattedDuration}`;
+      let confirmationMessage = `Extend ${extendableNodes.length} ${pluralizeNodes(
+        extendableNodes.length,
+      )} for ${formattedDuration}`;
 
       // If there's only one node, show the price per node per hour
       if (filteredQuotes.length === 1 && filteredQuotes[0].value) {
@@ -231,7 +229,7 @@ async function extendNodeAction(
         // If there's multiple nodes, show the total price, as nodes could be on different zones or have different hardware
         confirmationMessage += ` for ~$${totalPrice / 100}`;
       } else {
-        confirmationMessage = red(
+        confirmationMessage = chalk.red(
           "No nodes available matching your requirements. This is likely due to insufficient capacity. Attempt to extend anyway",
         );
       }
@@ -244,9 +242,9 @@ async function extendNodeAction(
     }
 
     const spinner = ora(
-      `Extending ${extendableNodes.length} ${
-        pluralizeNodes(extendableNodes.length)
-      }...`,
+      `Extending ${extendableNodes.length} ${pluralizeNodes(
+        extendableNodes.length,
+      )}...`,
     ).start();
 
     const results: { name: string; node: SFCNodes.Node }[] = [];
@@ -267,15 +265,21 @@ async function extendNodeAction(
     }
 
     if (options.json) {
-      console.log(JSON.stringify(results.map((r) => r.node), null, 2));
+      console.log(
+        JSON.stringify(
+          results.map((r) => r.node),
+          null,
+          2,
+        ),
+      );
       process.exit(0);
     }
 
     if (results.length > 0) {
       spinner.succeed(
-        `Successfully extended ${results.length} ${
-          pluralizeNodes(results.length)
-        }`,
+        `Successfully extended ${results.length} ${pluralizeNodes(
+          results.length,
+        )}`,
       );
     }
 
@@ -284,26 +288,24 @@ async function extendNodeAction(
         spinner.fail("Failed to extend any nodes");
       } else {
         spinner.warn(
-          `Extended ${results.length} ${
-            pluralizeNodes(results.length)
-          }, but ${errors.length} failed`,
+          `Extended ${results.length} ${pluralizeNodes(
+            results.length,
+          )}, but ${errors.length} failed`,
         );
       }
     }
 
     if (results.length > 0) {
-      console.log(gray("\nExtended nodes:"));
+      console.log(chalk.gray("\nExtended nodes:"));
       console.log(createNodesTable(results.map((r) => r.node)));
+      console.log(chalk.gray(`\nDuration extended by ${formattedDuration}`));
       console.log(
-        gray(
-          `\nDuration extended by ${formattedDuration}`,
-        ),
+        chalk.gray(`Max price: $${options.maxPrice.toFixed(2)}/hour`),
       );
-      console.log(gray(`Max price: $${options.maxPrice.toFixed(2)}/hour`));
     }
 
     if (errors.length > 0) {
-      console.log(gray("\nFailed to extend:"));
+      console.log(chalk.gray("\nFailed to extend:"));
       for (const error of errors) {
         console.log(`  • ${error.name}: ${error.error}`);
       }

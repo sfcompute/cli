@@ -1,16 +1,16 @@
-import { type Command, Option } from "@commander-js/extra-typings";
-import { yellow } from "jsr:@std/fmt/colors";
-import { parseDate } from "chrono-node";
-import { Box, render, Text, useApp } from "ink";
-import Spinner from "ink-spinner";
-import ms from "ms";
 import console from "node:console";
 import process from "node:process";
 import { setTimeout } from "node:timers";
-import boxen from "npm:boxen@8.0.1";
+import { type Command, Option } from "@commander-js/extra-typings";
+import boxen from "boxen";
+import chalk from "chalk";
+import { parseDate } from "chrono-node";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Box, render, Text, useApp } from "ink";
+import Spinner from "ink-spinner";
+import ms from "ms";
 import parseDurationFromLibrary from "parse-duration";
 import React, { useCallback, useEffect, useState } from "react";
 import invariant from "tiny-invariant";
@@ -28,14 +28,14 @@ import {
   roundEndDate,
   roundStartDate,
 } from "../../helpers/units.ts";
+import type { components } from "../../schema.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
-import type { Quote } from "../Quote.tsx";
-import QuoteDisplay from "../Quote.tsx";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
-import { components } from "../../schema.ts";
+import type { Quote } from "../Quote.tsx";
+import QuoteDisplay from "../Quote.tsx";
+import { Row } from "../Row.tsx";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -48,10 +48,7 @@ export function _registerBuy(program: Command) {
     .command("buy")
     .description("Place a buy order")
     .showHelpAfterError()
-    .option(
-      "-t, --type <type>",
-      "Type of GPU",
-    )
+    .option("-t, --type <type>", "Type of GPU")
     .option(
       "-n, --accelerators <quantity>",
       "Number of GPUs to purchase",
@@ -85,7 +82,7 @@ export function _registerBuy(program: Command) {
       const { duration, end } = command.opts();
       if ((!duration && !end) || (!!duration && !!end)) {
         console.error(
-          yellow("Specify either --duration or --end, but not both"),
+          chalk.yellow("Specify either --duration or --end, but not both"),
         );
         command.help();
         process.exit(1);
@@ -106,17 +103,17 @@ export function _registerBuy(program: Command) {
     )
     .option(
       "-z, --zone <zone>",
-      "Send into a specific zone. If provided, \`-t\`/`--type` will be ignored.",
+      "Send into a specific zone. If provided, `-t`/`--type` will be ignored.",
     )
     .option(
       "-c, --cluster <cluster>",
-      "Send into a specific cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
+      "Send into a specific cluster (deprecated, alias for --zone). If provided, `-t`/`--type` will be ignored.",
     )
     .hook("preAction", (command) => {
       const { type, zone, cluster, colocate } = command.opts();
       if (!type && !zone && !cluster && !colocate) {
         console.error(
-          yellow("Must specify either --type, --zone or --colocate"),
+          chalk.yellow("Must specify either --type, --zone or --colocate"),
         );
         command.help();
         process.exit(1);
@@ -231,16 +228,16 @@ export function QuoteComponent(props: { options: SfBuyOptions }) {
     })();
   }, [props.options, exit]);
 
-  return isLoading
-    ? (
+  return isLoading ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
       <Box gap={1}>
-        <Spinner type="dots" />
-        <Box gap={1}>
-          <Text>Getting quote...</Text>
-        </Box>
+        <Text>Getting quote...</Text>
       </Box>
-    )
-    : <QuoteDisplay quote={quote} />;
+    </Box>
+  ) : (
+    <QuoteDisplay quote={quote} />
+  );
 }
 
 export function QuoteAndBuy(props: { options: SfBuyOptions }) {
@@ -291,7 +288,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
 
       if (cluster) {
         const api = await apiClient();
-        const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+        const { data, error, response } = await api.GET("/v0/zones/{id}", {
           params: {
             path: {
               id: cluster,
@@ -325,16 +322,16 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
     })();
   }, [props.options]);
 
-  return orderProps === null
-    ? (
+  return orderProps === null ? (
+    <Box gap={1}>
+      <Spinner type="dots" />
       <Box gap={1}>
-        <Spinner type="dots" />
-        <Box gap={1}>
-          <Text>Getting quote...</Text>
-        </Box>
+        <Text>Getting quote...</Text>
       </Box>
-    )
-    : <BuyOrder {...orderProps} zone={zone} />;
+    </Box>
+  ) : (
+    <BuyOrder {...orderProps} zone={zone} />
+  );
 }
 
 export function getTotalPrice(
@@ -360,11 +357,11 @@ function BuyOrderPreview(props: BuyOrderProps) {
   const realDurationHours = realDuration / 3600 / 1000;
   const realDurationString = ms(realDuration);
 
-  const totalPrice = getTotalPrice(props.price, props.size, realDurationHours) /
-    100;
+  const totalPrice =
+    getTotalPrice(props.price, props.size, realDurationHours) / 100;
 
-  const isSupportedType = typeof props.type === "string" &&
-    props.type in InstanceTypeMetadata;
+  const isSupportedType =
+    typeof props.type === "string" && props.type in InstanceTypeMetadata;
   const typeLabel = isSupportedType
     ? InstanceTypeMetadata[props.type!]?.displayName
     : props.type;
@@ -404,11 +401,7 @@ function BuyOrderPreview(props: BuyOrderProps) {
           </Box>
           <Box gap={1}>
             <Text>{typeLabel}</Text>
-            {isSupportedType && (
-              <Text dimColor>
-                ({props.type!})
-              </Text>
-            )}
+            {isSupportedType && <Text dimColor>({props.type!})</Text>}
           </Box>
         </Box>
       )}
@@ -446,13 +439,14 @@ function BuyOrderPreview(props: BuyOrderProps) {
 
 const MemoizedBuyOrderPreview = React.memo(BuyOrderPreview);
 
-type Order =
-  & Omit<NonNullable<Awaited<ReturnType<typeof getOrder>>>, "status">
-  & {
-    status:
-      | NonNullable<Awaited<ReturnType<typeof getOrder>>>["status"]
-      | NonNullable<Awaited<ReturnType<typeof placeBuyOrder>>>["status"];
-  };
+type Order = Omit<
+  NonNullable<Awaited<ReturnType<typeof getOrder>>>,
+  "status"
+> & {
+  status:
+    | NonNullable<Awaited<ReturnType<typeof getOrder>>>["status"]
+    | NonNullable<Awaited<ReturnType<typeof placeBuyOrder>>>["status"];
+};
 type BuyOrderProps = {
   price: number;
   size: number;
@@ -476,9 +470,9 @@ function VMWarning(props: BuyOrderProps) {
   let equivalentCommand = `sf nodes create -n ${props.size}`;
 
   if (props.price) {
-    equivalentCommand += ` -p ${
-      (props.price * GPUS_PER_NODE / 100).toFixed(2)
-    }`;
+    equivalentCommand += ` -p ${((props.price * GPUS_PER_NODE) / 100).toFixed(
+      2,
+    )}`;
   }
   if (props.startAt !== "NOW") {
     const startFormatted = startDate.toISOString();
@@ -486,7 +480,7 @@ function VMWarning(props: BuyOrderProps) {
   }
   equivalentCommand += ` -d ${realDurationString}`;
   if (props.yes) {
-    equivalentCommand += ` -y`;
+    equivalentCommand += " -y";
   }
   if (props.cluster) {
     equivalentCommand += ` -z ${props.cluster}`;
@@ -514,9 +508,7 @@ function BuyOrder(props: BuyOrderProps) {
   const isVM = type?.endsWith("v") || zone?.delivery_type === "VM";
   const [vmWarningState, setVmWarningState] = useState<
     "prompt" | "accepted" | "dismissed" | "not_applicable"
-  >(
-    isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable",
-  );
+  >(isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable");
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
@@ -551,8 +543,8 @@ function BuyOrder(props: BuyOrderProps) {
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       const { startAt, endsAt } = props;
-      const realDurationInHours = dayjs(endsAt).diff(dayjs(startAt)) / 1000 /
-        3600;
+      const realDurationInHours =
+        dayjs(endsAt).diff(dayjs(startAt)) / 1000 / 3600;
       const totalPriceInCents = getTotalPrice(
         props.price,
         props.size,
@@ -606,15 +598,18 @@ function BuyOrder(props: BuyOrderProps) {
     [props, exit, submitOrder],
   );
 
-  const handleDismissVMWarning = useCallback((submitValue: boolean) => {
-    if (!submitValue) {
-      setIsLoading(false);
-      setResultMessage(
-        "VM order not placed. We recommend you use 'sf nodes create' instead.",
-      );
-      setTimeout(exit, 0);
-    } else setVmWarningState("accepted");
-  }, [exit]);
+  const handleDismissVMWarning = useCallback(
+    (submitValue: boolean) => {
+      if (!submitValue) {
+        setIsLoading(false);
+        setResultMessage(
+          "VM order not placed. We recommend you use 'sf nodes create' instead.",
+        );
+        setTimeout(exit, 0);
+      } else setVmWarningState("accepted");
+    },
+    [exit],
+  );
 
   useEffect(() => {
     if (!isLoading || !order?.id) {
@@ -655,9 +650,7 @@ function BuyOrder(props: BuyOrderProps) {
             <>
               <Text color="red">
                 Place an order for a legacy VM anyway?{" "}
-                <Text color="white">
-                  (y/n)
-                </Text>
+                <Text color="white">(y/n)</Text>
               </Text>
 
               <ConfirmInput
@@ -669,35 +662,30 @@ function BuyOrder(props: BuyOrderProps) {
         </Box>
       )}
 
-      {(vmWarningState === "dismissed" || vmWarningState === "not_applicable" ||
+      {(vmWarningState === "dismissed" ||
+        vmWarningState === "not_applicable" ||
         vmWarningState === "accepted") && (
-        <MemoizedBuyOrderPreview
-          {...props}
-        />
+        <MemoizedBuyOrderPreview {...props} />
       )}
 
       {vmWarningState === "accepted" && !isLoading && !props.yes && (
         <Box gap={1}>
           <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       )}
 
       {(vmWarningState === "dismissed" ||
-        vmWarningState === "not_applicable") && !isLoading && !props.yes && (
-        <Box gap={1}>
-          <Text>Place order? (y/n)</Text>
+        vmWarningState === "not_applicable") &&
+        !isLoading &&
+        !props.yes && (
+          <Box gap={1}>
+            <Text>Place order? (y/n)</Text>
 
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
-        </Box>
-      )}
+            <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
+          </Box>
+        )}
 
       {isLoading && (
         <Box gap={1} flexDirection="column">
@@ -724,52 +712,47 @@ function BuyOrder(props: BuyOrderProps) {
             order.status === "filled" &&
             (order as Awaited<ReturnType<typeof getOrder>>) &&
             order.execution_price && (
-            <Box flexDirection="column">
-              {order.start_at && order.end_at &&
-                order.start_at !== order.end_at && (
+              <Box flexDirection="column">
+                {order.start_at &&
+                  order.end_at &&
+                  order.start_at !== order.end_at && (
+                    <Row
+                      headWidth={16}
+                      head="executed rate"
+                      value={`~${centsToDollarsFormatted(
+                        Number(order.execution_price) /
+                          (Number(order.quantity) * GPUS_PER_NODE) /
+                          dayjs(order.end_at).diff(
+                            dayjs(order.start_at),
+                            "hours",
+                            true,
+                          ),
+                      )}/gpu/hr`}
+                    />
+                  )}
                 <Row
                   headWidth={16}
-                  head="executed rate"
-                  value={`~${
-                    centsToDollarsFormatted(
-                      Number(order.execution_price) /
-                        ((Number(order.quantity)) *
-                          GPUS_PER_NODE) /
-                        dayjs(order.end_at).diff(
-                          dayjs(order.start_at),
-                          "hours",
-                          true,
-                        ),
-                    )
-                  }/gpu/hr`}
-                />
-              )}
-              <Row
-                headWidth={16}
-                head="executed total"
-                value={`~${
-                  centsToDollarsFormatted(
+                  head="executed total"
+                  value={`~${centsToDollarsFormatted(
                     Number(order.execution_price),
-                  )
-                }`}
-              />
-              {order.execution_price && Number(order.price) > 0 &&
-                Number(order.execution_price) > 0 &&
-                Number(order.execution_price) < Number(order.price) && (
-                <Row
-                  headWidth={16}
-                  head="saved"
-                  value={`~${
-                    (
-                      ((Number(order.price) - Number(order.execution_price)) *
-                        100) /
-                      Number(order.price)
-                    ).toFixed(2)
-                  }%`}
+                  )}`}
                 />
-              )}
-            </Box>
-          )}
+                {order.execution_price &&
+                  Number(order.price) > 0 &&
+                  Number(order.execution_price) > 0 &&
+                  Number(order.execution_price) < Number(order.price) && (
+                    <Row
+                      headWidth={16}
+                      head="saved"
+                      value={`~${(
+                        ((Number(order.price) - Number(order.execution_price)) *
+                          100) /
+                          Number(order.price)
+                      ).toFixed(2)}%`}
+                    />
+                  )}
+              </Box>
+            )}
         </Box>
       )}
 
@@ -834,8 +817,9 @@ export async function placeBuyOrder(options: {
     start_at,
     end_at: roundEndDate(options.endsAt).toISOString(),
     price: options.totalPriceInCents,
-    colocate_with:
-      (options.colocateWith ? [options.colocateWith] : []) as string[],
+    colocate_with: (options.colocateWith
+      ? [options.colocateWith]
+      : []) as string[],
     flags: {
       ioc: !options.standing,
     },
@@ -888,9 +872,10 @@ export function getPricePerGpuHourFromQuote(
   // from the market's perspective, "NOW" means at the beginning of the next minute.
   // when the order duration is very short, this can cause the rate to be computed incorrectly
   // if we implicitly assume it to mean `new Date()`.
-  const coercedStartTime = startTimeOrNow === "NOW"
-    ? roundDateUpToNextMinute(new Date())
-    : startTimeOrNow;
+  const coercedStartTime =
+    startTimeOrNow === "NOW"
+      ? roundDateUpToNextMinute(new Date())
+      : startTimeOrNow;
   const durationSeconds = dayjs(quote.end_at).diff(dayjs(coercedStartTime));
   const durationHours = durationSeconds / 3600 / 1000;
 
@@ -898,9 +883,10 @@ export function getPricePerGpuHourFromQuote(
 }
 
 async function getQuoteFromParsedSfBuyOptions(options: SfBuyOptions) {
-  const startsAt = options.start === "NOW"
-    ? "NOW"
-    : roundStartDate(parseStartDate(options.start));
+  const startsAt =
+    options.start === "NOW"
+      ? "NOW"
+      : roundStartDate(parseStartDate(options.start));
   const durationSeconds = options.duration
     ? options.duration
     : dayjs(options.end).diff(dayjs(parseStartDate(startsAt)), "seconds");
@@ -946,12 +932,14 @@ export async function getQuote(options: QuoteOptions) {
       side: "buy",
       instance_type: options.instanceType,
       quantity: options.quantity,
-      min_start_date: options.minStartTime === "NOW"
-        ? ("NOW" as const)
-        : options.minStartTime.toISOString(),
-      max_start_date: options.maxStartTime === "NOW"
-        ? ("NOW" as const)
-        : options.maxStartTime.toISOString(),
+      min_start_date:
+        options.minStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.minStartTime.toISOString(),
+      max_start_date:
+        options.maxStartTime === "NOW"
+          ? ("NOW" as const)
+          : options.maxStartTime.toISOString(),
       min_duration: options.minDurationSeconds,
       max_duration: options.maxDurationSeconds,
       cluster: options.cluster,
@@ -1002,12 +990,16 @@ export async function getQuote(options: QuoteOptions) {
 export async function getOrder(orderId: string) {
   const api = await apiClient();
 
-  const { data: order, error, response } = await api.GET("/v0/orders/{id}", {
+  const {
+    data: order,
+    error,
+    response,
+  } = await api.GET("/v0/orders/{id}", {
     params: { path: { id: orderId } },
   });
 
   if (error) {
-    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    // @ts-expect-error -- TODO: FIXME: include error in OpenAPI schema output
     if (error?.code === "order.not_found" || response.status === 404) {
       return undefined;
     }

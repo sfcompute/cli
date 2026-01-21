@@ -1,16 +1,15 @@
-import React from "react";
-import { Command } from "@commander-js/extra-typings";
-import { gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
-import ora from "ora";
+import { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
 import { render } from "ink";
+import ora from "ora";
 
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { createNodesTable, jsonOption, pluralizeNodes } from "./utils.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { NodesVerboseDisplay } from "./list.tsx";
+import { createNodesTable, jsonOption, pluralizeNodes } from "./utils.ts";
 
 const get = new Command("get")
   .alias("show")
@@ -68,10 +67,10 @@ async function getNodesAction(
 
     if (notFound.length > 0) {
       console.error(
-        red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
-          }:`,
+        chalk.red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(
+            notFound.length,
+          )}:`,
         ),
       );
       for (const name of notFound) {
@@ -89,10 +88,10 @@ async function getNodesAction(
       // Show table format
       console.log(createNodesTable(fetchedNodes));
       console.log(
-        gray(
-          `\nFound ${fetchedNodes.length} ${
-            pluralizeNodes(fetchedNodes.length)
-          }.`,
+        chalk.gray(
+          `\nFound ${fetchedNodes.length} ${pluralizeNodes(
+            fetchedNodes.length,
+          )}.`,
         ),
       );
     } else {

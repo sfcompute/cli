@@ -2,10 +2,9 @@ import { Badge } from "@inkjs/ui";
 import { Box, Text } from "ink";
 import { formatDateRange } from "little-date";
 import ms from "ms";
-import * as React from "react";
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { Row } from "../Row.tsx";
 import type { ActiveContract, Contract } from "./types.ts";
 import {
   type ContractState,
@@ -113,9 +112,7 @@ export function ContractDisplay(props: { contract: Contract }) {
           <Box gap={1}>
             <Text>{typeLabel}</Text>
             {isSupportedType && (
-              <Text dimColor>
-                ({props.contract.instance_type})
-              </Text>
+              <Text dimColor>({props.contract.instance_type})</Text>
             )}
           </Box>
         </Box>

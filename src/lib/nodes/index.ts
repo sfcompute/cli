@@ -1,17 +1,17 @@
-import { type Command } from "@commander-js/extra-typings";
 import console from "node:console";
+import type { Command } from "@commander-js/extra-typings";
 
 import { addCreate } from "./create.ts";
-import list from "./list.tsx";
-import release from "./release.ts";
 import deleteCommand from "./delete.ts";
-import set from "./set.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
-import { addRedeploy } from "./redeploy.ts";
-import ssh from "./ssh.ts";
-import logs from "./logs.ts";
 import { addImage } from "./image/index.ts";
+import list from "./list.tsx";
+import logs from "./logs.ts";
+import { addRedeploy } from "./redeploy.ts";
+import release from "./release.ts";
+import set from "./set.ts";
+import ssh from "./ssh.ts";
 
 export async function registerNodes(program: Command) {
   const nodes = program

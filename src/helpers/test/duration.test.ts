@@ -1,7 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.112.0/testing/asserts.ts";
+import { expect, test } from "vitest";
 import { parseDurationArgument } from "../duration.ts";
 
-Deno.test("parseDurationArgument", () => {
+test("parseDurationArgument", () => {
   const testCases: [string, number | undefined][] = [
     ["", undefined],
     ["0", 0],
@@ -36,6 +36,6 @@ Deno.test("parseDurationArgument", () => {
 
   for (const [input, expected] of testCases) {
     const result = parseDurationArgument(input);
-    assertEquals(result, expected);
+    expect(result).toEqual(expected);
   }
 });

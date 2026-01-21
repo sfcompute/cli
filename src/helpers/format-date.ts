@@ -5,9 +5,9 @@ import {
   isSameYear,
   startOfDay,
 } from "date-fns";
-import { formatDateRange } from "little-date";
 import dayjs, { type Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { formatDateRange } from "little-date";
 
 dayjs.extend(utc);
 
@@ -32,25 +32,31 @@ const formatTime = (date: Date, locale?: string): string => {
   );
 };
 
-const createFormatTime = (locale?: string) => (date: Date): string =>
-  formatTime(date, locale);
+const createFormatTime =
+  (locale?: string) =>
+  (date: Date): string =>
+    formatTime(date, locale);
 
-export const formatDate = (date: Date, {
-  today = new Date(),
-  showToday = true,
-  forceIncludeTime = false,
-}: {
-  showToday?: boolean;
-  forceIncludeTime?: boolean;
-  today?: Date;
-} = {}): string => {
+export const formatDate = (
+  date: Date,
+  {
+    today = new Date(),
+    showToday = true,
+    forceIncludeTime = false,
+  }: {
+    showToday?: boolean;
+    forceIncludeTime?: boolean;
+    today?: Date;
+  } = {},
+): string => {
   const thisYear = isSameYear(date, today);
   const thisDay = isSameDay(date, today);
   const formatTimeWithLocale = createFormatTime("en-US");
 
-  const timeSuffix = !isSameMinute(startOfDay(date), date) || forceIncludeTime
-    ? `, ${formatTimeWithLocale(date)}`
-    : "";
+  const timeSuffix =
+    !isSameMinute(startOfDay(date), date) || forceIncludeTime
+      ? `, ${formatTimeWithLocale(date)}`
+      : "";
 
   const yearSuffix = thisYear ? "" : `, ${format(date, "yyyy")}`;
 

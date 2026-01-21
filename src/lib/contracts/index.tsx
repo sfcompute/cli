@@ -1,7 +1,6 @@
+import * as console from "node:console";
 import { Command } from "@commander-js/extra-typings";
 import { render } from "ink";
-import * as console from "node:console";
-import React from "react";
 import { apiClient } from "../../apiClient.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
 import {
@@ -34,11 +33,9 @@ export function registerContracts(program: Command) {
             const validStates = ["active", "upcoming", "expired"];
             if (!validStates.includes(value.toLowerCase())) {
               throw new Error(
-                `Invalid state: ${value}. Valid states are: ${
-                  validStates.join(
-                    ", ",
-                  )
-                }`,
+                `Invalid state: ${value}. Valid states are: ${validStates.join(
+                  ", ",
+                )}`,
               );
             }
             // Convert lowercase input to title case for internal use
@@ -68,8 +65,7 @@ async function listContracts(
 
   const api = await apiClient();
 
-  const state = showAll ? "All" : (stateFilter as ContractState) ||
-    undefined;
+  const state = showAll ? "All" : (stateFilter as ContractState) || undefined;
 
   const { data, error, response } = await api.GET("/v0/contracts", {
     params: {

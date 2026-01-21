@@ -1,27 +1,26 @@
-import React from "react";
-import SFCNodes from "@sfcompute/nodes-sdk-alpha";
-import { Command } from "@commander-js/extra-typings";
-import { Box, render, Text } from "ink";
-import Link from "ink-link";
 import console from "node:console";
+import { Command } from "@commander-js/extra-typings";
+import type SFCNodes from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
-import { brightBlack } from "jsr:@std/fmt/colors";
+import utc from "dayjs/plugin/utc";
+import { Box, render, Text } from "ink";
+import Link from "ink-link";
+import { formatDate } from "../../../helpers/format-date.ts";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
 import { Row } from "../../Row.tsx";
-import { formatDate } from "../../../helpers/format-date.ts";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
 
-export function ImageDisplay(
-  { image }: {
-    image: SFCNodes.VMs.ImageGetResponse;
-  },
-) {
+export function ImageDisplay({
+  image,
+}: {
+  image: SFCNodes.VMs.ImageGetResponse;
+}) {
   const expiresAt = image.expires_at ? new Date(image.expires_at) : null;
   const isExpired = expiresAt ? expiresAt < new Date() : false;
 
@@ -29,17 +28,11 @@ export function ImageDisplay(
   const statusText = isExpired ? "Expired" : "Ready";
 
   return (
-    <Box
-      flexDirection="column"
-      padding={0}
-      width={80}
-    >
-      <Box
-        borderStyle="single"
-        borderColor="cyan"
-        paddingX={1}
-      >
-        <Text color="cyan" bold>Image: {image.name} ({image.image_id})</Text>
+    <Box flexDirection="column" padding={0} width={80}>
+      <Box borderStyle="single" borderColor="cyan" paddingX={1}>
+        <Text color="cyan" bold>
+          Image: {image.name} ({image.image_id})
+        </Text>
       </Box>
 
       <Box paddingX={1} flexDirection="column">
@@ -55,9 +48,7 @@ export function ImageDisplay(
           head="URL: "
           value={
             <Box flexDirection="column" paddingRight={1}>
-              <Text color="cyan">
-                Use curl or wget to download.
-              </Text>
+              <Text color="cyan">Use curl or wget to download.</Text>
               <Link url={image.download_url} fallback={false}>
                 {image.download_url}
               </Link>
@@ -70,10 +61,11 @@ export function ImageDisplay(
             value={
               <Box gap={1}>
                 <Text color={isExpired ? "red" : undefined}>
-                  {expiresAt.toISOString()} {brightBlack(
-                    `(${formatDate(dayjs(expiresAt).toDate())} ${
-                      dayjs(expiresAt).format("z")
-                    })`,
+                  {expiresAt.toISOString()}{" "}
+                  {chalk.blackBright(
+                    `(${formatDate(dayjs(expiresAt).toDate())} ${dayjs(
+                      expiresAt,
+                    ).format("z")})`,
                   )}
                 </Text>
                 {isExpired && <Text dimColor>(Expired)</Text>}

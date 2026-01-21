@@ -20,21 +20,19 @@ sf --version  # 0.1.0
 
 ### Setup
 
-- Install [Deno](https://docs.deno.com/runtime/)
-  - `2.2.3`
-- Install dependencies `deno install`
-  - Use same mental model as `npm install`
-- Auth your CLI with `deno run prod login`
+- Install [Node.js](https://nodejs.org/) (v22 or later) - used as the runtime
+- Install [Bun](https://bun.sh/) - used as the package manager
+- Install dependencies: `bun install`
+- Auth your CLI with `bun run prod login`
 
 ### Development Loop
 
 - Make code changes
 - Test changes with
-  - `deno run devv` to test against local API
-  - `deno run prod` to test against production API
-  - The `deno run <env>` is an alias to the user facing `sf` command. So if you
-    wanted to run `sf login` locally against the local API, run
-    `deno run devv login`
+  - `bun run dev` to test against local API
+  - `bun run prod` to test against production API
+  - These are aliases to the user facing `sf` command. So if you wanted to run
+    `sf login` locally against the local API, run `bun run dev login`
 
 ## New Release
 
@@ -78,10 +76,9 @@ Releases are managed through GitHub Actions. To create a new release:
 The workflow will:
 
 - Run quality checks:
-  - Format checking with `deno fmt`
-  - Linting with `deno lint`
-  - Type checking with `deno check`
-  - Run all tests with `deno test --allow-all`
+  - Linting with `biome ci`
+  - Type checking with `tsc --noEmit`
+  - Run all tests with `vitest`
 - Bump the version in package.json
 - Create a new GitHub release with compiled binaries
 - Push the version bump commit back to main

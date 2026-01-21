@@ -1,5 +1,5 @@
-import process from "node:process";
 import * as console from "node:console";
+import process from "node:process";
 import { clearAuthFromConfig } from "./config.ts";
 
 export function logAndQuit(message: string): never {
@@ -19,13 +19,13 @@ export function logSupportCTAAndQuit(): never {
 }
 
 export function logLoginMessageAndQuit(): never {
-  logAndQuit(`You need to login first.\n\n\t$ sf login\n`);
+  logAndQuit("You need to login first.\n\n\t$ sf login\n");
 }
 
 export async function logSessionTokenExpiredAndQuit(): Promise<never> {
   await clearAuthFromConfig();
   logAndQuit(
-    `\nYour session has expired. Please login again.\n\n\t$ sf login\n`,
+    "\nYour session has expired. Please login again.\n\n\t$ sf login\n",
   );
 }
 

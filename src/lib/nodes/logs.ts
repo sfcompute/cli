@@ -1,29 +1,27 @@
-import { Command, CommanderError } from "@commander-js/extra-typings";
 import console from "node:console";
+import process from "node:process";
 import { setTimeout } from "node:timers";
+import { Command, CommanderError } from "@commander-js/extra-typings";
+import chalk from "chalk";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import ora from "ora";
-import { cyan } from "jsr:@std/fmt/colors";
-import process from "node:process";
 
-import { getLastVM } from "./utils.ts";
 import { apiClient } from "../../apiClient.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { paths } from "../../schema.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import type { paths } from "../../schema.ts";
+import { getLastVM } from "./utils.ts";
 
 dayjs.extend(utc);
 
 type VMLogsParams = paths["/v0/vms/logs2"]["get"]["parameters"]["query"];
 type VMLogsResponse =
-  paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"][
-    "application/json"
-  ]["data"];
+  paths["/v0/vms/logs2"]["get"]["responses"]["200"]["content"]["application/json"]["data"];
 
 function formatTimestampToISO(timestamp: string): string {
   const date = dayjs(timestamp);
@@ -51,7 +49,8 @@ const logs = new Command("logs")
     (val) => {
       const parsedValue = Number(val);
       if (
-        Number.isNaN(parsedValue) || !Number.isInteger(parsedValue) ||
+        Number.isNaN(parsedValue) ||
+        !Number.isInteger(parsedValue) ||
         parsedValue <= 0
       ) {
         throw new CommanderError(
@@ -103,9 +102,7 @@ Examples:
     try {
       // Validate that either node or instance is provided, but not both
       if (!node && !options.instance) {
-        logAndQuit(
-          "Either a node name/ID or --instance flag must be provided",
-        );
+        logAndQuit("Either a node name/ID or --instance flag must be provided");
       }
 
       if (node && options.instance) {
@@ -123,15 +120,15 @@ Examples:
 
         try {
           const nodeData = await nodesClientInstance.nodes.get(node);
-          spinner.succeed(`Node found for name ${cyan(node)}.`);
+          spinner.succeed(`Node found for name ${chalk.cyan(node)}.`);
 
           const lastVm = getLastVM(nodeData);
 
           if (!lastVm) {
             spinner.fail(
-              `Node ${
-                cyan(node)
-              } does not have a VM. VMs can take up to 5-10 minutes to spin up.`,
+              `Node ${chalk.cyan(
+                node,
+              )} does not have a VM. VMs can take up to 5-10 minutes to spin up.`,
             );
             process.exit(1);
           }
@@ -139,7 +136,7 @@ Examples:
           vmId = lastVm.id;
         } catch {
           spinner.info(
-            `No node found for name ${cyan(node)}. Interpreting as VM ID...`,
+            `No node found for name ${chalk.cyan(node)}. Interpreting as VM ID...`,
           );
           vmId = node;
         }
@@ -204,9 +201,7 @@ Examples:
 
       const flushIncompleteLine = () => {
         if (incompleteLine.length > 0) {
-          console.log(
-            `[${lastTimestamp}] ${incompleteLine}`,
-          );
+          console.log(`[${lastTimestamp}] ${incompleteLine}`);
         }
       };
 
@@ -248,8 +243,8 @@ Examples:
 
         if (newResponse?.data?.length) {
           processLogs(newResponse.data);
-          sinceSeqnum = newResponse.data[newResponse.data.length - 1].seqnum +
-            1;
+          sinceSeqnum =
+            newResponse.data[newResponse.data.length - 1].seqnum + 1;
         }
 
         await new Promise((resolve) => setTimeout(resolve, 2000));

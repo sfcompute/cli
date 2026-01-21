@@ -1,17 +1,17 @@
-import { Command } from "@commander-js/extra-typings";
-import Table from "cli-table3";
-import { cyan, gray, green, red, yellow } from "jsr:@std/fmt/colors";
 import console from "node:console";
+import { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
+import chalk from "chalk";
+import Table from "cli-table3";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
+import { apiClient } from "../../apiClient.ts";
 import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { apiClient } from "../../apiClient.ts";
 
 dayjs.extend(utc);
 
@@ -66,10 +66,10 @@ const list = new Command("list")
     const hasRecentlyCreatedVMs = contractsData.some((contract) =>
       dayjs(contract.shape.intervals[0]).isAfter(
         dayjs().subtract(10, "minutes"),
-      )
+      ),
     );
 
-    if ((!(vmsData.length > 0) && !hasRecentlyCreatedVMs)) {
+    if (!(vmsData.length > 0) && !hasRecentlyCreatedVMs) {
       if (options.json) {
         console.log(JSON.stringify([], null, 2));
         return;
@@ -91,13 +91,13 @@ const list = new Command("list")
     }
 
     if (unscheduledVMs > 0 || hasRecentlyCreatedVMs) {
-      const message = `VMs take 5-10 minutes to spin up and may show as ${
-        green("Running")
-      } before they are ready for ssh.
+      const message = `VMs take 5-10 minutes to spin up and may show as ${chalk.green(
+        "Running",
+      )} before they are ready for ssh.
 
-You can use ${
-        cyan("sf vm logs -f")
-      } to follow your VM's startup script output.`;
+You can use ${chalk.cyan(
+        "sf vm logs -f",
+      )} to follow your VM's startup script output.`;
 
       console.error(
         boxen(message, {
@@ -108,7 +108,11 @@ You can use ${
     }
 
     const table = new Table({
-      head: [cyan("ID"), cyan("Status"), cyan("Last Updated")],
+      head: [
+        chalk.cyan("ID"),
+        chalk.cyan("Status"),
+        chalk.cyan("Last Updated"),
+      ],
       style: {
         head: [],
         border: ["gray"],
@@ -119,7 +123,7 @@ You can use ${
       table.push([
         {
           colSpan: 3,
-          content: yellow(
+          content: chalk.yellow(
             `${unscheduledVMs} additional VMs awaiting scheduling`,
           ),
         },
@@ -128,13 +132,14 @@ You can use ${
 
     formattedData.forEach((instance) => {
       const status = instance.status.toLowerCase();
-      const statusText = status === "running"
-        ? green("Running")
-        : status === "dead"
-        ? red("Dead")
-        : status === "off"
-        ? gray("Off")
-        : instance.status;
+      const statusText =
+        status === "running"
+          ? chalk.green("Running")
+          : status === "dead"
+            ? chalk.red("Dead")
+            : status === "off"
+              ? chalk.gray("Off")
+              : instance.status;
 
       table.push([instance.id, statusText, instance.last_updated_at]);
     });
@@ -142,11 +147,11 @@ You can use ${
     const exampleId = formattedData[0].id;
 
     console.log(table.toString());
-    console.log(`\n${gray("Use VM IDs to access and replace VMs.")}\n`);
-    console.log(gray("Examples:"));
-    console.log(`  sf vm ssh ${cyan(`root@${exampleId}`)}`);
-    console.log(`  sf vm logs -i ${cyan(exampleId)} -f`);
-    console.log(`  sf vm replace -i ${cyan(exampleId)}`);
+    console.log(`\n${chalk.gray("Use VM IDs to access and replace VMs.")}\n`);
+    console.log(chalk.gray("Examples:"));
+    console.log(`  sf vm ssh ${chalk.cyan(`USERNAME@${exampleId}`)}`);
+    console.log(`  sf vm logs -i ${chalk.cyan(exampleId)} -f`);
+    console.log(`  sf vm replace -i ${chalk.cyan(exampleId)}`);
   });
 
 export default list;

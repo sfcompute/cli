@@ -1,9 +1,9 @@
-import { Command } from "@commander-js/extra-typings";
+import type { Command } from "@commander-js/extra-typings";
 import { isFeatureEnabled } from "../posthog.ts";
 
 import create from "./create.tsx";
-import update from "./update.tsx";
 import list from "./list.tsx";
+import update from "./update.tsx";
 
 export async function registerScale(program: Command) {
   const isEnabled = await isFeatureEnabled("procurements");

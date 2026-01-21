@@ -1,10 +1,9 @@
-import { type Command, Option } from "@commander-js/extra-typings";
-import { render } from "ink";
 import * as console from "node:console";
+import { type Command, Option } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React from "react";
+import { render } from "ink";
 import { getAuthToken, isLoggedIn } from "../../helpers/config.ts";
 import { parseDurationArgument } from "../../helpers/duration.ts";
 import {
@@ -330,7 +329,7 @@ export async function submitOrderCancellationByIdAction(orderId: string) {
     method: "DELETE",
     body: JSON.stringify({}),
     headers: {
-      "Content-ype": "application/json",
+      "Content-Type": "application/json",
       Authorization: `Bearer ${await getAuthToken()}`,
     },
   });
@@ -339,8 +338,7 @@ export async function submitOrderCancellationByIdAction(orderId: string) {
       return await logSessionTokenExpiredAndQuit();
     }
 
-    const error = await response.json();
-    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
+    const error = (await response.json()) as { code?: string };
     switch (error.code) {
       case "order.not_found":
         return logAndQuit(`Order ${orderId} not found`);
@@ -352,8 +350,7 @@ export async function submitOrderCancellationByIdAction(orderId: string) {
     }
   }
 
-  const resp = await response.json();
-  // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
+  const resp = (await response.json()) as { object?: string };
   const cancellationSubmitted = resp.object === "pending";
   if (!cancellationSubmitted) {
     return logAndQuit(`Failed to cancel order ${orderId}`);

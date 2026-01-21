@@ -7,17 +7,14 @@ on:
     branches: [main]
 
 jobs:
-  # run format, lint, and test
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version-file: .tool-versions
-      - run: deno install
-      - run: deno fmt --check
-      - run: deno lint
-      - run: deno check --config deno.json .
-      - run: deno test --allow-all
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: biomejs/setup-biome@v2
+      - run: bun install
+      - run: biome ci .
+      - run: bun run check
+      - run: bun run test

@@ -1,13 +1,13 @@
-import { type Command } from "@commander-js/extra-typings";
+import console from "node:console";
+import process from "node:process";
+import type { Command } from "@commander-js/extra-typings";
+import boxen from "boxen";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import boxen from "npm:boxen@8.0.1";
-import console from "node:console";
-import process from "node:process";
 import ora from "ora";
-import { getContractRange } from "../contracts/utils.ts";
 import { apiClient } from "../../apiClient.ts";
+import { getContractRange } from "../contracts/utils.ts";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -40,19 +40,17 @@ function _registerExtend(program: Command) {
     .addHelpText(
       "before",
       `
-${
-        boxen(
-          `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
+${boxen(
+  `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
   \x1b[31mTo create, extend, and release specific machines directly, use \x1b[97msf nodes\x1b[31m.\x1b[0m
   \x1b[31mTo "extend" a contract, use \x1b[97msf buy -colo <contract_id> -s <contract_end_time> -d <duration>\x1b[31m.\x1b[0m
   \x1b[31mHowever, contracts don't map to specific machines, so you can't choose which will persist.\x1b[0m
   \x1b[31mWe strongly recommend using \x1b[97msf nodes\x1b[31m instead.\x1b[0m`,
-          {
-            padding: 0.75,
-            borderColor: "red",
-          },
-        )
-      }
+  {
+    padding: 0.75,
+    borderColor: "red",
+  },
+)}
 `,
     )
     .action(async function extendAction(options) {
@@ -74,8 +72,8 @@ ${
         spinner.clear();
       }
 
-      const contractRange = contract?.shape &&
-        getContractRange(contract?.shape);
+      const contractRange =
+        contract?.shape && getContractRange(contract?.shape);
 
       // Build the equivalent sf buy command
       let equivalentCommand = `sf buy -colo ${options.contract} -s ${
@@ -86,26 +84,28 @@ ${
         equivalentCommand += ` -p ${options.price}`;
       }
       if (options.yes) {
-        equivalentCommand += ` -y`;
+        equivalentCommand += " -y";
       }
       if (options.quote) {
-        equivalentCommand += ` -q`;
+        equivalentCommand += " -q";
       }
       if (options.standing) {
-        equivalentCommand += ` --standing`;
+        equivalentCommand += " --standing";
       }
 
-      console.error(boxen(
-        `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
+      console.error(
+        boxen(
+          `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
   \x1b[31mTo create, extend, and release specific machines directly, use \x1b[97msf nodes\x1b[31m.\x1b[0m
   \x1b[31mTo "extend" a contract, use: \x1b[97m${equivalentCommand}\x1b[31m.\x1b[0m
   \x1b[31mHowever, contracts don't map to specific machines, so you can't choose which will persist.\x1b[0m
   \x1b[31mWe strongly recommend using \x1b[97msf nodes\x1b[31m instead.\x1b[0m`,
-        {
-          padding: 0.75,
-          borderColor: "red",
-        },
-      ));
+          {
+            padding: 0.75,
+            borderColor: "red",
+          },
+        ),
+      );
 
       if (fetchFailed) {
         process.exit(1);

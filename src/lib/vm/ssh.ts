@@ -1,14 +1,14 @@
-import type { Command } from "@commander-js/extra-typings";
+import child_process from "node:child_process";
 import console from "node:console";
 import process from "node:process";
+import type { Command } from "@commander-js/extra-typings";
 import { Shescape } from "shescape";
+import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { getApiUrl } from "../../helpers/urls.ts";
-import { getAuthToken } from "../../helpers/config.ts";
-import child_process from "node:child_process";
 
 export function registerSsh(program: Command) {
   program
@@ -28,10 +28,10 @@ export function registerSsh(program: Command) {
       const splitDestination = destination.split("@");
       let vmId: string;
       let sshUsername: string | undefined;
-      if (splitDestination.length == 1) {
+      if (splitDestination.length === 1) {
         sshUsername = undefined;
         vmId = splitDestination[0];
-      } else if (splitDestination.length == 2) {
+      } else if (splitDestination.length === 2) {
         sshUsername = splitDestination[0];
         vmId = splitDestination[1];
       } else {
@@ -62,10 +62,12 @@ export function registerSsh(program: Command) {
       const data = (await response.json()) as {
         ssh_hostname: string;
         ssh_port: number;
-        ssh_host_keys: {
-          key_type: string;
-          base64_encoded_key: string;
-        }[] | undefined;
+        ssh_host_keys:
+          | {
+              key_type: string;
+              base64_encoded_key: string;
+            }[]
+          | undefined;
       };
       const sshHostname = data.ssh_hostname;
       const sshPort = data.ssh_port;
@@ -104,8 +106,8 @@ export function registerSsh(program: Command) {
       cmd = cmd.concat(["-o", `HostKeyAlias=${vmId}.vms.sfcompute.dev`]);
       cmd = cmd.concat([sshDestination]);
 
-      let shescape: undefined | Shescape = undefined;
-      let shell: undefined | string = undefined;
+      let shescape: undefined | Shescape;
+      let shell: undefined | string;
       if (process.env.SHELL !== undefined) {
         try {
           shescape = new Shescape({
@@ -129,7 +131,7 @@ export function registerSsh(program: Command) {
         console.log(`Executing (${shell} style output): ${shell_cmd}`);
       }
 
-      // Ideally this would use `@alphahydrae/exec` but `deno compile` doesn't
+      // Ideally this would use `@alphahydrae/exec` but `pkg` doesn't
       // support ffi modules.
       const result = child_process.spawnSync(cmd[0], cmd.slice(1), {
         stdio: "inherit",

@@ -1,6 +1,6 @@
-import { Command } from "@commander-js/extra-typings";
-import { readFileSync } from "node:fs";
 import console from "node:console";
+import { readFileSync } from "node:fs";
+import { Command } from "@commander-js/extra-typings";
 import { getAuthToken } from "../../helpers/config.ts";
 import {
   logAndQuit,

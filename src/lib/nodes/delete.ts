@@ -1,10 +1,10 @@
-import { Command } from "@commander-js/extra-typings";
-import { confirm } from "@inquirer/prompts";
-import { brightRed, gray, red } from "jsr:@std/fmt/colors";
 import console from "node:console";
 import process from "node:process";
-import ora from "ora";
+import { Command } from "@commander-js/extra-typings";
+import { confirm } from "@inquirer/prompts";
 import type { SFCNodes } from "@sfcompute/nodes-sdk-alpha";
+import chalk from "chalk";
+import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import {
@@ -15,9 +15,7 @@ import {
 } from "./utils.ts";
 
 const deleteCommand = new Command("delete")
-  .description(
-    "Permanently delete compute nodes",
-  )
+  .description("Permanently delete compute nodes")
   .showHelpAfterError()
   .argument("<names...>", "Node IDs or names to delete")
   .addOption(yesOption)
@@ -67,8 +65,8 @@ async function deleteNodesAction(
     const notFound: string[] = [];
 
     for (const nameOrId of nodeNames) {
-      const node = fetchedNodes.find((n) =>
-        n.name === nameOrId || n.id === nameOrId
+      const node = fetchedNodes.find(
+        (n) => n.name === nameOrId || n.id === nameOrId,
       );
       if (node) {
         foundNodes.push({ name: nameOrId, node });
@@ -79,10 +77,10 @@ async function deleteNodesAction(
 
     if (notFound.length > 0) {
       console.log(
-        red(
-          `Could not find ${notFound.length === 1 ? "this" : "these"} ${
-            pluralizeNodes(notFound.length)
-          }:`,
+        chalk.red(
+          `Could not find ${notFound.length === 1 ? "this" : "these"} ${pluralizeNodes(
+            notFound.length,
+          )}:`,
         ),
       );
       for (const name of notFound) {
@@ -104,7 +102,7 @@ async function deleteNodesAction(
     for (const { name, node } of foundNodes) {
       // Check if node has an active or pending VM
       const hasActiveVM = node.vms?.data?.some((vm) =>
-        activeOrPendingVMStatuses.includes(vm.status)
+        activeOrPendingVMStatuses.includes(vm.status),
       );
 
       if (hasActiveVM) {
@@ -128,17 +126,17 @@ async function deleteNodesAction(
       // Print nodes with active or pending VMs
       if (activeVMNodes.length > 0) {
         console.log(
-          red(
-            `Cannot delete ${activeVMNodes.length === 1 ? "this" : "these"} ${
-              pluralizeNodes(activeVMNodes.length)
-            } with active or pending VMs:`,
+          chalk.red(
+            `Cannot delete ${activeVMNodes.length === 1 ? "this" : "these"} ${pluralizeNodes(
+              activeVMNodes.length,
+            )} with active or pending VMs:`,
           ),
         );
         for (const { name } of activeVMNodes) {
           console.log(`  • ${name}`);
         }
         console.log(
-          brightRed(
+          chalk.redBright(
             "\nNodes cannot be deleted while they have an active or pending VM.\n",
           ),
         );
@@ -147,22 +145,22 @@ async function deleteNodesAction(
       // Print non-released auto-reserved nodes
       if (unreleasedAutoNodes.length > 0) {
         console.log(
-          red(
+          chalk.red(
             `Cannot delete ${
               unreleasedAutoNodes.length === 1 ? "this" : "these"
-            } ${
-              pluralizeNodes(unreleasedAutoNodes.length)
-            } non-released auto-reserved nodes:`,
+            } ${pluralizeNodes(
+              unreleasedAutoNodes.length,
+            )} non-released auto-reserved nodes:`,
           ),
         );
         for (const { name } of unreleasedAutoNodes) {
           console.log(`  • ${name}`);
         }
         console.log(
-          brightRed(
-            `\nRelease the ${
-              pluralizeNodes(unreleasedAutoNodes.length)
-            } first with: sf nodes release <node-names...>\n`,
+          chalk.redBright(
+            `\nRelease the ${pluralizeNodes(
+              unreleasedAutoNodes.length,
+            )} first with: sf nodes release <node-names...>\n`,
           ),
         );
       }
@@ -177,11 +175,7 @@ async function deleteNodesAction(
 
     if (options.dryRun) {
       if (options.json) {
-        console.log(JSON.stringify(
-          nodesToDelete,
-          null,
-          2,
-        ));
+        console.log(JSON.stringify(nodesToDelete, null, 2));
         process.exit(0);
       }
 
@@ -190,10 +184,10 @@ async function deleteNodesAction(
       if (nodesToDelete.length > 0) {
         console.log(createNodesTable(nodesToDelete));
         console.log(
-          gray(
-            `\nWould delete ${nodesToDelete.length} ${
-              pluralizeNodes(nodesToDelete.length)
-            }.`,
+          chalk.gray(
+            `\nWould delete ${nodesToDelete.length} ${pluralizeNodes(
+              nodesToDelete.length,
+            )}.`,
           ),
         );
       }
@@ -205,16 +199,16 @@ async function deleteNodesAction(
     if (!options.yes) {
       if (nodesToDelete.length > 0) {
         console.log(
-          `The following ${
-            pluralizeNodes(nodesToDelete.length)
-          } will be permanently deleted:`,
+          `The following ${pluralizeNodes(
+            nodesToDelete.length,
+          )} will be permanently deleted:`,
         );
         console.log(createNodesTable(nodesToDelete));
       }
 
       if (nodesToDelete.length > 0) {
         console.log(
-          brightRed(
+          chalk.redBright(
             `\nWarning: ${
               nodesToDelete.length === 1 ? "This node" : "These nodes"
             } will be permanently deleted and cannot be recovered.\n`,
@@ -223,9 +217,9 @@ async function deleteNodesAction(
       }
 
       const confirmed = await confirm({
-        message: `Delete ${nodesToDelete.length} ${
-          pluralizeNodes(nodesToDelete.length)
-        }? This action cannot be undone.`,
+        message: `Delete ${nodesToDelete.length} ${pluralizeNodes(
+          nodesToDelete.length,
+        )}? This action cannot be undone.`,
         default: false,
       });
       if (!confirmed) {
@@ -235,11 +229,10 @@ async function deleteNodesAction(
     }
 
     const deleteSpinner = ora(
-      `Deleting ${nodesToDelete.length} ${
-        pluralizeNodes(nodesToDelete.length)
-      }...`,
-    )
-      .start();
+      `Deleting ${nodesToDelete.length} ${pluralizeNodes(
+        nodesToDelete.length,
+      )}...`,
+    ).start();
 
     const results: { name: string; status: string }[] = [];
     const errors: { name: string; error: string }[] = [];
@@ -266,23 +259,19 @@ async function deleteNodesAction(
         deleteSpinner.fail("Failed to delete any nodes");
       } else {
         deleteSpinner.warn(
-          `Deleted ${results.length} ${
-            pluralizeNodes(results.length)
-          }, but ${errors.length} failed`,
+          `Deleted ${results.length} ${pluralizeNodes(
+            results.length,
+          )}, but ${errors.length} failed`,
         );
       }
-      console.error(gray("\nFailed to delete:"));
+      console.error(chalk.gray("\nFailed to delete:"));
       for (const error of errors) {
         console.error(`  • ${error.name}: ${error.error}`);
       }
     }
 
     if (options.json) {
-      console.log(JSON.stringify(
-        results,
-        null,
-        2,
-      ));
+      console.log(JSON.stringify(results, null, 2));
       process.exit(0);
     }
   } catch (err) {

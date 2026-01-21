@@ -1,36 +1,35 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import console from "node:console";
+import process from "node:process";
+import { setTimeout } from "node:timers";
+import { Command, Option } from "@commander-js/extra-typings";
+import boxen from "boxen";
+import dayjs from "dayjs";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { Command, Option } from "@commander-js/extra-typings";
-import process from "node:process";
-import console from "node:console";
-import { setTimeout } from "node:timers";
-import boxen from "npm:boxen@8.0.1";
-import dayjs from "dayjs";
-import { pluralizeNodes } from "../nodes/utils.ts";
-
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { roundDateUpToNextMinute } from "../../helpers/units.ts";
 
+import type { components } from "../../schema.ts";
+import { getQuote } from "../buy/index.tsx";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-import { getQuote } from "../buy/index.tsx";
-import { components } from "../../schema.ts";
-
+import { pluralizeNodes } from "../nodes/utils.ts";
+import ConfirmationMessage from "./ConfirmationMessage.tsx";
+import ProcurementDisplay from "./ProcurementDisplay.tsx";
 import {
   acceleratorsToNodes,
   type ColocationStrategyName,
   DEFAULT_LIMIT_PRICE_MULTIPLIER,
   DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS,
   MIN_CONTRACT_MINUTES,
+  type Procurement,
   parseAccelerators,
   parseHorizonArg,
   parsePriceArg,
-  type Procurement,
 } from "./utils.ts";
-import { roundDateUpToNextMinute } from "../../helpers/units.ts";
-import ProcurementDisplay from "./ProcurementDisplay.tsx";
-import ConfirmationMessage from "./ConfirmationMessage.tsx";
 
 type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
 
@@ -50,15 +49,15 @@ function ScaleWarning(props: CreateProcurementCommandProps) {
     equivalentCommand += ` -p ${pricePerNodeHour.toFixed(2)}`;
   }
   if (props.yes) {
-    equivalentCommand += ` -y`;
+    equivalentCommand += " -y";
   }
 
   const warningMessage = boxen(
     `\x1b[31mWe're deprecating \x1b[97msf scale\x1b[31m.\x1b[0m
 \x1b[31mCreate auto reserved nodes using \x1b[97msf nodes\x1b[31m instead:\x1b[0m \x1b[97m${equivalentCommand}\x1b[0m
-\x1b[31mThe above command creates ${nodesRequired} self-extending ${
-      pluralizeNodes(nodesRequired)
-    } that ${
+\x1b[31mThe above command creates ${nodesRequired} self-extending ${pluralizeNodes(
+      nodesRequired,
+    )} that ${
       nodesRequired === 1 ? "maintains" : "maintain"
     } capacity automatically.\x1b[0m`,
     {
@@ -116,7 +115,7 @@ function useCreateProcurement() {
         setIsLoading(false);
       }
     },
-    [setIsLoading, setResult, setError],
+    [],
   );
 
   return {
@@ -134,16 +133,13 @@ type CreateProcurementCommandProps = ReturnType<typeof create.opts> & {
 function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const { exit } = useApp();
   const clusterName = props.zone || props.cluster;
-  const isVM = props.type?.endsWith("v") ||
-    props.zoneInfo?.delivery_type === "VM";
+  const isVM =
+    props.type?.endsWith("v") || props.zoneInfo?.delivery_type === "VM";
   const [scaleWarningState, setScaleWarningState] = useState<
     "prompt" | "accepted" | "dismissed" | "not_applicable"
-  >(
-    isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable",
-  );
-  const [confirmationMessage, setConfirmationMessage] = useState<
-    React.ReactNode
-  >();
+  >(isVM ? (props.yes ? "accepted" : "prompt") : "not_applicable");
+  const [confirmationMessage, setConfirmationMessage] =
+    useState<React.ReactNode>();
 
   const nodesRequired = useMemo(
     () => acceleratorsToNodes(props.accelerators),
@@ -165,6 +161,8 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const [isQuoting, setIsQuoting] = useState(false);
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only on mount. We read props inside the effect but don't want to re-run when they change.
   useEffect(() => {
     (async function init() {
       try {
@@ -192,9 +190,10 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
             // from the market's perspective, "NOW" means at the beginning of the next minute.
             // when the order duration is very short, this can cause the rate to be computed incorrectly
             // if we implicitly assume it to mean `new Date()`.
-            const coercedStartTime = quote.start_at === "NOW"
-              ? roundDateUpToNextMinute(new Date())
-              : new Date(quote.start_at);
+            const coercedStartTime =
+              quote.start_at === "NOW"
+                ? roundDateUpToNextMinute(new Date())
+                : new Date(quote.start_at);
             const durationSeconds = dayjs(quote.end_at).diff(
               dayjs(coercedStartTime),
             );
@@ -243,12 +242,8 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     })();
   }, []);
 
-  const {
-    isLoading,
-    error,
-    result,
-    createProcurement,
-  } = useCreateProcurement();
+  const { isLoading, error, result, createProcurement } =
+    useCreateProcurement();
 
   useEffect(() => {
     if (error) {
@@ -258,13 +253,16 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     }
   }, [error, result, exit]);
 
-  const handleDismissScaleWarning = useCallback((submitValue: boolean) => {
-    if (!submitValue) {
-      exit();
-    } else {
-      setScaleWarningState("accepted");
-    }
-  }, [exit]);
+  const handleDismissScaleWarning = useCallback(
+    (submitValue: boolean) => {
+      if (!submitValue) {
+        exit();
+      } else {
+        setScaleWarningState("accepted");
+      }
+    },
+    [exit],
+  );
 
   const handleSubmit = (submitValue: boolean) => {
     if (!submitValue) {
@@ -328,15 +326,9 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
       <Box flexDirection="column" gap={1}>
         <ScaleWarning {...props} />
         <Text color="red">
-          Create a procurement anyway?{" "}
-          <Text color="white">
-            (y/N)
-          </Text>
+          Create a procurement anyway? <Text color="white">(y/N)</Text>
         </Text>
-        <ConfirmInput
-          isChecked={false}
-          onSubmit={handleDismissScaleWarning}
-        />
+        <ConfirmInput isChecked={false} onSubmit={handleDismissScaleWarning} />
       </Box>
     );
   }
@@ -349,10 +341,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
         {confirmationMessage}
         <Box>
           <Text>Create procurement? (y/N)</Text>
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       </Box>
     );
@@ -360,17 +349,16 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
 
   // Show confirmation for non-VM procurements (h100i, etc.)
   if (
-    confirmationMessage && !props.yes && scaleWarningState === "not_applicable"
+    confirmationMessage &&
+    !props.yes &&
+    scaleWarningState === "not_applicable"
   ) {
     return (
       <Box flexDirection="column" gap={1}>
         {confirmationMessage}
         <Box>
           <Text>Create procurement? (y/N)</Text>
-          <ConfirmInput
-            isChecked={false}
-            onSubmit={handleSubmit}
-          />
+          <ConfirmInput isChecked={false} onSubmit={handleSubmit} />
         </Box>
       </Box>
     );
@@ -414,25 +402,22 @@ $ sf scale create -n 8 --horizon '30m'
   .addOption(
     new Option(
       "-z, --zone <zone>",
-      "Only buy on the specified zone. If provided, \`-t\`/`--type` will be ignored.",
+      "Only buy on the specified zone. If provided, `-t`/`--type` will be ignored.",
     ).implies({ colocationStrategy: "pinned" as const }),
   )
   .addOption(
     new Option(
       "-c, --cluster <cluster>",
-      "Only buy on the specified cluster (deprecated, alias for --zone). If provided, \`-t\`/`--type` will be ignored.",
+      "Only buy on the specified cluster (deprecated, alias for --zone). If provided, `-t`/`--type` will be ignored.",
     ).implies({ colocationStrategy: "pinned" as const }),
   )
   .addOption(
     new Option(
       "-s, --colocation-strategy <strategy>",
-      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
-    ).choices([
-      "anywhere",
-      "colocate",
-      "colocate-pinned",
-      "pinned",
-    ]).default("colocate-pinned"),
+      "Colocation strategy to use for the procurement. Can be one of `anywhere`, `colocate`, `colocate-pinned`, or `pinned`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.",
+    )
+      .choices(["anywhere", "colocate", "colocate-pinned", "pinned"])
+      .default("colocate-pinned"),
   )
   .option(
     "-d, --horizon <horizon>",
@@ -442,9 +427,9 @@ $ sf scale create -n 8 --horizon '30m'
   )
   .option(
     "-p, --price <price>",
-    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${
-      (DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100).toFixed(2)
-    } if we can't get a price estimate.`,
+    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${(
+      DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100
+    ).toFixed(2)} if we can't get a price estimate.`,
     parsePriceArg,
   )
   .option("-y, --yes", "Automatically confirm the command.")
@@ -464,7 +449,7 @@ $ sf scale create -n 8 --horizon '30m'
 
     if (clusterName) {
       const api = await apiClient();
-      const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+      const { data, error, response } = await api.GET("/v0/zones/{id}", {
         params: {
           path: {
             id: clusterName,
@@ -483,10 +468,7 @@ $ sf scale create -n 8 --horizon '30m'
     }
 
     const { waitUntilExit } = render(
-      <CreateProcurementCommand
-        {...options}
-        zoneInfo={zoneInfo}
-      />,
+      <CreateProcurementCommand {...options} zoneInfo={zoneInfo} />,
     );
     await waitUntilExit();
   });

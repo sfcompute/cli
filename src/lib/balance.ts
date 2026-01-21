@@ -1,7 +1,7 @@
-import type { Command } from "@commander-js/extra-typings";
-import Table from "cli-table3";
 import * as console from "node:console";
-import { gray, green } from "jsr:@std/fmt/colors";
+import type { Command } from "@commander-js/extra-typings";
+import chalk from "chalk";
+import Table from "cli-table3";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
 import {
@@ -44,10 +44,7 @@ export function registerBalance(program: Command) {
         );
       }
 
-      const {
-        available_balance_cents,
-        current_balance_cents,
-      } = data;
+      const { available_balance_cents, current_balance_cents } = data;
 
       const availableWhole = available_balance_cents / 100;
       const availableCents = available_balance_cents;
@@ -71,20 +68,20 @@ export function registerBalance(program: Command) {
         const formattedBalance = usdFormatter.format(balanceWhole);
 
         const table = new Table({
-          head: [gray("Type"), gray("Amount"), gray("Cents")],
+          head: [chalk.gray("Type"), chalk.gray("Amount"), chalk.gray("Cents")],
           colWidths: [15, 15, 35],
         });
 
         table.push(
           [
             "Available",
-            green(formattedAvailable),
-            green(availableCents.toLocaleString()),
+            chalk.green(formattedAvailable),
+            chalk.green(availableCents.toLocaleString()),
           ],
           [
             "Balance",
-            gray(formattedBalance),
-            gray(balanceCents.toLocaleString()),
+            chalk.gray(formattedBalance),
+            chalk.gray(balanceCents.toLocaleString()),
           ],
         );
 

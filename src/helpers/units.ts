@@ -1,9 +1,9 @@
+import { select } from "@inquirer/prompts";
+import chalk from "chalk";
 import * as chrono from "chrono-node";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { select } from "@inquirer/prompts";
-import { gray } from "jsr:@std/fmt/colors";
+import utc from "dayjs/plugin/utc";
 import type { Nullable } from "../types/empty.ts";
 import { dateSameAcrossTimezones, formatDate } from "./format-date.ts";
 
@@ -39,9 +39,8 @@ export function computeApproximateDurationSeconds(
   startDate: Date | "NOW",
   endDate: Date,
 ): number {
-  const startEpoch = startDate === "NOW"
-    ? currentEpoch()
-    : dateToEpoch(startDate);
+  const startEpoch =
+    startDate === "NOW" ? currentEpoch() : dateToEpoch(startDate);
   const endEpoch = dateToEpoch(endDate);
   return dayjs(epochToDate(endEpoch)).diff(dayjs(epochToDate(startEpoch)), "s");
 }
@@ -91,7 +90,7 @@ export function priceWholeToCents(
     return { cents: price * 100, invalid: false };
   } else if (typeof price === "string") {
     // remove any whitespace, dollar signs, negative signs, single and double quotes
-    const priceCleaned = price.replace(/[\s\$\-\'\"]/g, "");
+    const priceCleaned = price.replace(/[\s$\-'"]/g, "");
     if (priceCleaned === "") {
       return { cents: null, invalid: true };
     }
@@ -149,23 +148,21 @@ type SelectChoice<Value> = {
  */
 export async function selectTime(
   date: Date,
-  config: Omit<Parameters<typeof select>[0], "choices">,
+  config: Omit<Parameters<typeof select<Date | "NOW">>[0], "choices">,
 ): Promise<Date | "NOW"> {
   const suggestedLower = dayjs(date).startOf("hour");
   const suggestedHigher = dayjs(date).startOf("hour").add(1, "hour");
 
   const choices: SelectChoice<Date | "NOW">[] = [];
 
-  const suggestedHigherUserTZ = `${
-    formatDate(suggestedHigher.toDate(), { forceIncludeTime: true })
-  } ${dayjs(suggestedHigher).format("z")}`;
-  const suggestedHigherUTC = `${
-    formatDate(suggestedHigher.utc(true).toDate(), {
-      today: suggestedHigher.toDate(),
-      showToday: dateSameAcrossTimezones(suggestedHigher.toDate()),
-      forceIncludeTime: true,
-    })
-  } UTC`;
+  const suggestedHigherUserTZ = `${formatDate(suggestedHigher.toDate(), {
+    forceIncludeTime: true,
+  })} ${dayjs(suggestedHigher).format("z")}`;
+  const suggestedHigherUTC = `${formatDate(suggestedHigher.utc(true).toDate(), {
+    today: suggestedHigher.toDate(),
+    showToday: dateSameAcrossTimezones(suggestedHigher.toDate()),
+    forceIncludeTime: true,
+  })} UTC`;
 
   // If the lower boundary is in the past, suggest "NOW"
   if (suggestedLower.isBefore(dayjs(new Date()))) {
@@ -176,33 +173,30 @@ export async function selectTime(
     );
 
     choices.push({
-      name: `${immediatelyText.padEnd(maxLength)} ${
-        gray(
-          `${
-            formatDate(new Date(), { forceIncludeTime: true, showToday: false })
-          } ${dayjs(new Date()).format("z")}`,
-        )
-      }`,
+      name: `${immediatelyText.padEnd(maxLength)} ${chalk.gray(
+        `${formatDate(new Date(), {
+          forceIncludeTime: true,
+          showToday: false,
+        })} ${dayjs(new Date()).format("z")}`,
+      )}`,
       value: "NOW",
     });
 
     choices.push({
-      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${
-        gray(`${suggestedHigherUTC}`)
-      }`,
+      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${chalk.gray(
+        `${suggestedHigherUTC}`,
+      )}`,
       value: suggestedHigher.toDate(),
     });
   } else {
-    const suggestedLowerUserTZ = `${
-      formatDate(suggestedLower.toDate(), { forceIncludeTime: true })
-    } ${dayjs(suggestedLower).format("z")}`;
-    const suggestedLowerUTC = `${
-      formatDate(suggestedLower.utc(true).toDate(), {
-        today: suggestedLower.toDate(),
-        showToday: dateSameAcrossTimezones(suggestedLower.toDate()),
-        forceIncludeTime: true,
-      })
-    } UTC`;
+    const suggestedLowerUserTZ = `${formatDate(suggestedLower.toDate(), {
+      forceIncludeTime: true,
+    })} ${dayjs(suggestedLower).format("z")}`;
+    const suggestedLowerUTC = `${formatDate(suggestedLower.utc(true).toDate(), {
+      today: suggestedLower.toDate(),
+      showToday: dateSameAcrossTimezones(suggestedLower.toDate()),
+      forceIncludeTime: true,
+    })} UTC`;
 
     const maxLength = Math.max(
       suggestedLowerUserTZ.length,
@@ -210,16 +204,16 @@ export async function selectTime(
     );
 
     choices.push({
-      name: `${suggestedLowerUserTZ.padEnd(maxLength)} ${
-        gray(`${suggestedLowerUTC}`)
-      }`,
+      name: `${suggestedLowerUserTZ.padEnd(maxLength)} ${chalk.gray(
+        `${suggestedLowerUTC}`,
+      )}`,
       value: suggestedLower.toDate(),
     });
 
     choices.push({
-      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${
-        gray(`${suggestedHigherUTC}`)
-      }`,
+      name: `${suggestedHigherUserTZ.padEnd(maxLength)} ${chalk.gray(
+        `${suggestedHigherUTC}`,
+      )}`,
       value: suggestedHigher.toDate(),
     });
   }

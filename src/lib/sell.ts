@@ -62,8 +62,7 @@ export function registerSell(program: Command) {
       }
 
       if (options.accelerators % GPUS_PER_NODE !== 0) {
-        const exampleCommand =
-          `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
+        const exampleCommand = `sf sell -n ${GPUS_PER_NODE} -c ${options.contractId}`;
         return logAndQuit(
           `At the moment, only entire-nodes are available, so you must have a multiple of ${GPUS_PER_NODE} GPUs. Example command:\n\n${exampleCommand}`,
         );
@@ -119,9 +118,8 @@ export function registerSell(program: Command) {
         quantity: forceAsNumber(options.accelerators) / GPUS_PER_NODE,
         price: totalPrice,
         contract_id: options.contractId,
-        start_at: roundedStartDate === "NOW"
-          ? "NOW"
-          : roundedStartDate.toISOString(),
+        start_at:
+          roundedStartDate === "NOW" ? "NOW" : roundedStartDate.toISOString(),
         end_at: endDate.toISOString(),
       };
 
@@ -134,13 +132,11 @@ export function registerSell(program: Command) {
         switch (response.status) {
           case 400:
             return logAndQuit(
-              `Bad Request: ${error?.message}: ${
-                JSON.stringify(
-                  error?.details,
-                  null,
-                  2,
-                )
-              }`,
+              `Bad Request: ${error?.message}: ${JSON.stringify(
+                error?.details,
+                null,
+                2,
+              )}`,
             );
           // return logAndQuit(`Bad Request: ${error?.message}`);
           case 401:

@@ -1,6 +1,7 @@
-import type { Command } from "@commander-js/extra-typings";
+import { spawn } from "node:child_process";
 import * as console from "node:console";
 import process from "node:process";
+import type { Command } from "@commander-js/extra-typings";
 import ora from "ora";
 
 /**
@@ -16,8 +17,9 @@ const getIsOnLatestVersion = async (currentVersion: string | undefined) => {
   const latestVersionResponse = await fetch(latestVersionUrl);
 
   if (latestVersionResponse.ok) {
-    const latestVersionData = await latestVersionResponse.json();
-    // @ts-ignore: Deno has narrower types for fetch responses, but we know this code works atm.
+    const latestVersionData = (await latestVersionResponse.json()) as {
+      tag_name: string;
+    };
     const latestVersion = latestVersionData.tag_name;
 
     return latestVersion === currentVersion;
@@ -37,8 +39,7 @@ export function registerUpgrade(program: Command) {
 
       if (version) {
         spinner.start(`Checking if version ${version} exists`);
-        const url =
-          `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
+        const url = `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
         const response = await fetch(url, { method: "HEAD" });
 
         if (response.status === 404) {
@@ -72,24 +73,36 @@ export function registerUpgrade(program: Command) {
 
       // Execute the script with bash
       spinner.start("Installing upgrade");
-      const command = new Deno.Command("bash", {
-        stdin: "piped",
-        stdout: "piped",
-        stderr: "piped",
-        env: version ? { SF_CLI_VERSION: version } : undefined,
+
+      const bashProcess = spawn("bash", [], {
+        stdio: ["pipe", "pipe", "pipe"],
+        env: version
+          ? { ...process.env, SF_CLI_VERSION: version }
+          : process.env,
       });
 
-      const bashProcess = command.spawn();
-      const stdinWriter = bashProcess.stdin.getWriter();
-      await stdinWriter.write(new TextEncoder().encode(script));
-      stdinWriter.close();
+      let stdout = "";
+      let stderr = "";
 
-      const { code, stdout, stderr } = await bashProcess.output();
+      bashProcess.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      bashProcess.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      bashProcess.stdin.write(script);
+      bashProcess.stdin.end();
+
+      const code = await new Promise<number | null>((resolve) => {
+        bashProcess.on("close", resolve);
+      });
 
       if (code !== 0) {
         spinner.fail("Upgrade failed");
-        console.error(new TextDecoder().decode(stderr));
-        console.log(new TextDecoder().decode(stdout));
+        console.error(stderr);
+        console.log(stdout);
         process.exit(1);
       }
 

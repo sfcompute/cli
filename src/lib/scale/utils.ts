@@ -1,15 +1,13 @@
 import parseDuration from "parse-duration";
 
+import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { dollarsToCents } from "../../helpers/units.ts";
-import { apiClient } from "../../apiClient.ts";
 import type { paths } from "../../schema.ts";
 
 import { GPUS_PER_NODE } from "../constants.ts";
 export type Procurement =
-  paths["/v0/procurements"]["get"]["responses"]["200"]["content"][
-    "application/json"
-  ]["data"][number];
+  paths["/v0/procurements"]["get"]["responses"]["200"]["content"]["application/json"]["data"][number];
 export type ColocationStrategyName = Procurement["colocation_strategy"]["type"];
 
 export const DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS = 265 as const; // Example default price
@@ -42,13 +40,13 @@ export function parseHorizonArg(horizon: string) {
     logAndQuit(`Failed to parse horizon: ${horizon}`);
   }
   if (parsedHorizon < 1) {
-    logAndQuit(`Minimum horizon is 1 minute`);
+    logAndQuit("Minimum horizon is 1 minute");
   }
   return Math.ceil(parsedHorizon);
 }
 
 export function parseAccelerators(accelerators: string) {
-  const parsedAccelerators = Number.parseInt(accelerators);
+  const parsedAccelerators = Number.parseInt(accelerators, 10);
   if (parsedAccelerators % GPUS_PER_NODE !== 0) {
     logAndQuit(`Only multiples of ${GPUS_PER_NODE} GPUs are allowed.`);
   }
@@ -60,20 +58,14 @@ export function acceleratorsToNodes(accelerators: number) {
   return Math.floor(accelerators / GPUS_PER_NODE);
 }
 
-export async function getProcurement({
-  id,
-}: {
-  id: string;
-}) {
+export async function getProcurement({ id }: { id: string }) {
   const client = await apiClient();
   const res = await client.GET("/v0/procurements/{id}", {
     params: { path: { id: id } },
   });
 
   if (!res.response.ok) {
-    throw new Error(
-      res.error?.message || "Failed to get procurement",
-    );
+    throw new Error(res.error?.message || "Failed to get procurement");
   }
 
   return res.data ?? null;

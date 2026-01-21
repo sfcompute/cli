@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
+import { setTimeout } from "node:timers";
+import { Command } from "@commander-js/extra-typings";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { Command } from "@commander-js/extra-typings";
-import { setTimeout } from "node:timers";
+import { useEffect, useState } from "react";
 
 import { apiClient } from "../../apiClient.ts";
 
-import { getProcurement, parseIds, type Procurement } from "./utils.ts";
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
+import { getProcurement, type Procurement, parseIds } from "./utils.ts";
 
 async function listProcurements() {
   const client = await apiClient();
   const procurements: Procurement[] = [];
   let hasMore = true;
   while (hasMore) {
-    const { response, data: listObject, error } = await client.GET(
-      "/v0/procurements",
-      {
-        query: {
-          limit: 100,
-          offset: procurements.length,
-        },
+    const {
+      response,
+      data: listObject,
+      error,
+    } = await client.GET("/v0/procurements", {
+      query: {
+        limit: 100,
+        offset: procurements.length,
       },
-    );
+    });
 
     if (!response.ok) {
       throw new Error(error?.message || "Failed to list procurements");
@@ -45,6 +46,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   >([]);
   const { exit } = useApp();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only when props change. We call exit() inside but don't want it as a dependency to avoid re-running on exit changes.
   useEffect(() => {
     async function fetchInfo() {
       try {
@@ -59,20 +61,21 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 
           const failed: { id: string; message: string }[] = [];
 
-          settled.forEach((result, idx) => {
+          for (const [idx, result] of settled.entries()) {
             if (result.status === "fulfilled" && result.value !== null) {
               fetchedProcurements.push(result.value);
             } else {
               failed.push({
                 id: ids[idx],
-                message: result.status === "rejected"
-                  ? (result.reason instanceof Error
-                    ? result.reason.message
-                    : String(result.reason))
-                  : "Unknown error",
+                message:
+                  result.status === "rejected"
+                    ? result.reason instanceof Error
+                      ? result.reason.message
+                      : String(result.reason)
+                    : "Unknown error",
               });
             }
-          });
+          }
 
           setFailedFetches(failed);
         } else {
@@ -95,7 +98,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
       }
     }
     fetchInfo();
-  }, [props.type, props.ids, exit]);
+  }, [props]);
 
   if (isLoading) {
     return (
