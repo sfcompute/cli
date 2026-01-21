@@ -15,8 +15,5 @@ export default defineConfig({
   },
   esbuildOptions(options) {
     options.bundle = true;
-    options.alias = {
-      "react-devtools-core": "./src/stubs/react-devtools-core.ts",
-    };
   },
 });
