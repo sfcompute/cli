@@ -62,7 +62,7 @@ const upload = new Command("upload")
     "Number of parts to upload concurrently",
     (value) => {
       const parsed = Number.parseInt(value, 10);
-      if (isNaN(parsed) || parsed < 1) {
+      if (Number.isNaN(parsed) || parsed < 1) {
         throw new Error("Concurrency must be a positive integer");
       }
       return parsed;
@@ -94,9 +94,9 @@ const upload = new Command("upload")
 
       const imageId = startResponse.data.image_id;
       preparingSpinner.succeed(
-        `Started upload for image ${chalk.cyan(name)} (${
-          chalk.blackBright(imageId)
-        })`,
+        `Started upload for image ${chalk.cyan(name)} (${chalk.blackBright(
+          imageId,
+        )})`,
       );
 
       // Get file info and open as stream
@@ -107,11 +107,9 @@ const upload = new Command("upload")
       const maxFileSize = 128 * 1024 * 1024 * 1024; // 128 GiB in bytes
       if (fileSize > maxFileSize) {
         logAndQuit(
-          `File size exceeds maximum allowed size of 128 GiB. File size: ${
-            (
-              fileSize / (1024 * 1024 * 1024)
-            ).toFixed(2)
-          } GiB`,
+          `File size exceeds maximum allowed size of 128 GiB. File size: ${(
+            fileSize / (1024 * 1024 * 1024)
+          ).toFixed(2)} GiB`,
         );
       }
 
@@ -122,9 +120,10 @@ const upload = new Command("upload")
 
       // For files smaller than default chunk, use the whole file as one part
       // Otherwise use default chunk size, but ensure we don't exceed maxParts
-      const chunkSize = fileSize <= defaultChunk
-        ? Math.max(fileSize, minChunk)
-        : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
+      const chunkSize =
+        fileSize <= defaultChunk
+          ? Math.max(fileSize, minChunk)
+          : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
 
       const totalParts = Math.ceil(fileSize / chunkSize);
 
@@ -162,7 +161,7 @@ const upload = new Command("upload")
 
       progressBar = new cliProgress.SingleBar({
         format:
-          `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
+          "{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}",
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
         hideCursor: true,
@@ -366,7 +365,7 @@ const upload = new Command("upload")
       });
       progressBar.stop();
 
-      finalizingSpinner = ora(`Validating upload...`).start();
+      finalizingSpinner = ora("Validating upload...").start();
       // Calculate SHA256 hash for integrity verification using streaming
       const hash = crypto.createHash("sha256");
 
@@ -396,7 +395,7 @@ const upload = new Command("upload")
         );
       }
 
-      finalizingSpinner.succeed(`Image uploaded and verified`);
+      finalizingSpinner.succeed("Image uploaded and verified");
 
       const object = completeResponse.data;
       console.log(chalk.gray("\nNext steps:"));

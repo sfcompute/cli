@@ -84,13 +84,13 @@ ${boxen(
         equivalentCommand += ` -p ${options.price}`;
       }
       if (options.yes) {
-        equivalentCommand += ` -y`;
+        equivalentCommand += " -y";
       }
       if (options.quote) {
-        equivalentCommand += ` -q`;
+        equivalentCommand += " -q";
       }
       if (options.standing) {
-        equivalentCommand += ` --standing`;
+        equivalentCommand += " --standing";
       }
 
       console.error(

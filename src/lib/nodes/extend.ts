@@ -117,7 +117,7 @@ async function extendNodeAction(
       }
       console.log(
         chalk.redBright(
-          `\nTo configure auto reserved nodes, use the \`sf nodes set\` command.`,
+          "\nTo configure auto reserved nodes, use the `sf nodes set` command.",
         ),
       );
     }

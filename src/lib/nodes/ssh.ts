@@ -32,7 +32,7 @@ Standard \`ssh\` behavior applies (e.g. defaults to your current username).`)
   .addOption(jsonOption)
   .argument(
     "<destination>",
-    "Node name, Node ID, or VM ID to SSH into.\nFollows \`ssh\` behavior (i.e. root@node or jenson@node).",
+    "Node name, Node ID, or VM ID to SSH into.\nFollows `ssh` behavior (i.e. root@node or jenson@node).",
   )
   .usage("[options] [user@]<destination>")
   .allowExcessArguments(false)

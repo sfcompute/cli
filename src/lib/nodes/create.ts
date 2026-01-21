@@ -59,7 +59,7 @@ function formatNodeDescription(
  */
 function validateCount(val: string): number {
   const parsed = Number.parseInt(val, 10);
-  if (isNaN(parsed) || parsed <= 0) {
+  if (Number.isNaN(parsed) || parsed <= 0) {
     throw new CommanderError(
       1,
       "INVALID_COUNT",
@@ -424,7 +424,7 @@ async function createNodesAction(
         if (options.zone) {
           confirmationMessage += ` on ${chalk.cyan(options.zone)}`;
         } else {
-          confirmationMessage += ` on any matching zone`;
+          confirmationMessage += " on any matching zone";
         }
       }
 
@@ -463,7 +463,7 @@ async function createNodesAction(
         console.log(chalk.gray("\nCreated nodes:"));
         console.log(createNodesTable(createdNodes));
         console.log(`\n${chalk.gray("Next steps:")}`);
-        console.log(`  sf nodes list`);
+        console.log("  sf nodes list");
         // Auto Reserved nodes can't be extended, so only suggest it for reserved nodes
         if (isReserved) {
           console.log(

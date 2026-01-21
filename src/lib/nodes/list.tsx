@@ -454,7 +454,7 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
 
       {node.vms?.data && node.vms.data.length > 1 && (
         <Box flexDirection="column" gap={0} marginLeft={1} marginRight={2}>
-          <Box marginTop={1} paddingX={1}></Box>
+          <Box marginTop={1} paddingX={1} />
           <VMTable vms={node.vms.data} />
         </Box>
       )}
@@ -506,12 +506,10 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
           </Box>
           <Box marginLeft={2} flexDirection="column" paddingX={1}>
             {node.node_type === "autoreserved" && (
-              <>
-                <Row
-                  head="Max Price: "
-                  value={`$${pricePerHour.toFixed(2)}/hour`}
-                />
-              </>
+              <Row
+                head="Max Price: "
+                value={`$${pricePerHour.toFixed(2)}/hour`}
+              />
             )}
             {node.node_type !== "autoreserved" && (
               <>

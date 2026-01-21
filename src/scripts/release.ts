@@ -19,7 +19,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    )
+    ),
   );
   switch (type) {
     case "major":
@@ -176,14 +176,12 @@ program
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices(
-      [
-        "major",
-        "minor",
-        "patch",
-        "prerelease",
-      ] as const,
-    ),
+    new Argument("type").choices([
+      "major",
+      "minor",
+      "patch",
+      "prerelease",
+    ] as const),
   )
   .action(async (type) => {
     try {

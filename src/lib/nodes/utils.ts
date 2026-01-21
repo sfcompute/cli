@@ -35,7 +35,6 @@ export function getStatusColor(status: SFCNodes.Node["status"]): string {
       return chalk.red(statusText);
     case "deleted":
       return chalk.gray(statusText);
-    case "unknown":
     default:
       return statusText;
   }
@@ -181,7 +180,7 @@ export function pluralizeNodes(count: number) {
  */
 export function validatePrice(val: string, minimum = 0): number {
   const parsed = Number.parseFloat(val);
-  if (isNaN(parsed) || parsed <= 0) {
+  if (Number.isNaN(parsed) || parsed <= 0) {
     throw new CommanderError(
       1,
       "INVALID_PRICE",
@@ -207,7 +206,7 @@ export function validatePrice(val: string, minimum = 0): number {
  */
 export function validateDuration(val: string, minimum = 3600): number {
   const parsed = Number.parseInt(val, 10);
-  if (isNaN(parsed)) {
+  if (Number.isNaN(parsed)) {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
@@ -245,7 +244,7 @@ export function parseDuration(duration: string): number {
     throw new CommanderError(
       1,
       "INVALID_DURATION",
-      `Duration must be at least 1 hour`,
+      "Duration must be at least 1 hour",
     );
   }
   return parsed;

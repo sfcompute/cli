@@ -64,7 +64,7 @@ export function registerSell(program: Command) {
       }
 
       const size = parseAccelerators(options.accelerators);
-      if (isNaN(size) || size <= 0) {
+      if (Number.isNaN(size) || size <= 0) {
         return logAndQuit(
           `Invalid number of accelerators: ${options.accelerators}`,
         );
@@ -212,7 +212,7 @@ function SellOrder(props: {
           return;
         }
 
-        const o = await getOrder(order!.id);
+        const o = await getOrder(order?.id);
         setOrder(o);
         if (o) {
           setTimeout(exit, 0);
@@ -359,7 +359,7 @@ export async function placeSellOrder(options: {
     realDurationHours,
   );
   invariant(
-    totalPrice == Math.ceil(totalPrice),
+    totalPrice === Math.ceil(totalPrice),
     "totalPrice must be a whole number",
   );
 

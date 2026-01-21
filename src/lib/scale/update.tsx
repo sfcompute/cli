@@ -323,10 +323,9 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
             ))}
           </Box>
         )}
-        {successfulProcurements &&
-          successfulProcurements.map((s, i) => (
-            <ProcurementDisplay key={i} procurement={s} />
-          ))}
+        {successfulProcurements?.map((s, i) => (
+          <ProcurementDisplay key={i} procurement={s} />
+        ))}
       </Box>
     );
   }

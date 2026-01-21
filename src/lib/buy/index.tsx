@@ -288,7 +288,7 @@ export function QuoteAndBuy(props: { options: SfBuyOptions }) {
 
       if (cluster) {
         const api = await apiClient();
-        const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+        const { data, error, response } = await api.GET("/v0/zones/{id}", {
           params: {
             path: {
               id: cluster,
@@ -480,7 +480,7 @@ function VMWarning(props: BuyOrderProps) {
   }
   equivalentCommand += ` -d ${realDurationString}`;
   if (props.yes) {
-    equivalentCommand += ` -y`;
+    equivalentCommand += " -y";
   }
   if (props.cluster) {
     equivalentCommand += ` -z ${props.cluster}`;

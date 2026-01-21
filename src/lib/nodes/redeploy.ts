@@ -136,7 +136,7 @@ async function redeployNodeAction(
       for (const { name } of nonRedeployableNodes) {
         console.log(`  • ${name}`);
       }
-      console.log(chalk.redBright(`\nOnly running nodes can be redeployed.\n`));
+      console.log(chalk.redBright("\nOnly running nodes can be redeployed.\n"));
     }
 
     if (redeployableNodes.length === 0) {
@@ -172,11 +172,11 @@ async function redeployNodeAction(
         configChanges.push(`  • New image: ${options.image}`);
       }
       if (encodedUserData) {
-        configChanges.push(`  • Updated cloud-init user data`);
+        configChanges.push("  • Updated cloud-init user data");
       }
       if (options.overrideEmpty) {
         configChanges.push(
-          `  • Clear any unspecified configuration (override empty)`,
+          "  • Clear any unspecified configuration (override empty)",
         );
       }
 

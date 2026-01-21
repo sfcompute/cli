@@ -226,7 +226,7 @@ async function listTokensAction() {
     // prompt user that they can generate one
     console.log(
       `${chalk.gray("Generate your first token with: ")}${chalk.magenta(
-        `sf tokens create`,
+        "sf tokens create",
       )}`,
     );
 

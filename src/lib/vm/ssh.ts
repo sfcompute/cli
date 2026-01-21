@@ -28,10 +28,10 @@ export function registerSsh(program: Command) {
       const splitDestination = destination.split("@");
       let vmId: string;
       let sshUsername: string | undefined;
-      if (splitDestination.length == 1) {
+      if (splitDestination.length === 1) {
         sshUsername = undefined;
         vmId = splitDestination[0];
-      } else if (splitDestination.length == 2) {
+      } else if (splitDestination.length === 2) {
         sshUsername = splitDestination[0];
         vmId = splitDestination[1];
       } else {

@@ -122,11 +122,8 @@ async function main() {
           const key = arg.slice(2);
           const nextArg = arr[i + 1];
           if (nextArg && !nextArg.startsWith("-")) {
-            (acc as Record<string, string | number | boolean>)[key] = isNaN(
-              Number(nextArg),
-            )
-              ? nextArg
-              : Number(nextArg);
+            (acc as Record<string, string | number | boolean>)[key] =
+              Number.isNaN(Number(nextArg)) ? nextArg : Number(nextArg);
           } else {
             (acc as Record<string, boolean>)[key] = true;
           }

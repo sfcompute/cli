@@ -40,7 +40,7 @@ export function parseHorizonArg(horizon: string) {
     logAndQuit(`Failed to parse horizon: ${horizon}`);
   }
   if (parsedHorizon < 1) {
-    logAndQuit(`Minimum horizon is 1 minute`);
+    logAndQuit("Minimum horizon is 1 minute");
   }
   return Math.ceil(parsedHorizon);
 }

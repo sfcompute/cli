@@ -51,7 +51,7 @@ function ScaleWarning(props: CreateProcurementCommandProps) {
     equivalentCommand += ` -p ${pricePerNodeHour.toFixed(2)}`;
   }
   if (props.yes) {
-    equivalentCommand += ` -y`;
+    equivalentCommand += " -y";
   }
 
   const warningMessage = boxen(
@@ -414,7 +414,7 @@ $ sf scale create -n 8 --horizon '30m'
   .addOption(
     new Option(
       "-s, --colocation-strategy <strategy>",
-      `Colocation strategy to use for the procurement. Can be one of \`anywhere\`, \`colocate\`, \`colocate-pinned\`, or \`pinned\`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.`,
+      "Colocation strategy to use for the procurement. Can be one of `anywhere`, `colocate`, `colocate-pinned`, or `pinned`. See https://docs.sfcompute.com/docs/on-demand-and-spot#colocation-behavior for more information.",
     )
       .choices(["anywhere", "colocate", "colocate-pinned", "pinned"])
       .default("colocate-pinned"),
@@ -449,7 +449,7 @@ $ sf scale create -n 8 --horizon '30m'
 
     if (clusterName) {
       const api = await apiClient();
-      const { data, error, response } = await api.GET(`/v0/zones/{id}`, {
+      const { data, error, response } = await api.GET("/v0/zones/{id}", {
         params: {
           path: {
             id: clusterName,
