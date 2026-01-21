@@ -94,7 +94,9 @@ const upload = new Command("upload")
 
       const imageId = startResponse.data.image_id;
       preparingSpinner.succeed(
-        `Started upload for image ${chalk.cyan(name)} (${chalk.blackBright(imageId)})`,
+        `Started upload for image ${chalk.cyan(name)} (${
+          chalk.blackBright(imageId)
+        })`,
       );
 
       // Get file info and open as stream
@@ -105,9 +107,11 @@ const upload = new Command("upload")
       const maxFileSize = 128 * 1024 * 1024 * 1024; // 128 GiB in bytes
       if (fileSize > maxFileSize) {
         logAndQuit(
-          `File size exceeds maximum allowed size of 128 GiB. File size: ${(
-            fileSize / (1024 * 1024 * 1024)
-          ).toFixed(2)} GiB`,
+          `File size exceeds maximum allowed size of 128 GiB. File size: ${
+            (
+              fileSize / (1024 * 1024 * 1024)
+            ).toFixed(2)
+          } GiB`,
         );
       }
 
@@ -118,10 +122,9 @@ const upload = new Command("upload")
 
       // For files smaller than default chunk, use the whole file as one part
       // Otherwise use default chunk size, but ensure we don't exceed maxParts
-      const chunkSize =
-        fileSize <= defaultChunk
-          ? Math.max(fileSize, minChunk)
-          : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
+      const chunkSize = fileSize <= defaultChunk
+        ? Math.max(fileSize, minChunk)
+        : Math.max(minChunk, Math.ceil(fileSize / maxParts), defaultChunk);
 
       const totalParts = Math.ceil(fileSize / chunkSize);
 
@@ -158,7 +161,8 @@ const upload = new Command("upload")
       let spinnerIndex = 0;
 
       progressBar = new cliProgress.SingleBar({
-        format: `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
+        format:
+          `{spinner} Uploading [{bar}] {percentage}% | {uploadedMB}/{totalMB} MB | {speed}`,
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
         hideCursor: true,
@@ -296,7 +300,7 @@ const upload = new Command("upload")
               headers: {
                 "Content-Type": "application/octet-stream",
               },
-              body: payload as unknown as BodyInit,
+              body: payload as BodyInit,
             });
 
             if (!res.ok) {
@@ -426,7 +430,9 @@ const upload = new Command("upload")
         );
       } else {
         console.error(
-          `\n${chalk.red("✗")} ${err instanceof Error ? err.message : String(err)}`,
+          `\n${chalk.red("✗")} ${
+            err instanceof Error ? err.message : String(err)
+          }`,
         );
       }
       process.exit(1);
