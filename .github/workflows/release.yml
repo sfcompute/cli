@@ -16,7 +16,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     # Only run this workflow on main branch
     if: github.ref == 'refs/heads/main'
     permissions:
