@@ -60,6 +60,7 @@ test("price whole to cents", () => {
 
   const invalidPrices = [null, undefined, [], {}];
   for (const input of invalidPrices) {
+    // biome-ignore lint/suspicious/noExplicitAny: these are invalid inputs and will not typecheck
     const { cents, invalid } = priceWholeToCents(input as any);
 
     expect(cents).toBeNull();
