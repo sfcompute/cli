@@ -21,7 +21,7 @@ export function registerSsh(program: Command) {
     )
     .argument(
       "<destination>",
-      "[user@]vm_id - VM ID to SSH into",
+      "[user@]vm_id - The (optional) username, and VM id to SSH into.",
     )
     .allowExcessArguments(false)
     .action(async (destination, options) => {
