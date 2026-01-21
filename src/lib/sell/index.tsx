@@ -285,13 +285,11 @@ function SellOrderPreview(props: {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-expect-error fromNow not typed
   const startFromNow = startDate.fromNow();
 
   const endDate = roundEndDate(props.endsAt);
   const end = endDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-expect-error fromNow not typed
   const endFromNow = endDate.fromNow();
 
   const realDuration = endDate.diff(startDate);
