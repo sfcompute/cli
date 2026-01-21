@@ -150,9 +150,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only on mount.
-  // We read props inside the effect but don't want to re-run when they change.
-  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only on mount. We read props inside the effect but don't want to re-run when they change.
   useEffect(() => {
     (async function onInit() {
       try {
@@ -251,7 +249,9 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
           );
         }
       } catch (err: unknown) {
-        exit(err instanceof Error ? err : new Error("An unknown error occurred"));
+        exit(
+          err instanceof Error ? err : new Error("An unknown error occurred"),
+        );
       }
     })();
   }, []);

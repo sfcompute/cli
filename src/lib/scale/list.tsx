@@ -46,9 +46,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   >([]);
   const { exit } = useApp();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only when props change.
-  // We call exit() inside but don't want it as a dependency to avoid re-running on exit changes.
-  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only when props change. We call exit() inside but don't want it as a dependency to avoid re-running on exit changes.
   useEffect(() => {
     async function fetchInfo() {
       try {

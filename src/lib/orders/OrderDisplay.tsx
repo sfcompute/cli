@@ -361,7 +361,7 @@ export function ScrollArea({
     });
   }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dispatch is stable from useReducer and doesn't need to be in deps.
   useEffect(() => {
     dispatch({ type: "SWITCHED_TAB" });
   }, [activeTab]);

@@ -166,6 +166,7 @@ function SellOrder(props: {
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we don't want to re-create callback when props change.
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       if (submitValue === false) {
@@ -176,8 +177,6 @@ function SellOrder(props: {
 
       submitOrder();
     },
-    // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we don't want to re-create callback when props change.
-    // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
     [exit],
   );
 
@@ -195,16 +194,14 @@ function SellOrder(props: {
     setOrder(placedOrder);
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we only want to run on mount if autoConfirm is true.
-  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+  // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we only want to run on mount if autoConfirm is true. See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
   useEffect(() => {
     if (props.autoConfirm) {
       submitOrder();
     }
   }, [props.autoConfirm]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Polling interval reads current state but shouldn't restart on state changes.
-  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Polling interval reads current state but shouldn't restart on state changes. See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isLoading) {
