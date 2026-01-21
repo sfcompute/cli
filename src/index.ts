@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+// Polyfill for Intl.Segmenter to avoid segfaults in pkg builds
+// pkg uses small-icu which causes crashes when Intl.Segmenter.segment() is called
+// See: https://github.com/yao-pkg/pkg-fetch/issues/134
+
+// Use polyfill-force to always replace the native implementation
+import "@formatjs/intl-segmenter/polyfill-force.js";
 
 import * as console from "node:console";
 import os from "node:os";

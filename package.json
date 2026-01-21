@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
+    "@formatjs/intl-segmenter": "^12.1.0",
     "@inkjs/ui": "^1.0.0",
     "@inquirer/prompts": "^8.2.0",
     "@sfcompute/nodes-sdk-alpha": "0.1.0-alpha.27",
