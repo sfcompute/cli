@@ -46,10 +46,10 @@ TARGET_FILE="${TARGET_DIR}/${BINARY_NAME}"
 if [ "$OS" = "Linux" ]; then
   case "${ARCH}" in
     x86_64)
-      target='node20-linux-x64'
+      target='node22-linux-x64'
       ;;
     aarch64)
-      target='node20-linux-arm64'
+      target='node22-linux-arm64'
       ;;
     *)
       echo "Unsupported Linux architecture: ${ARCH}" >&2
@@ -59,10 +59,10 @@ if [ "$OS" = "Linux" ]; then
 elif [ "$OS" = "Darwin" ]; then
   case "${ARCH}" in
     x86_64)
-      target='node20-macos-x64'
+      target='node22-macos-x64'
       ;;
     arm64)
-      target='node20-macos-arm64'
+      target='node22-macos-arm64'
       ;;
     *)
       echo "Unsupported macOS architecture: ${ARCH}" >&2

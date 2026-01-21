@@ -20,7 +20,7 @@ sf --version  # 0.1.0
 
 ### Setup
 
-- Install [Node.js](https://nodejs.org/) (v20 or later) - used as the runtime
+- Install [Node.js](https://nodejs.org/) (v22 or later) - used as the runtime
 - Install [Bun](https://bun.sh/) - used as the package manager
 - Install dependencies: `bun install`
 - Auth your CLI with `bun run prod login`

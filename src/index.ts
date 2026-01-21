@@ -1,4 +1,5 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
+
 
 import * as console from "node:console";
 import os from "node:os";

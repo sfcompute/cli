@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { spawnSync } from "node:child_process";
 import * as console from "node:console";
 import * as fs from "node:fs";
@@ -50,10 +51,10 @@ function saveVersion(version: string) {
 }
 
 const COMPILE_TARGETS: string[] = [
-  "node20-linux-x64",
-  "node20-linux-arm64",
-  "node20-macos-x64",
-  "node20-macos-arm64",
+  "node22-linux-x64",
+  "node22-linux-arm64",
+  "node22-macos-x64",
+  "node22-macos-arm64",
 ];
 
 async function compileDistribution() {
