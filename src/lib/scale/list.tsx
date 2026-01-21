@@ -1,13 +1,13 @@
 import { setTimeout } from "node:timers";
 import { Command } from "@commander-js/extra-typings";
-import { Box, Text, render, useApp } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
 import { apiClient } from "../../apiClient.ts";
 
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
-import { type Procurement, getProcurement, parseIds } from "./utils.ts";
+import { getProcurement, type Procurement, parseIds } from "./utils.ts";
 
 async function listProcurements() {
   const client = await apiClient();
@@ -46,6 +46,10 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   >([]);
   const { exit } = useApp();
 
+  const onFetchComplete = useEffectEvent(() => {
+    setTimeout(exit, 0);
+  });
+
   useEffect(() => {
     async function fetchInfo() {
       try {
@@ -60,7 +64,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
 
           const failed: { id: string; message: string }[] = [];
 
-          settled.forEach((result, idx) => {
+          for (const [idx, result] of settled.entries()) {
             if (result.status === "fulfilled" && result.value !== null) {
               fetchedProcurements.push(result.value);
             } else {
@@ -74,7 +78,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
                     : "Unknown error",
               });
             }
-          });
+          }
 
           setFailedFetches(failed);
         } else {
@@ -93,11 +97,11 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         );
       } finally {
         setIsLoading(false);
-        setTimeout(exit, 0);
+        onFetchComplete();
       }
     }
     fetchInfo();
-  }, [props.type, props.ids, exit]);
+  }, [props]);
 
   if (isLoading) {
     return (

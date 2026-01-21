@@ -3,12 +3,11 @@ import type { Command } from "@commander-js/extra-typings";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Box, render, useApp } from "ink";
-import { Text } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
 import parseDurationFromLibrary from "parse-duration";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
@@ -21,8 +20,8 @@ import { getContract } from "../../helpers/fetchers.ts";
 import { parseStartDate } from "../../helpers/units.ts";
 import type { components } from "../../schema.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { Row } from "../Row.tsx";
 
 type SellOrderFlags = components["schemas"]["market-api_OrderFlags"];
 
@@ -112,7 +111,7 @@ function parseAccelerators(accelerators?: string) {
     return 1;
   }
 
-  return Number.parseInt(accelerators) / GPUS_PER_NODE;
+  return Number.parseInt(accelerators, 10) / GPUS_PER_NODE;
 }
 
 function parseDuration(duration?: string) {
@@ -167,6 +166,20 @@ function SellOrder(props: {
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
+  const submitOrder = useEffectEvent(async () => {
+    setIsLoading(true);
+    // Place the sell order
+    const placedOrder = await placeSellOrder({
+      price: props.price,
+      contractId: props.contractId,
+      quantity: props.size,
+      startAt: props.startAt,
+      endsAt: props.endsAt,
+      flags: props.flags,
+    });
+    setOrder(placedOrder);
+  });
+
   const handleSubmit = useCallback(
     (submitValue: boolean) => {
       if (submitValue === false) {
@@ -180,44 +193,33 @@ function SellOrder(props: {
     [exit],
   );
 
-  async function submitOrder() {
-    setIsLoading(true);
-    // Place the sell order
-    const order = await placeSellOrder({
-      price: props.price,
-      contractId: props.contractId,
-      quantity: props.size,
-      startAt: props.startAt,
-      endsAt: props.endsAt,
-      flags: props.flags,
-    });
-    setOrder(order);
-  }
-
   useEffect(() => {
     if (props.autoConfirm) {
       submitOrder();
     }
   }, [props.autoConfirm]);
 
+  const onPollOrder = useEffectEvent(async () => {
+    if (!isLoading) {
+      exit();
+      return;
+    }
+
+    if (!order) {
+      return;
+    }
+
+    const o = await getOrder(order.id);
+    setOrder(o);
+    if (o) {
+      setTimeout(exit, 0);
+    }
+  });
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isLoading) {
-      interval = setInterval(async () => {
-        if (!isLoading) {
-          exit();
-        }
-
-        if (!order) {
-          return;
-        }
-
-        const o = await getOrder(order?.id);
-        setOrder(o);
-        if (o) {
-          setTimeout(exit, 0);
-        }
-      }, 200);
+      interval = setInterval(onPollOrder, 200);
     }
 
     return () => {
@@ -225,7 +227,7 @@ function SellOrder(props: {
         clearInterval(interval);
       }
     };
-  }, [isLoading, exit, order]);
+  }, [isLoading]);
 
   return (
     <Box gap={1} flexDirection="column">
@@ -283,13 +285,13 @@ function SellOrderPreview(props: {
   const startDate = props.startAt === "NOW" ? dayjs() : dayjs(props.startAt);
   const start = startDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
+  // @ts-expect-error fromNow not typed
   const startFromNow = startDate.fromNow();
 
   const endDate = roundEndDate(props.endsAt);
   const end = endDate.format("MMM D h:mm a").toLowerCase();
 
-  // @ts-ignore fromNow not typed
+  // @ts-expect-error fromNow not typed
   const endFromNow = endDate.fromNow();
 
   const realDuration = endDate.diff(startDate);
@@ -411,7 +413,7 @@ export async function getOrder(orderId: string) {
   });
 
   if (error) {
-    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    // @ts-expect-error -- TODO: FIXME: include error in OpenAPI schema output
     if (error?.code === "order.not_found" || response.status === 404) {
       return undefined;
     }

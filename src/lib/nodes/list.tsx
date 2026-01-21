@@ -539,9 +539,9 @@ function NodeVerboseDisplay({ node }: { node: SFCNodes.Node }) {
             </Text>
           </Box>
           <Box marginLeft={2} flexDirection="column" paddingX={1}>
-            {nodeActions.map((action, index) => (
+            {nodeActions.map((action) => (
               <Row
-                key={index}
+                key={action.label}
                 head={`${action.label}: `}
                 value={action.command}
               />

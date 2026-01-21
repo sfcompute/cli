@@ -1,17 +1,17 @@
+import console from "node:console";
 import { setTimeout } from "node:timers";
 import { Command } from "@commander-js/extra-typings";
-import { Box, Text, render, useApp } from "ink";
+import chalk from "chalk";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import {
   type ReactNode,
   useCallback,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
 } from "react";
-
-import console from "node:console";
-import chalk from "chalk";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
@@ -20,9 +20,9 @@ import ProcurementDisplay, {
   ProcurementHeader,
 } from "./ProcurementDisplay.tsx";
 import {
-  type Procurement,
   acceleratorsToNodes,
   getProcurement,
+  type Procurement,
   parseAccelerators,
   parseHorizonArg,
   parseIds,
@@ -62,11 +62,15 @@ export async function updateProcurement({
   return data;
 }
 
+interface UpdateResult {
+  id: string;
+  result: PromiseSettledResult<Procurement | undefined>;
+}
+
 function useUpdateProcurements() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>();
-  const [results, setResults] =
-    useState<PromiseSettledResult<Procurement | undefined>[]>();
+  const [results, setResults] = useState<UpdateResult[]>();
 
   const updateProcurements = useCallback(
     async (
@@ -88,10 +92,14 @@ function useUpdateProcurements() {
           }),
         );
 
-        const results = await Promise.allSettled(updatePromises);
-        setResults(results);
+        const settledResults = await Promise.allSettled(updatePromises);
+        const resultsWithIds = ids.map((id, i) => ({
+          id,
+          result: settledResults[i],
+        }));
+        setResults(resultsWithIds);
 
-        const failures = results.filter((r) => r.status === "rejected");
+        const failures = settledResults.filter((r) => r.status === "rejected");
         if (failures.length > 0) {
           setError(`Failed to update ${failures.length} procurement(s)`);
         }
@@ -142,109 +150,110 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
 
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
-  useEffect(() => {
-    (async function init() {
-      try {
-        const settledResults = await Promise.allSettled(
-          props.ids.map((id) => getProcurement({ id })),
+
+  const onInit = useEffectEvent(async () => {
+    try {
+      const settledResults = await Promise.allSettled(
+        props.ids.map((id) => getProcurement({ id })),
+      );
+
+      const successfullyFetched = settledResults
+        .filter(
+          (r): r is PromiseFulfilledResult<Procurement> =>
+            r.status === "fulfilled" && r.value != null,
+        )
+        .map((r) => r.value);
+
+      const failedToFetch = settledResults
+        .map((r, i) => [r, props.ids[i]] as const)
+        .filter(
+          (r): r is [PromiseRejectedResult, string] =>
+            r[0].status === "rejected",
+        )
+        .map(
+          (r) =>
+            [
+              r[0].reason instanceof Error
+                ? r[0].reason.message
+                : "Unknown error",
+              r[1],
+            ] as const,
         );
 
-        const successfullyFetched = settledResults
-          .filter(
-            (r): r is PromiseFulfilledResult<Procurement> =>
-              r.status === "fulfilled" && r.value != null,
-          )
-          .map((r) => r.value);
+      if (successfullyFetched.length === 0) {
+        logAndQuit("No procurements could be fetched");
+      }
 
-        const failedToFetch = settledResults
-          .map((r, i) => [r, props.ids[i]] as const)
-          .filter(
-            (r): r is [PromiseRejectedResult, string] =>
-              r[0].status === "rejected",
-          )
-          .map(
-            (r) =>
-              [
-                r[0].reason instanceof Error
-                  ? r[0].reason.message
-                  : "Unknown error",
-                r[1],
-              ] as const,
-          );
+      setProcurements(settledResults);
+      setDisplayedPricePerGpuHourInCents(props.price);
 
-        if (successfullyFetched.length === 0) {
-          logAndQuit("No procurements could be fetched");
-        }
-
-        setProcurements(settledResults);
-        setDisplayedPricePerGpuHourInCents(props.price);
-
-        if (props.yes) {
-          await updateProcurements(
-            successfullyFetched.map((p) => p.id),
-            {
-              horizonMinutes: props.horizon,
-              nodesRequired,
-              pricePerGpuHourInCents: props.price,
-            },
-          );
-        } else {
-          setConfirmationMessage(
-            <Box flexDirection="column">
-              {successfullyFetched?.length > 0 &&
-                successfullyFetched.map((p) => (
-                  <Box key={p.id} flexDirection="column">
-                    <ProcurementHeader
-                      id={p.id}
-                      quantity={p.desired_quantity}
-                      status={p.status}
-                    />
-                    <ConfirmationMessage
-                      key={p.id}
-                      quote={false}
-                      type={p.instance_type}
-                      horizonMinutes={
-                        props.horizon === p.horizon ? undefined : props.horizon
-                      }
-                      pricePerGpuHourInCents={
-                        props.price === p.buy_limit_price_per_gpu_hour
-                          ? undefined
-                          : props.price
-                      }
-                      accelerators={
-                        props.accelerators !== undefined &&
-                        acceleratorsToNodes(props.accelerators) !==
-                          p.desired_quantity
-                          ? props.accelerators
-                          : undefined
-                      }
-                      update
-                    />
+      if (props.yes) {
+        await updateProcurements(
+          successfullyFetched.map((p) => p.id),
+          {
+            horizonMinutes: props.horizon,
+            nodesRequired,
+            pricePerGpuHourInCents: props.price,
+          },
+        );
+      } else {
+        setConfirmationMessage(
+          <Box flexDirection="column">
+            {successfullyFetched?.length > 0 &&
+              successfullyFetched.map((p) => (
+                <Box key={p.id} flexDirection="column">
+                  <ProcurementHeader
+                    id={p.id}
+                    quantity={p.desired_quantity}
+                    status={p.status}
+                  />
+                  <ConfirmationMessage
+                    key={p.id}
+                    quote={false}
+                    type={p.instance_type}
+                    horizonMinutes={
+                      props.horizon === p.horizon ? undefined : props.horizon
+                    }
+                    pricePerGpuHourInCents={
+                      props.price === p.buy_limit_price_per_gpu_hour
+                        ? undefined
+                        : props.price
+                    }
+                    accelerators={
+                      props.accelerators !== undefined &&
+                      acceleratorsToNodes(props.accelerators) !==
+                        p.desired_quantity
+                        ? props.accelerators
+                        : undefined
+                    }
+                    update
+                  />
+                </Box>
+              ))}
+            {failedToFetch?.length > 0 && (
+              <>
+                <Text color="red">
+                  Failed to fetch {failedToFetch.length} procurement(s):
+                </Text>
+                {failedToFetch.map(([message, id]) => (
+                  <Box key={id} flexDirection="column">
+                    <Text color="red">
+                      - {message} ({id})
+                    </Text>
                   </Box>
                 ))}
-              {failedToFetch?.length > 0 && (
-                <>
-                  <Text color="red">
-                    Failed to fetch {failedToFetch.length} procurement(s):
-                  </Text>
-                  {failedToFetch.map(([message, id]) => (
-                    <Box key={id} flexDirection="column">
-                      <Text color="red">
-                        - {message} ({id})
-                      </Text>
-                    </Box>
-                  ))}
-                </>
-              )}
-            </Box>,
-          );
-        }
-      } catch (err: unknown) {
-        exit(
-          err instanceof Error ? err : new Error("An unknown error occurred"),
+              </>
+            )}
+          </Box>,
         );
       }
-    })();
+    } catch (err: unknown) {
+      exit(err instanceof Error ? err : new Error("An unknown error occurred"));
+    }
+  });
+
+  useEffect(() => {
+    onInit();
   }, []);
 
   const { isLoading, error, results, updateProcurements } =
@@ -276,6 +285,8 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
       props.horizon,
       nodesRequired,
       displayedPricePerGpuHourInCents,
+      exit,
+      updateProcurements,
     ],
   );
 
@@ -295,15 +306,25 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   if (results) {
     const successfulProcurements = results
       .filter(
-        (r): r is PromiseFulfilledResult<Procurement> =>
-          r.status === "fulfilled" && r.value != null,
+        (
+          r,
+        ): r is UpdateResult & {
+          result: PromiseFulfilledResult<Procurement>;
+        } => r.result.status === "fulfilled" && r.result.value != null,
       )
-      .map((r) => r.value);
+      .map((r) => r.result.value);
     const failedProcurements = results
-      .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-      .map((r) =>
-        r.reason instanceof Error ? r.reason.message : "Unknown error",
-      );
+      .filter(
+        (r): r is UpdateResult & { result: PromiseRejectedResult } =>
+          r.result.status === "rejected",
+      )
+      .map((r) => ({
+        id: r.id,
+        error:
+          r.result.reason instanceof Error
+            ? r.result.reason.message
+            : "Unknown error",
+      }));
     return (
       <Box flexDirection="column" gap={1}>
         {successfulProcurements && successfulProcurements.length > 0 && (
@@ -316,15 +337,15 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
             <Text color="red">
               Failed to update {failedProcurements.length} procurement(s):
             </Text>
-            {failedProcurements.map((f, i) => (
-              <Text key={i} color="red">
-                - {f}
+            {failedProcurements.map((f) => (
+              <Text key={f.id} color="red">
+                - {f.id}: {f.error}
               </Text>
             ))}
           </Box>
         )}
-        {successfulProcurements?.map((s, i) => (
-          <ProcurementDisplay key={i} procurement={s} />
+        {successfulProcurements?.map((s) => (
+          <ProcurementDisplay key={s.id} procurement={s} />
         ))}
       </Box>
     );

@@ -4,30 +4,34 @@ import { setTimeout } from "node:timers";
 import { Command, Option } from "@commander-js/extra-typings";
 import boxen from "boxen";
 import dayjs from "dayjs";
-import { Box, Text, render, useApp } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { pluralizeNodes } from "../nodes/utils.ts";
-
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from "react";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { roundDateUpToNextMinute } from "../../helpers/units.ts";
 
 import type { components } from "../../schema.ts";
-import ConfirmInput from "../ConfirmInput.tsx";
 import { getQuote } from "../buy/index.tsx";
+import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-
-import { roundDateUpToNextMinute } from "../../helpers/units.ts";
+import { pluralizeNodes } from "../nodes/utils.ts";
 import ConfirmationMessage from "./ConfirmationMessage.tsx";
 import ProcurementDisplay from "./ProcurementDisplay.tsx";
 import {
+  acceleratorsToNodes,
   type ColocationStrategyName,
   DEFAULT_LIMIT_PRICE_MULTIPLIER,
   DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS,
   MIN_CONTRACT_MINUTES,
   type Procurement,
-  acceleratorsToNodes,
   parseAccelerators,
   parseHorizonArg,
   parsePriceArg,
@@ -117,7 +121,7 @@ function useCreateProcurement() {
         setIsLoading(false);
       }
     },
-    [setIsLoading, setResult, setError],
+    [],
   );
 
   return {
@@ -163,83 +167,86 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   const [isQuoting, setIsQuoting] = useState(false);
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
-  useEffect(() => {
-    (async function init() {
-      try {
-        let limitPricePerGpuHourInCents = props.price;
-        // Get quote if price not specified and not skipping confirmation
-        if (!props.yes && limitPricePerGpuHourInCents === undefined) {
-          const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, props.horizon);
-          setIsQuoting(true);
 
-          const quoteQuantity = nodesRequired === 0 ? 1 : nodesRequired;
-          const quote = await getQuote({
-            instanceType: props.type,
-            quantity: quoteQuantity,
-            minStartTime: "NOW",
-            maxStartTime: "NOW",
-            minDurationSeconds: quoteMinutes * 60,
-            maxDurationSeconds: quoteMinutes * 60 + 3600,
-            cluster: clusterName,
-          });
-          setIsQuoting(false);
+  const onInit = useEffectEvent(async () => {
+    try {
+      let limitPricePerGpuHourInCents = props.price;
+      // Get quote if price not specified and not skipping confirmation
+      if (!props.yes && limitPricePerGpuHourInCents === undefined) {
+        const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, props.horizon);
+        setIsQuoting(true);
 
-          // Calculate market price from quote or use default
-          limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-          if (quote) {
-            // from the market's perspective, "NOW" means at the beginning of the next minute.
-            // when the order duration is very short, this can cause the rate to be computed incorrectly
-            // if we implicitly assume it to mean `new Date()`.
-            const coercedStartTime =
-              quote.start_at === "NOW"
-                ? roundDateUpToNextMinute(new Date())
-                : new Date(quote.start_at);
-            const durationSeconds = dayjs(quote.end_at).diff(
-              dayjs(coercedStartTime),
-            );
-            const quoteDurationHours = durationSeconds / 1000 / 60 / 60;
-            limitPricePerGpuHourInCents = Math.ceil(
-              DEFAULT_LIMIT_PRICE_MULTIPLIER *
-                (quote.price /
-                  (quoteDurationHours * (quoteQuantity * GPUS_PER_NODE))),
-            );
-          }
-        }
+        const quoteQuantity = nodesRequired === 0 ? 1 : nodesRequired;
+        const quote = await getQuote({
+          instanceType: props.type,
+          quantity: quoteQuantity,
+          minStartTime: "NOW",
+          maxStartTime: "NOW",
+          minDurationSeconds: quoteMinutes * 60,
+          maxDurationSeconds: quoteMinutes * 60 + 3600,
+          cluster: clusterName,
+        });
+        setIsQuoting(false);
 
-        // Use default if still undefined (e.g., --yes without --price)
-        limitPricePerGpuHourInCents ??= DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
-        setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
-
-        if (props.yes) {
-          await createProcurement({
-            horizonMinutes: props.horizon,
-            nodesRequired,
-            type: props.type,
-            pricePerGpuHourInCents: limitPricePerGpuHourInCents,
-            cluster: clusterName,
-            colocationStrategy,
-          });
-        } else {
-          setConfirmationMessage(
-            <ConfirmationMessage
-              quote={props.price === undefined}
-              horizonMinutes={props.horizon}
-              pricePerGpuHourInCents={limitPricePerGpuHourInCents}
-              accelerators={props.accelerators}
-              type={props.type}
-              colocationStrategy={colocationStrategy}
-            />,
+        // Calculate market price from quote or use default
+        limitPricePerGpuHourInCents = DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+        if (quote) {
+          // from the market's perspective, "NOW" means at the beginning of the next minute.
+          // when the order duration is very short, this can cause the rate to be computed incorrectly
+          // if we implicitly assume it to mean `new Date()`.
+          const coercedStartTime =
+            quote.start_at === "NOW"
+              ? roundDateUpToNextMinute(new Date())
+              : new Date(quote.start_at);
+          const durationSeconds = dayjs(quote.end_at).diff(
+            dayjs(coercedStartTime),
+          );
+          const quoteDurationHours = durationSeconds / 1000 / 60 / 60;
+          limitPricePerGpuHourInCents = Math.ceil(
+            DEFAULT_LIMIT_PRICE_MULTIPLIER *
+              (quote.price /
+                (quoteDurationHours * (quoteQuantity * GPUS_PER_NODE))),
           );
         }
-      } catch (err: unknown) {
-        setIsQuoting(false);
-        logAndQuit(
-          err instanceof Error
-            ? err.message
-            : "An unknown error occurred during initialization",
+      }
+
+      // Use default if still undefined (e.g., --yes without --price)
+      limitPricePerGpuHourInCents ??= DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS;
+      setDisplayedPricePerGpuHourInCents(limitPricePerGpuHourInCents);
+
+      if (props.yes) {
+        await createProcurement({
+          horizonMinutes: props.horizon,
+          nodesRequired,
+          type: props.type,
+          pricePerGpuHourInCents: limitPricePerGpuHourInCents,
+          cluster: clusterName,
+          colocationStrategy,
+        });
+      } else {
+        setConfirmationMessage(
+          <ConfirmationMessage
+            quote={props.price === undefined}
+            horizonMinutes={props.horizon}
+            pricePerGpuHourInCents={limitPricePerGpuHourInCents}
+            accelerators={props.accelerators}
+            type={props.type}
+            colocationStrategy={colocationStrategy}
+          />,
         );
       }
-    })();
+    } catch (err: unknown) {
+      setIsQuoting(false);
+      logAndQuit(
+        err instanceof Error
+          ? err.message
+          : "An unknown error occurred during initialization",
+      );
+    }
+  });
+
+  useEffect(() => {
+    onInit();
   }, []);
 
   const { isLoading, error, result, createProcurement } =
