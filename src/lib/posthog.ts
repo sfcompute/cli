@@ -1,11 +1,11 @@
 import process from "node:process";
 import { PostHog } from "posthog-node";
+import { apiClient } from "../apiClient.ts";
 import { loadConfig, saveConfig } from "../helpers/config.ts";
 import {
   cacheFeatureFlag,
   getCachedFeatureFlag,
 } from "../helpers/feature-flags.ts";
-import { getApiUrl } from "../helpers/urls.ts";
 
 const postHogClient = new PostHog(
   "phc_ErsIQYNj6gPFTkHfupfuUGeKjabwtk3WTPdkTDktbU4",
@@ -39,15 +39,9 @@ const trackEvent = ({
     let exchangeAccountId = config.account_id;
 
     if (!exchangeAccountId) {
-      const response = await fetch(await getApiUrl("me"), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${config.auth_token}`,
-        },
-      });
-      const data = (await response.json()) as any;
-      if (data.id) {
+      const client = await apiClient(config.auth_token);
+      const { data } = await client.GET("/v0/me");
+      if (data?.id) {
         exchangeAccountId = data.id;
         saveConfig({ ...config, account_id: data.id });
       }
