@@ -17,4 +17,4 @@ jobs:
       - run: bun install
       - run: biome ci .
       - run: bun run check
-      - run: bun test
+      - run: bun run test
