@@ -173,6 +173,15 @@ export function OrderDisplay(props: {
     }
   }, [props.orders]);
 
+  const { sellOrdersCount, buyOrdersCount } = React.useMemo(() => {
+    return {
+      sellOrdersCount: props.orders.filter((order) => order.side === "sell")
+        .length,
+      buyOrdersCount: props.orders.filter((order) => order.side === "buy")
+        .length,
+    };
+  }, [props.orders]);
+
   if (props.orders.length === 0) {
     return (
       <Box flexDirection="column" gap={1} paddingBottom={1}>
@@ -190,15 +199,6 @@ export function OrderDisplay(props: {
     activeTab === "all"
       ? props.orders
       : props.orders.filter((order) => order.side === activeTab);
-
-  const { sellOrdersCount, buyOrdersCount } = React.useMemo(() => {
-    return {
-      sellOrdersCount: props.orders.filter((order) => order.side === "sell")
-        .length,
-      buyOrdersCount: props.orders.filter((order) => order.side === "buy")
-        .length,
-    };
-  }, [props.orders]);
 
   return (
     <ScrollArea
@@ -321,9 +321,7 @@ export function ScrollArea({
   sellOrdersCount: number;
   buyOrdersCount: number;
 }) {
-  const [state, dispatch] = React.useReducer<
-    React.Reducer<ScrollState, ScrollAction>
-  >(reducer, {
+  const [state, dispatch] = React.useReducer(reducer, {
     height,
     scrollTop: 0,
     innerHeight: 0,
