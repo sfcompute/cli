@@ -43,7 +43,7 @@ const trackEvent = ({
       const { data } = await client.GET("/v0/me");
       if (data?.id) {
         exchangeAccountId = data.id;
-        saveConfig({ ...config, account_id: data.id });
+        await saveConfig({ ...config, account_id: data.id });
       }
     }
 
