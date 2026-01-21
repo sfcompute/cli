@@ -13,7 +13,6 @@ import {
 } from "../helpers/errors.ts";
 import type { components } from "../schema.ts";
 import { isFeatureEnabled } from "./posthog.ts";
-import { components } from "../schema.ts";
 
 type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
 
@@ -150,12 +149,12 @@ function displayZonesTable(zones: ZoneInfo[]) {
 
   const table = new Table({
     head: [
-      cyan("Zone"),
-      cyan("Delivery Type"),
-      cyan("Available Nodes"),
-      cyan("GPU Type"),
-      cyan("Interconnect"),
-      cyan("Region"),
+      chalk.cyan("Zone"),
+      chalk.cyan("Delivery Type"),
+      chalk.cyan("Available Nodes"),
+      chalk.cyan("GPU Type"),
+      chalk.cyan("Interconnect"),
+      chalk.cyan("Region"),
     ],
     style: {
       head: [],
@@ -166,8 +165,8 @@ function displayZonesTable(zones: ZoneInfo[]) {
   sortedZones.forEach((zone) => {
     const available = getCurrentAvailableCapacity(zone);
     const availableNodesText = available > 0
-      ? green(available.toString())
-      : red(available.toString());
+      ? chalk.green(available.toString())
+      : chalk.red(available.toString());
 
     table.push([
       zone.name,
@@ -185,11 +184,11 @@ function displayZonesTable(zones: ZoneInfo[]) {
   const availableZoneName = availableZones?.[0]?.name ?? "alamo";
   console.log(table.toString());
   console.log(
-    `\n${gray("Use zone names when placing orders or configuring nodes.")}\n`,
+    `\n${chalk.gray("Use zone names when placing orders or configuring nodes.")}\n`,
   );
-  console.log(gray("Examples:"));
-  console.log(`  sf buy --zone ${green(availableZoneName)}`);
-  console.log(`  sf scale create -n 16 --zone ${green(availableZoneName)}`);
+  console.log(chalk.gray("Examples:"));
+  console.log(`  sf buy --zone ${chalk.green(availableZoneName)}`);
+  console.log(`  sf scale create -n 16 --zone ${chalk.green(availableZoneName)}`);
 }
 
 function EmptyZonesDisplay() {
