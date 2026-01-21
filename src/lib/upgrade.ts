@@ -39,7 +39,8 @@ export function registerUpgrade(program: Command) {
 
       if (version) {
         spinner.start(`Checking if version ${version} exists`);
-        const url = `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
+        const url =
+          `https://github.com/sfcompute/cli/archive/refs/tags/${version}.zip`;
         const response = await fetch(url, { method: "HEAD" });
 
         if (response.status === 404) {
@@ -84,11 +85,11 @@ export function registerUpgrade(program: Command) {
       let stdout = "";
       let stderr = "";
 
-      bashProcess.stdout.on("data", (data: Buffer) => {
+      bashProcess.stdout.on("data", (data) => {
         stdout += data.toString();
       });
 
-      bashProcess.stderr.on("data", (data: Buffer) => {
+      bashProcess.stderr.on("data", (data) => {
         stderr += data.toString();
       });
 

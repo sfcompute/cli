@@ -19,7 +19,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
-    ),
+    )
   );
   switch (type) {
     case "major":
@@ -35,12 +35,12 @@ function bumpVersion(
   }
 }
 
-async function getLocalVersion() {
+function getLocalVersion() {
   const packageJson = fs.readFileSync("package.json", "utf-8");
   return JSON.parse(packageJson).version;
 }
 
-async function saveVersion(version: string) {
+function saveVersion(version: string) {
   const packageJson = fs.readFileSync("package.json", "utf-8");
   const packageObj = JSON.parse(packageJson);
   packageObj.version = version;
@@ -76,7 +76,11 @@ async function compileDistribution() {
     console.log(`✅ Compiled for ${target}`);
 
     const zipFileName = `dist/sf-${target}.zip`;
-    const zipResult = spawnSync("zip", ["-j", zipFileName, `dist/sf-${target}`]);
+    const zipResult = spawnSync("zip", [
+      "-j",
+      zipFileName,
+      `dist/sf-${target}`,
+    ]);
 
     if (zipResult.status !== 0) {
       console.error(zipResult.stderr?.toString() ?? "");
@@ -162,7 +166,7 @@ async function createRelease(version: string) {
   console.log("✅ Pushed to origin main");
 }
 
-async function cleanDist() {
+function cleanDist() {
   fs.rmSync("./dist", { recursive: true, force: true });
 }
 
@@ -172,12 +176,14 @@ program
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices([
-      "major",
-      "minor",
-      "patch",
-      "prerelease",
-    ] as const),
+    new Argument("type").choices(
+      [
+        "major",
+        "minor",
+        "patch",
+        "prerelease",
+      ] as const,
+    ),
   )
   .action(async (type) => {
     try {
