@@ -48,46 +48,41 @@ async function saveVersion(version: string) {
   fs.writeFileSync("package.json", `${JSON.stringify(packageObj, null, 2)}\n`);
 }
 
-// Map pkg targets to output names (keeping original names for backward compatibility)
-const COMPILE_TARGETS: { pkgTarget: string; outputName: string }[] = [
-  { pkgTarget: "node20-linux-x64", outputName: "x86_64-unknown-linux-gnu" },
-  { pkgTarget: "node20-linux-arm64", outputName: "aarch64-unknown-linux-gnu" },
-  { pkgTarget: "node20-macos-x64", outputName: "x86_64-apple-darwin" },
-  { pkgTarget: "node20-macos-arm64", outputName: "aarch64-apple-darwin" },
+const COMPILE_TARGETS: string[] = [
+  "node20-linux-x64",
+  "node20-linux-arm64",
+  "node20-macos-x64",
+  "node20-macos-arm64",
 ];
 
 async function compileDistribution() {
   // Create dist directory
   fs.mkdirSync("./dist", { recursive: true });
 
-  for (const { pkgTarget, outputName } of COMPILE_TARGETS) {
+  for (const target of COMPILE_TARGETS) {
     const result = spawnSync("npx", [
       "pkg",
       ".",
       "--target",
-      pkgTarget,
+      target,
       "--output",
-      `dist/sf-${outputName}`,
+      `dist/sf-${target}`,
     ]);
 
     if (result.status !== 0) {
       console.error(result.stderr?.toString() ?? "");
-      logAndError(`Failed to compile for ${pkgTarget}`);
+      logAndError(`Failed to compile for ${target}`);
     }
-    console.log(`✅ Compiled for ${outputName}`);
+    console.log(`✅ Compiled for ${target}`);
 
-    const zipFileName = `dist/sf-${outputName}.zip`;
-    const zipResult = spawnSync("zip", [
-      "-j",
-      zipFileName,
-      `dist/sf-${outputName}`,
-    ]);
+    const zipFileName = `dist/sf-${target}.zip`;
+    const zipResult = spawnSync("zip", ["-j", zipFileName, `dist/sf-${target}`]);
 
     if (zipResult.status !== 0) {
       console.error(zipResult.stderr?.toString() ?? "");
-      logAndError(`Failed to zip the binary for ${outputName}`);
+      logAndError(`Failed to zip the binary for ${target}`);
     }
-    console.log(`✅ Zipped binary for ${outputName}`);
+    console.log(`✅ Zipped binary for ${target}`);
   }
 }
 
