@@ -8,7 +8,6 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
-  useEffectEvent,
   useMemo,
   useState,
 } from "react";
@@ -151,109 +150,110 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
 
-  const onInit = useEffectEvent(async () => {
-    try {
-      const settledResults = await Promise.allSettled(
-        props.ids.map((id) => getProcurement({ id })),
-      );
-
-      const successfullyFetched = settledResults
-        .filter(
-          (r): r is PromiseFulfilledResult<Procurement> =>
-            r.status === "fulfilled" && r.value != null,
-        )
-        .map((r) => r.value);
-
-      const failedToFetch = settledResults
-        .map((r, i) => [r, props.ids[i]] as const)
-        .filter(
-          (r): r is [PromiseRejectedResult, string] =>
-            r[0].status === "rejected",
-        )
-        .map(
-          (r) =>
-            [
-              r[0].reason instanceof Error
-                ? r[0].reason.message
-                : "Unknown error",
-              r[1],
-            ] as const,
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only on mount.
+  // We read props inside the effect but don't want to re-run when they change.
+  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+  useEffect(() => {
+    (async function onInit() {
+      try {
+        const settledResults = await Promise.allSettled(
+          props.ids.map((id) => getProcurement({ id })),
         );
 
-      if (successfullyFetched.length === 0) {
-        logAndQuit("No procurements could be fetched");
-      }
+        const successfullyFetched = settledResults
+          .filter(
+            (r): r is PromiseFulfilledResult<Procurement> =>
+              r.status === "fulfilled" && r.value != null,
+          )
+          .map((r) => r.value);
 
-      setProcurements(settledResults);
-      setDisplayedPricePerGpuHourInCents(props.price);
+        const failedToFetch = settledResults
+          .map((r, i) => [r, props.ids[i]] as const)
+          .filter(
+            (r): r is [PromiseRejectedResult, string] =>
+              r[0].status === "rejected",
+          )
+          .map(
+            (r) =>
+              [
+                r[0].reason instanceof Error
+                  ? r[0].reason.message
+                  : "Unknown error",
+                r[1],
+              ] as const,
+          );
 
-      if (props.yes) {
-        await updateProcurements(
-          successfullyFetched.map((p) => p.id),
-          {
-            horizonMinutes: props.horizon,
-            nodesRequired,
-            pricePerGpuHourInCents: props.price,
-          },
-        );
-      } else {
-        setConfirmationMessage(
-          <Box flexDirection="column">
-            {successfullyFetched?.length > 0 &&
-              successfullyFetched.map((p) => (
-                <Box key={p.id} flexDirection="column">
-                  <ProcurementHeader
-                    id={p.id}
-                    quantity={p.desired_quantity}
-                    status={p.status}
-                  />
-                  <ConfirmationMessage
-                    key={p.id}
-                    quote={false}
-                    type={p.instance_type}
-                    horizonMinutes={
-                      props.horizon === p.horizon ? undefined : props.horizon
-                    }
-                    pricePerGpuHourInCents={
-                      props.price === p.buy_limit_price_per_gpu_hour
-                        ? undefined
-                        : props.price
-                    }
-                    accelerators={
-                      props.accelerators !== undefined &&
-                      acceleratorsToNodes(props.accelerators) !==
-                        p.desired_quantity
-                        ? props.accelerators
-                        : undefined
-                    }
-                    update
-                  />
-                </Box>
-              ))}
-            {failedToFetch?.length > 0 && (
-              <>
-                <Text color="red">
-                  Failed to fetch {failedToFetch.length} procurement(s):
-                </Text>
-                {failedToFetch.map(([message, id]) => (
-                  <Box key={id} flexDirection="column">
-                    <Text color="red">
-                      - {message} ({id})
-                    </Text>
+        if (successfullyFetched.length === 0) {
+          logAndQuit("No procurements could be fetched");
+        }
+
+        setProcurements(settledResults);
+        setDisplayedPricePerGpuHourInCents(props.price);
+
+        if (props.yes) {
+          await updateProcurements(
+            successfullyFetched.map((p) => p.id),
+            {
+              horizonMinutes: props.horizon,
+              nodesRequired,
+              pricePerGpuHourInCents: props.price,
+            },
+          );
+        } else {
+          setConfirmationMessage(
+            <Box flexDirection="column">
+              {successfullyFetched?.length > 0 &&
+                successfullyFetched.map((p) => (
+                  <Box key={p.id} flexDirection="column">
+                    <ProcurementHeader
+                      id={p.id}
+                      quantity={p.desired_quantity}
+                      status={p.status}
+                    />
+                    <ConfirmationMessage
+                      key={p.id}
+                      quote={false}
+                      type={p.instance_type}
+                      horizonMinutes={
+                        props.horizon === p.horizon ? undefined : props.horizon
+                      }
+                      pricePerGpuHourInCents={
+                        props.price === p.buy_limit_price_per_gpu_hour
+                          ? undefined
+                          : props.price
+                      }
+                      accelerators={
+                        props.accelerators !== undefined &&
+                        acceleratorsToNodes(props.accelerators) !==
+                          p.desired_quantity
+                          ? props.accelerators
+                          : undefined
+                      }
+                      update
+                    />
                   </Box>
                 ))}
-              </>
-            )}
-          </Box>,
-        );
+              {failedToFetch?.length > 0 && (
+                <>
+                  <Text color="red">
+                    Failed to fetch {failedToFetch.length} procurement(s):
+                  </Text>
+                  {failedToFetch.map(([message, id]) => (
+                    <Box key={id} flexDirection="column">
+                      <Text color="red">
+                        - {message} ({id})
+                      </Text>
+                    </Box>
+                  ))}
+                </>
+              )}
+            </Box>,
+          );
+        }
+      } catch (err: unknown) {
+        exit(err instanceof Error ? err : new Error("An unknown error occurred"));
       }
-    } catch (err: unknown) {
-      exit(err instanceof Error ? err : new Error("An unknown error occurred"));
-    }
-  });
-
-  useEffect(() => {
-    onInit();
+    })();
   }, []);
 
   const { isLoading, error, results, updateProcurements } =

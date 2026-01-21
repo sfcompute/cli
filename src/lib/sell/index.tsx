@@ -7,7 +7,7 @@ import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
 import parseDurationFromLibrary from "parse-duration";
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { apiClient } from "../../apiClient.ts";
 import { isLoggedIn } from "../../helpers/config.ts";
@@ -166,7 +166,22 @@ function SellOrder(props: {
   const { exit } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
 
-  const submitOrder = useEffectEvent(async () => {
+  const handleSubmit = useCallback(
+    (submitValue: boolean) => {
+      if (submitValue === false) {
+        setIsLoading(false);
+        exit();
+        return;
+      }
+
+      submitOrder();
+    },
+    // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we don't want to re-create callback when props change.
+    // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
+    [exit],
+  );
+
+  async function submitOrder() {
     setIsLoading(true);
     // Place the sell order
     const placedOrder = await placeSellOrder({
@@ -178,48 +193,36 @@ function SellOrder(props: {
       flags: props.flags,
     });
     setOrder(placedOrder);
-  });
+  }
 
-  const handleSubmit = useCallback(
-    (submitValue: boolean) => {
-      if (submitValue === false) {
-        setIsLoading(false);
-        exit();
-        return;
-      }
-
-      submitOrder();
-    },
-    [exit],
-  );
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: submitOrder reads props but we only want to run on mount if autoConfirm is true.
+  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
   useEffect(() => {
     if (props.autoConfirm) {
       submitOrder();
     }
   }, [props.autoConfirm]);
 
-  const onPollOrder = useEffectEvent(async () => {
-    if (!isLoading) {
-      exit();
-      return;
-    }
-
-    if (!order) {
-      return;
-    }
-
-    const o = await getOrder(order.id);
-    setOrder(o);
-    if (o) {
-      setTimeout(exit, 0);
-    }
-  });
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Polling interval reads current state but shouldn't restart on state changes.
+  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     if (isLoading) {
-      interval = setInterval(onPollOrder, 200);
+      interval = setInterval(async () => {
+        if (!isLoading) {
+          exit();
+        }
+
+        if (!order) {
+          return;
+        }
+
+        const o = await getOrder(order?.id);
+        setOrder(o);
+        if (o) {
+          setTimeout(exit, 0);
+        }
+      }, 200);
     }
 
     return () => {

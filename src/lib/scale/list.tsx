@@ -2,7 +2,7 @@ import { setTimeout } from "node:timers";
 import { Command } from "@commander-js/extra-typings";
 import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { apiClient } from "../../apiClient.ts";
 
@@ -46,10 +46,9 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
   >([]);
   const { exit } = useApp();
 
-  const onFetchComplete = useEffectEvent(() => {
-    setTimeout(exit, 0);
-  });
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only when props change.
+  // We call exit() inside but don't want it as a dependency to avoid re-running on exit changes.
+  // See: https://react.dev/blog/2025/10/01/react-19-2#use-effect-event
   useEffect(() => {
     async function fetchInfo() {
       try {
@@ -97,7 +96,7 @@ function ProcurementsList(props: { type?: string; ids?: string[] }) {
         );
       } finally {
         setIsLoading(false);
-        onFetchComplete();
+        setTimeout(exit, 0);
       }
     }
     fetchInfo();
