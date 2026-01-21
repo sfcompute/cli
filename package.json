@@ -1,9 +1,8 @@
 {
   "name": "sf-cli",
   "type": "module",
-  "bin": "src/index.ts",
+  "bin": "dist/index.cjs",
   "pkg": {
-    "scripts": "src/**/*.ts",
     "assets": [
       "package.json"
     ],
@@ -21,7 +20,7 @@
   },
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
-    "@inkjs/ui": "^2.0.0",
+    "@inkjs/ui": "^1.0.0",
     "@inquirer/prompts": "^8.2.0",
     "@sfcompute/nodes-sdk-alpha": "0.1.0-alpha.27",
     "@types/ms": "^0.7.34",
@@ -36,11 +35,11 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
     "dotenv": "^16.4.5",
-    "ink": "^6.6.0",
+    "ink": "npm:ink-cjs@^4.4.1",
     "ink-link": "^4.1.0",
     "ink-spinner": "^5.0.0",
     "ink-testing-library": "^4.0.0",
-    "ink-text-input": "^6.0.0",
+    "ink-text-input": "^5.0.1",
     "inquirer": "^13.2.0",
     "little-date": "^1.0.0",
     "ms": "^2.1.3",
@@ -50,7 +49,7 @@
     "parse-duration": "^2.1.3",
     "posthog-node": "^4.10.1",
     "prettier": "^3.5.3",
-    "react": "^19.2.3",
+    "react": "^18.3.1",
     "semver": "^7.6.3",
     "shescape": "^2.1.1",
     "tiny-invariant": "^1.3.3",
@@ -64,9 +63,10 @@
     "@types/async-retry": "^1.4.9",
     "@types/cli-progress": "^3.11.6",
     "@types/node": "^20.0.0",
-    "@types/react": "^19.2.9",
+    "@types/react": "^18.3.21",
     "@types/semver": "^7.5.8",
     "@yao-pkg/pkg": "^5.12.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
