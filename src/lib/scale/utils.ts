@@ -46,7 +46,7 @@ export function parseHorizonArg(horizon: string) {
 }
 
 export function parseAccelerators(accelerators: string) {
-  const parsedAccelerators = Number.parseInt(accelerators);
+  const parsedAccelerators = Number.parseInt(accelerators, 10);
   if (parsedAccelerators % GPUS_PER_NODE !== 0) {
     logAndQuit(`Only multiples of ${GPUS_PER_NODE} GPUs are allowed.`);
   }
@@ -58,11 +58,7 @@ export function acceleratorsToNodes(accelerators: number) {
   return Math.floor(accelerators / GPUS_PER_NODE);
 }
 
-export async function getProcurement({
-  id,
-}: {
-  id: string;
-}) {
+export async function getProcurement({ id }: { id: string }) {
   const client = await apiClient();
   const res = await client.GET("/v0/procurements/{id}", {
     params: { path: { id: id } },

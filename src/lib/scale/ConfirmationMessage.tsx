@@ -1,14 +1,13 @@
 import { Box, Text } from "ink";
 
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
-
-import { Row } from "../Row.tsx";
 import { formatDuration } from "../orders/index.tsx";
+import { Row } from "../Row.tsx";
 
 import {
+  formatColocationStrategy,
   MIN_CONTRACT_MINUTES,
   type Procurement,
-  formatColocationStrategy,
 } from "./utils.ts";
 
 export default function ConfirmationMessage(props: {

@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { Box, Text, render } from "ink";
+import { Box, render, Text } from "ink";
 import ora from "ora";
 
 import { getAuthToken } from "../../helpers/config.ts";
@@ -19,8 +19,8 @@ import {
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
-  DEFAULT_NODE_LS_LIMIT,
   createNodesTable,
+  DEFAULT_NODE_LS_LIMIT,
   getLastVM,
   getStatusColor,
   getVMStatusColor,

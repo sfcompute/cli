@@ -3,8 +3,8 @@ import { Box, Text } from "ink";
 import { formatDateRange } from "little-date";
 import ms from "ms";
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { Row } from "../Row.tsx";
 import type { ActiveContract, Contract } from "./types.ts";
 import {
   type ContractState,

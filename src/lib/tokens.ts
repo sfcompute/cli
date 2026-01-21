@@ -250,13 +250,7 @@ async function listTokensAction() {
   process.exit(0);
 }
 
-async function deleteTokenAction({
-  id,
-  yes,
-}: {
-  id: string;
-  yes?: boolean;
-}) {
+async function deleteTokenAction({ id, yes }: { id: string; yes?: boolean }) {
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     logLoginMessageAndQuit();

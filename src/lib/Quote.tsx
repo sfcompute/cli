@@ -1,6 +1,6 @@
 import { Box, Text } from "ink";
-import { Row } from "./Row.tsx";
 import { getPricePerGpuHourFromQuote } from "./buy/index.tsx";
+import { Row } from "./Row.tsx";
 
 export default function QuoteDisplay(props: { quote: Quote }) {
   if (!props.quote) {

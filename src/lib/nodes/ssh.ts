@@ -180,8 +180,8 @@ Examples:
       cmd = cmd.concat(["-o", `HostKeyAlias=${vmId}.vms.sfcompute.dev`]);
       cmd = cmd.concat([sshDestination]);
 
-      let shescape: undefined | Shescape = undefined;
-      let shell: undefined | string = undefined;
+      let shescape: undefined | Shescape;
+      let shell: undefined | string;
       if (process.env.SHELL !== undefined) {
         try {
           shescape = new Shescape({

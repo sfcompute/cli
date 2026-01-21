@@ -1,9 +1,9 @@
 import process from "node:process";
 import dayjs from "dayjs";
-import { Box, Text, measureElement, useInput } from "ink";
+import { Box, measureElement, Text, useInput } from "ink";
 import React, { useEffect } from "react";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { Row } from "../Row.tsx";
 import { formatDuration } from "./index.tsx";
 import type { HydratedOrder } from "./types.ts";
 
@@ -201,32 +201,30 @@ export function OrderDisplay(props: {
   }, [props.orders]);
 
   return (
-    <>
-      <ScrollArea
-        height={NUMBER_OF_ORDERS_TO_DISPLAY}
-        orders={orders}
-        activeTab={activeTab}
-        sellOrdersCount={sellOrdersCount}
-        buyOrdersCount={buyOrdersCount}
-      >
-        {orders.map((order) => {
-          return props.expanded ? (
-            <Order order={order} key={order.id} />
-          ) : (
-            <OrderMinimal order={order} key={order.id} activeTab={activeTab} />
-          );
-        })}
+    <ScrollArea
+      height={NUMBER_OF_ORDERS_TO_DISPLAY}
+      orders={orders}
+      activeTab={activeTab}
+      sellOrdersCount={sellOrdersCount}
+      buyOrdersCount={buyOrdersCount}
+    >
+      {orders.map((order) => {
+        return props.expanded ? (
+          <Order order={order} key={order.id} />
+        ) : (
+          <OrderMinimal order={order} key={order.id} activeTab={activeTab} />
+        );
+      })}
 
-        {orders.length === 0 && (
-          <Box>
-            <Text>
-              There are 0 outstanding {activeTab === "all" ? "" : activeTab}{" "}
-              orders right now.
-            </Text>
-          </Box>
-        )}
-      </ScrollArea>
-    </>
+      {orders.length === 0 && (
+        <Box>
+          <Text>
+            There are 0 outstanding {activeTab === "all" ? "" : activeTab}{" "}
+            orders right now.
+          </Text>
+        </Box>
+      )}
+    </ScrollArea>
   );
 }
 

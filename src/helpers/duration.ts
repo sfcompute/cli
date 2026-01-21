@@ -15,7 +15,7 @@ export const parseDurationArgument = (rawDuration: string | undefined) => {
 
   // For backwards compatibility, we want to support users passing in seconds directly.
   // Some of the CLI use to support seconds directly, now we support durations strings.
-  const attemptedParseAsNumber = Number.parseInt(duration);
+  const attemptedParseAsNumber = Number.parseInt(duration, 10);
 
   if (
     !Number.isNaN(attemptedParseAsNumber) &&

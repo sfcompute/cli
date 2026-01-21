@@ -2,7 +2,7 @@ import * as console from "node:console";
 import type { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 import Table from "cli-table3";
-import { Box, Text, render } from "ink";
+import { Box, render, Text } from "ink";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
 import {

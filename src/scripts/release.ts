@@ -19,6 +19,7 @@ function bumpVersion(
     Number.parseInt(
       // Remove everything after the - if there is one
       v.includes("-") ? v.split("-")[0] : v,
+      10,
     ),
   );
   switch (type) {

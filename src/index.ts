@@ -18,7 +18,7 @@ import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
 import { registerNodes } from "./lib/nodes/index.ts";
 import { registerOrders } from "./lib/orders/index.tsx";
-import { IS_TRACKING_DISABLED, analytics } from "./lib/posthog.ts";
+import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerScale } from "./lib/scale/index.tsx";
 import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";

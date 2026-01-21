@@ -22,7 +22,7 @@ export async function getOrder(orderId: string) {
     },
   });
   if (!response.ok) {
-    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    // @ts-expect-error -- TODO: FIXME: include error in OpenAPI schema output
     if (error?.code === "order.not_found") {
       return null;
     }

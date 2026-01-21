@@ -90,7 +90,7 @@ export function priceWholeToCents(
     return { cents: price * 100, invalid: false };
   } else if (typeof price === "string") {
     // remove any whitespace, dollar signs, negative signs, single and double quotes
-    const priceCleaned = price.replace(/[\s\$\-\'\"]/g, "");
+    const priceCleaned = price.replace(/[\s$\-'"]/g, "");
     if (priceCleaned === "") {
       return { cents: null, invalid: true };
     }

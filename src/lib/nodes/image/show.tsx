@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import advanced from "dayjs/plugin/advancedFormat";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { Box, Text, render } from "ink";
+import { Box, render, Text } from "ink";
 import Link from "ink-link";
 import { formatDate } from "../../../helpers/format-date.ts";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";

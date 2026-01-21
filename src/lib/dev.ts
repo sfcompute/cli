@@ -112,7 +112,7 @@ function registerEpoch(program: Command) {
         const colorDiffedEpochs = colorDiffEpochs(timestamps);
 
         timestamps.forEach((epochTimestamp, i) => {
-          const date = epochToDate(Number.parseInt(epochTimestamp));
+          const date = epochToDate(Number.parseInt(epochTimestamp, 10));
           console.log(
             `${colorDiffedEpochs[i]} | ${chalk.yellow(
               dayjs(date).format("hh:mm A MM-DD-YYYY"),

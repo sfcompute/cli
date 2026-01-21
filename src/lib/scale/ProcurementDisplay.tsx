@@ -2,12 +2,11 @@ import { Badge } from "@inkjs/ui";
 import { Box, Text } from "ink";
 
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
-
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { formatDuration } from "../orders/index.tsx";
+import { Row } from "../Row.tsx";
 
-import { type Procurement, formatColocationStrategy } from "./utils.ts";
+import { formatColocationStrategy, type Procurement } from "./utils.ts";
 
 export function ProcurementHeader({
   id,
@@ -45,7 +44,9 @@ export default function ProcurementDisplay({
     horizon,
     colocation_strategy,
   },
-}: { procurement: Procurement }) {
+}: {
+  procurement: Procurement;
+}) {
   const horizonMinutes = horizon;
   const quantity = desired_quantity * GPUS_PER_NODE;
   const pricePerGpuHourInCents = buy_limit_price_per_gpu_hour;

@@ -8,7 +8,7 @@ import { parseDate } from "chrono-node";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Box, Text, render, useApp } from "ink";
+import { Box, render, Text, useApp } from "ink";
 import Spinner from "ink-spinner";
 import ms from "ms";
 import parseDurationFromLibrary from "parse-duration";
@@ -30,12 +30,12 @@ import {
 } from "../../helpers/units.ts";
 import type { components } from "../../schema.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
-import type { Quote } from "../Quote.tsx";
-import QuoteDisplay from "../Quote.tsx";
-import { Row } from "../Row.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { parseAccelerators } from "../index.ts";
 import { analytics } from "../posthog.ts";
+import type { Quote } from "../Quote.tsx";
+import QuoteDisplay from "../Quote.tsx";
+import { Row } from "../Row.tsx";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -999,7 +999,7 @@ export async function getOrder(orderId: string) {
   });
 
   if (error) {
-    // @ts-ignore -- TODO: FIXME: include error in OpenAPI schema output
+    // @ts-expect-error -- TODO: FIXME: include error in OpenAPI schema output
     if (error?.code === "order.not_found" || response.status === 404) {
       return undefined;
     }
