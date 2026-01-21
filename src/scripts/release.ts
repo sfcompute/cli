@@ -58,18 +58,35 @@ const COMPILE_TARGETS: string[] = [
 ];
 
 async function compileDistribution() {
-  // Create dist directory
+  // Clean and create dist directory
+  fs.rmSync("./dist", { recursive: true, force: true });
   fs.mkdirSync("./dist", { recursive: true });
 
+  // Bundle with tsup first
+  console.log("Bundling with tsup...");
+  const tsupResult = spawnSync("npx", ["tsup"], { stdio: "inherit" });
+
+  if (tsupResult.status !== 0) {
+    logAndError("Failed to bundle with tsup");
+  }
+  console.log("✅ Bundle created at dist/index.cjs");
+
+  // Compile for each target using @yao-pkg/pkg
+  // Note: segfaults on macOS arm64 were fixed by polyfilling Intl.Segmenter
+  // See: https://github.com/yao-pkg/pkg-fetch/issues/134
   for (const target of COMPILE_TARGETS) {
-    const result = spawnSync("npx", [
-      "pkg",
-      ".",
-      "--target",
-      target,
-      "--output",
-      `dist/sf-${target}`,
-    ]);
+    const result = spawnSync(
+      "npx",
+      [
+        "@yao-pkg/pkg",
+        "dist/index.cjs",
+        "--target",
+        target,
+        "--output",
+        `dist/sf-${target}`,
+      ],
+      { stdio: "inherit" },
+    );
 
     if (result.status !== 0) {
       console.error(result.stderr?.toString() ?? "");
@@ -178,26 +195,36 @@ program
     "A github release tool for the project. Valid types are: major, minor, patch, prerelease",
   )
   .addArgument(
-    new Argument("type").choices([
+    new Argument("[type]").choices([
       "major",
       "minor",
       "patch",
       "prerelease",
     ] as const),
   )
-  .action(async (type) => {
+  .option("--no-commit", "Dry run: build only, skip version bump, git commit, and GitHub release")
+  .action(async (type, options) => {
     try {
-      const ghCheckResult = spawnSync("which", ["gh"]);
+      const noCommit = !options.commit;
 
-      if (ghCheckResult.status !== 0) {
-        console.error(
-          `The 'gh' command is not installed. Please install it.
+      if (!noCommit && !type) {
+        console.error("error: type argument is required when not using --no-commit");
+        process.exit(1);
+      }
+
+      if (!noCommit) {
+        const ghCheckResult = spawnSync("which", ["gh"]);
+
+        if (ghCheckResult.status !== 0) {
+          console.error(
+            `The 'gh' command is not installed. Please install it.
 
   $ brew install gh
 
   `,
-        );
-        process.exit(1);
+          );
+          process.exit(1);
+        }
       }
 
       process.on("SIGINT", () => {
@@ -212,10 +239,24 @@ program
 
       await cleanDist();
       const version = await getLocalVersion();
-      const bumpedVersion = bumpVersion(version, type);
-      await saveVersion(bumpedVersion);
+      const bumpedVersion = type ? bumpVersion(version, type) : version;
+
+      if (noCommit) {
+        if (type) {
+          console.log(`🔍 Dry run: would bump version to ${bumpedVersion}`);
+        }
+      } else {
+        await saveVersion(bumpedVersion);
+      }
+
       await compileDistribution();
-      await createRelease(bumpedVersion);
+
+      if (noCommit) {
+        console.log("🔍 Dry run: skipping GitHub release and git commit");
+        console.log(`✅ Dry run complete. Binaries available in ./dist`);
+      } else {
+        await createRelease(bumpedVersion);
+      }
     } catch (err) {
       console.error(err);
     }
