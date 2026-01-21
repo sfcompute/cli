@@ -4,7 +4,9 @@
   "bin": "src/index.ts",
   "pkg": {
     "scripts": "src/**/*.ts",
-    "assets": ["package.json"],
+    "assets": [
+      "package.json"
+    ],
     "outputPath": "dist"
   },
   "scripts": {

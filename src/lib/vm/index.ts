@@ -27,7 +27,7 @@ async function getVMDeprecationWarning() {
   const client = await nodesClient();
   const nodes = await client.nodes.list();
   const numNodesWithVMs =
-    nodes.data?.filter((node) => node.vms?.data?.length ?? 0 > 0).length ?? 0;
+    nodes.data?.filter((node) => (node.vms?.data?.length ?? 0) > 0).length ?? 0;
   if (numNodesWithVMs > 0) {
     return chalk.yellow(
       boxen(
