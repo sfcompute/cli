@@ -45,9 +45,9 @@ Releases are managed through GitHub Actions. To create a new release:
 3. Click on the "Release" workflow
 4. Click "Run workflow"
 5. Select the version bump type:
-   - `patch`: for backwards-compatible bug fixes (0.0.x)
-   - `minor`: for backwards-compatible new features (0.x.0)
-   - `major`: for breaking changes (x.0.0)
+   - `patch`: for backwards-compatible changes (0.0.x)
+   - `minor`: for breaking changes (0.x.0)
+   - `major`: for major breaking changes (x.0.0)
    - `prerelease`: for pre-release versions (0.0.0-pre.timestamp)
 6. Click "Run workflow" to start the release process
 
