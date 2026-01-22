@@ -1,7 +1,11 @@
 import * as console from "node:console";
 import type { Command } from "@commander-js/extra-typings";
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+} from "date-fns";
 import dayjs from "dayjs";
-import { differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
 import { Box, render, Text } from "ink";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
@@ -93,8 +97,14 @@ function getZoneCapacityMetrics(zone: ZoneInfo): CapacityMetrics {
 
   return {
     availableNow,
-    availableWithin1Day: { count: maxWithin1Day, startTimestamp: maxWithin1DayStart },
-    availableWithin1Week: { count: maxWithin1Week, startTimestamp: maxWithin1WeekStart },
+    availableWithin1Day: {
+      count: maxWithin1Day,
+      startTimestamp: maxWithin1DayStart,
+    },
+    availableWithin1Week: {
+      count: maxWithin1Week,
+      startTimestamp: maxWithin1WeekStart,
+    },
   };
 }
 
@@ -123,7 +133,7 @@ function hashString(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   return Math.abs(hash);
@@ -219,7 +229,6 @@ function hasAvailability(zone: ZoneInfo): boolean {
   );
 }
 
-
 function formatShortDistance(date: Date): string {
   const now = new Date();
   const minutes = differenceInMinutes(date, now);
@@ -253,7 +262,11 @@ function AvailabilityDisplay({
   const countStr = String(count).padStart(padWidth);
 
   if (isNow && count === 0) {
-    return <Text color="red" dimColor>sold out</Text>;
+    return (
+      <Text color="red" dimColor>
+        sold out
+      </Text>
+    );
   }
 
   if (isNow) {
@@ -268,7 +281,12 @@ function AvailabilityDisplay({
   if (count === 0 || startTimestamp === null) {
     return (
       <>
-        <Text color={count === 0 ? "red" : "greenBright"} dimColor={count === 0}>{countStr}</Text>
+        <Text
+          color={count === 0 ? "red" : "greenBright"}
+          dimColor={count === 0}
+        >
+          {countStr}
+        </Text>
         <Text color="green">{" now   "}</Text>
       </>
     );
@@ -325,12 +343,18 @@ function ZonesTableDisplay({
 
   // Pre-calculate metrics for all zones to determine padding widths
   const allMetrics = zones.map((z) => getZoneCapacityMetrics(z));
-  
+
   // Calculate max values for each column to determine padding
   const maxNow = Math.max(1, ...allMetrics.map((m) => m.availableNow));
-  const maxToday = Math.max(1, ...allMetrics.map((m) => m.availableWithin1Day.count));
-  const maxWeek = Math.max(1, ...allMetrics.map((m) => m.availableWithin1Week.count));
-  
+  const maxToday = Math.max(
+    1,
+    ...allMetrics.map((m) => m.availableWithin1Day.count),
+  );
+  const maxWeek = Math.max(
+    1,
+    ...allMetrics.map((m) => m.availableWithin1Week.count),
+  );
+
   // Calculate pad widths (number of digits needed)
   const nowPadWidth = String(maxNow).length;
   const todayPadWidth = String(maxToday).length;
@@ -368,11 +392,21 @@ function ZonesTableDisplay({
             <Text color="magenta">now</Text>
           </Box>
           <Text color="gray">┊</Text>
-          <Box width={COL.soonest} paddingLeft={1} paddingRight={1} justifyContent="flex-end">
+          <Box
+            width={COL.soonest}
+            paddingLeft={1}
+            paddingRight={1}
+            justifyContent="flex-end"
+          >
             <Text color="magenta">soonest</Text>
           </Box>
           <Text color="gray">┊</Text>
-          <Box width={COL.max} paddingLeft={1} paddingRight={1} justifyContent="flex-end">
+          <Box
+            width={COL.max}
+            paddingLeft={1}
+            paddingRight={1}
+            justifyContent="flex-end"
+          >
             <Text color="magenta">max</Text>
           </Box>
         </Box>
@@ -388,7 +422,9 @@ function ZonesTableDisplay({
           // Total width of node columns: now(11) + separator(1) + soonest(11) + separator(1) + max(11) = 35
           const nodeColsWidth = COL.now + 1 + COL.soonest + 1 + COL.max;
           const soldOutText = "sold out";
-          const dashCount = Math.floor((nodeColsWidth - soldOutText.length - 2) / 2);
+          const dashCount = Math.floor(
+            (nodeColsWidth - soldOutText.length - 2) / 2,
+          );
           const soldOutDisplay = `${"-".repeat(dashCount)} ${soldOutText} ${"-".repeat(dashCount)}`;
 
           return (
@@ -400,7 +436,9 @@ function ZonesTableDisplay({
                 <Text>{zone.hardware_type}</Text>
               </Box>
               <Box width={COL.region} paddingLeft={1}>
-                <Text color={getRegionColor(zone.region)}>{formatRegion(zone.region)}</Text>
+                <Text color={getRegionColor(zone.region)}>
+                  {formatRegion(zone.region)}
+                </Text>
               </Box>
               {allSoldOut ? (
                 <Box width={nodeColsWidth} paddingLeft={1}>
@@ -420,7 +458,9 @@ function ZonesTableDisplay({
                   <Box width={COL.soonest} paddingLeft={1}>
                     <AvailabilityDisplay
                       count={metrics.availableWithin1Day.count}
-                      startTimestamp={metrics.availableWithin1Day.startTimestamp}
+                      startTimestamp={
+                        metrics.availableWithin1Day.startTimestamp
+                      }
                       padWidth={todayPadWidth}
                     />
                   </Box>
@@ -428,7 +468,9 @@ function ZonesTableDisplay({
                   <Box width={COL.max} paddingLeft={1}>
                     <AvailabilityDisplay
                       count={metrics.availableWithin1Week.count}
-                      startTimestamp={metrics.availableWithin1Week.startTimestamp}
+                      startTimestamp={
+                        metrics.availableWithin1Week.startTimestamp
+                      }
                       padWidth={weekPadWidth}
                     />
                   </Box>
@@ -449,9 +491,7 @@ function ZonesTableDisplay({
             borderColor="gray"
             paddingLeft={1}
           >
-            <Text color="gray">
-              {hiddenCount} sold-out zones hidden. Use{" "}
-            </Text>
+            <Text color="gray">{hiddenCount} sold-out zones hidden. Use </Text>
             <Text color="white">sf zones ls</Text>
             <Text color="green"> --all</Text>
             <Text color="gray"> to show.</Text>
@@ -462,16 +502,16 @@ function ZonesTableDisplay({
       {/* Examples */}
       {firstAvailableZone && (
         <Box flexDirection="column" marginTop={1}>
-          <Text color="gray">
-            Use zone names when launching nodes.
-          </Text>
+          <Text color="gray">Use zone names when launching nodes.</Text>
           <Box marginTop={1} flexDirection="column">
             <Text color="gray">Examples:</Text>
             <Text>
-              {"  "}sf nodes create --zone <Text color="green">{firstAvailableZone}</Text>
+              {"  "}sf nodes create --zone{" "}
+              <Text color="green">{firstAvailableZone}</Text>
               {firstAvailableZoneStartTime && (
                 <>
-                  {" "}-s <Text color="green">{firstAvailableZoneStartTime}</Text>
+                  {" "}
+                  -s <Text color="green">{firstAvailableZoneStartTime}</Text>
                 </>
               )}
             </Text>
@@ -526,10 +566,12 @@ async function displayZonesTable(
 
     // Break ties with availableWithin1Week (higher first)
     if (
-      aMetrics.availableWithin1Week.count !== bMetrics.availableWithin1Week.count
+      aMetrics.availableWithin1Week.count !==
+      bMetrics.availableWithin1Week.count
     ) {
       return (
-        bMetrics.availableWithin1Week.count - aMetrics.availableWithin1Week.count
+        bMetrics.availableWithin1Week.count -
+        aMetrics.availableWithin1Week.count
       );
     }
 
@@ -576,7 +618,9 @@ function EmptyZonesDisplay() {
       <Box paddingLeft={2} flexDirection="column">
         <Text dimColor># Check back later for available zones</Text>
         <Text color="yellow">sf zones ls</Text>
-        <Text dimColor># To show all zones, including those with no availability</Text>
+        <Text dimColor>
+          # To show all zones, including those with no availability
+        </Text>
         <Text color="yellow">sf zones ls --all</Text>
       </Box>
     </Box>
