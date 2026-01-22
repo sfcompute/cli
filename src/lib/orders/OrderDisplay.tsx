@@ -189,7 +189,7 @@ export function OrderDisplay(props: {
 
         <Box paddingLeft={4} flexDirection="column">
           <Text dimColor># Place an order to buy compute</Text>
-          <Text color="yellow">sf buy</Text>
+          <Text color="yellow">sf nodes create</Text>
         </Box>
       </Box>
     );

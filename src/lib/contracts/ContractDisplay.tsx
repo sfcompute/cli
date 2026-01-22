@@ -170,8 +170,8 @@ export function ContractList(props: { contracts: Contract[] }) {
         </Box>
 
         <Box paddingLeft={4} flexDirection="column">
-          <Text dimColor># Place a buy order to get started</Text>
-          <Text color="yellow">sf buy</Text>
+          <Text dimColor># Buy a node to get started</Text>
+          <Text color="yellow">sf nodes create</Text>
         </Box>
       </Box>
     );
