@@ -29,8 +29,4 @@ Examples:\n
     image.help();
   });
 
-export function addImage(program: Command) {
-  program.addCommand(image);
-}
-
 export default image;

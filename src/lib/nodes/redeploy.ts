@@ -49,6 +49,12 @@ const redeploy = new Command("redeploy")
       "If set, any configuration left empty will be cleared in the new VM (default: inherits from current VM)",
     ),
   )
+  .addOption(
+    new Option(
+      "-i, --image <image-id>",
+      "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
+    ),
+  )
   .addOption(yesOption)
   .addOption(jsonOption)
   .addHelpText(
@@ -285,16 +291,6 @@ async function redeployNodeAction(
   } catch (err) {
     handleNodesError(err);
   }
-}
-
-export function addRedeploy(program: Command) {
-  redeploy.addOption(
-    new Option(
-      "-i, --image <image-id>",
-      "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
-    ),
-  );
-  program.addCommand(redeploy);
 }
 
 export default redeploy;

@@ -129,6 +129,12 @@ const create = new Command("create")
         }
       }),
   )
+  .addOption(
+    new Option(
+      "-i, --image <image-id>",
+      "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
+    ),
+  )
   .addOption(yesOption)
   .addOption(jsonOption)
   .hook("preAction", (command) => {
@@ -489,16 +495,6 @@ async function createNodesAction(
   } catch (err) {
     handleNodesError(err);
   }
-}
-
-export function addCreate(program: Command) {
-  create.addOption(
-    new Option(
-      "-i, --image <image-id>",
-      "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
-    ),
-  );
-  program.addCommand(create);
 }
 
 export default create;

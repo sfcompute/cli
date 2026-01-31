@@ -1,19 +1,19 @@
 import console from "node:console";
 import type { Command } from "@commander-js/extra-typings";
 
-import { addCreate } from "./create.ts";
+import create from "./create.ts";
 import deleteCommand from "./delete.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
-import { addImage } from "./image/index.ts";
+import image from "./image/index.ts";
 import list from "./list.tsx";
 import logs from "./logs.ts";
-import { addRedeploy } from "./redeploy.ts";
+import redeploy from "./redeploy.ts";
 import release from "./release.ts";
 import set from "./set.ts";
 import ssh from "./ssh.ts";
 
-export async function registerNodes(program: Command) {
+export function registerNodes(program: Command) {
   const nodes = program
     .command("nodes")
     .alias("node")
@@ -21,16 +21,15 @@ export async function registerNodes(program: Command) {
     .description("Manage compute nodes")
     .addCommand(list)
     .addCommand(get)
+    .addCommand(create)
     .addCommand(extend)
     .addCommand(release)
     .addCommand(deleteCommand)
+    .addCommand(redeploy)
     .addCommand(set)
     .addCommand(ssh)
-    .addCommand(logs);
-
-  addImage(nodes);
-  addCreate(nodes);
-  addRedeploy(nodes);
+    .addCommand(logs)
+    .addCommand(image);
 
   const baseHelpText = nodes.helpInformation();
 
