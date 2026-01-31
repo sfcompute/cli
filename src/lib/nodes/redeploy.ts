@@ -8,7 +8,6 @@ import chalk from "chalk";
 import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   jsonOption,
@@ -48,6 +47,12 @@ const redeploy = new Command("redeploy")
     new Option(
       "-O, --override-empty",
       "If set, any configuration left empty will be cleared in the new VM (default: inherits from current VM)",
+    ),
+  )
+  .addOption(
+    new Option(
+      "-i, --image <image-id>",
+      "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
     ),
   )
   .addOption(yesOption)
@@ -286,20 +291,6 @@ async function redeployNodeAction(
   } catch (err) {
     handleNodesError(err);
   }
-}
-
-// Remove this once the feature flag is enabled by default
-export async function addRedeploy(program: Command) {
-  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
-  if (imagesEnabled) {
-    redeploy.addOption(
-      new Option(
-        "-i, --image <image-id>",
-        "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
-      ),
-    );
-  }
-  program.addCommand(redeploy);
 }
 
 export default redeploy;

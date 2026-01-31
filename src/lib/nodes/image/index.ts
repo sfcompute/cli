@@ -1,5 +1,4 @@
 import { Command } from "@commander-js/extra-typings";
-import { isFeatureEnabled } from "../../posthog.ts";
 import list from "./list.tsx";
 import show from "./show.tsx";
 import upload from "./upload.ts";
@@ -29,12 +28,5 @@ Examples:\n
   .action(() => {
     image.help();
   });
-
-export async function addImage(program: Command) {
-  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
-  if (imagesEnabled) {
-    program.addCommand(image);
-  }
-}
 
 export default image;

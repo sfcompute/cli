@@ -3,7 +3,7 @@ import type { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
 import chalk from "chalk";
 import { nodesClient } from "../../nodesClient.ts";
-import { addImage } from "../nodes/image/index.ts";
+import image from "../nodes/image/index.ts";
 import { pluralizeNodes } from "../nodes/utils.ts";
 import list from "./list.ts";
 import logs from "./logs.ts";
@@ -62,8 +62,9 @@ export async function registerVM(program: Command) {
 
   registerSsh(vm);
 
-  vm.addCommand(list).addCommand(logs).addCommand(replace).addCommand(script);
-
-  // Add images command if feature flag is enabled
-  await addImage(vm);
+  vm.addCommand(list)
+    .addCommand(logs)
+    .addCommand(replace)
+    .addCommand(script)
+    .addCommand(image);
 }
