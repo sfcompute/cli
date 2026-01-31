@@ -6,6 +6,8 @@ import {
   differenceInMinutes,
 } from "date-fns";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
 import { Box, render, Text } from "ink";
 import { apiClient } from "../apiClient.ts";
 import { isLoggedIn } from "../helpers/config.ts";
@@ -17,7 +19,43 @@ import {
 import type { components } from "../schema.ts";
 import { isFeatureEnabled } from "./posthog.ts";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 type ZoneInfo = components["schemas"]["node-api_ZoneInfo"];
+
+/**
+ * Get the timezone abbreviation for display purposes
+ * @param useUTC - If true, return "UTC" instead of local timezone
+ * @returns Timezone abbreviation (e.g., "PST", "EST", "UTC")
+ */
+function getTimezoneAbbreviation(useUTC = false): string {
+  if (useUTC) {
+    return "UTC";
+  }
+
+  try {
+    // Get the user's local timezone
+    const userTimezone = dayjs.tz.guess();
+
+    // Use Intl.DateTimeFormat to get the timezone abbreviation
+    // This is more reliable than dayjs.format("z") in Node.js
+    const dateFormatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: userTimezone,
+      timeZoneName: "short",
+    });
+    const parts = dateFormatter.formatToParts(new Date());
+    const timeZonePart = parts.find((part) => part.type === "timeZoneName");
+
+    if (timeZonePart?.value) {
+      return timeZonePart.value;
+    }
+  } catch {
+    // Fall through to return UTC
+  }
+
+  return "UTC";
+}
 
 type CapacityMetrics = {
   availableNow: number;
@@ -320,8 +358,8 @@ const COL = {
   gpu: 6,
   region: 15,
   now: 11,
-  soonest: 11,
-  max: 11,
+  soonest: 18, // Increased to accommodate " (PST)" or similar timezone indicators
+  max: 18, // Increased to accommodate " (PST)" or similar timezone indicators
 };
 
 function ZonesTableDisplay({
@@ -359,6 +397,9 @@ function ZonesTableDisplay({
   const nowPadWidth = String(maxNow).length;
   const todayPadWidth = String(maxToday).length;
   const weekPadWidth = String(maxWeek).length;
+
+  // Get timezone abbreviation for display
+  const timezoneAbbr = getTimezoneAbbreviation();
 
   return (
     <Box flexDirection="column">
@@ -398,7 +439,8 @@ function ZonesTableDisplay({
             paddingRight={1}
             justifyContent="flex-end"
           >
-            <Text color="magenta">soonest</Text>
+            <Text color="magenta">soonest </Text>
+            <Text color="yellow">({timezoneAbbr})</Text>
           </Box>
           <Text color="gray">┊</Text>
           <Box
@@ -407,7 +449,8 @@ function ZonesTableDisplay({
             paddingRight={1}
             justifyContent="flex-end"
           >
-            <Text color="magenta">max</Text>
+            <Text color="magenta">max </Text>
+            <Text color="yellow">({timezoneAbbr})</Text>
           </Box>
         </Box>
 
@@ -419,7 +462,7 @@ function ZonesTableDisplay({
             metrics.availableWithin1Day.count === 0 &&
             metrics.availableWithin1Week.count === 0;
 
-          // Total width of node columns: now(11) + separator(1) + soonest(11) + separator(1) + max(11) = 35
+          // Total width of node columns: now(11) + separator(1) + soonest(18) + separator(1) + max(18) = 49
           const nodeColsWidth = COL.now + 1 + COL.soonest + 1 + COL.max;
           const soldOutText = "sold out";
           const dashCount = Math.floor(
