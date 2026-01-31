@@ -34,37 +34,27 @@ function getTimezoneAbbreviation(useUTC = false): string {
     return "UTC";
   }
 
-  // Get the user's local timezone
-  const userTimezone = dayjs.tz.guess();
+  try {
+    // Get the user's local timezone
+    const userTimezone = dayjs.tz.guess();
 
-  // Get current date in the user's timezone
-  const now = dayjs().tz(userTimezone);
+    // Use Intl.DateTimeFormat to get the timezone abbreviation
+    // This is more reliable than dayjs.format("z") in Node.js
+    const dateFormatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: userTimezone,
+      timeZoneName: "short",
+    });
+    const parts = dateFormatter.formatToParts(new Date());
+    const timeZonePart = parts.find((part) => part.type === "timeZoneName");
 
-  // Format to get timezone abbreviation
-  // This uses the browser/system's locale data to get the short timezone name
-  const formatted = now.format("z");
-
-  // If we get a timezone offset instead of abbreviation, try another approach
-  if (
-    formatted.startsWith("GMT") ||
-    formatted.startsWith("+") ||
-    formatted.startsWith("-")
-  ) {
-    // Extract timezone abbreviation from locale string
-    try {
-      const dateFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: userTimezone,
-        timeZoneName: "short",
-      });
-      const parts = dateFormatter.formatToParts(new Date());
-      const timeZonePart = parts.find((part) => part.type === "timeZoneName");
-      return timeZonePart?.value || "UTC";
-    } catch {
-      return "UTC";
+    if (timeZonePart?.value) {
+      return timeZonePart.value;
     }
+  } catch {
+    // Fall through to return UTC
   }
 
-  return formatted;
+  return "UTC";
 }
 
 type CapacityMetrics = {
