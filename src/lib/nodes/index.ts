@@ -28,9 +28,9 @@ export async function registerNodes(program: Command) {
     .addCommand(ssh)
     .addCommand(logs);
 
-  await addImage(nodes);
-  await addCreate(nodes);
-  await addRedeploy(nodes);
+  addImage(nodes);
+  addCreate(nodes);
+  addRedeploy(nodes);
 
   const baseHelpText = nodes.helpInformation();
 

@@ -21,7 +21,6 @@ import {
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
-import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   durationOption,
@@ -492,17 +491,13 @@ async function createNodesAction(
   }
 }
 
-// Remove this once the feature flag is enabled by default
-export async function addCreate(program: Command) {
-  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
-  if (imagesEnabled) {
-    create.addOption(
-      new Option(
-        "-i, --image <image-id>",
-        "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
-      ),
-    );
-  }
+export function addCreate(program: Command) {
+  create.addOption(
+    new Option(
+      "-i, --image <image-id>",
+      "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
+    ),
+  );
   program.addCommand(create);
 }
 

@@ -8,7 +8,6 @@ import chalk from "chalk";
 import ora from "ora";
 
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   jsonOption,
@@ -288,17 +287,13 @@ async function redeployNodeAction(
   }
 }
 
-// Remove this once the feature flag is enabled by default
-export async function addRedeploy(program: Command) {
-  const imagesEnabled = await isFeatureEnabled("custom-vm-images");
-  if (imagesEnabled) {
-    redeploy.addOption(
-      new Option(
-        "-i, --image <image-id>",
-        "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
-      ),
-    );
-  }
+export function addRedeploy(program: Command) {
+  redeploy.addOption(
+    new Option(
+      "-i, --image <image-id>",
+      "ID of the VM image to use for the new VM (inherits from current VM if not specified)",
+    ),
+  );
   program.addCommand(redeploy);
 }
 

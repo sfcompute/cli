@@ -64,6 +64,5 @@ export async function registerVM(program: Command) {
 
   vm.addCommand(list).addCommand(logs).addCommand(replace).addCommand(script);
 
-  // Add images command if feature flag is enabled
-  await addImage(vm);
+  addImage(vm);
 }
