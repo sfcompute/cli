@@ -462,7 +462,7 @@ function ZonesTableDisplay({
             metrics.availableWithin1Day.count === 0 &&
             metrics.availableWithin1Week.count === 0;
 
-          // Total width of node columns: now(11) + separator(1) + soonest(11) + separator(1) + max(11) = 35
+          // Total width of node columns: now(11) + separator(1) + soonest(18) + separator(1) + max(18) = 49
           const nodeColsWidth = COL.now + 1 + COL.soonest + 1 + COL.max;
           const soldOutText = "sold out";
           const dashCount = Math.floor(
