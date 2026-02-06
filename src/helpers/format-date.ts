@@ -109,9 +109,9 @@ export const formatNullableDateRange = (
  * This is needed because formatDate() uses toLocaleTimeString() which always
  * formats in local timezone. This function formats directly in UTC using dayjs.
  *
- * Shows "Today" only if the UTC and local representations fall on the same
- * calendar day. Otherwise shows the UTC date explicitly to avoid confusion
- * (e.g., "Today, 8pm PST" with "Feb 6, 4am UTC" makes it clear they're different days).
+ * Only shows the date if UTC falls on a different calendar day than local
+ * (e.g., "Today, 8pm PST Feb 6, 4am UTC"). If same day, just shows time
+ * (e.g., "Today, 10am PST 6pm UTC").
  */
 export const formatDateAsUTC = (date: Dayjs): string => {
   const utcDate = date.utc();
@@ -133,7 +133,7 @@ export const formatDateAsUTC = (date: Dayjs): string => {
     utcDate.year() === localDate.year();
 
   if (sameCalendarDay) {
-    return `Today, ${timeStr} UTC`;
+    return `${timeStr} UTC`;
   }
 
   return `${utcDate.format("MMM D")}, ${timeStr} UTC`;
