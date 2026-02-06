@@ -117,16 +117,13 @@ export const formatDateAsUTC = (date: Dayjs): string => {
   const utcDate = date.utc();
   const localDate = date;
 
-  const hour = utcDate.hour();
-  const minute = utcDate.minute();
-  const ampm = hour >= 12 ? "pm" : "am";
-  const hour12 = hour % 12 || 12;
+  // Format time: "4pm" or "4:30pm"
   const timeStr =
-    minute === 0
-      ? `${hour12}${ampm}`
-      : `${hour12}:${String(minute).padStart(2, "0")}${ampm}`;
+    utcDate.minute() === 0
+      ? utcDate.format("ha")
+      : utcDate.format("h:mma");
 
-  // Only show "Today" if UTC and local fall on the same calendar day
+  // Only show date if UTC and local fall on different calendar days
   const sameCalendarDay =
     utcDate.date() === localDate.date() &&
     utcDate.month() === localDate.month() &&
