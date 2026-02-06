@@ -119,9 +119,7 @@ export const formatDateAsUTC = (date: Dayjs): string => {
 
   // Format time: "4pm" or "4:30pm"
   const timeStr =
-    utcDate.minute() === 0
-      ? utcDate.format("ha")
-      : utcDate.format("h:mma");
+    utcDate.minute() === 0 ? utcDate.format("ha") : utcDate.format("h:mma");
 
   // Only show date if UTC and local fall on different calendar days
   const sameCalendarDay =
