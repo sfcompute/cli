@@ -23,6 +23,7 @@ import {
   DEFAULT_NODE_LS_LIMIT,
   getLastVM,
   getStatusColor,
+  getTimezoneAbbreviation,
   getVMStatusColor,
   jsonOption,
   pluralizeNodes,
@@ -48,6 +49,9 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
   const sortedVms = vms.sort((a, b) => b.updated_at - a.updated_at);
   const vmsToShow = sortedVms.slice(0, 5);
   const remainingVms = sortedVms.length - 5;
+
+  // Get timezone abbreviation for the header
+  const timezoneAbbr = getTimezoneAbbreviation();
 
   return (
     <Box flexDirection="column" padding={0}>
@@ -143,10 +147,16 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
             borderLeft={false}
             borderRight={false}
             borderColor="gray"
+            gap={1}
           >
             <Text bold color="cyan">
               Start/End
             </Text>
+            {timezoneAbbr && (
+              <Text bold color="white">
+                ({timezoneAbbr})
+              </Text>
+            )}
           </Box>
           {vmsToShow.map((vm) => {
             const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;
