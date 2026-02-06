@@ -23,11 +23,11 @@ import {
   DEFAULT_NODE_LS_LIMIT,
   getLastVM,
   getStatusColor,
+  getTimezoneAbbreviation,
   getVMStatusColor,
   jsonOption,
   pluralizeNodes,
   printNodeType,
-  getTimezoneAbbreviation,
 } from "./utils.ts";
 
 dayjs.extend(utc);
@@ -152,10 +152,11 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
             <Text bold color="cyan">
               Start/End
             </Text>
-            {timezoneAbbr && <Text bold color="white">
+            {timezoneAbbr && (
+              <Text bold color="white">
                 ({timezoneAbbr})
               </Text>
-            }
+            )}
           </Box>
           {vmsToShow.map((vm) => {
             const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;

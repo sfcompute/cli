@@ -152,7 +152,8 @@ export function createNodesTable(
       chalk.cyan("CURRENT VM"),
       chalk.cyan("GPU"),
       chalk.cyan("ZONE"),
-      chalk.cyan("START/END") + (timezoneAbbr ? ` ${chalk.white(`(${timezoneAbbr})`)}` : ""),
+      chalk.cyan("START/END") +
+        (timezoneAbbr ? ` ${chalk.white(`(${timezoneAbbr})`)}` : ""),
       chalk.cyan("MAX PRICE"),
     ],
     style: {
