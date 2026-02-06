@@ -4,10 +4,48 @@ import chalk from "chalk";
 import { parseDate } from "chrono-node";
 import Table from "cli-table3";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
 import { parseDurationArgument } from "../../helpers/duration.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatNullableDateRange } from "../../helpers/format-date.ts";
 import { parseStartDateOrNow } from "../../helpers/units.ts";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+/**
+ * Get the timezone abbreviation for display purposes
+ * @param useUTC - If true, return "UTC" instead of local timezone
+ * @returns Timezone abbreviation (e.g., "PST", "EST", "UTC")
+ */
+function getTimezoneAbbreviation(useUTC = false): string {
+  if (useUTC) {
+    return "UTC";
+  }
+
+  try {
+    // Get the user's local timezone
+    const userTimezone = dayjs.tz.guess();
+
+    // Use Intl.DateTimeFormat to get the timezone abbreviation
+    // This is more reliable than dayjs.format("z") in Node.js
+    const dateFormatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: userTimezone,
+      timeZoneName: "short",
+    });
+    const parts = dateFormatter.formatToParts(new Date());
+    const timeZonePart = parts.find((part) => part.type === "timeZoneName");
+
+    if (timeZonePart?.value) {
+      return timeZonePart.value;
+    }
+  } catch {
+    // Fall through to return UTC
+  }
+
+  return "UTC";
+}
 
 export function printNodeStatus(status: SFCNodes.Node["status"]): string {
   switch (status) {
@@ -103,6 +141,9 @@ export function createNodesTable(
   nodes: SFCNodes.Node[],
   limit: number = DEFAULT_NODE_LS_LIMIT,
 ): string {
+  // Get timezone abbreviation for the header
+  const timezoneAbbr = getTimezoneAbbreviation();
+
   const table = new Table({
     head: [
       chalk.cyan("NAME"),
@@ -111,7 +152,7 @@ export function createNodesTable(
       chalk.cyan("CURRENT VM"),
       chalk.cyan("GPU"),
       chalk.cyan("ZONE"),
-      chalk.cyan("START/END"),
+      chalk.cyan("START/END") + " " + chalk.yellow(`(${timezoneAbbr})`),
       chalk.cyan("MAX PRICE"),
     ],
     style: {
