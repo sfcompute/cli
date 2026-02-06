@@ -105,7 +105,7 @@ export const formatNullableDateRange = (
 };
 
 export const dateSameAcrossTimezones = (date: Date): boolean => {
-  const endDayUserTZ = dayjs(date);
-  const endDayUTC = dayjs(date).utc(true);
-  return endDayUserTZ.isSame(endDayUTC);
+  const localDate = dayjs(date);
+  const utcDate = dayjs(date).utc();
+  return localDate.isSame(utcDate, 'day');
 };
