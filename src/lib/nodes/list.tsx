@@ -27,44 +27,12 @@ import {
   jsonOption,
   pluralizeNodes,
   printNodeType,
+  getTimezoneAbbreviation,
 } from "./utils.ts";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
-
-/**
- * Get the timezone abbreviation for display purposes
- * @param useUTC - If true, return "UTC" instead of local timezone
- * @returns Timezone abbreviation (e.g., "PST", "EST", "UTC")
- */
-function getTimezoneAbbreviation(useUTC = false): string {
-  if (useUTC) {
-    return "UTC";
-  }
-
-  try {
-    // Get the user's local timezone
-    const userTimezone = dayjs.tz.guess();
-
-    // Use Intl.DateTimeFormat to get the timezone abbreviation
-    // This is more reliable than dayjs.format("z") in Node.js
-    const dateFormatter = new Intl.DateTimeFormat("en-US", {
-      timeZone: userTimezone,
-      timeZoneName: "short",
-    });
-    const parts = dateFormatter.formatToParts(new Date());
-    const timeZonePart = parts.find((part) => part.type === "timeZoneName");
-
-    if (timeZonePart?.value) {
-      return timeZonePart.value;
-    }
-  } catch {
-    // Fall through to return UTC
-  }
-
-  return "UTC";
-}
 
 // Valid node status values for filtering
 const VALID_STATES = [
@@ -179,14 +147,15 @@ function VMTable({ vms }: { vms: NonNullable<SFCNodes.Node["vms"]>["data"] }) {
             borderLeft={false}
             borderRight={false}
             borderColor="gray"
+            gap={1}
           >
             <Text bold color="cyan">
               Start/End
             </Text>
-            <Text> </Text>
-            <Text bold color="yellow">
-              ({timezoneAbbr})
-            </Text>
+            {timezoneAbbr && <Text bold color="white">
+                ({timezoneAbbr})
+              </Text>
+            }
           </Box>
           {vmsToShow.map((vm) => {
             const startDate = vm.start_at ? dayjs.unix(vm.start_at) : null;

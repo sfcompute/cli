@@ -19,7 +19,7 @@ dayjs.extend(timezone);
  * @param useUTC - If true, return "UTC" instead of local timezone
  * @returns Timezone abbreviation (e.g., "PST", "EST", "UTC")
  */
-function getTimezoneAbbreviation(useUTC = false): string {
+export function getTimezoneAbbreviation(useUTC = false) {
   if (useUTC) {
     return "UTC";
   }
@@ -44,7 +44,7 @@ function getTimezoneAbbreviation(useUTC = false): string {
     // Fall through to return UTC
   }
 
-  return "UTC";
+  return null;
 }
 
 export function printNodeStatus(status: SFCNodes.Node["status"]): string {
@@ -152,7 +152,7 @@ export function createNodesTable(
       chalk.cyan("CURRENT VM"),
       chalk.cyan("GPU"),
       chalk.cyan("ZONE"),
-      chalk.cyan("START/END") + " " + chalk.yellow(`(${timezoneAbbr})`),
+      chalk.cyan("START/END") + (timezoneAbbr ? ` ${chalk.white(`(${timezoneAbbr})`)}` : ""),
       chalk.cyan("MAX PRICE"),
     ],
     style: {
