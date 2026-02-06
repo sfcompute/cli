@@ -158,7 +158,7 @@ export async function selectTime(
   const suggestedHigherUserTZ = `${formatDate(suggestedHigher.toDate(), {
     forceIncludeTime: true,
   })} ${dayjs(suggestedHigher).format("z")}`;
-  const suggestedHigherUTC = `${formatDate(suggestedHigher.utc(true).toDate(), {
+  const suggestedHigherUTC = `${formatDate(suggestedHigher.utc().toDate(), {
     today: suggestedHigher.toDate(),
     showToday: dateSameAcrossTimezones(suggestedHigher.toDate()),
     forceIncludeTime: true,
@@ -192,7 +192,7 @@ export async function selectTime(
     const suggestedLowerUserTZ = `${formatDate(suggestedLower.toDate(), {
       forceIncludeTime: true,
     })} ${dayjs(suggestedLower).format("z")}`;
-    const suggestedLowerUTC = `${formatDate(suggestedLower.utc(true).toDate(), {
+    const suggestedLowerUTC = `${formatDate(suggestedLower.utc().toDate(), {
       today: suggestedLower.toDate(),
       showToday: dateSameAcrossTimezones(suggestedLower.toDate()),
       forceIncludeTime: true,
