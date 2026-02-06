@@ -104,8 +104,37 @@ export const formatNullableDateRange = (
   return startEnd;
 };
 
-export const dateSameAcrossTimezones = (date: Date): boolean => {
-  const localDate = dayjs(date);
-  const utcDate = dayjs(date).utc();
-  return localDate.isSame(utcDate, 'day');
+/**
+ * Formats a dayjs date in UTC timezone.
+ * This is needed because formatDate() uses toLocaleTimeString() which always
+ * formats in local timezone. This function formats directly in UTC using dayjs.
+ *
+ * Shows "Today" only if the UTC and local representations fall on the same
+ * calendar day. Otherwise shows the UTC date explicitly to avoid confusion
+ * (e.g., "Today, 8pm PST" with "Feb 6, 4am UTC" makes it clear they're different days).
+ */
+export const formatDateAsUTC = (date: Dayjs): string => {
+  const utcDate = date.utc();
+  const localDate = date;
+
+  const hour = utcDate.hour();
+  const minute = utcDate.minute();
+  const ampm = hour >= 12 ? "pm" : "am";
+  const hour12 = hour % 12 || 12;
+  const timeStr =
+    minute === 0
+      ? `${hour12}${ampm}`
+      : `${hour12}:${String(minute).padStart(2, "0")}${ampm}`;
+
+  // Only show "Today" if UTC and local fall on the same calendar day
+  const sameCalendarDay =
+    utcDate.date() === localDate.date() &&
+    utcDate.month() === localDate.month() &&
+    utcDate.year() === localDate.year();
+
+  if (sameCalendarDay) {
+    return `Today, ${timeStr} UTC`;
+  }
+
+  return `${utcDate.format("MMM D")}, ${timeStr} UTC`;
 };

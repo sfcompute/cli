@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import type { Nullable } from "../types/empty.ts";
-import { dateSameAcrossTimezones, formatDate } from "./format-date.ts";
+import { formatDate, formatDateAsUTC } from "./format-date.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -158,11 +158,7 @@ export async function selectTime(
   const suggestedHigherUserTZ = `${formatDate(suggestedHigher.toDate(), {
     forceIncludeTime: true,
   })} ${dayjs(suggestedHigher).format("z")}`;
-  const suggestedHigherUTC = `${formatDate(suggestedHigher.utc().toDate(), {
-    today: suggestedHigher.toDate(),
-    showToday: dateSameAcrossTimezones(suggestedHigher.toDate()),
-    forceIncludeTime: true,
-  })} UTC`;
+  const suggestedHigherUTC = formatDateAsUTC(suggestedHigher);
 
   // If the lower boundary is in the past, suggest "NOW"
   if (suggestedLower.isBefore(dayjs(new Date()))) {
@@ -192,11 +188,7 @@ export async function selectTime(
     const suggestedLowerUserTZ = `${formatDate(suggestedLower.toDate(), {
       forceIncludeTime: true,
     })} ${dayjs(suggestedLower).format("z")}`;
-    const suggestedLowerUTC = `${formatDate(suggestedLower.utc().toDate(), {
-      today: suggestedLower.toDate(),
-      showToday: dateSameAcrossTimezones(suggestedLower.toDate()),
-      forceIncludeTime: true,
-    })} UTC`;
+    const suggestedLowerUTC = formatDateAsUTC(suggestedLower);
 
     const maxLength = Math.max(
       suggestedLowerUserTZ.length,
