@@ -104,8 +104,32 @@ export const formatNullableDateRange = (
   return startEnd;
 };
 
-export const dateSameAcrossTimezones = (date: Date): boolean => {
-  const endDayUserTZ = dayjs(date);
-  const endDayUTC = dayjs(date).utc(true);
-  return endDayUserTZ.isSame(endDayUTC);
+/**
+ * Formats a dayjs date in UTC timezone.
+ * This is needed because formatDate() uses toLocaleTimeString() which always
+ * formats in local timezone. This function formats directly in UTC using dayjs.
+ *
+ * Only shows the date if UTC falls on a different calendar day than local
+ * (e.g., "Today, 8pm PST Feb 6, 4am UTC"). If same day, just shows time
+ * (e.g., "Today, 10am PST 6pm UTC").
+ */
+export const formatDateAsUTC = (date: Dayjs): string => {
+  const utcDate = date.utc();
+  const localDate = date;
+
+  // Format time: "4pm" or "4:30pm"
+  const timeStr =
+    utcDate.minute() === 0 ? utcDate.format("ha") : utcDate.format("h:mma");
+
+  // Only show date if UTC and local fall on different calendar days
+  const sameCalendarDay =
+    utcDate.date() === localDate.date() &&
+    utcDate.month() === localDate.month() &&
+    utcDate.year() === localDate.year();
+
+  if (sameCalendarDay) {
+    return `${timeStr} UTC`;
+  }
+
+  return `${utcDate.format("MMM D")}, ${timeStr} UTC`;
 };
