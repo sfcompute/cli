@@ -19,7 +19,6 @@ import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
 import { registerContracts } from "./lib/contracts/index.tsx";
 import { registerDev } from "./lib/dev.ts";
-import { registerExtend } from "./lib/extend/index.tsx";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
 import { registerNodes } from "./lib/nodes/index.ts";
@@ -44,7 +43,6 @@ async function main() {
 
   // commands
   registerLogin(program);
-  registerExtend(program);
   registerContracts(program);
   registerBalance(program);
   registerTokens(program);

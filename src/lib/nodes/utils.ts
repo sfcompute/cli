@@ -8,7 +8,7 @@ import timezone from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 import { parseDurationArgument } from "../../helpers/duration.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
-import { formatNullableDateRange } from "../../helpers/format-date.ts";
+import { formatNullableDateRange } from "../../helpers/format-time.ts";
 import { parseStartDateOrNow } from "../../helpers/units.ts";
 
 dayjs.extend(utc);

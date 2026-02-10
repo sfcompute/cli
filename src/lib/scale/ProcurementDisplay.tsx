@@ -1,6 +1,6 @@
 import { Badge } from "@inkjs/ui";
 import { Box, Text } from "ink";
-import { formatDuration } from "../../helpers/format-duration.ts";
+import { formatDuration } from "../../helpers/format-time.ts";
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";

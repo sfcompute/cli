@@ -2,7 +2,7 @@ import process from "node:process";
 import dayjs from "dayjs";
 import { Box, measureElement, Text, useInput } from "ink";
 import React, { useEffect } from "react";
-import { formatDuration } from "../../helpers/format-duration.ts";
+import { formatDuration } from "../../helpers/format-time.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
 import type { HydratedOrder } from "./types.ts";

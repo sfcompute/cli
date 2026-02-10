@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { apiClient } from "../apiClient.ts";
 import { GPUS_PER_NODE } from "../lib/constants.ts";
+import type { components } from "../schema.ts";
 import { logAndQuit, logSessionTokenExpiredAndQuit } from "./errors.ts";
 import { parseStartDateOrNow, roundDateUpToNextMinute } from "./units.ts";
 
@@ -22,7 +23,7 @@ export function getPricePerGpuHourFromQuote(
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
-type QuoteOptions = {
+export async function getQuote(options: {
   instanceType?: string;
   quantity: number;
   minStartTime: Date | "NOW";
@@ -31,9 +32,7 @@ type QuoteOptions = {
   maxDurationSeconds: number;
   cluster?: string;
   colocateWith?: string;
-};
-
-export async function getQuote(options: QuoteOptions) {
+}) {
   const api = await apiClient();
 
   const params = {
@@ -96,21 +95,4 @@ export async function getQuote(options: QuoteOptions) {
   };
 }
 
-export type Quote =
-  | {
-      price: number;
-      quantity: number;
-      start_at: string;
-      end_at: string;
-      instance_type: string;
-      zone?: string;
-    }
-  | {
-      price: number;
-      quantity: number;
-      start_at: string;
-      end_at: string;
-      contract_id: string;
-      zone?: string;
-    }
-  | null;
+export type Quote = components["schemas"]["quoter_ApiQuoteDetails"] | null;

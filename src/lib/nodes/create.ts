@@ -12,7 +12,7 @@ import utc from "dayjs/plugin/utc";
 import ora from "ora";
 
 import { logAndQuit } from "../../helpers/errors.ts";
-import { formatDate } from "../../helpers/format-date.ts";
+import { formatDate } from "../../helpers/format-time.ts";
 import { getPricePerGpuHourFromQuote, getQuote } from "../../helpers/quote.ts";
 import {
   parseStartDate,

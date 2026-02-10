@@ -1,5 +1,5 @@
 import { Box, Text } from "ink";
-import { formatDuration } from "../../helpers/format-duration.ts";
+import { formatDuration } from "../../helpers/format-time.ts";
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
 import { Row } from "../Row.tsx";
 

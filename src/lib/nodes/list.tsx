@@ -15,7 +15,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import {
   formatDate,
   formatNullableDateRange,
-} from "../../helpers/format-date.ts";
+} from "../../helpers/format-time.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 import {
