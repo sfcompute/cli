@@ -8,9 +8,9 @@ import { formatDuration } from "date-fns/formatDuration";
 import { intervalToDuration } from "date-fns/intervalToDuration";
 import dayjs from "dayjs";
 import ora from "ora";
+import { getPricePerGpuHourFromQuote, getQuote } from "../../helpers/quote.ts";
 import { selectTime } from "../../helpers/units.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { getPricePerGpuHourFromQuote, getQuote } from "../../helpers/quote.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import {
   createNodesTable,

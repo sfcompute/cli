@@ -1,14 +1,8 @@
 import dayjs from "dayjs";
 import { apiClient } from "../apiClient.ts";
-import {
-  logAndQuit,
-  logSessionTokenExpiredAndQuit,
-} from "./errors.ts";
-import {
-  parseStartDateOrNow,
-  roundDateUpToNextMinute,
-} from "./units.ts";
 import { GPUS_PER_NODE } from "../lib/constants.ts";
+import { logAndQuit, logSessionTokenExpiredAndQuit } from "./errors.ts";
+import { parseStartDateOrNow, roundDateUpToNextMinute } from "./units.ts";
 
 export function getPricePerGpuHourFromQuote(
   quote: Pick<NonNullable<Quote>, "start_at" | "end_at" | "price" | "quantity">,
