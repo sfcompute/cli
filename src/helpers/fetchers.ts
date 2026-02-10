@@ -13,20 +13,3 @@ export async function getContract(contractId: string) {
   }
   return data;
 }
-
-export async function getOrder(orderId: string) {
-  const api = await apiClient();
-  const { data, response, error } = await api.GET("/v0/orders/{id}", {
-    params: {
-      path: { id: orderId },
-    },
-  });
-  if (!response.ok) {
-    // @ts-expect-error -- TODO: FIXME: include error in OpenAPI schema output
-    if (error?.code === "order.not_found") {
-      return null;
-    }
-    return logAndQuit(`Failed to get order: ${response.statusText}`);
-  }
-  return data;
-}

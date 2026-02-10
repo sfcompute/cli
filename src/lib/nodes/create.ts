@@ -19,7 +19,7 @@ import {
   selectTime,
 } from "../../helpers/units.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
+import { getPricePerGpuHourFromQuote, getQuote } from "../../helpers/quote.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import {
   createNodesTable,

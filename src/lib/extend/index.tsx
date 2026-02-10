@@ -2,15 +2,8 @@ import console from "node:console";
 import process from "node:process";
 import type { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
 import ora from "ora";
 import { apiClient } from "../../apiClient.ts";
-import { getContractRange } from "../contracts/utils.ts";
-
-dayjs.extend(relativeTime);
-dayjs.extend(duration);
 
 function _registerExtend(program: Command) {
   return program
@@ -43,9 +36,7 @@ function _registerExtend(program: Command) {
 ${boxen(
   `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
   \x1b[31mTo create, extend, and release specific machines directly, use \x1b[97msf nodes\x1b[31m.\x1b[0m
-  \x1b[31mTo "extend" a contract, use \x1b[97msf buy -colo <contract_id> -s <contract_end_time> -d <duration>\x1b[31m.\x1b[0m
-  \x1b[31mHowever, contracts don't map to specific machines, so you can't choose which will persist.\x1b[0m
-  \x1b[31mWe strongly recommend using \x1b[97msf nodes\x1b[31m instead.\x1b[0m`,
+  \x1b[31mFor example: \x1b[97msf nodes extend <node-name> --duration 3600 --max-price 12.50\x1b[31m.\x1b[0m`,
   {
     padding: 0.75,
     borderColor: "red",
@@ -72,34 +63,11 @@ ${boxen(
         spinner.clear();
       }
 
-      const contractRange =
-        contract?.shape && getContractRange(contract?.shape);
-
-      // Build the equivalent sf buy command
-      let equivalentCommand = `sf buy -colo ${options.contract} -s ${
-        contractRange?.endsAt?.toISOString?.() ?? "<contract_end_time>"
-      } -d ${options.duration}`;
-
-      if (options.price) {
-        equivalentCommand += ` -p ${options.price}`;
-      }
-      if (options.yes) {
-        equivalentCommand += " -y";
-      }
-      if (options.quote) {
-        equivalentCommand += " -q";
-      }
-      if (options.standing) {
-        equivalentCommand += " --standing";
-      }
-
       console.error(
         boxen(
           `\x1b[31m\x1b[97msf extend\x1b[31m is deprecated.\x1b[0m
   \x1b[31mTo create, extend, and release specific machines directly, use \x1b[97msf nodes\x1b[31m.\x1b[0m
-  \x1b[31mTo "extend" a contract, use: \x1b[97m${equivalentCommand}\x1b[31m.\x1b[0m
-  \x1b[31mHowever, contracts don't map to specific machines, so you can't choose which will persist.\x1b[0m
-  \x1b[31mWe strongly recommend using \x1b[97msf nodes\x1b[31m instead.\x1b[0m`,
+  \x1b[31mFor example: \x1b[97msf nodes extend <node-name> --duration 3600 --max-price 12.50\x1b[31m.\x1b[0m`,
           {
             padding: 0.75,
             borderColor: "red",

@@ -3,7 +3,7 @@ import { Box, Text } from "ink";
 
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
-import { formatDuration } from "../orders/index.tsx";
+import { formatDuration } from "../../helpers/format-duration.ts";
 import { Row } from "../Row.tsx";
 
 import { formatColocationStrategy, type Procurement } from "./utils.ts";

@@ -22,10 +22,6 @@ const apiPaths: Record<string, Path<IdParams | never>> = {
   me: "/v0/me",
   ping: "/v0/ping",
 
-  orders_list: "/v0/orders",
-  orders_get: ({ id }: IdParams): string => `/v0/orders/${id}`,
-  orders_cancel: ({ id }: IdParams): string => `/v0/orders/${id}`,
-
   quote_get: "/v0/quote",
 
   instances_list: "/v0/instances",

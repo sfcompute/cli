@@ -4,7 +4,7 @@ import { Box, measureElement, Text, useInput } from "ink";
 import React, { useEffect } from "react";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
-import { formatDuration } from "./index.tsx";
+import { formatDuration } from "../../helpers/format-duration.ts";
 import type { HydratedOrder } from "./types.ts";
 
 export function orderDetails(order: HydratedOrder) {

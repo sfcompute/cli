@@ -13,7 +13,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { roundDateUpToNextMinute } from "../../helpers/units.ts";
 
 import type { components } from "../../schema.ts";
-import { getQuote } from "../buy/index.tsx";
+import { getQuote } from "../../helpers/quote.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { pluralizeNodes } from "../nodes/utils.ts";
