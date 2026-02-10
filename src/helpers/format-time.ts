@@ -6,8 +6,8 @@ import {
   startOfDay,
 } from "date-fns";
 import dayjs, { type Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
 import duration from "dayjs/plugin/duration";
+import utc from "dayjs/plugin/utc";
 import { formatDateRange } from "little-date";
 
 dayjs.extend(utc);
