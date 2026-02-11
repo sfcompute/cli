@@ -2,9 +2,9 @@ import process from "node:process";
 import dayjs from "dayjs";
 import { Box, measureElement, Text, useInput } from "ink";
 import React, { useEffect } from "react";
+import { formatDuration } from "../../helpers/format-time.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
-import { formatDuration } from "./index.tsx";
 import type { HydratedOrder } from "./types.ts";
 
 export function orderDetails(order: HydratedOrder) {

@@ -12,14 +12,14 @@ import utc from "dayjs/plugin/utc";
 import ora from "ora";
 
 import { logAndQuit } from "../../helpers/errors.ts";
-import { formatDate } from "../../helpers/format-date.ts";
+import { formatDate } from "../../helpers/format-time.ts";
+import { getPricePerGpuHourFromQuote, getQuote } from "../../helpers/quote.ts";
 import {
   parseStartDate,
   roundStartDate,
   selectTime,
 } from "../../helpers/units.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import { getPricePerGpuHourFromQuote, getQuote } from "../buy/index.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import {
   createNodesTable,

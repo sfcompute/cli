@@ -17,17 +17,13 @@ import { checkVersion } from "./checkVersion.ts";
 import { loadConfig, saveConfig } from "./helpers/config.ts";
 import { getAppBanner } from "./lib/app-banner.ts";
 import { registerBalance } from "./lib/balance.ts";
-import { registerBuy } from "./lib/buy/index.tsx";
 import { registerContracts } from "./lib/contracts/index.tsx";
 import { registerDev } from "./lib/dev.ts";
-import { registerExtend } from "./lib/extend/index.tsx";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
 import { registerNodes } from "./lib/nodes/index.ts";
-import { registerOrders } from "./lib/orders/index.tsx";
 import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerScale } from "./lib/scale/index.tsx";
-import { registerSell } from "./lib/sell.ts";
 import { registerTokens } from "./lib/tokens.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm/index.ts";
@@ -47,11 +43,7 @@ async function main() {
 
   // commands
   registerLogin(program);
-  registerBuy(program);
-  registerExtend(program);
-  registerOrders(program);
   registerContracts(program);
-  registerSell(program);
   registerBalance(program);
   registerTokens(program);
   registerUpgrade(program);

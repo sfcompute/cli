@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import type { Nullable } from "../types/empty.ts";
-import { formatDate, formatDateAsUTC } from "./format-date.ts";
+import { formatDate, formatDateAsUTC } from "./format-time.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

@@ -10,10 +10,9 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { getQuote } from "../../helpers/quote.ts";
 import { roundDateUpToNextMinute } from "../../helpers/units.ts";
-
 import type { components } from "../../schema.ts";
-import { getQuote } from "../buy/index.tsx";
 import ConfirmInput from "../ConfirmInput.tsx";
 import { GPUS_PER_NODE } from "../constants.ts";
 import { pluralizeNodes } from "../nodes/utils.ts";

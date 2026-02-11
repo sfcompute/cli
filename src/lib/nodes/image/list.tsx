@@ -6,7 +6,7 @@ import ora from "ora";
 
 import { getAuthToken } from "../../../helpers/config.ts";
 import { logAndQuit } from "../../../helpers/errors.ts";
-import { formatDate } from "../../../helpers/format-date.ts";
+import { formatDate } from "../../../helpers/format-time.ts";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
 
 const list = new Command("list")

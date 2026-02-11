@@ -10,7 +10,7 @@ import {
   logLoginMessageAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../helpers/errors.ts";
-import { formatDate } from "../helpers/format-date.ts";
+import { formatDate } from "../helpers/format-time.ts";
 import { getApiUrl } from "../helpers/urls.ts";
 
 export const TOKEN_EXPIRATION_SECONDS = {
