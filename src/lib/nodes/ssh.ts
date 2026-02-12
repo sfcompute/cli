@@ -13,16 +13,10 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import type { components } from "../../schema.ts";
 import { jsonOption } from "./utils.ts";
 
-type SshInfo = {
-  ssh_hostname: string;
-  ssh_port: number;
-  ssh_host_keys?: {
-    key_type: string;
-    base64_encoded_key: string;
-  }[];
-};
+type SshInfo = components["schemas"]["vmorch_GetSshResponse"];
 
 const ssh = new Command("ssh")
   .description(`SSH into a VM on a node.
