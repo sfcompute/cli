@@ -399,7 +399,7 @@ const upload = new Command("upload")
 
       const object = completeResponse.data;
       console.log(chalk.gray("\nNext steps:"));
-      console.log(`  sf nodes images show ${chalk.cyan(object.image_id)}`);
+      console.log(`  sf nodes images show ${chalk.cyan(object.id)}`);
     } catch (err) {
       // Clean up spinner timer
       if (spinnerTimer) {
