@@ -6,14 +6,23 @@ import chalk from "chalk";
 import ora from "ora";
 import { Shescape } from "shescape";
 
-import { getAuthToken } from "../../helpers/config.ts";
+import { apiClient } from "../../apiClient.ts";
+import { getAuthToken, loadConfig } from "../../helpers/config.ts";
 import {
   logAndQuit,
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
-import { getApiUrl } from "../../helpers/urls.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { jsonOption } from "./utils.ts";
+
+type SshInfo = {
+  ssh_hostname: string;
+  ssh_port: number;
+  ssh_host_keys?: {
+    key_type: string;
+    base64_encoded_key: string;
+  }[];
+};
 
 const ssh = new Command("ssh")
   .description(`SSH into a VM on a node.
@@ -46,7 +55,7 @@ Examples:
 
   \x1b[2m# SSH with a specific username\x1b[0m
   $ sf nodes ssh jenson@my-node
-  
+
   \x1b[2m# SSH directly to a VM ID\x1b[0m
   $ sf nodes ssh root@vm_xxxxxxxxxxxxxxxxxxxxx
 `,
@@ -67,75 +76,72 @@ Examples:
         logAndQuit(`Invalid SSH destination string: ${destination}`);
       }
 
-      let vmId: string;
+      const sshSpinner = ora("Fetching SSH information...").start();
+      const config = await loadConfig();
+      const token = await getAuthToken();
 
-      // If the ID doesn't start with vm_, assume it's a node name/ID
-      if (!nodeOrVmId.startsWith("vm_")) {
-        const client = await nodesClient();
-        const spinner = ora("Fetching node information...").start();
+      let hostKeyAlias: string;
+      let data: SshInfo;
 
-        try {
-          const node = await client.nodes.get(nodeOrVmId);
-          spinner.succeed(`Node found for name ${chalk.cyan(nodeOrVmId)}.`);
+      // Try v2 endpoint first
+      const v2Response = await fetch(
+        `${config.api_url}/v2/nodes/${nodeOrVmId}/ssh`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-          if (!node?.current_vm) {
-            spinner.fail(
-              `Node ${chalk.cyan(
-                nodeOrVmId,
-              )} does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
-            );
-            process.exit(1);
+      if (v2Response.ok) {
+        data = await v2Response.json();
+        hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
+      } else {
+        // Fall back to v1 flow: resolve node name/ID to VM ID, then use v0 endpoint
+        let vmId: string;
+
+        if (!nodeOrVmId.startsWith("vm_")) {
+          const client = await nodesClient();
+          try {
+            const node = await client.nodes.get(nodeOrVmId);
+            if (!node?.current_vm) {
+              sshSpinner.fail(
+                `Node ${chalk.cyan(
+                  nodeOrVmId,
+                )} does not have a current VM. VMs can take up to 5-10 minutes to spin up.`,
+              );
+              process.exit(1);
+            }
+            vmId = node.current_vm.id;
+          } catch {
+            vmId = nodeOrVmId;
           }
-
-          vmId = node.current_vm.id;
-        } catch {
-          spinner.info(
-            `No node found for name ${chalk.cyan(
-              nodeOrVmId,
-            )}. Interpreting as VM ID...`,
-          );
+        } else {
           vmId = nodeOrVmId;
         }
-      } else {
-        vmId = nodeOrVmId;
-      }
 
-      const sshSpinner = ora("Fetching SSH information...").start();
-      const baseUrl = await getApiUrl("vms_ssh_get");
-      const params = new URLSearchParams();
-      params.append("vm_id", vmId);
-      const url = `${baseUrl}?${params.toString()}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${await getAuthToken()}`,
-        },
-      });
+        const client = await apiClient(token);
+        const { response, data: sshData } = await client.GET("/v0/vms/ssh", {
+          params: { query: { vm_id: vmId } },
+        });
 
-      if (!response.ok) {
         if (response.status === 401) {
           sshSpinner.stop();
           logSessionTokenExpiredAndQuit();
         }
 
-        sshSpinner.fail(
-          `Failed to retrieve SSH information for ${chalk.cyan(
-            vmId,
-          )}: ${response.statusText}`,
-        );
-        process.exit(1);
+        if (!response.ok || !sshData) {
+          sshSpinner.fail(
+            `Failed to retrieve SSH information for ${chalk.cyan(
+              vmId,
+            )}: ${response.statusText}`,
+          );
+          process.exit(1);
+        }
+
+        data = sshData;
+        hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
       }
 
-      const data = (await response.json()) as {
-        ssh_hostname: string;
-        ssh_port: number;
-        ssh_host_keys:
-          | {
-              key_type: string;
-              base64_encoded_key: string;
-            }[]
-          | undefined;
-      };
       sshSpinner.succeed("SSH information fetched successfully.");
 
       if (options.json) {
@@ -162,7 +168,7 @@ Examples:
         let knownHostsCommand = ["/usr/bin/env", "printf", "%s %s %s\\n"];
         for (const sshHostKey of sshHostKeys) {
           knownHostsCommand = knownHostsCommand.concat([
-            `${vmId}.vms.sfcompute.dev`,
+            hostKeyAlias,
             sshHostKey.key_type,
             sshHostKey.base64_encoded_key,
           ]);
@@ -177,7 +183,7 @@ Examples:
         cmd = cmd.concat(["-o", `KnownHostsCommand=${knownHostsCommand_str}`]);
       }
 
-      cmd = cmd.concat(["-o", `HostKeyAlias=${vmId}.vms.sfcompute.dev`]);
+      cmd = cmd.concat(["-o", `HostKeyAlias=${hostKeyAlias}`]);
       cmd = cmd.concat([sshDestination]);
 
       let shescape: undefined | Shescape;
