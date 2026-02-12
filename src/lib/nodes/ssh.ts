@@ -77,23 +77,46 @@ Examples:
       let hostKeyAlias: string;
       let data: SshInfo;
 
-      // Try v2 endpoint first
-      const v2Response = await fetch(
-        `${config.api_url}/v2/nodes/${nodeOrVmId}/ssh`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      if (nodeOrVmId.startsWith("vm_")) {
+        // vm_ prefix means this is a legacy VM ID; skip v2 and go straight to v0
+        const client = await apiClient(token);
+        const { response, data: sshData } = await client.GET("/v0/vms/ssh", {
+          params: { query: { vm_id: nodeOrVmId } },
+        });
 
-      if (v2Response.ok) {
-        data = await v2Response.json();
-        hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
+        if (response.status === 401) {
+          sshSpinner.stop();
+          logSessionTokenExpiredAndQuit();
+        }
+
+        if (!response.ok || !sshData) {
+          sshSpinner.fail(
+            `Failed to retrieve SSH information for ${chalk.cyan(
+              nodeOrVmId,
+            )}: ${response.statusText}`,
+          );
+          process.exit(1);
+        }
+
+        data = sshData;
+        hostKeyAlias = `${nodeOrVmId}.vms.sfcompute.dev`;
       } else {
-        // Fall back to v1 flow: resolve node name/ID to VM ID, then use v0 endpoint
-        let vmId: string;
+        // Try v2 endpoint first
+        const v2Response = await fetch(
+          `${config.api_url}/v2/nodes/${nodeOrVmId}/ssh`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-        if (!nodeOrVmId.startsWith("vm_")) {
+        if (v2Response.ok) {
+          data = await v2Response.json();
+          hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
+        } else {
+          // Fall back to v0 flow: resolve node name/ID to VM ID
+          let vmId: string;
+
           const client = await nodesClient();
           try {
             const node = await client.nodes.get(nodeOrVmId);
@@ -109,31 +132,29 @@ Examples:
           } catch {
             vmId = nodeOrVmId;
           }
-        } else {
-          vmId = nodeOrVmId;
+
+          const apiCli = await apiClient(token);
+          const { response, data: sshData } = await apiCli.GET("/v0/vms/ssh", {
+            params: { query: { vm_id: vmId } },
+          });
+
+          if (response.status === 401) {
+            sshSpinner.stop();
+            logSessionTokenExpiredAndQuit();
+          }
+
+          if (!response.ok || !sshData) {
+            sshSpinner.fail(
+              `Failed to retrieve SSH information for ${chalk.cyan(
+                vmId,
+              )}: ${response.statusText}`,
+            );
+            process.exit(1);
+          }
+
+          data = sshData;
+          hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
         }
-
-        const client = await apiClient(token);
-        const { response, data: sshData } = await client.GET("/v0/vms/ssh", {
-          params: { query: { vm_id: vmId } },
-        });
-
-        if (response.status === 401) {
-          sshSpinner.stop();
-          logSessionTokenExpiredAndQuit();
-        }
-
-        if (!response.ok || !sshData) {
-          sshSpinner.fail(
-            `Failed to retrieve SSH information for ${chalk.cyan(
-              vmId,
-            )}: ${response.statusText}`,
-          );
-          process.exit(1);
-        }
-
-        data = sshData;
-        hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
       }
 
       sshSpinner.succeed("SSH information fetched successfully.");
