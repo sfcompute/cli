@@ -74,34 +74,11 @@ Examples:
       const config = await loadConfig();
       const token = await getAuthToken();
 
-      let hostKeyAlias: string;
-      let data: SshInfo;
+      let hostKeyAlias = "";
+      let data: SshInfo | undefined;
 
-      if (nodeOrVmId.startsWith("vm_")) {
-        // vm_ prefix means this is a legacy VM ID; skip v2 and go straight to v0
-        const client = await apiClient(token);
-        const { response, data: sshData } = await client.GET("/v0/vms/ssh", {
-          params: { query: { vm_id: nodeOrVmId } },
-        });
-
-        if (response.status === 401) {
-          sshSpinner.stop();
-          logSessionTokenExpiredAndQuit();
-        }
-
-        if (!response.ok || !sshData) {
-          sshSpinner.fail(
-            `Failed to retrieve SSH information for ${chalk.cyan(
-              nodeOrVmId,
-            )}: ${response.statusText}`,
-          );
-          process.exit(1);
-        }
-
-        data = sshData;
-        hostKeyAlias = `${nodeOrVmId}.vms.sfcompute.dev`;
-      } else {
-        // Try v2 endpoint first
+      // Try v2 endpoint for non-vm_ IDs
+      if (!nodeOrVmId.startsWith("vm_")) {
         const v2Response = await fetch(
           `${config.api_url}/v2/nodes/${nodeOrVmId}/ssh`,
           {
@@ -113,10 +90,14 @@ Examples:
         if (v2Response.ok) {
           data = await v2Response.json();
           hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
-        } else {
-          // Fall back to v0 flow: resolve node name/ID to VM ID
-          let vmId: string;
+        }
+      }
 
+      // Fall back to v0 flow if v2 didn't resolve
+      if (!data) {
+        let vmId: string;
+
+        if (!nodeOrVmId.startsWith("vm_")) {
           const client = await nodesClient();
           try {
             const node = await client.nodes.get(nodeOrVmId);
@@ -132,29 +113,31 @@ Examples:
           } catch {
             vmId = nodeOrVmId;
           }
-
-          const apiCli = await apiClient(token);
-          const { response, data: sshData } = await apiCli.GET("/v0/vms/ssh", {
-            params: { query: { vm_id: vmId } },
-          });
-
-          if (response.status === 401) {
-            sshSpinner.stop();
-            logSessionTokenExpiredAndQuit();
-          }
-
-          if (!response.ok || !sshData) {
-            sshSpinner.fail(
-              `Failed to retrieve SSH information for ${chalk.cyan(
-                vmId,
-              )}: ${response.statusText}`,
-            );
-            process.exit(1);
-          }
-
-          data = sshData;
-          hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
+        } else {
+          vmId = nodeOrVmId;
         }
+
+        const client = await apiClient(token);
+        const { response, data: sshData } = await client.GET("/v0/vms/ssh", {
+          params: { query: { vm_id: vmId } },
+        });
+
+        if (response.status === 401) {
+          sshSpinner.stop();
+          logSessionTokenExpiredAndQuit();
+        }
+
+        if (!response.ok || !sshData) {
+          sshSpinner.fail(
+            `Failed to retrieve SSH information for ${chalk.cyan(
+              vmId,
+            )}: ${response.statusText}`,
+          );
+          process.exit(1);
+        }
+
+        data = sshData;
+        hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
       }
 
       sshSpinner.succeed("SSH information fetched successfully.");
