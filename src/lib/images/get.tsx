@@ -108,7 +108,9 @@ const get = new Command("get")
       params: { path: { id } },
     });
     if (!response.ok || !image) {
-      logAndQuit(`Failed to get image: ${response.status} ${response.statusText}`);
+      logAndQuit(
+        `Failed to get image: ${response.status} ${response.statusText}`,
+      );
     }
 
     // Fetch download URL if image is completed

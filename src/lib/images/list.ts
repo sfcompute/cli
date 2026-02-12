@@ -34,7 +34,9 @@ Examples:\n
     spinner.stop();
 
     if (!response.ok || !result) {
-      logAndQuit(`Failed to list images: ${response.status} ${response.statusText}`);
+      logAndQuit(
+        `Failed to list images: ${response.status} ${response.statusText}`,
+      );
     }
 
     if (options.json) {

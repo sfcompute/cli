@@ -231,13 +231,10 @@ const upload = new Command("upload")
             }
 
             // Get presigned URL via v2 API
-            const partResponse = await client.POST(
-              "/v2/images/{id}/parts",
-              {
-                params: { path: { id: imageId } },
-                body: { part_id: part },
-              },
-            );
+            const partResponse = await client.POST("/v2/images/{id}/parts", {
+              params: { path: { id: imageId } },
+              body: { part_id: part },
+            });
 
             if (!partResponse.response.ok || !partResponse.data) {
               const status = partResponse.response.status;
@@ -356,13 +353,10 @@ const upload = new Command("upload")
       const sha256Hash = hash.digest("hex");
 
       // Complete upload via v2 API
-      const completeResponse = await client.POST(
-        "/v2/images/{id}/complete",
-        {
-          params: { path: { id: imageId } },
-          body: { sha256_hash: sha256Hash },
-        },
-      );
+      const completeResponse = await client.POST("/v2/images/{id}/complete", {
+        params: { path: { id: imageId } },
+        body: { sha256_hash: sha256Hash },
+      });
 
       if (!completeResponse.response.ok || !completeResponse.data) {
         const errorText = await completeResponse.response
@@ -376,9 +370,7 @@ const upload = new Command("upload")
       finalizingSpinner.succeed("Image uploaded and verified");
 
       console.log(chalk.gray("\nNext steps:"));
-      console.log(
-        `  sf images get ${chalk.cyan(completeResponse.data.id)}`,
-      );
+      console.log(`  sf images get ${chalk.cyan(completeResponse.data.id)}`);
     } catch (err) {
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
