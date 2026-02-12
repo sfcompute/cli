@@ -1,32 +1,32 @@
-import { Command } from "@commander-js/extra-typings";
-import list from "./list.tsx";
-import show from "./show.tsx";
+import type { Command } from "@commander-js/extra-typings";
+import get from "./get.tsx";
+import list from "./list.ts";
 import upload from "./upload.ts";
 
-const image = new Command("images")
-  .alias("os")
-  .alias("image")
-  .description("Manage VM images")
-  .showHelpAfterError()
-  .addHelpText(
-    "after",
-    `
+export function registerImages(program: Command) {
+  const images = program
+    .command("images")
+    .alias("image")
+    .description("Manage images")
+    .showHelpAfterError()
+    .addHelpText(
+      "after",
+      `
 Examples:\n
   \x1b[2m# Upload an image file\x1b[0m
-  $ sf node image upload ./my-image.img
+  $ sf images upload -f ./my-image.raw -n my-image
 
   \x1b[2m# List all images\x1b[0m
-  $ sf node image list
+  $ sf images list
 
-  \x1b[2m# Show image details and download URL\x1b[0m
-  $ sf node image show <image-id>
+  \x1b[2m# Get image details and download URL\x1b[0m
+  $ sf images get <image-id>
 `,
-  )
-  .addCommand(list)
-  .addCommand(upload)
-  .addCommand(show)
-  .action(() => {
-    image.help();
-  });
-
-export default image;
+    )
+    .addCommand(list)
+    .addCommand(upload)
+    .addCommand(get)
+    .action(() => {
+      images.help();
+    });
+}

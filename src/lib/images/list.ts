@@ -3,136 +3,118 @@ import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 import Table from "cli-table3";
 import ora from "ora";
-
-import { getAuthToken } from "../../../helpers/config.ts";
-import { logAndQuit } from "../../../helpers/errors.ts";
-import { formatDate } from "../../../helpers/format-time.ts";
-import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
+import { apiClient } from "../../apiClient.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
+import { formatDate } from "../../helpers/format-time.ts";
 
 const list = new Command("list")
   .alias("ls")
-  .description("List all VM images")
+  .description("List images")
   .showHelpAfterError()
   .option("--json", "Output in JSON format")
   .addHelpText(
     "after",
     `
-Next Steps:\n
+Examples:\n
   \x1b[2m# List all images\x1b[0m
-  $ sf node images list
+  $ sf images list
 
   \x1b[2m# Get detailed info for a specific image\x1b[0m
-  $ sf node images show <image-id>
+  $ sf images get <image-id>
 
   \x1b[2m# List images in JSON format\x1b[0m
-  $ sf node images list --json
+  $ sf images list --json
 `,
   )
   .action(async (options) => {
-    try {
-      const token = await getAuthToken();
-      if (!token) {
-        logAndQuit("Not logged in. Please run 'sf login' first.");
-      }
-      const client = await nodesClient(token);
+    const client = await apiClient();
 
-      const spinner = ora("Fetching images...").start();
-      const { data: images } = await client.vms.images.list();
+    const spinner = ora("Fetching images...").start();
+    const { data: result, response } = await client.GET("/v2/images");
+    spinner.stop();
 
-      spinner.stop();
+    if (!response.ok || !result) {
+      logAndQuit(`Failed to list images: ${response.status} ${response.statusText}`);
+    }
 
-      if (options.json) {
-        console.log(JSON.stringify(images, null, 2));
-        return;
-      }
+    if (options.json) {
+      console.log(JSON.stringify(result, null, 2));
+      return;
+    }
 
-      if (images.length === 0) {
-        console.log("No images found.");
-        console.log(chalk.gray("\nUpload your first image:"));
-        console.log("  sf node images upload -f ./my-image.img -n my-image");
-        return;
-      }
+    const images = result.data;
 
-      // Sort images by created_at (newest first)
-      const sortedImages = [...images].sort((a, b) => {
-        const aTime = a.created_at || 0;
-        const bTime = b.created_at || 0;
-        return bTime - aTime;
-      });
-      const imagesToShow = sortedImages.slice(0, 5);
+    if (images.length === 0) {
+      console.log("No images found.");
+      console.log(chalk.gray("\nUpload your first image:"));
+      console.log("  sf images upload -f ./my-image.img -n my-image");
+      return;
+    }
 
-      // Create and display images table
-      const table = new Table({
-        head: [
-          chalk.cyan("NAME"),
-          chalk.cyan("ID"),
-          chalk.cyan("STATUS"),
-          chalk.cyan("CREATED"),
-        ],
-        style: {
-          head: [],
-          border: ["gray"],
+    // Sort images by created_at (newest first)
+    const sortedImages = [...images].sort((a, b) => {
+      return (b.created_at || 0) - (a.created_at || 0);
+    });
+    const imagesToShow = sortedImages.slice(0, 5);
+
+    const table = new Table({
+      head: [
+        chalk.cyan("NAME"),
+        chalk.cyan("ID"),
+        chalk.cyan("STATUS"),
+        chalk.cyan("CREATED"),
+      ],
+      style: {
+        head: [],
+        border: ["gray"],
+      },
+    });
+
+    for (const image of imagesToShow) {
+      const createdAt = image.created_at
+        ? formatDate(new Date(image.created_at * 1000))
+        : "Unknown";
+
+      const status = formatStatus(image.upload_status);
+
+      table.push([image.name, image.id, status, createdAt]);
+    }
+
+    if (images.length > 5) {
+      table.push([
+        {
+          colSpan: 4,
+          content: chalk.blackBright(
+            `${images.length - 5} older ${
+              images.length - 5 === 1 ? "image" : "images"
+            } not shown. Use sf images list --json to list all images.`,
+          ),
         },
-      });
+      ]);
+    }
 
-      for (const image of imagesToShow) {
-        const createdAt = image.created_at
-          ? formatDate(new Date(image.created_at * 1000))
-          : "Unknown";
+    console.log(table.toString());
 
-        const status = (() => {
-          switch (image.upload_status) {
-            case "started":
-              return chalk.green("Started");
-            case "uploading":
-              return chalk.yellow("Uploading");
-            case "completed":
-              return chalk.cyan("Completed");
-            case "failed":
-              return chalk.red("Failed");
-            default:
-              return chalk.gray("Unknown");
-          }
-        })();
-
-        table.push([image.name, image.image_id, status, createdAt]);
-      }
-      if (images.length > 5) {
-        table.push([
-          {
-            colSpan: 4,
-            content: chalk.blackBright(
-              `${images.length - 5} older ${
-                images.length - 5 === 1 ? "image" : "images"
-              } not shown. Use sf node images list --json to list all images.`,
-            ),
-          },
-        ]);
-      }
-
-      console.log(table.toString());
-
-      // Show next steps
-      console.log(chalk.gray("\nNext steps:"));
-
-      // Always show how to get info for a specific image
-      const firstImage = sortedImages[0];
-      if (firstImage) {
-        console.log(`  sf node images show ${chalk.cyan(firstImage.image_id)}`);
-      }
-      const firstCompletedImage = sortedImages.find(
-        (image) => image.upload_status === "completed",
-      );
-      if (firstCompletedImage) {
-        console.log(
-          `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${chalk.cyan(
-            firstCompletedImage.image_id,
-          )}`,
-        );
-      }
-    } catch (err) {
-      handleNodesError(err);
+    console.log(chalk.gray("\nNext steps:"));
+    const firstImage = sortedImages[0];
+    if (firstImage) {
+      console.log(`  sf images get ${chalk.cyan(firstImage.id)}`);
     }
   });
+
+function formatStatus(status: string): string {
+  switch (status) {
+    case "started":
+      return chalk.green("Started");
+    case "uploading":
+      return chalk.yellow("Uploading");
+    case "completed":
+      return chalk.cyan("Completed");
+    case "failed":
+      return chalk.red("Failed");
+    default:
+      return chalk.gray("Unknown");
+  }
+}
 
 export default list;
