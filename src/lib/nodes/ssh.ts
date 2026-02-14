@@ -147,9 +147,9 @@ Examples:
         return;
       }
 
-      const sshHostname = data.ssh_hostname;
-      const sshPort = data.ssh_port;
-      const sshHostKeys = data.ssh_host_keys || [];
+      const sshHostname = data.hostname ?? data.ssh_hostname;
+      const sshPort = data.port ?? data.ssh_port;
+      const sshHostKeys = data.host_keys ?? data.ssh_host_keys ?? [];
 
       let sshDestination = sshHostname;
       if (sshUsername !== undefined) {
@@ -168,7 +168,7 @@ Examples:
           knownHostsCommand = knownHostsCommand.concat([
             hostKeyAlias,
             sshHostKey.key_type,
-            sshHostKey.base64_encoded_key,
+            sshHostKey.key ?? sshHostKey.base64_encoded_key,
           ]);
         }
         // Escape all characters for proper pass through
