@@ -10,8 +10,8 @@ import chalk from "chalk";
 import cliProgress from "cli-progress";
 import cliSpinners from "cli-spinners";
 import ora, { type Ora } from "ora";
-import { apiClient } from "../../../apiClient.ts";
-import { logAndQuit } from "../../../helpers/errors.ts";
+import { apiClient } from "../../apiClient.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
 
 async function readChunk(
   filePath: string,
@@ -32,7 +32,6 @@ async function readChunk(
         start + offset,
       );
       if (bytesRead === 0) {
-        // EOF reached
         break;
       }
       offset += bytesRead;
@@ -54,7 +53,7 @@ async function readChunk(
 }
 
 const upload = new Command("upload")
-  .description("Upload a VM image file (multipart)")
+  .description("Upload an image file (multipart)")
   .requiredOption("-f, --file <file>", "Path to the image file")
   .requiredOption("-n, --name <name>", "Image name")
   .option(
@@ -76,35 +75,36 @@ const upload = new Command("upload")
     let progressBar: cliProgress.SingleBar | undefined;
 
     try {
-      preparingSpinner = ora(`Preparing upload for ${name}...`).start();
       const client = await apiClient();
 
-      // Start upload
-      const startResponse = await client.POST("/v1/vms/images/start_upload", {
-        body: {
-          name,
-        },
+      preparingSpinner = ora(`Preparing upload for ${name}...`).start();
+
+      // Create image via v2 API
+      const startResponse = await client.POST("/v2/images", {
+        body: { name },
       });
 
-      if (!startResponse.data) {
+      if (!startResponse.response.ok || !startResponse.data) {
+        const errorText = await startResponse.response.text().catch(() => "");
         throw new Error(
-          `Failed to start upload: ${startResponse.response.status} ${startResponse.response.statusText}`,
+          `Failed to start upload: ${startResponse.response.status} ${startResponse.response.statusText}${errorText ? ` - ${errorText}` : ""}`,
         );
       }
 
-      const imageId = startResponse.data.image_id;
+      const imageId = startResponse.data.id;
+
       preparingSpinner.succeed(
         `Started upload for image ${chalk.cyan(name)} (${chalk.blackBright(
           imageId,
         )})`,
       );
 
-      // Get file info and open as stream
+      // Get file info
       const fileInfo = await stat(filePath);
       const fileSize = fileInfo.size;
 
       // Check file size limit (128 GiB)
-      const maxFileSize = 128 * 1024 * 1024 * 1024; // 128 GiB in bytes
+      const maxFileSize = 128 * 1024 * 1024 * 1024;
       if (fileSize > maxFileSize) {
         logAndQuit(
           `File size exceeds maximum allowed size of 128 GiB. File size: ${(
@@ -113,13 +113,11 @@ const upload = new Command("upload")
         );
       }
 
-      // Calculate parts for progress tracking
-      const minChunk = 5 * 1024 * 1024; // 5 MiB (minimum)
+      // Calculate parts
+      const minChunk = 5 * 1024 * 1024; // 5 MiB
       const defaultChunk = 64 * 1024 * 1024; // 64 MiB
-      const maxParts = 10000; // object storage supports up to 10k parts
+      const maxParts = 10000;
 
-      // For files smaller than default chunk, use the whole file as one part
-      // Otherwise use default chunk size, but ensure we don't exceed maxParts
       const chunkSize =
         fileSize <= defaultChunk
           ? Math.max(fileSize, minChunk)
@@ -127,7 +125,6 @@ const upload = new Command("upload")
 
       const totalParts = Math.ceil(fileSize / chunkSize);
 
-      // Calculate upload parts metadata
       const uploadParts: Array<{
         part: number;
         start: number;
@@ -141,12 +138,10 @@ const upload = new Command("upload")
         uploadParts.push({ part, start, end });
       }
 
-      // Create combined ora + progress bar with per-part progress tracking
+      // Progress tracking
       const startTime = Date.now();
-      // Track progress per part to handle retries correctly
-      const partProgress = new Map<number, number>(); // part -> bytes uploaded
+      const partProgress = new Map<number, number>();
 
-      // Derive total bytes uploaded by summing all parts
       const getTotalBytesUploaded = () => {
         let total = 0;
         for (const bytes of partProgress.values()) {
@@ -155,7 +150,6 @@ const upload = new Command("upload")
         return total;
       };
 
-      // Use cli-spinners for consistent spinner frames and timing
       const spinner = cliSpinners.dots;
       let spinnerIndex = 0;
 
@@ -175,7 +169,6 @@ const upload = new Command("upload")
         totalMB: (fileSize / (1024 * 1024)).toFixed(1),
       });
 
-      // Throttle UI updates to 200ms
       const UI_UPDATE_INTERVAL_MS = 200;
       let lastUIUpdate = 0;
 
@@ -184,7 +177,6 @@ const upload = new Command("upload")
         const elapsedTime = (Date.now() - startTime) / 1000;
         const speed = totalBytesUploaded / elapsedTime;
 
-        // Format speed
         let speedStr: string;
         if (speed > 1024 * 1024) {
           speedStr = `${(speed / (1024 * 1024)).toFixed(1)} MB/s`;
@@ -202,7 +194,6 @@ const upload = new Command("upload")
         });
       };
 
-      // Create a timer to animate the spinner and update progress
       spinnerTimer = setInterval(() => {
         spinnerIndex++;
         const now = Date.now();
@@ -221,7 +212,7 @@ const upload = new Command("upload")
         partProgress.set(part, 0);
       };
 
-      // Upload parts concurrently with specified concurrency limit
+      // Upload parts
       const uploadPart = async ({
         part,
         start,
@@ -231,38 +222,26 @@ const upload = new Command("upload")
         start: number;
         end: number;
       }) => {
-        const chunkSize = end - start;
+        const partSize = end - start;
 
-        // Upload the chunk with retry, fetching fresh URL each attempt
         await retry(
           async (bail: (e: Error) => void, attemptNumber: number) => {
-            // Reset progress for this part on retry (except first attempt)
             if (attemptNumber > 1) {
               resetPartProgress(part);
             }
 
-            // Fetch fresh upload URL for this attempt
-            const response = await client.POST(
-              "/v1/vms/images/{image_id}/upload",
-              {
-                params: {
-                  path: {
-                    image_id: imageId,
-                  },
-                },
-                body: {
-                  part_id: part,
-                },
-              },
-            );
+            // Get presigned URL via v2 API
+            const partResponse = await client.POST("/v2/images/{id}/parts", {
+              params: { path: { id: imageId } },
+              body: { part_id: part },
+            });
 
-            if (!response.response.ok || !response.data) {
-              const status = response.response.status;
-              const errorText = response.response.ok
-                ? "No data in response"
-                : await response.response.text().catch(() => "");
+            if (!partResponse.response.ok || !partResponse.data) {
+              const status = partResponse.response.status;
+              const errorText = await partResponse.response
+                .text()
+                .catch(() => "");
 
-              // Bail on non-transient 4xx errors (except 408 Request Timeout and 429 Too Many Requests)
               if (
                 status >= 400 &&
                 status < 500 &&
@@ -271,24 +250,24 @@ const upload = new Command("upload")
               ) {
                 bail(
                   new Error(
-                    `Failed to get upload URL for part ${part}: ${status} ${response.response.statusText} - ${errorText}`,
+                    `Failed to get upload URL for part ${part}: ${status} ${partResponse.response.statusText} - ${errorText}`,
                   ),
                 );
                 return;
               }
 
               throw new Error(
-                `Failed to get upload URL for part ${part}: ${status} ${response.response.statusText} - ${errorText}`,
+                `Failed to get upload URL for part ${part}: ${status} ${partResponse.response.statusText} - ${errorText}`,
               );
             }
 
-            const url = response.data.upload_url;
+            const url = partResponse.data.upload_url;
 
             // Read chunk from disk with progress tracking
             const payload = await readChunk(
               filePath,
               start,
-              chunkSize,
+              partSize,
               (bytesRead) => {
                 updateProgress(part, bytesRead);
               },
@@ -303,7 +282,6 @@ const upload = new Command("upload")
             });
 
             if (!res.ok) {
-              // Bail on non-transient 4xx errors (except 408 and 429)
               if (
                 res.status >= 400 &&
                 res.status < 500 &&
@@ -330,7 +308,6 @@ const upload = new Command("upload")
           },
         );
 
-        // Mark part as complete
         return part;
       };
 
@@ -350,7 +327,6 @@ const upload = new Command("upload")
           }
         }
       } finally {
-        // Always clean up timer, even on error
         if (spinnerTimer) {
           clearInterval(spinnerTimer);
           spinnerTimer = undefined;
@@ -358,7 +334,7 @@ const upload = new Command("upload")
       }
 
       progressBar.update(fileSize, {
-        spinner: chalk.green("✔"),
+        spinner: chalk.green("\u2714"),
         speed: "0 B/s",
         uploadedMB: (fileSize / (1024 * 1024)).toFixed(1),
         totalMB: (fileSize / (1024 * 1024)).toFixed(1),
@@ -366,55 +342,47 @@ const upload = new Command("upload")
       progressBar.stop();
 
       finalizingSpinner = ora("Validating upload...").start();
-      // Calculate SHA256 hash for integrity verification using streaming
-      const hash = crypto.createHash("sha256");
 
+      // Calculate SHA256 hash
+      const hash = crypto.createHash("sha256");
       const fileStream = fs.createReadStream(filePath);
       for await (const chunk of fileStream) {
         hash.update(chunk);
       }
 
       const sha256Hash = hash.digest("hex");
-      const completeResponse = await client.PUT(
-        "/v1/vms/images/{image_id}/complete_upload",
-        {
-          params: {
-            path: {
-              image_id: imageId,
-            },
-          },
-          body: {
-            sha256_hash: sha256Hash,
-          },
-        },
-      );
 
-      if (!completeResponse.data) {
+      // Complete upload via v2 API
+      const completeResponse = await client.POST("/v2/images/{id}/complete", {
+        params: { path: { id: imageId } },
+        body: { sha256_hash: sha256Hash },
+      });
+
+      if (!completeResponse.response.ok || !completeResponse.data) {
+        const errorText = await completeResponse.response
+          .text()
+          .catch(() => "");
         throw new Error(
-          `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}`,
+          `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}${errorText ? ` - ${errorText}` : ""}`,
         );
       }
 
       finalizingSpinner.succeed("Image uploaded and verified");
 
-      const object = completeResponse.data;
       console.log(chalk.gray("\nNext steps:"));
-      console.log(`  sf nodes images show ${chalk.cyan(object.id)}`);
+      console.log(`  sf images get ${chalk.cyan(completeResponse.data.id)}`);
     } catch (err) {
-      // Clean up spinner timer
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
         spinnerTimer = undefined;
       }
 
-      // Stop progress bar
       try {
         progressBar?.stop();
       } catch {
         // Ignore if progress bar not started
       }
 
-      // Stop any running spinners on error
       if (preparingSpinner?.isSpinning) {
         preparingSpinner.fail(
           `Upload preparation failed: ${
@@ -429,7 +397,7 @@ const upload = new Command("upload")
         );
       } else {
         console.error(
-          `\n${chalk.red("✗")} ${
+          `\n${chalk.red("\u2717")} ${
             err instanceof Error ? err.message : String(err)
           }`,
         );
