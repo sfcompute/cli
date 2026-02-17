@@ -94,16 +94,7 @@ Examples:
         );
 
         if (v2Response.ok) {
-          const v2Data = await v2Response.json();
-          data = {
-            hostname: v2Data.hostname,
-            port: v2Data.port,
-            host_keys: v2Data.host_keys ?? [],
-            last_successful_key_update:
-              v2Data.last_successful_key_update ?? null,
-            last_attempted_key_update:
-              v2Data.last_attempted_key_update ?? null,
-          };
+          data = (await v2Response.json()) as SshInfo;
           hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
         }
       }
