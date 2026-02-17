@@ -152,8 +152,7 @@ Examples:
           })),
           last_successful_key_update:
             sshData.last_successful_key_update ?? null,
-          last_attempted_key_update:
-            sshData.last_attempted_key_update ?? null,
+          last_attempted_key_update: sshData.last_attempted_key_update ?? null,
         };
         hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
       }
