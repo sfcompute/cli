@@ -13,10 +13,16 @@ import {
   logSessionTokenExpiredAndQuit,
 } from "../../helpers/errors.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
-import type { components } from "../../schema.ts";
 import { jsonOption } from "./utils.ts";
 
-type SshInfo = components["schemas"]["vmorch_GetSshResponse"];
+// Canonical SSH info shape (v2 NodeSshInfo format)
+type SshInfo = {
+  hostname: string;
+  port: number;
+  host_keys: { key_type: string; key: string }[];
+  last_successful_key_update: number | null;
+  last_attempted_key_update: number | null;
+};
 
 const ssh = new Command("ssh")
   .description(`SSH into a VM on a node.
@@ -88,7 +94,7 @@ Examples:
         );
 
         if (v2Response.ok) {
-          data = await v2Response.json();
+          data = (await v2Response.json()) as SshInfo;
           hostKeyAlias = `${nodeOrVmId}.v2.nodes.sfcompute.dev`;
         }
       }
@@ -136,7 +142,18 @@ Examples:
           process.exit(1);
         }
 
-        data = sshData;
+        // Coerce v0 response to v2 shape
+        data = {
+          hostname: sshData.ssh_hostname,
+          port: sshData.ssh_port,
+          host_keys: (sshData.ssh_host_keys ?? []).map((k) => ({
+            key_type: k.key_type,
+            key: k.base64_encoded_key,
+          })),
+          last_successful_key_update:
+            sshData.last_successful_key_update ?? null,
+          last_attempted_key_update: sshData.last_attempted_key_update ?? null,
+        };
         hostKeyAlias = `${vmId}.vms.sfcompute.dev`;
       }
 
@@ -147,9 +164,9 @@ Examples:
         return;
       }
 
-      const sshHostname = data.ssh_hostname;
-      const sshPort = data.ssh_port;
-      const sshHostKeys = data.ssh_host_keys || [];
+      const sshHostname = data.hostname;
+      const sshPort = data.port;
+      const sshHostKeys = data.host_keys;
 
       let sshDestination = sshHostname;
       if (sshUsername !== undefined) {
@@ -168,7 +185,7 @@ Examples:
           knownHostsCommand = knownHostsCommand.concat([
             hostKeyAlias,
             sshHostKey.key_type,
-            sshHostKey.base64_encoded_key,
+            sshHostKey.key,
           ]);
         }
         // Escape all characters for proper pass through
