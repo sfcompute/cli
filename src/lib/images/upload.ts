@@ -10,7 +10,7 @@ import chalk from "chalk";
 import cliProgress from "cli-progress";
 import cliSpinners from "cli-spinners";
 import ora, { type Ora } from "ora";
-import { apiClient } from "../../apiClient.ts";
+import { getAuthToken, loadConfig } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 
 async function readChunk(
@@ -75,23 +75,31 @@ const upload = new Command("upload")
     let progressBar: cliProgress.SingleBar | undefined;
 
     try {
-      const client = await apiClient();
+      const config = await loadConfig();
+      const token = await getAuthToken();
+      const apiHeaders = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
 
       preparingSpinner = ora(`Preparing upload for ${name}...`).start();
 
       // Create image via v2 API
-      const startResponse = await client.POST("/v2/images", {
-        body: { name },
+      const startResponse = await fetch(`${config.api_url}/v2/images`, {
+        method: "POST",
+        headers: apiHeaders,
+        body: JSON.stringify({ name }),
       });
 
-      if (!startResponse.response.ok || !startResponse.data) {
-        const errorText = await startResponse.response.text().catch(() => "");
+      if (!startResponse.ok) {
         throw new Error(
-          `Failed to start upload: ${startResponse.response.status} ${startResponse.response.statusText}${errorText ? ` - ${errorText}` : ""}`,
+          `Failed to start upload: ${startResponse.status} ${startResponse.statusText}`,
         );
       }
 
-      const imageId = startResponse.data.id;
+      const startData: { object: "image"; id: string; upload_status: string } =
+        await startResponse.json();
+      const imageId = startData.id;
 
       preparingSpinner.succeed(
         `Started upload for image ${chalk.cyan(name)} (${chalk.blackBright(
@@ -231,16 +239,17 @@ const upload = new Command("upload")
             }
 
             // Get presigned URL via v2 API
-            const partResponse = await client.POST("/v2/images/{id}/parts", {
-              params: { path: { id: imageId } },
-              body: { part_id: part },
-            });
+            const partResponse = await fetch(
+              `${config.api_url}/v2/images/${imageId}/parts`,
+              {
+                method: "POST",
+                headers: apiHeaders,
+                body: JSON.stringify({ part_id: part }),
+              },
+            );
 
-            if (!partResponse.response.ok || !partResponse.data) {
-              const status = partResponse.response.status;
-              const errorText = await partResponse.response
-                .text()
-                .catch(() => "");
+            if (!partResponse.ok) {
+              const status = partResponse.status;
 
               if (
                 status >= 400 &&
@@ -250,18 +259,20 @@ const upload = new Command("upload")
               ) {
                 bail(
                   new Error(
-                    `Failed to get upload URL for part ${part}: ${status} ${partResponse.response.statusText} - ${errorText}`,
+                    `Failed to get upload URL for part ${part}: ${status} ${partResponse.statusText}`,
                   ),
                 );
                 return;
               }
 
               throw new Error(
-                `Failed to get upload URL for part ${part}: ${status} ${partResponse.response.statusText} - ${errorText}`,
+                `Failed to get upload URL for part ${part}: ${status} ${partResponse.statusText}`,
               );
             }
 
-            const url = partResponse.data.upload_url;
+            const partData: { url: string; expires_at: string } =
+              await partResponse.json();
+            const url = partData.url;
 
             // Read chunk from disk with progress tracking
             const payload = await readChunk(
@@ -353,24 +364,31 @@ const upload = new Command("upload")
       const sha256Hash = hash.digest("hex");
 
       // Complete upload via v2 API
-      const completeResponse = await client.POST("/v2/images/{id}/complete", {
-        params: { path: { id: imageId } },
-        body: { sha256_hash: sha256Hash },
-      });
+      const completeResponse = await fetch(
+        `${config.api_url}/v2/images/${imageId}/complete`,
+        {
+          method: "POST",
+          headers: apiHeaders,
+          body: JSON.stringify({ sha256: sha256Hash }),
+        },
+      );
 
-      if (!completeResponse.response.ok || !completeResponse.data) {
-        const errorText = await completeResponse.response
-          .text()
-          .catch(() => "");
+      if (!completeResponse.ok) {
         throw new Error(
-          `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}${errorText ? ` - ${errorText}` : ""}`,
+          `Failed to complete upload: ${completeResponse.status} ${completeResponse.statusText}`,
         );
       }
+
+      const completeData: {
+        object: "image";
+        upload_status: string;
+        id: string;
+      } = await completeResponse.json();
 
       finalizingSpinner.succeed("Image uploaded and verified");
 
       console.log(chalk.gray("\nNext steps:"));
-      console.log(`  sf images get ${chalk.cyan(completeResponse.data.id)}`);
+      console.log(`  sf images get ${chalk.cyan(completeData.id)}`);
     } catch (err) {
       if (spinnerTimer) {
         clearInterval(spinnerTimer);
