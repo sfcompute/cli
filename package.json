@@ -75,7 +75,7 @@
   "peerDependencies": {
     "typescript": "^5.6.2"
   },
-  "version": "0.30.0",
+  "version": "0.31.0",
   "overrides": {
     "is-fullwidth-code-point": "3.0.0"
   }
