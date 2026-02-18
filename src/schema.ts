@@ -2129,7 +2129,7 @@ export interface components {
      */
     vmorch_CapacityId: string;
     vmorch_CompleteUploadRequest: {
-      sha256_hash: string;
+      sha256: string;
     };
     vmorch_CompleteUploadResponse: {
       /**
@@ -2409,7 +2409,7 @@ export interface components {
       part_id: number;
     };
     vmorch_UploadPartResponse: {
-      upload_url: string;
+      url: string;
       expires_at: components["schemas"]["vmorch_UnixEpoch"];
     };
     /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */

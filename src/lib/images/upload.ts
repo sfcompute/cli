@@ -261,7 +261,7 @@ const upload = new Command("upload")
               );
             }
 
-            const url = partResponse.data.upload_url;
+            const url = partResponse.data.url;
 
             // Read chunk from disk with progress tracking
             const payload = await readChunk(
@@ -355,15 +355,12 @@ const upload = new Command("upload")
       // Complete upload via v2 API
       const completeResponse = await client.POST("/v2/images/{id}/complete", {
         params: { path: { id: imageId } },
-        body: { sha256_hash: sha256Hash },
+        body: { sha256: sha256Hash },
       });
 
       if (!completeResponse.response.ok || !completeResponse.data) {
-        const errorText = await completeResponse.response
-          .text()
-          .catch(() => "");
         throw new Error(
-          `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}${errorText ? ` - ${errorText}` : ""}`,
+          `Failed to complete upload: ${completeResponse.response.status} ${completeResponse.response.statusText}${completeResponse.error ? ` - ${JSON.stringify(completeResponse.error)}` : ""}`,
         );
       }
 
