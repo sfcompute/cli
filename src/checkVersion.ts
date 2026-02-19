@@ -125,12 +125,18 @@ export async function checkVersion() {
       chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
-      execSync("sf upgrade", { stdio: "inherit" });
+      execSync("sf upgrade", {
+        stdio: "inherit",
+        env: { ...process.env, SF_CLI_DISABLE_AUTO_UPGRADE: "1" },
+      });
       console.log(chalk.gray("\n☁️☁️☁️\n"));
 
       // Re-run the original command
       const args = process.argv.slice(2);
-      execSync(`sf ${args.join(" ")}`, { stdio: "inherit" });
+      execSync(`sf ${args.join(" ")}`, {
+        stdio: "inherit",
+        env: { ...process.env, SF_CLI_DISABLE_AUTO_UPGRADE: "1" },
+      });
       process.exit(0);
     } catch {
       // Silent error, just run the command the user wanted to run
