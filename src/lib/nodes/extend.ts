@@ -195,7 +195,7 @@ async function extendNodeAction(
         extendableNodes.map(async ({ node }) => {
           return await getQuote({
             instanceType: `${node.gpu_type.toLowerCase()}v` as const,
-            quantity: 8,
+            quantity: 1,
             minStartTime: node.end_at ? new Date(node.end_at * 1000) : "NOW",
             maxStartTime: node.end_at ? new Date(node.end_at * 1000) : "NOW",
             minDurationSeconds: minDurationSeconds,
@@ -223,11 +223,15 @@ async function extendNodeAction(
         const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
         confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(2)}/node/hr`;
       } else if (filteredQuotes.length > 1) {
-        const totalPrice = filteredQuotes.reduce((acc, quote) => {
-          return acc + (quote.value?.price ?? 0);
+        const durationHours = options.duration! / 3600;
+        const totalPricePerHour = filteredQuotes.reduce((acc, quote) => {
+          if (!quote.value) return acc;
+          const pricePerGpuHour = getPricePerGpuHourFromQuote(quote.value);
+          const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
+          return acc + pricePerNodeHour;
         }, 0);
-        // If there's multiple nodes, show the total price, as nodes could be on different zones or have different hardware
-        confirmationMessage += ` for ~$${totalPrice / 100}`;
+        const totalEstimate = totalPricePerHour * durationHours;
+        confirmationMessage += ` for ~$${totalEstimate.toFixed(0)}`;
       } else {
         confirmationMessage = chalk.red(
           "No nodes available matching your requirements. This is likely due to insufficient capacity. Attempt to extend anyway",
