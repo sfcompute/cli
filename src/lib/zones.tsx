@@ -336,8 +336,9 @@ function ZonesTableDisplay({
   firstAvailableZoneStartTime: string | null;
 }) {
   // Calculate dynamic zone column width based on longest zone name
+  // Minimum 13 to fit header: paddingLeft(1) + "zone"(4) + gap(1) + "(slug)"(6) + padding(1)
   const zoneWidth = Math.max(
-    6, // minimum width for "zone" header + padding
+    13,
     ...zones.map((z) => z.name.length + 2), // +2 for padding
   );
 
