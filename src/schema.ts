@@ -1433,6 +1433,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v2/feature_flags/{feature_flag_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get feature flag status for the authenticated user */
+    get: operations["get_feature_flag"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/inference/batches": {
     parameters: {
       query?: never;
@@ -9219,6 +9236,35 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["large_scale_inference_Model"][];
+        };
+      };
+    };
+  };
+  get_feature_flag: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        feature_flag_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Feature flag status */
+      200: {
+        headers: { [name: string]: unknown };
+        content: {
+          "application/json": {
+            enabled: boolean;
+          };
+        };
+      };
+      /** @description Feature flag not found */
+      404: {
+        headers: { [name: string]: unknown };
+        content: {
+          "application/json": unknown;
         };
       };
     };
