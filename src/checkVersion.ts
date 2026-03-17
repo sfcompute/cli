@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -93,11 +92,6 @@ async function checkProductionCLIVersion() {
 }
 
 export async function checkVersion() {
-  // Disable auto-upgrade if env var is set
-  if (process.env.SF_CLI_DISABLE_AUTO_UPGRADE) {
-    return;
-  }
-
   // Skip version check if running upgrade command
   const args = process.argv.slice(2);
   if (args[0] === "upgrade") return;
@@ -117,26 +111,7 @@ export async function checkVersion() {
   const isOutdated = semver.lt(version, latestVersion);
   if (!isOutdated) return;
 
-  // Only auto-upgrade for patch changes and when not going to a prerelease
-  const isPatchUpdate = semver.diff(version, latestVersion) === "patch";
-
-  if (isPatchUpdate && !latestIsPrerelease) {
-    console.log(
-      chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
-    );
-    try {
-      execSync("sf upgrade", { stdio: "inherit" });
-      console.log(chalk.gray("\n☁️☁️☁️\n"));
-
-      // Re-run the original command
-      const args = process.argv.slice(2);
-      execSync(`sf ${args.join(" ")}`, { stdio: "inherit" });
-      process.exit(0);
-    } catch {
-      // Silent error, just run the command the user wanted to run
-    }
-  } else if (!latestIsPrerelease) {
-    // Only show update message for non-prerelease versions
+  if (!latestIsPrerelease) {
     const message = `
 Please update your CLI.
 
