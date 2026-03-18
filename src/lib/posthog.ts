@@ -81,14 +81,20 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
     return cachedFlag.value;
   }
 
-  // If not in cache or expired, fetch from PostHog
-  const result = await postHogClient.isFeatureEnabled(
-    feature,
-    exchangeAccountId,
-  );
+  // Fetch from the v2/feature_flags API
+  let finalResult = false;
+  try {
+    const client = await apiClient(config.auth_token);
+    const { data, response } = await client.GET(
+      "/v2/feature_flags/{feature_flag_id}",
+      { params: { path: { feature_flag_id: feature } } },
+    );
+    // 404 means the flag doesn't exist → treat as disabled (false)
+    finalResult = response.ok ? (data?.enabled ?? false) : false;
+  } catch {
+    // Network or parse error → default to false
+  }
 
-  // Cache the result (PostHog returns undefined if there's an error, default to false)
-  const finalResult = result ?? false;
   await cacheFeatureFlag(feature, exchangeAccountId, finalResult);
 
   return finalResult;
