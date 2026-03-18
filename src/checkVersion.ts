@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import * as console from "node:console";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -8,6 +8,7 @@ import boxen from "boxen";
 import chalk from "chalk";
 import semver from "semver";
 import pkg from "../package.json" with { type: "json" };
+import { handleUpgrade } from "./lib/upgrade.ts";
 
 const CACHE_FILE = join(homedir(), ".sfcompute", "version-cache");
 const CACHE_TTL = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
@@ -125,13 +126,26 @@ export async function checkVersion() {
       chalk.cyan(`Automatically upgrading ${version} → ${latestVersion}`),
     );
     try {
-      execSync("sf upgrade", { stdio: "inherit" });
+      const success = await handleUpgrade(version, latestVersion);
+      if (!success) throw new Error("Upgrade failed");
       console.log(chalk.gray("\n☁️☁️☁️\n"));
 
-      // Re-run the original command
-      const args = process.argv.slice(2);
-      execSync(`sf ${args.join(" ")}`, { stdio: "inherit" });
-      process.exit(0);
+      // Re-run the original command with the newly installed binary.
+      // process.execPath is the binary's own path in a pkg build; the
+      // upgrade just replaced that file on disk, so re-invoking it runs
+      // the new version. We use `env -u PKG_EXECPATH` because pkg's
+      // patched child_process re-adds PKG_EXECPATH even if we delete it
+      // from the env object, causing the bootstrap to treat argv[1] as a
+      // script path. spawnSync with an argv array avoids shell injection.
+      const reRun = spawnSync(
+        "env",
+        ["-u", "PKG_EXECPATH", process.execPath, ...process.argv.slice(2)],
+        {
+          stdio: "inherit",
+          env: { ...process.env, SF_CLI_DISABLE_AUTO_UPGRADE: "1" },
+        },
+      );
+      process.exit(reRun.status ?? 0);
     } catch {
       // Silent error, just run the command the user wanted to run
     }
