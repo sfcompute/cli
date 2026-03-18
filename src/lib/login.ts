@@ -18,7 +18,7 @@ import { getLoggedInAccountId } from "./me.ts";
 export function registerLogin(program: Command) {
   program
     .command("login")
-    .description("Login to the San Francisco Compute Company")
+    .description("Login to SF Compute")
     .action(async () => {
       const spinner = ora("Logging in...\n").start();
 
