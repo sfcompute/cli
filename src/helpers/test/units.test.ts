@@ -97,14 +97,14 @@ test("dollarsToCents returns integer cents without floating point errors", () =>
   // These prices are known to produce floating point precision errors
   // e.g. 17.60 * 100 = 1760.0000000000002 in IEEE 754
   const cases: [number, number][] = [
-    [17.60, 1760],
-    [12.50, 1250],
+    [17.6, 1760],
+    [12.5, 1250],
     [9.99, 999],
-    [0.10, 10],
+    [0.1, 10],
     [3.33, 333],
     [7.77, 777],
     [11.11, 1111],
-    [20.00, 2000],
+    [20.0, 2000],
     [0.01, 1],
     [99.99, 9999],
   ];
@@ -138,8 +138,8 @@ test("priceWholeToCents returns integer cents for prices with floating point iss
 
 test("priceWholeToCents handles numeric input without floating point errors", () => {
   const cases: [number, number][] = [
-    [17.60, 1760],
-    [12.50, 1250],
+    [17.6, 1760],
+    [12.5, 1250],
     [9.99, 999],
   ];
 
