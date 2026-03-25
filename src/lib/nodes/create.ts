@@ -267,7 +267,7 @@ async function createNodesAction(
     // Convert CLI options to SDK parameters
     const createParams: SFCNodes.NodeCreateParams = {
       desired_count: count,
-      max_price_per_node_hour: options.maxPrice * 100,
+      max_price_per_node_hour: Math.round(options.maxPrice * 100),
       names: names.length > 0 ? names : undefined,
       any_zone: options.anyZone ?? false,
       zone: options.zone,
