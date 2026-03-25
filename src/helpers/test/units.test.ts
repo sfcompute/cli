@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import {
   type Cents,
   centsToDollarsFormatted,
+  dollarsToCents,
   priceWholeToCents,
 } from "../units.ts";
 
@@ -22,7 +23,7 @@ test("price whole to cents", () => {
     ["$1.000", 100],
 
     ["$1.23", 123],
-    ["$1.234", 123.4],
+    ["$1.234", 123],
 
     // formatted as numbers
     ["0", 0],
@@ -31,7 +32,7 @@ test("price whole to cents", () => {
     ["100", 100_00],
 
     ["1.23", 123],
-    ["1.234", 123.4],
+    ["1.234", 123],
 
     // nested quotes (double)
     ['"$0"', 0],
@@ -89,5 +90,63 @@ test("cents to dollars formatted", () => {
     const result = centsToDollarsFormatted(input as Cents);
 
     expect(result).toEqual(expected);
+  }
+});
+
+test("dollarsToCents returns integer cents without floating point errors", () => {
+  // These prices are known to produce floating point precision errors
+  // e.g. 17.60 * 100 = 1760.0000000000002 in IEEE 754
+  const cases: [number, number][] = [
+    [17.60, 1760],
+    [12.50, 1250],
+    [9.99, 999],
+    [0.10, 10],
+    [3.33, 333],
+    [7.77, 777],
+    [11.11, 1111],
+    [20.00, 2000],
+    [0.01, 1],
+    [99.99, 9999],
+  ];
+
+  for (const [dollars, expectedCents] of cases) {
+    const cents = dollarsToCents(dollars);
+    expect(cents).toBe(expectedCents);
+    expect(Number.isInteger(cents)).toBe(true);
+  }
+});
+
+test("priceWholeToCents returns integer cents for prices with floating point issues", () => {
+  // Regression test: $17.60 was sent to API as 1760.0000000000002
+  // which failed deserialization as i64
+  const cases: [string, number][] = [
+    ["$17.60", 1760],
+    ["17.60", 1760],
+    ["$12.50", 1250],
+    ["$9.99", 999],
+    ["$0.10", 10],
+    ["$20.00", 2000],
+  ];
+
+  for (const [input, expectedCents] of cases) {
+    const { cents, invalid } = priceWholeToCents(input);
+    expect(invalid).toBe(false);
+    expect(cents).toBe(expectedCents);
+    expect(Number.isInteger(cents)).toBe(true);
+  }
+});
+
+test("priceWholeToCents handles numeric input without floating point errors", () => {
+  const cases: [number, number][] = [
+    [17.60, 1760],
+    [12.50, 1250],
+    [9.99, 999],
+  ];
+
+  for (const [input, expectedCents] of cases) {
+    const { cents, invalid } = priceWholeToCents(input);
+    expect(invalid).toBe(false);
+    expect(cents).toBe(expectedCents);
+    expect(Number.isInteger(cents)).toBe(true);
   }
 });

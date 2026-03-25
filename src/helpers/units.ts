@@ -87,7 +87,7 @@ export function priceWholeToCents(
       return { cents: null, invalid: true };
     }
 
-    return { cents: price * 100, invalid: false };
+    return { cents: Math.round(price * 100), invalid: false };
   } else if (typeof price === "string") {
     // remove any whitespace, dollar signs, negative signs, single and double quotes
     const priceCleaned = price.replace(/[\s$\-'"]/g, "");
@@ -97,7 +97,7 @@ export function priceWholeToCents(
 
     const parsedPrice = Number.parseFloat(priceCleaned);
 
-    return { cents: parsedPrice * 100, invalid: false };
+    return { cents: Math.round(parsedPrice * 100), invalid: false };
   }
 
   // default invalid
@@ -113,7 +113,7 @@ export function centsToDollars(cents: Cents): number {
 }
 
 export function dollarsToCents(dollars: number): Cents {
-  return Math.ceil(dollars * 100);
+  return Math.round(dollars * 100);
 }
 export function parseStartDateOrNow(startDate?: string): Date | "NOW" {
   if (!startDate) return "NOW";
