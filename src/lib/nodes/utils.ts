@@ -334,9 +334,7 @@ function parseStartDateOrNowOrThrow(val: string): Date | "NOW" {
   if (nowRe.test(val)) return "NOW";
   const chronoDate = parseDate(val);
   if (!chronoDate) {
-    throw new CommanderError(
-      1,
-      "INVALID_START",
+    logAndQuit(
       `Invalid start time: "${val}". Use ISO 8601 format (e.g. '2024-01-15T10:00:00Z'), a relative time (e.g. '+1h'), or 'NOW'.`,
     );
   }
