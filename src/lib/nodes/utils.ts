@@ -9,7 +9,6 @@ import utc from "dayjs/plugin/utc.js";
 import { parseDurationArgument } from "../../helpers/duration.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatNullableDateRange } from "../../helpers/format-time.ts";
-import { parseStartDateOrNow } from "../../helpers/units.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -330,11 +329,25 @@ export const maxPriceOption = new Option(
 /**
  * Common --start option using same parser as buy command
  */
+function parseStartDateOrNowOrThrow(val: string): Date | "NOW" {
+  const nowRe = /\b(?:"|')?[nN][oO][wW](?:"|')?\b/;
+  if (nowRe.test(val)) return "NOW";
+  const chronoDate = parseDate(val);
+  if (!chronoDate) {
+    throw new CommanderError(
+      1,
+      "INVALID_START",
+      `Invalid start time: "${val}". Use ISO 8601 format (e.g. '2024-01-15T10:00:00Z'), a relative time (e.g. '+1h'), or 'NOW'.`,
+    );
+  }
+  return chronoDate;
+}
+
 export const startOrNowOption = new Option(
   "-s, --start <start>",
   "Start time (ISO 8601 format:'2022-10-27T14:30:00Z' or relative time like '+1d', or 'NOW')",
 )
-  .argParser(parseStartDateOrNow)
+  .argParser(parseStartDateOrNowOrThrow)
   .default("NOW" as const);
 
 /**
