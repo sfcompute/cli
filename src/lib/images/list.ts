@@ -32,8 +32,7 @@ Examples:\n
     const workspace = await getDefaultWorkspace();
 
     const spinner = ora("Fetching images...").start();
-    // biome-ignore lint/suspicious/noExplicitAny: OpenAPI schema is stale and doesn't include the workspace query param
-    const { data: result, response } = await (client as any).GET("/v2/images", {
+    const { data: result, response } = await client.GET("/v2/images", {
       params: { query: { workspace } },
     });
     spinner.stop();
