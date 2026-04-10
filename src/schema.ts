@@ -2414,6 +2414,8 @@ export interface components {
     };
     vmorch_StartUploadRequest: {
       name: components["schemas"]["vmorch_Name"];
+      /** @description Workspace URN (e.g. sfc:workspace:{account_id}:default). */
+      workspace?: string;
     };
     /**
      * Format: int64
@@ -4988,6 +4990,8 @@ export interface operations {
         starting_after?: components["schemas"]["vmorch_ImagesCursor"];
         /** @description Cursor for backward pagination. */
         ending_before?: components["schemas"]["vmorch_ImagesCursor"];
+        /** @description Workspace URN (e.g. sfc:workspace:{account_id}:default). */
+        workspace?: string;
       };
       header?: never;
       path?: never;

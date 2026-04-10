@@ -6,6 +6,7 @@ import ora from "ora";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatDate } from "../../helpers/format-time.ts";
+import { getDefaultWorkspace } from "./utils.ts";
 
 const list = new Command("list")
   .alias("ls")
@@ -28,9 +29,12 @@ Examples:\n
   )
   .action(async (options) => {
     const client = await apiClient();
+    const workspace = await getDefaultWorkspace();
 
     const spinner = ora("Fetching images...").start();
-    const { data: result, response } = await client.GET("/v2/images");
+    const { data: result, response } = await client.GET("/v2/images", {
+      params: { query: { workspace } },
+    });
     spinner.stop();
 
     if (!response.ok || !result) {

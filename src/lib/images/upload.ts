@@ -12,6 +12,7 @@ import cliSpinners from "cli-spinners";
 import ora, { type Ora } from "ora";
 import { getAuthToken, loadConfig } from "../../helpers/config.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import { getDefaultWorkspace } from "./utils.ts";
 
 async function readChunk(
   filePath: string,
@@ -84,11 +85,13 @@ const upload = new Command("upload")
 
       preparingSpinner = ora(`Preparing upload for ${name}...`).start();
 
+      const workspace = await getDefaultWorkspace();
+
       // Create image via v2 API
       const startResponse = await fetch(`${config.api_url}/v2/images`, {
         method: "POST",
         headers: apiHeaders,
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, workspace }),
       });
 
       if (!startResponse.ok) {
