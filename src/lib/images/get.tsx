@@ -116,11 +116,11 @@ const get = new Command("get")
     // Fetch download URL if image is completed
     let download = null;
     if (image.upload_status === "completed") {
-      const { data: downloadData } = await client.GET(
+      const { data: downloadData, response: downloadResponse } = await client.GET(
         "/v2/images/{id}/download",
         { params: { path: { id } } },
       );
-      if (downloadData) {
+      if (downloadResponse.ok && downloadData) {
         download = downloadData;
       }
     }
