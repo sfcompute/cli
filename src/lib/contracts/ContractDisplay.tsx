@@ -140,7 +140,7 @@ export function ContractDisplay(props: { contract: Contract }) {
           {intervalData.map((data, index) => {
             return (
               <Box
-                key={`${index}-${data.quantity}`}
+                key={`${props.contract.id}-${data.start.toISOString()}`}
                 paddingLeft={index === 0 ? 0 : COLUMN_WIDTH}
               >
                 {index === 0 && (
