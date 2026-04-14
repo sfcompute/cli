@@ -2204,7 +2204,7 @@ export interface components {
      */
     vmorch_ImageDiscriminator: "image";
     vmorch_ImageDownloadResponse: {
-      download_url: string;
+      url: string;
       expires_at: components["schemas"]["vmorch_UnixEpoch"];
       sha256_hash: string;
       /** Format: u-int64 */

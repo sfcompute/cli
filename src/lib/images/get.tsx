@@ -26,7 +26,7 @@ function ImageDisplay({
     upload_status: string;
     sha256_hash: string | null;
   };
-  download: { download_url: string; expires_at: number } | null;
+  download: { url: string; expires_at: number } | null;
 }) {
   const expiresAt = download?.expires_at
     ? new Date(download.expires_at * 1000)
@@ -51,8 +51,8 @@ function ImageDisplay({
               value={
                 <Box flexDirection="column" paddingRight={1}>
                   <Text color="cyan">Use curl or wget to download.</Text>
-                  <Link url={download.download_url} fallback={false}>
-                    {download.download_url}
+                  <Link url={download.url} fallback={false}>
+                    {download.url}
                   </Link>
                 </Box>
               }
@@ -116,11 +116,11 @@ const get = new Command("get")
     // Fetch download URL if image is completed
     let download = null;
     if (image.upload_status === "completed") {
-      const { data: downloadData } = await client.GET(
-        "/v2/images/{id}/download",
-        { params: { path: { id } } },
-      );
-      if (downloadData) {
+      const { data: downloadData, response: downloadResponse } =
+        await client.GET("/v2/images/{id}/download", {
+          params: { path: { id } },
+        });
+      if (downloadResponse.ok && downloadData) {
         download = downloadData;
       }
     }
