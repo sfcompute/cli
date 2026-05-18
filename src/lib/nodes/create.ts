@@ -135,6 +135,15 @@ const create = new Command("create")
       "ID of the VM image to boot on the nodes. View available images with `sf node images list`.",
     ),
   )
+  .addOption(
+    // Hidden experimental flag. Requires the (account, instance SKU) pair to
+    // be in the IB whitelist server-side; otherwise the request is rejected
+    // with 403. Kept undocumented while the field is in preview.
+    new Option(
+      "--enable-infiniband",
+      "Enable InfiniBand on the nodes (experimental, undocumented).",
+    ).hideHelp(),
+  )
   .addOption(yesOption)
   .addOption(jsonOption)
   .hook("preAction", (command) => {
@@ -274,6 +283,7 @@ async function createNodesAction(
       cloud_init_user_data: encodedUserData,
       image_id: options.image,
       node_type: isReserved ? "reserved" : "autoreserved",
+      ...(options.enableInfiniband ? { _preview_enable_infiniband: true } : {}),
     };
 
     if (isReserved) {
