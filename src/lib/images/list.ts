@@ -3,18 +3,20 @@ import { Command } from "@commander-js/extra-typings";
 import chalk from "chalk";
 import Table from "cli-table3";
 import ora from "ora";
+import { apiClient } from "../../apiClient.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
 import { formatDate } from "../../helpers/format-time.ts";
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { getDefaultWorkspace } from "./utils.ts";
 
-const list = new Command("list")
-  .alias("ls")
-  .description("List images")
-  .showHelpAfterError()
-  .option("--json", "Output in JSON format")
-  .addHelpText(
-    "after",
-    `
+export function createList() {
+  return new Command("list")
+    .alias("ls")
+    .description("List images")
+    .showHelpAfterError()
+    .option("--json", "Output in JSON format")
+    .addHelpText(
+      "after",
+      `
 Examples:\n
   \x1b[2m# List all images\x1b[0m
   $ sf images list
@@ -25,22 +27,29 @@ Examples:\n
   \x1b[2m# List images in JSON format\x1b[0m
   $ sf images list --json
 `,
-  )
-  .action(async (options) => {
-    try {
-      const client = await nodesClient();
+    )
+    .action(async (options) => {
+      const client = await apiClient();
       const workspace = await getDefaultWorkspace();
 
       const spinner = ora("Fetching images...").start();
-      const result = await client.vms.images.list({ workspace });
+      const { data, response } = await client.GET("/preview/v2/images", {
+        params: { query: { workspace } },
+      });
       spinner.stop();
 
+      if (!response.ok || !data) {
+        logAndQuit(
+          `Failed to list images: ${response.status} ${response.statusText}`,
+        );
+      }
+
       if (options.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify(data, null, 2));
         return;
       }
 
-      const images = result.data;
+      const images = data.data;
 
       if (images.length === 0) {
         console.log("No images found.");
@@ -49,10 +58,9 @@ Examples:\n
         return;
       }
 
-      // Sort images by created_at (newest first)
-      const sortedImages = [...images].sort((a, b) => {
-        return (b.created_at || 0) - (a.created_at || 0);
-      });
+      const sortedImages = [...images].sort(
+        (a, b) => (b.created_at || 0) - (a.created_at || 0),
+      );
       const imagesToShow = sortedImages.slice(0, 5);
 
       const table = new Table({
@@ -62,20 +70,19 @@ Examples:\n
           chalk.cyan("STATUS"),
           chalk.cyan("CREATED"),
         ],
-        style: {
-          head: [],
-          border: ["gray"],
-        },
+        style: { head: [], border: ["gray"] },
       });
 
       for (const image of imagesToShow) {
         const createdAt = image.created_at
           ? formatDate(new Date(image.created_at * 1000))
           : "Unknown";
-
-        const status = formatStatus(image.upload_status);
-
-        table.push([image.name, image.id, status, createdAt]);
+        table.push([
+          image.name,
+          image.id,
+          formatStatus(image.upload_status),
+          createdAt,
+        ]);
       }
 
       if (images.length > 5) {
@@ -98,10 +105,18 @@ Examples:\n
       if (firstImage) {
         console.log(`  sf images get ${chalk.cyan(firstImage.id)}`);
       }
-    } catch (err) {
-      handleNodesError(err);
-    }
-  });
+      const firstCompletedImage = sortedImages.find(
+        (image) => image.upload_status === "completed",
+      );
+      if (firstCompletedImage) {
+        console.log(
+          `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${chalk.cyan(
+            firstCompletedImage.id,
+          )}`,
+        );
+      }
+    });
+}
 
 function formatStatus(status: string): string {
   switch (status) {
@@ -113,9 +128,9 @@ function formatStatus(status: string): string {
       return chalk.cyan("Completed");
     case "failed":
       return chalk.red("Failed");
+    case "revoked":
+      return chalk.red("Revoked");
     default:
       return chalk.gray("Unknown");
   }
 }
-
-export default list;

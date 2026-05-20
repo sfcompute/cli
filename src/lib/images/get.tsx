@@ -7,30 +7,27 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { Box, render, Text } from "ink";
 import Link from "ink-link";
-import { getAuthToken, loadConfig } from "../../helpers/config.ts";
+import { apiClient } from "../../apiClient.ts";
+import { logAndQuit } from "../../helpers/errors.ts";
 import { formatDate } from "../../helpers/format-time.ts";
-import { handleNodesError, nodesClient } from "../../nodesClient.ts";
+import type { components } from "../../schema.ts";
 import { Row } from "../Row.tsx";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
 
+type Image = components["schemas"]["sfc-api_ImageListEntry"];
+type Download = components["schemas"]["sfc-api_ImageDownloadResponse"];
+
 function ImageDisplay({
   image,
   download,
 }: {
-  image: {
-    name: string;
-    id: string;
-    upload_status: string;
-    sha256: string | null;
-  };
-  download: { url: string; expires_at: number } | null;
+  image: Image;
+  download: Download | null;
 }) {
-  const expiresAt = download?.expires_at
-    ? new Date(download.expires_at * 1000)
-    : null;
+  const expiresAt = download ? new Date(download.expires_at * 1000) : null;
   const isExpired = expiresAt ? expiresAt < new Date() : false;
 
   return (
@@ -92,36 +89,40 @@ function formatStatusInk(status: string): React.ReactElement {
       return <Text color="cyan">Completed</Text>;
     case "failed":
       return <Text color="red">Failed</Text>;
+    case "revoked":
+      return <Text color="red">Revoked</Text>;
     default:
       return <Text dimColor>Unknown</Text>;
   }
 }
 
-const get = new Command("get")
-  .description("Get image details and download URL")
-  .argument("<id>", "Image ID or name")
-  .option("--json", "Output JSON")
-  .action(async (id, opts) => {
-    try {
-      const client = await nodesClient();
-      const image = await client.vms.images.get(id);
+export function createGet() {
+  return new Command("get")
+    .alias("show")
+    .description("Get image details and download URL")
+    .argument("<id>", "Image ID or name")
+    .option("--json", "Output JSON")
+    .action(async (id, opts) => {
+      const client = await apiClient();
 
-      // Fetch download URL if image is completed
-      let download: { url: string; expires_at: number } | null = null;
-      if (image.upload_status === "completed") {
-        const config = await loadConfig();
-        const token = await getAuthToken();
-        const downloadResponse = await fetch(
-          `${config.api_url}/preview/v2/images/${encodeURIComponent(id)}/download`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+      const { data: image, response } = await client.GET(
+        "/preview/v2/images/{id}",
+        { params: { path: { id } } },
+      );
+      if (!response.ok || !image) {
+        logAndQuit(
+          `Failed to get image: ${response.status} ${response.statusText}`,
         );
-        if (downloadResponse.ok) {
-          download = (await downloadResponse.json()) as {
-            url: string;
-            expires_at: number;
-          };
+      }
+
+      let download: Download | null = null;
+      if (image.upload_status === "completed") {
+        const { data: downloadData } = await client.GET(
+          "/preview/v2/images/{id}/download",
+          { params: { path: { id } } },
+        );
+        if (downloadData) {
+          download = downloadData;
         }
       }
 
@@ -130,15 +131,6 @@ const get = new Command("get")
         return;
       }
 
-      render(
-        <ImageDisplay
-          image={{ ...image, sha256: image.sha256 ?? null }}
-          download={download}
-        />,
-      );
-    } catch (err) {
-      handleNodesError(err);
-    }
-  });
-
-export default get;
+      render(<ImageDisplay image={image} download={download} />);
+    });
+}
