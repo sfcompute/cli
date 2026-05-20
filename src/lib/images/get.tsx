@@ -7,9 +7,9 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { Box, render, Text } from "ink";
 import Link from "ink-link";
-import { apiClient } from "../../apiClient.ts";
-import { logAndQuit } from "../../helpers/errors.ts";
+import { getAuthToken, loadConfig } from "../../helpers/config.ts";
 import { formatDate } from "../../helpers/format-time.ts";
+import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { Row } from "../Row.tsx";
 
 dayjs.extend(utc);
@@ -24,7 +24,7 @@ function ImageDisplay({
     name: string;
     id: string;
     upload_status: string;
-    sha256_hash: string | null;
+    sha256: string | null;
   };
   download: { url: string; expires_at: number } | null;
 }) {
@@ -43,7 +43,7 @@ function ImageDisplay({
 
       <Box paddingX={1} flexDirection="column">
         <Row head="Status: " value={formatStatusInk(image.upload_status)} />
-        {image.sha256_hash && <Row head="SHA256: " value={image.sha256_hash} />}
+        {image.sha256 && <Row head="SHA256: " value={image.sha256} />}
         {download && (
           <>
             <Row
@@ -102,40 +102,43 @@ const get = new Command("get")
   .argument("<id>", "Image ID or name")
   .option("--json", "Output JSON")
   .action(async (id, opts) => {
-    const client = await apiClient();
+    try {
+      const client = await nodesClient();
+      const image = await client.vms.images.get(id);
 
-    const { data: image, response } = await client.GET("/v2/images/{id}", {
-      params: { path: { id } },
-    });
-    if (!response.ok || !image) {
-      logAndQuit(
-        `Failed to get image: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    // Fetch download URL if image is completed
-    let download = null;
-    if (image.upload_status === "completed") {
-      const { data: downloadData, response: downloadResponse } =
-        await client.GET("/v2/images/{id}/download", {
-          params: { path: { id } },
-        });
-      if (downloadResponse.ok && downloadData) {
-        download = downloadData;
+      // Fetch download URL if image is completed
+      let download: { url: string; expires_at: number } | null = null;
+      if (image.upload_status === "completed") {
+        const config = await loadConfig();
+        const token = await getAuthToken();
+        const downloadResponse = await fetch(
+          `${config.api_url}/preview/v2/images/${encodeURIComponent(id)}/download`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        if (downloadResponse.ok) {
+          download = (await downloadResponse.json()) as {
+            url: string;
+            expires_at: number;
+          };
+        }
       }
-    }
 
-    if (opts.json) {
-      console.log(JSON.stringify({ ...image, download }, null, 2));
-      return;
-    }
+      if (opts.json) {
+        console.log(JSON.stringify({ ...image, download }, null, 2));
+        return;
+      }
 
-    render(
-      <ImageDisplay
-        image={{ ...image, sha256_hash: image.sha256_hash ?? null }}
-        download={download}
-      />,
-    );
+      render(
+        <ImageDisplay
+          image={{ ...image, sha256: image.sha256 ?? null }}
+          download={download}
+        />,
+      );
+    } catch (err) {
+      handleNodesError(err);
+    }
   });
 
 export default get;

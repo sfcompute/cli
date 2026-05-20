@@ -7,9 +7,9 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { Box, render, Text } from "ink";
 import Link from "ink-link";
-import { apiClient } from "../../../apiClient.ts";
-import { logAndQuit } from "../../../helpers/errors.ts";
+import { getAuthToken, loadConfig } from "../../../helpers/config.ts";
 import { formatDate } from "../../../helpers/format-time.ts";
+import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
 import { Row } from "../../Row.tsx";
 
 dayjs.extend(utc);
@@ -124,34 +124,37 @@ const show = new Command("show")
   .argument("<image-id>", "ID of the image")
   .option("--json", "Output JSON")
   .action(async (imageId, opts) => {
-    const client = await apiClient();
+    try {
+      const client = await nodesClient();
+      const image = await client.vms.images.get(imageId);
 
-    const { data: image, response } = await client.GET("/v2/images/{id}", {
-      params: { path: { id: imageId } },
-    });
-    if (!response.ok || !image) {
-      logAndQuit(
-        `Failed to get image: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    let download = null;
-    if (image.upload_status === "completed") {
-      const { data: downloadData, response: downloadResponse } =
-        await client.GET("/v2/images/{id}/download", {
-          params: { path: { id: imageId } },
-        });
-      if (downloadResponse.ok && downloadData) {
-        download = downloadData;
+      let download: { url: string; expires_at: number } | null = null;
+      if (image.upload_status === "completed") {
+        const config = await loadConfig();
+        const token = await getAuthToken();
+        const downloadResponse = await fetch(
+          `${config.api_url}/preview/v2/images/${encodeURIComponent(imageId)}/download`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        if (downloadResponse.ok) {
+          download = (await downloadResponse.json()) as {
+            url: string;
+            expires_at: number;
+          };
+        }
       }
-    }
 
-    if (opts.json) {
-      console.log(JSON.stringify({ ...image, download }, null, 2));
-      return;
-    }
+      if (opts.json) {
+        console.log(JSON.stringify({ ...image, download }, null, 2));
+        return;
+      }
 
-    render(<ImageDisplay image={image} download={download} />);
+      render(<ImageDisplay image={image} download={download} />);
+    } catch (err) {
+      handleNodesError(err);
+    }
   });
 
 export default show;

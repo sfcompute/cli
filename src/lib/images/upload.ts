@@ -87,8 +87,8 @@ const upload = new Command("upload")
 
       const workspace = await getDefaultWorkspace();
 
-      // Create image via v2 API
-      const startResponse = await fetch(`${config.api_url}/v2/images`, {
+      // Create image via preview/v2 API
+      const startResponse = await fetch(`${config.api_url}/preview/v2/images`, {
         method: "POST",
         headers: apiHeaders,
         body: JSON.stringify({ name, workspace }),
@@ -241,9 +241,9 @@ const upload = new Command("upload")
               resetPartProgress(part);
             }
 
-            // Get presigned URL via v2 API
+            // Get presigned URL via preview/v2 API
             const partResponse = await fetch(
-              `${config.api_url}/v2/images/${imageId}/parts`,
+              `${config.api_url}/preview/v2/images/${imageId}/parts`,
               {
                 method: "POST",
                 headers: apiHeaders,
@@ -366,9 +366,9 @@ const upload = new Command("upload")
 
       const sha256Hash = hash.digest("hex");
 
-      // Complete upload via v2 API
+      // Complete upload via preview/v2 API
       const completeResponse = await fetch(
-        `${config.api_url}/v2/images/${imageId}/complete`,
+        `${config.api_url}/preview/v2/images/${imageId}/complete`,
         {
           method: "POST",
           headers: apiHeaders,
