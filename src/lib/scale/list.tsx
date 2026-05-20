@@ -26,7 +26,7 @@ async function listProcurements() {
     });
 
     if (!response.ok) {
-      throw new Error(error?.message || "Failed to list procurements");
+      throw new Error(error?.error?.message || "Failed to list procurements");
     }
 
     const { data = [], has_more = false } = listObject ?? {};

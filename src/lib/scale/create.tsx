@@ -101,7 +101,9 @@ function useCreateProcurement() {
           },
         );
         if (!response.ok) {
-          throw new Error(error?.message || "Failed to create procurement");
+          throw new Error(
+            error?.error?.message || "Failed to create procurement",
+          );
         }
         setResult(data);
       } catch (err: unknown) {

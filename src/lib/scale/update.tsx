@@ -53,8 +53,8 @@ export async function updateProcurement({
   );
   if (!response.ok) {
     throw new Error(
-      error?.message
-        ? `${error.message} (${response.status})`
+      error?.error?.message
+        ? `${error.error.message} (${response.status})`
         : "Failed to update procurement",
     );
   }
