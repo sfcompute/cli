@@ -40,7 +40,7 @@ const trackEvent = ({
 
     if (!exchangeAccountId) {
       const client = await apiClient(config.auth_token);
-      const { data } = await client.GET("/v0/me");
+      const { data } = await client.GET("/v1/account/me", {});
       if (data?.id) {
         exchangeAccountId = data.id;
         await saveConfig({ ...config, account_id: data.id });
