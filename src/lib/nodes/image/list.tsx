@@ -8,6 +8,7 @@ import { getAuthToken } from "../../../helpers/config.ts";
 import { logAndQuit } from "../../../helpers/errors.ts";
 import { formatDate } from "../../../helpers/format-time.ts";
 import { handleNodesError, nodesClient } from "../../../nodesClient.ts";
+import { getDefaultWorkspace } from "../../images/utils.ts";
 
 const list = new Command("list")
   .alias("ls")
@@ -35,9 +36,10 @@ Next Steps:\n
         logAndQuit("Not logged in. Please run 'sf login' first.");
       }
       const client = await nodesClient(token);
+      const workspace = await getDefaultWorkspace();
 
       const spinner = ora("Fetching images...").start();
-      const { data: images } = await client.vms.images.list();
+      const { data: images } = await client.vms.images.list({ workspace });
 
       spinner.stop();
 
@@ -95,7 +97,7 @@ Next Steps:\n
           }
         })();
 
-        table.push([image.name, image.image_id, status, createdAt]);
+        table.push([image.name, image.id, status, createdAt]);
       }
       if (images.length > 5) {
         table.push([
@@ -118,7 +120,7 @@ Next Steps:\n
       // Always show how to get info for a specific image
       const firstImage = sortedImages[0];
       if (firstImage) {
-        console.log(`  sf node images show ${chalk.cyan(firstImage.image_id)}`);
+        console.log(`  sf node images show ${chalk.cyan(firstImage.id)}`);
       }
       const firstCompletedImage = sortedImages.find(
         (image) => image.upload_status === "completed",
@@ -126,7 +128,7 @@ Next Steps:\n
       if (firstCompletedImage) {
         console.log(
           `  sf nodes create -z hayesvalley -d 2h -p 13.50 --image ${chalk.cyan(
-            firstCompletedImage.image_id,
+            firstCompletedImage.id,
           )}`,
         );
       }

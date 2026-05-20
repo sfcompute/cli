@@ -8,7 +8,7 @@
         "@formatjs/intl-segmenter": "^12.1.0",
         "@inkjs/ui": "^1.0.0",
         "@inquirer/prompts": "^8.2.0",
-        "@sfcompute/nodes-sdk-alpha": "0.1.0-alpha.27",
+        "@sfcompute/nodes-sdk-alpha": "0.1.0-alpha.31",
         "@types/ms": "^0.7.34",
         "async-retry": "^1.3.3",
         "axios": "^1.8.4",
@@ -258,7 +258,7 @@
 
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.55.2", "", { "os": "win32", "cpu": "x64" }, "sha512-xNO+fksQhsAckRtDSPWaMeT1uIM+JrDRXlerpnWNXhn1TdB3YZ6uKBMBTKP0eX9XtYEP978hHk1f8332i2AW8Q=="],
 
-    "@sfcompute/nodes-sdk-alpha": ["@sfcompute/nodes-sdk-alpha@0.1.0-alpha.27", "", {}, "sha512-IcnuTpfZszCLpBtEOFCas0fhc0yAgCvGZ8JvN9DdM1zWMUswHyuumYKDEVt6ZUXjJVnMt09Uhqh2sWHOEer+rQ=="],
+    "@sfcompute/nodes-sdk-alpha": ["@sfcompute/nodes-sdk-alpha@0.1.0-alpha.31", "", {}, "sha512-pdomgDeEvMQjo/F+GlmgMdN1l9eyICi8tlQlDLQ3xTIQ2D/++RK/WH2q153/xofOnwl/56P0IFYk9xl1Z7qx8w=="],
 
     "@types/async-retry": ["@types/async-retry@1.4.9", "", { "dependencies": { "@types/retry": "*" } }, "sha512-s1ciZQJzRh3708X/m3vPExr5KJlzlZJvXsKpbtE2luqNcbROr64qU+3KpJsYHqWMeaxI839OvXf9PrUSw1Xtyg=="],
 
