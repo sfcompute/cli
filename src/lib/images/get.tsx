@@ -12,6 +12,7 @@ import { logAndQuit } from "../../helpers/errors.ts";
 import { formatDate } from "../../helpers/format-time.ts";
 import type { components } from "../../schema.ts";
 import { Row } from "../Row.tsx";
+import type { CreateImagesOptions } from "./index.ts";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
@@ -96,7 +97,7 @@ function formatStatusInk(status: string): React.ReactElement {
   }
 }
 
-export function createGet() {
+export function createGet(_opts: CreateImagesOptions = {}) {
   return new Command("get")
     .alias("show")
     .description("Get image details and download URL")

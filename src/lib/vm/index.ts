@@ -3,7 +3,7 @@ import type { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
 import chalk from "chalk";
 import { nodesClient } from "../../nodesClient.ts";
-import createImagesCommand from "../nodes/image/index.ts";
+import { createImagesCommand } from "../images/index.ts";
 import { pluralizeNodes } from "../nodes/utils.ts";
 import list from "./list.ts";
 import logs from "./logs.ts";
@@ -66,5 +66,13 @@ export async function registerVM(program: Command) {
     .addCommand(logs)
     .addCommand(replace)
     .addCommand(script)
-    .addCommand(createImagesCommand());
+    .addCommand(
+      // Preserve the `os` alias and array-shaped `list --json` output that the
+      // pre-shared-factory `sf vm images` had; help text examples reference
+      // `sf vm images …` so they match the user's invocation.
+      createImagesCommand({
+        parentPath: "sf vm images",
+        legacyJsonShape: true,
+      }).alias("os"),
+    );
 }

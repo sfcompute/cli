@@ -12,6 +12,7 @@ import cliSpinners from "cli-spinners";
 import ora, { type Ora } from "ora";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
+import type { CreateImagesOptions } from "./index.ts";
 import { getDefaultWorkspace } from "./utils.ts";
 
 async function readChunk(
@@ -53,7 +54,7 @@ async function readChunk(
   }
 }
 
-export function createUpload() {
+export function createUpload(_opts: CreateImagesOptions = {}) {
   return new Command("upload")
     .description("Upload an image file (multipart)")
     .requiredOption("-f, --file <file>", "Path to the image file")
