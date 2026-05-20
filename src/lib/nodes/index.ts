@@ -1,7 +1,8 @@
 import console from "node:console";
 import type { Command } from "@commander-js/extra-typings";
 import { createImagesCommand } from "../images/index.ts";
-import create from "./create.ts";
+import { isFeatureEnabled } from "../posthog.ts";
+import { createCreateCommand } from "./create.ts";
 import deleteCommand from "./delete.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
@@ -12,7 +13,9 @@ import release from "./release.ts";
 import set from "./set.ts";
 import ssh from "./ssh.ts";
 
-export function registerNodes(program: Command) {
+export async function registerNodes(program: Command) {
+  const enableInfiniband = await isFeatureEnabled("infiniband-preview");
+
   const nodes = program
     .command("nodes")
     .alias("node")
@@ -20,7 +23,7 @@ export function registerNodes(program: Command) {
     .description("Manage compute nodes")
     .addCommand(list)
     .addCommand(get)
-    .addCommand(create)
+    .addCommand(createCreateCommand({ enableInfiniband }))
     .addCommand(extend)
     .addCommand(release)
     .addCommand(deleteCommand)
