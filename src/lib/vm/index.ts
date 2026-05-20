@@ -66,13 +66,5 @@ export async function registerVM(program: Command) {
     .addCommand(logs)
     .addCommand(replace)
     .addCommand(script)
-    .addCommand(
-      // Preserve the `os` alias and array-shaped `list --json` output that the
-      // pre-shared-factory `sf vm images` had; help text examples reference
-      // `sf vm images …` so they match the user's invocation.
-      createImagesCommand({
-        parentPath: "sf vm images",
-        legacyJsonShape: true,
-      }).alias("os"),
-    );
+    .addCommand(createImagesCommand());
 }
