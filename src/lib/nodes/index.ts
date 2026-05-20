@@ -5,7 +5,7 @@ import create from "./create.ts";
 import deleteCommand from "./delete.ts";
 import extend from "./extend.ts";
 import get from "./get.tsx";
-import image from "./image/index.ts";
+import createImagesCommand from "./image/index.ts";
 import list from "./list.tsx";
 import logs from "./logs.ts";
 import redeploy from "./redeploy.ts";
@@ -29,7 +29,7 @@ export function registerNodes(program: Command) {
     .addCommand(set)
     .addCommand(ssh)
     .addCommand(logs)
-    .addCommand(image);
+    .addCommand(createImagesCommand());
 
   const baseHelpText = nodes.helpInformation();
 

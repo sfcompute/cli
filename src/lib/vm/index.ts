@@ -3,7 +3,7 @@ import type { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
 import chalk from "chalk";
 import { nodesClient } from "../../nodesClient.ts";
-import image from "../nodes/image/index.ts";
+import createImagesCommand from "../nodes/image/index.ts";
 import { pluralizeNodes } from "../nodes/utils.ts";
 import list from "./list.ts";
 import logs from "./logs.ts";
@@ -66,5 +66,5 @@ export async function registerVM(program: Command) {
     .addCommand(logs)
     .addCommand(replace)
     .addCommand(script)
-    .addCommand(image);
+    .addCommand(createImagesCommand());
 }
