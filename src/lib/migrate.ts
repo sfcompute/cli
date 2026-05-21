@@ -11,10 +11,12 @@ const MIGRATION_GUIDE_URL =
   "https://docs.sfcompute.com/preview/guides/migrating-from-nodes";
 
 export function showMigrateBanner() {
-  const message = `A new sf is here.
+  const message = `We've rewritten sf in Rust — faster, with new commands
+like 'sf availability', 'sf capacities', and 'sf orders'.
 
-We're moving to a Rust CLI with new commands like
-'sf availability', 'sf capacities', and 'sf orders'.
+Migrating also opts you into our public preview, which
+lets you resell unused compute back to the market and
+earn credits.
 
 Run 'sf migrate' to install it. Your current sf will
 be moved to 'sf-old' so you can keep using it.
