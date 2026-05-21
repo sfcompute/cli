@@ -78,7 +78,7 @@ async function listContracts(
   if (!response.ok) {
     switch (response.status) {
       case 400:
-        return logAndQuit(`Bad Request: ${error?.message}`);
+        return logAndQuit(`Bad Request: ${error?.error?.message}`);
       case 401:
         return await logSessionTokenExpiredAndQuit();
       default:

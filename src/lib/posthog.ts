@@ -40,7 +40,7 @@ const trackEvent = ({
 
     if (!exchangeAccountId) {
       const client = await apiClient(config.auth_token);
-      const { data } = await client.GET("/v0/me");
+      const { data } = await client.GET("/v1/account/me", {});
       if (data?.id) {
         exchangeAccountId = data.id;
         await saveConfig({ ...config, account_id: data.id });
@@ -81,16 +81,20 @@ export const isFeatureEnabled = async (feature: FeatureFlags) => {
     return cachedFlag.value;
   }
 
-  // Fetch from the v2/feature_flags API
+  // Fetch from the v2/feature_flags API. Uses raw fetch because the route is
+  // not exposed on the regenerated `src/schema.ts` (only the admin variant is),
+  // but it is still served externally per the HAProxy config.
   let finalResult = false;
   try {
-    const client = await apiClient(config.auth_token);
-    const { data, response } = await client.GET(
-      "/v2/feature_flags/{feature_flag_id}",
-      { params: { path: { feature_flag_id: feature } } },
+    const response = await fetch(
+      `${config.api_url}/v2/feature_flags/${encodeURIComponent(feature)}`,
+      { headers: { Authorization: `Bearer ${config.auth_token}` } },
     );
+    if (response.ok) {
+      const data = (await response.json()) as { enabled?: boolean };
+      finalResult = data?.enabled ?? false;
+    }
     // 404 means the flag doesn't exist → treat as disabled (false)
-    finalResult = response.ok ? (data?.enabled ?? false) : false;
   } catch {
     // Network or parse error → default to false
   }

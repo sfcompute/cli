@@ -4,229 +4,6 @@
  */
 
 export interface paths {
-  "/v0/me": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description The authenticated account */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Account"];
-          };
-        };
-        /** @description Account not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/tokens": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          include_system?: boolean;
-          origin_client?: "cli" | "web" | "manual";
-        };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description List tokens */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_ListTokenResponse"];
-          };
-        };
-        /** @description Account not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: {
-        content: {
-          "application/json": {
-            /**
-             * @description Number of seconds until token expires.
-             * @example 604800
-             */
-            expires_in_seconds: number;
-            /** @description Name of the token. */
-            name?: string;
-            /** @description Description of the token. */
-            description?: string;
-            /** @enum {string} */
-            origin_client: "cli";
-          };
-        };
-      };
-      responses: {
-        /** @description Token created successfully */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_Token"];
-          };
-        };
-        /** @description Invalid request parameters */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_MaxTokenLimitReached"];
-          };
-        };
-        /** @description Authentication required */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"];
-          };
-        };
-        /** @description Account is frozen */
-        403: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_AccountFrozenError"];
-          };
-        };
-        /** @description Token not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json":
-              | components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"]
-              | components["schemas"]["San_Francisco_Compute_Documentation_InvalidTokenCreateOriginClient"];
-          };
-        };
-        /** @description Token generation rate limit exceeded */
-        429: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["San_Francisco_Compute_Documentation_MaxTokenLimitReached"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/tokens/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Token deleted */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              success: boolean;
-            };
-          };
-        };
-        /** @description Token or account not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json":
-              | components["schemas"]["San_Francisco_Compute_Documentation_AccountNotFoundError"]
-              | components["schemas"]["San_Francisco_Compute_Documentation_TokenNotFound"];
-          };
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/v0/transactions": {
     parameters: {
       query?: never;
@@ -293,107 +70,6 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/credentials": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ListResponse"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      /** @description Credential details */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_types.KubernetesCredentialBody"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.BaseCredentialResponse"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v0/credentials/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Credential ID (format: cred_<nanoid>) */
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.DeleteResponse"];
-          };
-        };
-      };
-    };
     options?: never;
     head?: never;
     patch?: never;
@@ -471,290 +147,6 @@ export interface paths {
       cookie?: never;
     };
     get: operations["get_vms_ssh"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/vms/images": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Images
-     * @description List all VM Images for the authenticated account
-     */
-    get: operations["list_vms_images"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/vms/images/start_upload": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["start_image_upload"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/vms/images/{image_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Download Image
-     * @description Get the download URL for a VM image by ID
-     */
-    get: operations["download_image"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/vms/images/{image_id}/complete_upload": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: operations["complete_image_upload"];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/vms/images/{image_id}/upload": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["create_image_upload_url"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/images": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Images
-     * @description List all VM Images for the authenticated account
-     */
-    get: operations["list_images_v2"];
-    put?: never;
-    /**
-     * Create image
-     * @description Start a new image upload. Returns the created image metadata.
-     */
-    post: operations["start_upload"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/images/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Image
-     * @description Get metadata for a VM image by ID
-     */
-    get: operations["get_image"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/images/{id}/complete": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["complete_upload"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/images/{id}/download": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Download Image
-     * @description Get a presigned download URL for a completed VM image
-     */
-    get: operations["download_image_v2"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/images/{id}/parts": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: operations["upload_part"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/nodes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List nodes
-     * @description List nodes
-     */
-    get: operations["list_nodes"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/nodes/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get node
-     * @description Retrieve details of a specific node by ID.
-     */
-    get: operations["get_node"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/nodes/{id}/logs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get node logs
-     * @description Retrieve log chunks for a specific node, with optional filtering by sequence number and timestamp.
-     */
-    get: operations["get_node_logs"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/nodes/{id}/replace": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Replace node
-     * @description Replace a node by destroying the existing one and creating a new node in the same capacity. Optionally specify a new image and cloud-init user data.
-     */
-    post: operations["replace_node"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/nodes/{id}/ssh": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get node SSH info
-     * @description Get SSH connection details for a specific node, including hostname, port, and host keys.
-     */
-    get: operations["get_node_ssh"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1180,6 +572,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List events
+     * @description List events for the authenticated account, ordered by sequence.
+     */
+    get: operations["list_events"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/invoices/calculate_pricing": {
     parameters: {
       query?: never;
@@ -1285,7 +697,249 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/v2/capacities": {
+  "/preview/v2/admin/feature_flags": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update a feature flag
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update the enabled state and/or account_regex of an existing feature flag. At least one of enabled or account_regex must be provided. Omitted fields are left unchanged.
+     */
+    put: operations["adminUpdateFeatureFlag"];
+    /**
+     * Create a feature flag for an account
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a feature flag for an account. Returns a feature_flag_id that can be used to update or delete the entry.
+     */
+    post: operations["adminCreateFeatureFlag"];
+    /**
+     * Delete a feature flag
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Soft delete a feature flag entry by its feature_flag_id.
+     */
+    delete: operations["adminDeleteFeatureFlag"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/images/{id}/publish": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Publish image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Publish an image, making it publicly visible to all users. Requires admin permissions. The image must belong to the caller's account and have a completed upload.
+     */
+    post: operations["publish_image"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/images/{id}/set-default": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Set default image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Set a public image as the default. The image must have provider = 'sfc'. Atomically swaps the default from any previous default image to this one. Requires admin permissions.
+     */
+    post: operations["set_default_image"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_sku_properties": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["listInstanceSkuPropertyKeys"];
+    put?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    post: operations["createInstanceSkuPropertyKey"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_sku_properties/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["getInstanceSkuPropertyKey"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    patch: operations["patchInstanceSkuPropertyKey"];
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_sku_properties/{key}/values": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["listInstanceSkuPropertyValues"];
+    put?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    post: operations["createInstanceSkuPropertyValue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_sku_properties/{key}/values/{value}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["getInstanceSkuPropertyValue"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    patch: operations["patchInstanceSkuPropertyValue"];
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_skus": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["listInstanceSkus"];
+    put?: never;
+    /**
+     * Create a new instance SKU with validated properties.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Minimal compared to the v1 `POST /v1/admin/clusters` endpoint: this
+     *     does **not** touch zones, workspaces, capacities, delivery fees, or
+     *     zone metadata — only the trading-engine `CreateCluster` command with
+     *     validated properties. Use the v1 endpoint if you need that extra
+     *     provider-onboarding plumbing.
+     */
+    post: operations["createInstanceSku"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/admin/instance_skus/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    get: operations["getInstanceSku"];
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    put: operations["putInstanceSku"];
+    post?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    delete: operations["deleteInstanceSku"];
+    options?: never;
+    head?: never;
+    /**
+     * Patch an instance SKU's display metadata. Currently only `name` is
+     *     updatable here — properties go through `PUT /admin/instance_skus/{id}/properties`
+     *     (full replacement, with the dangerous-rewrite guards). Lookups still
+     *     happen by id; the name is purely for display.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     */
+    patch: operations["patchInstanceSku"];
+    trace?: never;
+  };
+  "/preview/v2/admin/invoices/{account_id}/create": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description > ⚠️ This endpoint is in [public preview](/preview/roadmap). */
+    post: operations["adminCreateInvoice"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List grouped instance-SKU availability
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Aggregate availability across instance SKUs that match `requirements`, grouped by the given property keys. Each group exposes a summed `total` schedule plus a per-SKU breakdown.
+     */
+    get: operations["list_availability"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/capacities": {
     parameters: {
       query?: never;
       header?: never;
@@ -1294,22 +948,26 @@ export interface paths {
     };
     /**
      * List capacities
-     * @description List all capacities owned by the authenticated user.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all capacities.
      */
-    get: operations["list_capacities_handler"];
+    get: operations["list_capacities"];
     put?: never;
     /**
      * Create capacity
-     * @description Create a new capacity with optional requirements, node template, and scheduler.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a capacity to hold compute.
      */
-    post: operations["create_capacity_handler"];
+    post: operations["create_capacity"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v2/capacities/{id}": {
+  "/preview/v2/capacities/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1317,27 +975,33 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get capacity by ID or name
-     * @description Retrieve a capacity including its compute schedule and scheduler configuration.
+     * Get capacity
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a capacity by ID, resource path, or name, including its compute schedule.
      */
-    get: operations["get_capacity_handler"];
+    get: operations["fetch_capacity"];
     put?: never;
     post?: never;
     /**
      * Delete capacity
-     * @description Delete a capacity. The capacity must be empty and the scheduler must be disabled or absent.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete a capacity. The capacity must have no active orders, future allocations, active nodes, deployments, or procurements. Remove all dependencies before deleting.
      */
-    delete: operations["delete_capacity_handler"];
+    delete: operations["delete_capacity"];
     options?: never;
     head?: never;
     /**
      * Update capacity
-     * @description Update a capacity. Only provided fields are changed; omitted fields are left unchanged.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update a capacity. Omitted fields are left unchanged.
      */
-    patch: operations["patch_capacity_handler"];
+    patch: operations["update_capacity"];
     trace?: never;
   };
-  "/v2/node_templates": {
+  "/preview/v2/capacity_transfers": {
     parameters: {
       query?: never;
       header?: never;
@@ -1345,23 +1009,27 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List node templates
-     * @description List all node templates accessible by the authenticated user.
+     * List capacity transfers
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List capacity transfers for the caller's organization.
      */
-    get: operations["list_node_templates_handler"];
+    get: operations["list_capacity_transfers"];
     put?: never;
     /**
-     * Create node template
-     * @description Create a new node template with reusable VM configuration.
+     * Create capacity transfer
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Transfer some or all of one capacity into another
      */
-    post: operations["create_node_template_handler"];
+    post: operations["create_capacity_transfer"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v2/node_templates/{id}": {
+  "/preview/v2/capacity_transfers/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1369,23 +1037,639 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get node template by ID or name
-     * @description Get detailed information about a specific node template.
+     * Get capacity transfer
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a capacity transfer by ID.
      */
-    get: operations["get_node_template_handler"];
+    get: operations["fetch_capacity_transfer"];
     put?: never;
     post?: never;
-    /**
-     * Delete node template
-     * @description Delete a node template. The template must not be in use by any capacity.
-     */
-    delete: operations["delete_node_template_handler"];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v2/orders": {
+  "/preview/v2/deployments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List deployments
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all deployments.
+     */
+    get: operations["list_deployments"];
+    put?: never;
+    /**
+     * Create deployment
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a deployment for bulk node management.
+     */
+    post: operations["create_deployment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/deployments/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get deployment
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a deployment by ID or name.
+     */
+    get: operations["get_deployment"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete deployment
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete a deployment.
+     */
+    delete: operations["delete_deployment"];
+    options?: never;
+    head?: never;
+    /**
+     * Update deployment
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update a deployment's configuration.
+     */
+    patch: operations["patch_deployment"];
+    trace?: never;
+  };
+  "/preview/v2/grants": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List grants
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List grants, optionally filtered by workspace or principal. Callers without `grant:list` + `grant:read` are restricted to grants whose principal is themselves.
+     */
+    get: operations["list_grants_handler"];
+    put?: never;
+    /**
+     * Create grant
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Grant a role to a principal (user or token) on a workspace, or org-wide when workspace_id is omitted.
+     */
+    post: operations["create_grant_handler"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/grants/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get grant
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a grant by ID. Callers without `grant:read` may still fetch a grant whose principal is themselves
+     */
+    get: operations["get_grant_handler"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete grant
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete a grant.
+     */
+    delete: operations["delete_grant_handler"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List images
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List images in the specified workspace. Pass `sfc:workspace:sfcompute:public` as the workspace to list sfc-provided public images instead.
+     */
+    get: operations["list_images"];
+    put?: never;
+    /**
+     * Create image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create an image and start a multipart upload.
+     */
+    post: operations["create_image"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve an image by ID. Returns both user-owned and public images.
+     */
+    get: operations["fetch_image"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete an image.
+     */
+    delete: operations["delete_image"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images/{id}/complete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Complete image upload
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Finalize a multipart image upload.
+     */
+    post: operations["complete_image_upload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images/{id}/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Get a presigned URL to download an image.
+     */
+    get: operations["download_image"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images/{id}/parts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Get upload part URL
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Get a presigned URL to upload one part of a multipart image upload.
+     */
+    post: operations["create_image_upload_part_url"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/images/{id}/revoke": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Revoke image
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Revoke a private image. Revoked images can't back new instances; existing instances continue running.
+     */
+    post: operations["revoke_image"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instance_sku_property_catalog": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List instance SKU property catalog
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List every property key and its allowed values. Use the keys and values here when filling in `requirements` on orders and procurements.
+     */
+    get: operations["list_instance_sku_property_catalog"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instance_skus": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List instance SKUs
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all instance SKUs available on the market with their properties.
+     */
+    get: operations["list_instance_skus"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instance_skus/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get instance SKU
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve an instance SKU by ID, including its registered properties.
+     */
+    get: operations["get_instance_sku"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instance_templates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List instance templates
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all instance templates.
+     */
+    get: operations["list_instance_templates"];
+    put?: never;
+    /**
+     * Create instance template
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a reusable instance template.
+     */
+    post: operations["create_instance_template"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instance_templates/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get instance template
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve an instance template by ID or resource path.
+     */
+    get: operations["fetch_instance_template"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete instance template
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete an instance template. The template must not be in use by any capacity.
+     */
+    delete: operations["delete_instance_template"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List instances
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all instances.
+     */
+    get: operations["list_instances"];
+    put?: never;
+    /**
+     * Create instance
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create an instance.
+     */
+    post: operations["create_instance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update multiple instances
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update one or more instances atomically. All listed instances must be in the same workspace; mixed-workspace batches are rejected with 422.
+     */
+    patch: operations["batch_patch_instances"];
+    trace?: never;
+  };
+  "/preview/v2/instances/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get instance
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve an instance by ID or name.
+     */
+    get: operations["fetch_instance"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete instance
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete an instance.
+     */
+    delete: operations["delete_instance"];
+    options?: never;
+    head?: never;
+    /**
+     * Update instance
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update an instance. Omitted fields are left unchanged.
+     */
+    patch: operations["update_instance"];
+    trace?: never;
+  };
+  "/preview/v2/instances/{id}/logs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get instance logs
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve logs for an instance.
+     */
+    get: operations["get_instance_logs"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instances/{id}/ssh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get instance SSH info
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve SSH connection details for an instance.
+     */
+    get: operations["get_instance_ssh"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/instances/{id}/terminate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Terminate instance
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Terminates a running instance. Terminated instances can not be restarted.
+     */
+    post: operations["terminate_instance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/order_preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Estimate an order
+     * @description Estimate a buy or sell order before placing it.
+     */
+    post: operations["get_order_preview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/orderbook/depth": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get market depth
+     * @description Depth of book for the given requirements and delivery window, aggregated by price level. Individual orders, participants, and matched SKU identities are not exposed.
+     */
+    get: operations["get_orderbook_depth"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/orderbook/fills": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List market fills
+     * @description All contracts that filled on hardware meeting the requirements for the given delivery window, sorted newest first. One row per fill (contract). Participant identity is never exposed.
+     */
+    get: operations["list_orderbook_fills"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/orderbook/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get market quote
+     * @description Top-of-book quote (best bid + best ask) for the given requirements and delivery window. The book is aggregated across every SKU whose orders satisfy the requirements and that the caller is permitted to see.
+     */
+    get: operations["get_orderbook_quote"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/orderbook/windows": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List market windows
+     * @description List every delivery window with resting orders matching the requirements, within the given time range. Each row is a summary; use /quote or /depth for detail on a specific window.
+     */
+    get: operations["list_orderbook_windows"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/orders": {
     parameters: {
       query?: never;
       header?: never;
@@ -1394,22 +1678,26 @@ export interface paths {
     };
     /**
      * List orders
-     * @description List all orders for the authenticated user.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all orders.
      */
     get: operations["list_orders"];
     put?: never;
     /**
      * Create order
-     * @description Place a buy or sell order on the market for a specific capacity.
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Place a buy or sell order. Orders fill completely or not at all. All nodes fill on a single instance SKU matching the order's `requirements`. Order filling is asynchronous; poll `GET /v2/orders/{id}` to check status.
      */
-    post: operations["post_order"];
+    post: operations["create_order"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v2/orders/{id}": {
+  "/preview/v2/orders/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1417,15 +1705,19 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get order details
-     * @description Retrieve details of a specific order by ID.
+     * Get order
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve an order by ID.
      */
-    get: operations["get_order"];
+    get: operations["fetch_order"];
     put?: never;
     post?: never;
     /**
-     * Cancel an order
-     * @description Request cancellation of an order. This is asynchronous — poll `GET /v2/orders/{id}` to confirm the status has changed to cancelled.
+     * Cancel order
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Request cancellation of an order. This is asynchronous — poll `GET /v2/orders/{id}` to confirm the status has changed to cancelled.
      */
     delete: operations["cancel_order"];
     options?: never;
@@ -1433,68 +1725,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/v2/feature_flags/{feature_flag_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get feature flag status for the authenticated user */
-    get: operations["get_feature_flag"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/inference/batches": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List all batches
-     * @description Returns all batches for your account. Archived batches are excluded. Use `limit` and `after` parameters for pagination.
-     */
-    get: operations["list_batches"];
-    put?: never;
-    /**
-     * Create batch jobs
-     * @description Creates a new batch job. Accepts a single batch request or multiple requests. Make sure to follow the [expected file structure for batches](large-scale-inference#large-scale-inference__input-file-format). The batch starts in `accepted` status.
-     */
-    post: operations["create_batches"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/inference/batches/{batch_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a batch
-     * @description Returns details for a specific batch identified by `batch_id`.
-     */
-    get: operations["get_batch"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/inference/batches/{batch_id}/archive": {
+  "/preview/v2/permissions/check": {
     parameters: {
       query?: never;
       header?: never;
@@ -1504,57 +1735,109 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Archive a batch
-     * @description Archives a batch identified by `batch_id`. Archived batches are excluded from list results.
+     * Check permissions
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Evaluate one or more `"resource:verb"` actions against the caller's grants and return a single aggregated verdict. Pass `workspace` to check workspace-scoped grants, or omit it to check org-scoped grants.
      */
-    post: operations["archive_batch"];
+    post: operations["check_permission_handler"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v1/inference/batches/{batch_id}/cancel": {
+  "/preview/v2/procurements": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * List procurements
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all procurements.
+     */
+    get: operations["list_procurements"];
     put?: never;
     /**
-     * Cancel a batch
-     * @description Cancels a batch that is in `accepted` status. Batches in other states cannot be cancelled.
+     * Create procurement
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a market automation that maintains capacity by placing buy/sell orders.
      */
-    post: operations["cancel_batch"];
+    post: operations["create_procurement"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v1/inference/batches/{batch_id}/retry": {
+  "/preview/v2/procurements/{id}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get procurement
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a procurement by ID or name.
+     */
+    get: operations["get_procurement"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete procurement
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete a procurement. Standing orders are cancelled automatically.
+     */
+    delete: operations["delete_procurement"];
+    options?: never;
+    head?: never;
+    /**
+     * Update procurement
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update a procurement's configuration.
+     */
+    patch: operations["patch_procurement"];
+    trace?: never;
+  };
+  "/preview/v2/roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List roles
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all role definitions. Built-in roles appear first, followed by custom roles sorted by creation date (newest first).
+     */
+    get: operations["list_roles_handler"];
     put?: never;
     /**
-     * Retry a batch
-     * @description Retries a batch that is `failed`, `cancelled`, `expired`, or `completed` status. Presigned URLs must still be valid. Maximum `2` retries per batch.
+     * Create role
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a role.
      */
-    post: operations["retry_batch"];
+    post: operations["create_role_handler"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/v1/inference/models": {
+  "/preview/v2/roles/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1562,16 +1845,136 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List available models
-     * @description Returns all available models. Use `model_id` values when creating batches. If you don't see a model you need, please [contact us](https://sfcompute.com/inference/contact).
+     * Get role
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a role by ID, resource path, or name.
      */
-    get: operations["get_models"];
+    get: operations["get_role_handler"];
+    /**
+     * Update role
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Update a role's name and/or policy.
+     */
+    put: operations["update_role_handler"];
+    post?: never;
+    /**
+     * Delete role
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Delete a role by ID, resource path, or name.
+     */
+    delete: operations["delete_role_handler"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List users
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List users that are members of the caller's organization.
+     */
+    get: operations["list_users_handler"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/users/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get user
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Returns user details by ID or resource path.
+     */
+    get: operations["get_user_handler"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/workspaces": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List workspaces
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     List all workspaces for the authenticated account.
+     */
+    get: operations["list_workspaces_handler"];
+    put?: never;
+    /**
+     * Create workspace
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Create a workspace.
+     */
+    post: operations["create_workspace_handler"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/preview/v2/workspaces/{workspace}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get workspace
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Retrieve a workspace by name or ID.
+     */
+    get: operations["get_workspace_handler"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete workspace
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Soft-delete a workspace by name or ID. Workspace must be empty (no capacities, instance templates, or images).
+     */
+    delete: operations["delete_workspace_handler"];
+    options?: never;
+    head?: never;
+    /**
+     * Update workspace
+     * @description > ⚠️ This endpoint is in [public preview](/preview/roadmap).
+     *
+     *     Rename a workspace.
+     */
+    patch: operations["patch_workspace_handler"];
     trace?: never;
   };
   "/v0/quote": {
@@ -1594,155 +1997,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    San_Francisco_Compute_Documentation_Account: {
-      /**
-       * @example account
-       * @enum {string}
-       */
-      object: "account";
-      /** @example acc_123 */
-      id: string;
-      /**
-       * @example user
-       * @enum {string}
-       */
-      role: "admin" | "user" | "vendor" | "clops" | "sfcd";
-      /** @example true */
-      can_buy: boolean;
-      /** @example false */
-      can_sell: boolean;
-    };
-    San_Francisco_Compute_Documentation_AccountNotFoundError: {
-      /**
-       * @example error
-       * @enum {string}
-       */
-      object: "error";
-      /**
-       * @example account.not_found
-       * @enum {string}
-       */
-      code: "account.not_found";
-      /** @example Account not found */
-      message?: string;
-      /** @example {} */
-      details?: {
-        [key: string]: unknown;
-      };
-    };
-    San_Francisco_Compute_Documentation_Token: {
-      /**
-       * @description The type of object
-       * @enum {string}
-       */
-      object: "token";
-      id: string;
-      /**
-       * @description Only available after creation
-       * @example <jwt>
-       */
-      token?: string;
-      /** @description Name of the token. */
-      name: string | null;
-      /** @description Description of the token. */
-      description: string | null;
-      is_sandbox: boolean;
-      /** @description ISO 8601 date string of when token expires (in UTC). */
-      last_active_at: string | null;
-      /** @description ISO 8601 date string of when token expires (in UTC). */
-      expires_at: string;
-      /** @description ISO 8601 date string of when token was created (in UTC). */
-      created_at: string;
-      /** @enum {string|null} */
-      origin_client: "cli" | "web" | "manual" | null;
-      /** @description Whether the token was generated by the system & is being used in the background, or whether a user explicitly created it for their own use. */
-      is_system: boolean;
-    };
-    San_Francisco_Compute_Documentation_ListTokenResponse: {
-      data: components["schemas"]["San_Francisco_Compute_Documentation_Token"][];
-      /**
-       * @example true
-       * @example false
-       */
-      has_more: boolean;
-      /**
-       * @example list
-       * @enum {string}
-       */
-      object: "list";
-    };
-    San_Francisco_Compute_Documentation_MaxTokenLimitReached: {
-      /**
-       * @example error
-       * @enum {string}
-       */
-      object: "error";
-      /**
-       * @example token.max_token_limit_reached
-       * @enum {string}
-       */
-      code: "token.max_token_limit_reached";
-      /** @example Max token limit reached */
-      message?: string;
-      /** @example {} */
-      details?: {
-        [key: string]: unknown;
-      };
-    };
-    San_Francisco_Compute_Documentation_AccountFrozenError: {
-      /**
-       * @example error
-       * @enum {string}
-       */
-      object: "error";
-      /**
-       * @example account.frozen
-       * @enum {string}
-       */
-      code: "account.frozen";
-      /** @example Account is frozen */
-      message?: string;
-      /** @example {} */
-      details?: {
-        [key: string]: unknown;
-      };
-    };
-    San_Francisco_Compute_Documentation_InvalidTokenCreateOriginClient: {
-      /**
-       * @example error
-       * @enum {string}
-       */
-      object: "error";
-      /**
-       * @example token.invalid_token_create_origin_client
-       * @enum {string}
-       */
-      code: "token.invalid_token_create_origin_client";
-      /** @example Invalid token create origin client */
-      message?: string;
-      /** @example {} */
-      details?: {
-        [key: string]: unknown;
-      };
-    };
-    San_Francisco_Compute_Documentation_TokenNotFound: {
-      /**
-       * @example error
-       * @enum {string}
-       */
-      object: "error";
-      /**
-       * @example token.not_found
-       * @enum {string}
-       */
-      code: "token.not_found";
-      /** @example Token not found */
-      message?: string;
-      /** @example {} */
-      details?: {
-        [key: string]: unknown;
-      };
-    };
     /**
      * @description Whether the transaction is incoming to or outgoing from the account.
      * @example incoming
@@ -2093,93 +2347,6 @@ export interface components {
         newest_timestamp: string | null;
       };
     };
-    "SF_Compute_K8s_Orchestration_API_frontend_server.BaseCredentialResponse": {
-      cluster?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo"];
-      id?: string;
-      label?: string;
-      object?: string;
-      pubkey?: string;
-      username?: string;
-    };
-    "SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo": {
-      id?: string;
-      kubernetes_api_url?: string;
-      kubernetes_ca_cert?: string;
-      kubernetes_namespace?: string;
-      name?: string;
-      object?: string;
-    };
-    "SF_Compute_K8s_Orchestration_API_frontend_server.CredentialResponse": {
-      cluster?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.ClusterInfo"];
-      cluster_type?: string;
-      encrypted_kubeconfig?: string;
-      encrypted_token?: string;
-      ephemeral_pubkey?: string;
-      id?: string;
-      label?: string;
-      nonce?: string;
-      object?: string;
-      pubkey?: string;
-      username?: string;
-    };
-    "SF_Compute_K8s_Orchestration_API_frontend_server.DeleteResponse": {
-      deleted?: boolean;
-      id?: string;
-      object?: string;
-    };
-    "SF_Compute_K8s_Orchestration_API_frontend_server.ListResponse": {
-      data?: components["schemas"]["SF_Compute_K8s_Orchestration_API_frontend_server.CredentialResponse"][];
-      has_more?: boolean;
-      object?: string;
-    };
-    /** @description Credential request body */
-    "SF_Compute_K8s_Orchestration_API_types.KubernetesCredentialBody": {
-      cluster?: string;
-      label?: string;
-      object?: string;
-      pubkey?: string;
-      username?: string;
-    };
-    /**
-     * @description Unique identifier with prefix 'cap_'.
-     * @example cap_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    vmorch_CapacityId: string;
-    vmorch_CompleteUploadRequest: {
-      sha256_hash: string;
-    };
-    vmorch_CompleteUploadResponse: {
-      /**
-       * @example image
-       * @enum {string}
-       */
-      object?: "image";
-      upload_status: components["schemas"]["vmorch_ImageUploadStatus"];
-      id: components["schemas"]["vmorch_ImageId"];
-    };
-    vmorch_ErrorDetail: {
-      /** @description The field that caused the error (for validation errors) */
-      field?: string | null;
-      /** @description Specific error code for this detail */
-      code: string;
-      /** @description Human-readable error message */
-      message: string;
-    };
-    /** @enum {string} */
-    vmorch_ErrorType:
-      | "api_error"
-      | "invalid_request_error"
-      | "authentication_error"
-      | "idempotency_error"
-      | "conflict"
-      | "not_found"
-      | "request_timed_out"
-      | "forbidden"
-      | "not_implemented"
-      | "upgrade_required"
-      | "payment_required"
-      | "service_unavailable"
-      | "unprocessable_entity";
     vmorch_GetInstancesResponse: {
       data: components["schemas"]["vmorch_VmInstance"][];
     };
@@ -2198,178 +2365,6 @@ export interface components {
     vmorch_GetUserDataResponse: {
       script: components["schemas"]["vmorch_UserData"];
     };
-    /**
-     * @example image
-     * @enum {string}
-     */
-    vmorch_ImageDiscriminator: "image";
-    vmorch_ImageDownloadResponse: {
-      url: string;
-      expires_at: components["schemas"]["vmorch_UnixEpoch"];
-      sha256_hash: string;
-      /** Format: u-int64 */
-      object_size: number;
-    };
-    /**
-     * @description Unique identifier with prefix 'image_'.
-     * @example image_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    vmorch_ImageId: string;
-    vmorch_ImageInfo: {
-      /**
-       * @example image
-       * @enum {string}
-       */
-      object?: "image";
-      id: components["schemas"]["vmorch_ImageId"];
-      name: components["schemas"]["vmorch_Name"];
-      upload_status: components["schemas"]["vmorch_ImageUploadStatus"];
-      sha256_hash?: string | null;
-      created_at: components["schemas"]["vmorch_UnixEpoch"];
-    };
-    vmorch_ImageResponse: {
-      /**
-       * @example image
-       * @enum {string}
-       */
-      object?: "image";
-      id: components["schemas"]["vmorch_ImageId"];
-      name: components["schemas"]["vmorch_Name"];
-      upload_status: components["schemas"]["vmorch_ImageUploadStatus"];
-      sha256_hash?: string | null;
-      created_at: components["schemas"]["vmorch_UnixEpoch"];
-    };
-    /** @description Request body for image upload presigned URL generation */
-    vmorch_ImageUploadRequest: {
-      /**
-       * Format: int32
-       * @description part idx (1-based)
-       */
-      part_id: number;
-    };
-    /** @description Response body for image upload presigned URL generation */
-    vmorch_ImageUploadResponse: {
-      /** @description The presigned URL that can be used to upload the image part */
-      upload_url: string;
-      /** @description Timestamp when the presigned URL expires (RFC 3339 format) */
-      expires_at: string;
-    };
-    /** @enum {string} */
-    vmorch_ImageUploadStatus: "started" | "uploading" | "completed" | "failed";
-    /**
-     * @description Opaque pagination cursor for ImagesCursor. Wire format: `imgc_{base64url}`.
-     * @example imgc_gqXR7s0Kj5mHvE2wNpLc4Q
-     */
-    vmorch_ImagesCursor: string;
-    vmorch_ListImagesResponse: {
-      /**
-       * @example list
-       * @enum {string}
-       */
-      object: "list";
-      cursor?: null | components["schemas"]["vmorch_ImagesCursor"];
-      has_more: boolean;
-      data: components["schemas"]["vmorch_ImageInfo"][];
-    };
-    vmorch_ListNodesResponse: {
-      /**
-       * @example list
-       * @enum {string}
-       */
-      object: "list";
-      cursor?: null | components["schemas"]["vmorch_NodesCursor"];
-      has_more: boolean;
-      data: components["schemas"]["vmorch_NodeResponse"][];
-    };
-    /**
-     * @description A validated resource name. Must start with alphanumeric, followed by alphanumeric, '.', '_', or '-'. Max 255 characters.
-     * @example my-resource-name
-     */
-    vmorch_Name: string;
-    /**
-     * @description Unique identifier with prefix 'node_'.
-     * @example node_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    vmorch_NodeId: string;
-    vmorch_NodeLogChunk: {
-      /**
-       * @example logs_chunk
-       * @enum {string}
-       */
-      object?: "logs_chunk";
-      node_id: components["schemas"]["vmorch_NodeId"];
-      /** @description Wall-clock time as a unix timestamp (seconds). */
-      timestamp_realtime: components["schemas"]["vmorch_UnixEpoch"];
-      /**
-       * Format: int64
-       * @description Monotonic clock seconds.
-       */
-      timestamp_monotonic_secs: number;
-      /**
-       * Format: u-int32
-       * @description Nanosecond component of the monotonic clock.
-       */
-      timestamp_monotonic_nanos: number;
-      /** Format: u-int64 */
-      seqnum: number;
-      data: number[];
-    };
-    vmorch_NodeLogsResponse: {
-      /**
-       * @example list
-       * @enum {string}
-       */
-      object: "list";
-      data: components["schemas"]["vmorch_NodeLogChunk"][];
-    };
-    vmorch_NodeResponse: {
-      /**
-       * @example node
-       * @enum {string}
-       */
-      object?: "node";
-      id: components["schemas"]["vmorch_NodeId"];
-      status: components["schemas"]["vmorch_NodeStatus"];
-      capacity: components["schemas"]["vmorch_CapacityId"];
-      template: components["schemas"]["vmorch_NodeTemplateId"];
-    };
-    vmorch_NodeSshHostKey: {
-      /**
-       * @description Key algorithm (e.g. `ssh-ed25519`, `ssh-rsa`).
-       * @example ssh-ed25519
-       * @example ssh-rsa
-       */
-      key_type: string;
-      base64_encoded_key: string;
-    };
-    vmorch_NodeSshInfo: {
-      /** @example 24.125.89.203 */
-      ssh_hostname: string;
-      /**
-       * Format: u-int16
-       * @example 22
-       */
-      ssh_port: number;
-      ssh_host_keys: components["schemas"]["vmorch_NodeSshHostKey"][];
-      last_successful_key_update?:
-        | null
-        | components["schemas"]["vmorch_UnixEpoch"];
-      last_attempted_key_update?:
-        | null
-        | components["schemas"]["vmorch_UnixEpoch"];
-    };
-    /** @enum {string} */
-    vmorch_NodeStatus: "pending" | "running" | "terminated" | "node_failure";
-    /**
-     * @description Unique identifier with prefix 'ntmpl_'.
-     * @example ntmpl_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    vmorch_NodeTemplateId: string;
-    /**
-     * @description Opaque pagination cursor for NodesCursor. Wire format: `nodec_{base64url}`.
-     * @example nodec_gqXR7s0Kj5mHvE2wNpLc4Q
-     */
-    vmorch_NodesCursor: string;
     vmorch_PostReplaceRequest: {
       vm_id: string;
     };
@@ -2383,54 +2378,17 @@ export interface components {
     vmorch_PostUserDataResponse: {
       script: components["schemas"]["vmorch_UserData"];
     };
-    vmorch_ReplaceNodeRequest: {
-      /** @description Image to boot the replacement node. Defaults to the capacity's configured image. */
-      template?: string | null;
-    };
-    /** @description SFC standard error response */
-    vmorch_SerdeErrorProxy: {
-      /** @description The error type identifier */
-      type: components["schemas"]["vmorch_ErrorType"];
-      /** @description Human-readable error message */
-      message: string;
-      /** @description Array of detailed error information when applicable */
-      details: components["schemas"]["vmorch_ErrorDetail"][];
-    };
     vmorch_SshHostKeyInfo: {
       key_type: string;
       /** Format: byte */
       base64_encoded_key: string;
     };
-    /** @description Request body for starting a multipart upload */
-    vmorch_StartMultipartUploadRequest: {
-      /** @description Name of the image file. Must be unique per account. */
-      name: string;
-    };
-    /** @description Response body for starting a multipart upload */
-    vmorch_StartMultipartUploadResponse: {
-      object: components["schemas"]["vmorch_ImageDiscriminator"];
-      /** @description The image ID for the created image */
-      image_id: string;
-    };
-    vmorch_StartUploadRequest: {
-      name: components["schemas"]["vmorch_Name"];
-      /** @description Workspace URN (e.g. sfc:workspace:{account_id}:default). */
-      workspace?: string;
-    };
     /**
      * Format: int64
-     * @description Unix timestamp in seconds since epoch
+     * @description Unix timestamp.
      * @example 1738972800
      */
     vmorch_UnixEpoch: number;
-    vmorch_UploadPartRequest: {
-      /** Format: int32 */
-      part_id: number;
-    };
-    vmorch_UploadPartResponse: {
-      upload_url: string;
-      expires_at: components["schemas"]["vmorch_UnixEpoch"];
-    };
     /** @description if the script is valid utf8 then the response may be in either string, or byte form and the client must handle both */
     vmorch_UserData: string | number[];
     vmorch_VmInstance: {
@@ -2464,6 +2422,22 @@ export interface components {
        * @description The number of nodes available during this time period
        */
       quantity: number;
+    };
+    "node-api_BadRequestError": {
+      error: {
+        /** @enum {string} */
+        type: "invalid_request_error";
+        message: string;
+        details?: components["schemas"]["node-api_ErrorDetail"][];
+      };
+    };
+    "node-api_ConflictError": {
+      error: {
+        /** @enum {string} */
+        type: "conflict";
+        message: string;
+        details?: components["schemas"]["node-api_ErrorDetail"][];
+      };
     };
     "node-api_CreateNodesRequest": {
       /**
@@ -2508,7 +2482,7 @@ export interface components {
        * @description Custom node names
        *     Names cannot begin with 'vm_' or 'n_' as this is reserved for system-generated IDs
        *     Names cannot be numeric strings
-       *     Names cannot exceed 128 characters
+       *     Names cannot exceed 256 characters
        * @example [
        *       "cuda-crunch"
        *     ]
@@ -2523,7 +2497,7 @@ export interface components {
       cloud_init_user_data?: string;
       /**
        * @description Custom image ID to use for the VM instances
-       * @example vmi_1234567890abcdef
+       * @example image_1234567890abcdef
        */
       image_id?: string;
       /**
@@ -2532,6 +2506,14 @@ export interface components {
        * @example false
        */
       forward_443: boolean;
+      /**
+       * @description **Experimental — subject to change or removal without notice.**
+       *     Enables InfiniBand. Requires hardware in the chosen zone that
+       *     supports InfiniBand.
+       * @default false
+       * @example false
+       */
+      _preview_enable_infiniband: boolean;
     };
     /** @enum {string} */
     "node-api_DeliveryType": "K8s" | "VM";
@@ -2615,9 +2597,6 @@ export interface components {
           /** @enum {string} */
           type: "payment_required";
         };
-    "node-api_ErrorObject": {
-      error: components["schemas"]["node-api_ErrorContent"];
-    };
     /** @enum {string} */
     "node-api_ErrorType":
       | "api_error"
@@ -2632,7 +2611,8 @@ export interface components {
       | "upgrade_required"
       | "payment_required"
       | "service_unavailable"
-      | "unprocessable_entity";
+      | "unprocessable_entity"
+      | "gone";
     "node-api_ExtendNodeRequest": {
       /**
        * Format: int64
@@ -2648,8 +2628,22 @@ export interface components {
        */
       max_price_per_node_hour: number;
     };
+    "node-api_ForbiddenError": {
+      error: {
+        /** @enum {string} */
+        type: "forbidden";
+        message: string;
+      };
+    };
     /** @enum {string} */
     "node-api_InterconnectType": "Infiniband" | "None";
+    "node-api_InternalServerError": {
+      error: {
+        /** @enum {string} */
+        type: "api_error";
+        message: string;
+      };
+    };
     "node-api_ListResponse_Node": {
       /** @example list */
       object: string;
@@ -2785,10 +2779,31 @@ export interface components {
     };
     /** @enum {string} */
     "node-api_NodeType": "autoreserved" | "reserved";
+    "node-api_NotFoundError": {
+      error: {
+        /** @enum {string} */
+        type: "not_found";
+        message: string;
+      };
+    };
+    "node-api_NotImplementedError": {
+      error: {
+        /** @enum {string} */
+        type: "not_implemented";
+        message: string;
+      };
+    };
+    "node-api_PaymentRequiredError": {
+      error: {
+        /** @enum {string} */
+        type: "payment_required";
+        message: string;
+      };
+    };
     "node-api_RedeployNodeRequest": {
       /**
        * @description Redeploy node with this VM image ID
-       * @example vmi_1234567890abcdef
+       * @example image_1234567890abcdef
        */
       image_id?: string;
       /**
@@ -2815,6 +2830,20 @@ export interface components {
       | "NorthAmerica"
       | "AsiaPacific"
       | "EuropeMiddleEastAfrica";
+    "node-api_RequestTimedOutError": {
+      error: {
+        /** @enum {string} */
+        type: "request_timed_out";
+        message: string;
+      };
+    };
+    "node-api_ServiceUnavailableError": {
+      error: {
+        /** @enum {string} */
+        type: "service_unavailable";
+        message: string;
+      };
+    };
     /**
      * @description Node Status
      * @enum {string}
@@ -2828,12 +2857,34 @@ export interface components {
       | "deleted"
       | "failed"
       | "unknown";
+    "node-api_UnauthorizedError": {
+      error: {
+        /** @enum {string} */
+        type: "authentication_error";
+        message: string;
+      };
+    };
     /**
      * Format: int64
-     * @description Unix timestamp in seconds since epoch
+     * @description Unix timestamp.
      * @example 1738972800
      */
     "node-api_UnixEpoch": number;
+    "node-api_UnprocessableEntityError": {
+      error: {
+        /** @enum {string} */
+        type: "unprocessable_entity";
+        message: string;
+        details?: components["schemas"]["node-api_ErrorDetail"][];
+      };
+    };
+    "node-api_UpgradeRequiredError": {
+      error: {
+        /** @enum {string} */
+        type: "upgrade_required";
+        message: string;
+      };
+    };
     "node-api_Vm": {
       /** @example vm */
       object: string;
@@ -2860,7 +2911,7 @@ export interface components {
        * @example 1640998200
        */
       end_at: number | null;
-      /** @example vmi_myOZZXw4pfcp7H9DQOldd */
+      /** @example image_myOZZXw4pfcp7H9DQOldd */
       image_id?: string | null;
       /** @example hayesvalley */
       zone: string;
@@ -2944,24 +2995,24 @@ export interface components {
       line1?: string | null;
       line2?: string | null;
     };
-    "market-api_BaseCapacityDetails": {
-      /**
-       * @example capacity
-       * @enum {string}
-       */
-      object: "capacity";
-      id: components["schemas"]["market-api_CapacityId"];
-      name?: null | components["schemas"]["market-api_Name"];
-      node_template?: null | components["schemas"]["market-api_NodeTemplateId"];
-      /** @description Automatically start and stop nodes when this capacity has compute available. Requires a node template. */
-      start_nodes_automatically: boolean;
-      /** @description Zone requirements for this capacity. */
-      requirements: {
-        zones: components["schemas"]["market-api_ZoneName"][];
+    /** @description API-facing actor type that redacts internal system identifiers. */
+    "market-api_ApiActor":
+      | {
+          id: string;
+          /** @enum {string} */
+          type: "token";
+        }
+      | {
+          /** @enum {string} */
+          type: "system";
+        };
+    "market-api_BadRequestError": {
+      error: {
         /** @enum {string} */
-        type: "zones";
+        type: "invalid_request_error";
+        message: string;
+        details?: components["schemas"]["market-api_ErrorDetail"][];
       };
-      created_at: components["schemas"]["market-api_UnixEpoch"];
     };
     "market-api_CalculateInvoicePricingRequest": {
       invoice_id: string;
@@ -3000,73 +3051,7 @@ export interface components {
     };
     /** @enum {string} */
     "market-api_CancelOrderStatus": "pending";
-    /**
-     * @description Opaque pagination cursor for CapacitiesCursor. Wire format: `capc_{base64url}`.
-     * @example capc_gqXR7s0Kj5mHvE2wNpLc4Q
-     */
-    "market-api_CapacitiesCursor": string;
-    "market-api_CapacityDetails": {
-      /**
-       * @example capacity
-       * @enum {string}
-       */
-      object: "capacity";
-      id: components["schemas"]["market-api_CapacityId"];
-      name?: null | components["schemas"]["market-api_Name"];
-      node_template?: null | components["schemas"]["market-api_NodeTemplateId"];
-      /** @description Automatically start and stop nodes when this capacity has compute available. Requires a node template. */
-      start_nodes_automatically: boolean;
-      /** @description Zone requirements for this capacity. */
-      requirements: {
-        zones: components["schemas"]["market-api_ZoneName"][];
-        /** @enum {string} */
-        type: "zones";
-      };
-      created_at: components["schemas"]["market-api_UnixEpoch"];
-    } & {
-      /** @description Compute schedule for this capacity, per zone and aggregated. */
-      schedule_info: {
-        /** @description Future schedule of allocated compute per zone. Does not include historical data. */
-        zone_schedules: {
-          [key: string]: components["schemas"]["market-api_Schedule"];
-        };
-        /** @description Combined schedule across all zones. */
-        total_schedule: components["schemas"]["market-api_Schedule"];
-      };
-      /** @description Scheduler configuration for this capacity. */
-      scheduler: components["schemas"]["market-api_SchedulerDetails"];
-    };
-    /**
-     * @description Unique identifier with prefix 'cap_'.
-     * @example cap_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    "market-api_CapacityId": string;
-    "market-api_CapacityListEntry": {
-      /**
-       * @example capacity
-       * @enum {string}
-       */
-      object: "capacity";
-      id: components["schemas"]["market-api_CapacityId"];
-      name?: null | components["schemas"]["market-api_Name"];
-      node_template?: null | components["schemas"]["market-api_NodeTemplateId"];
-      /** @description Automatically start and stop nodes when this capacity has compute available. Requires a node template. */
-      start_nodes_automatically: boolean;
-      /** @description Zone requirements for this capacity. */
-      requirements: {
-        zones: components["schemas"]["market-api_ZoneName"][];
-        /** @enum {string} */
-        type: "zones";
-      };
-      created_at: components["schemas"]["market-api_UnixEpoch"];
-    } & {
-      /** @description Whether an active scheduler exists for this capacity */
-      scheduler_enabled: boolean;
-    };
-    /**
-     * @description Unique identifier with prefix 'clus_' that references a resource.
-     * @example clus_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
+    /** @example clus_k3R-nX9vLm7Qp2Yw5Jd8F */
     "market-api_ClusterId": string;
     "market-api_ColocationStrategy":
       | {
@@ -3086,10 +3071,19 @@ export interface components {
           /** @enum {string} */
           type: "pinned";
         };
-    /**
-     * @description Unique identifier with prefix 'cont_' that references a resource.
-     * @example cont_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
+    "market-api_ConflictError": {
+      error: {
+        /** @enum {string} */
+        type: "conflict";
+        message: string;
+        details?: components["schemas"]["market-api_ErrorDetail"][];
+      };
+    };
+    "market-api_Context": {
+      workspace?: string | null;
+      zone?: string | null;
+    };
+    /** @example cont_k3R-nX9vLm7Qp2Yw5Jd8F */
     "market-api_ContractId": string;
     "market-api_ContractResponse": {
       /**
@@ -3122,25 +3116,6 @@ export interface components {
     "market-api_ContractState": "Upcoming" | "Active" | "Expired";
     /** @enum {string} */
     "market-api_ContractStatus": "active" | "pending";
-    /** @description Create a new capacity to hold and manage compute. */
-    "market-api_CreateCapacityRequest": {
-      name?: null | components["schemas"]["market-api_Name"];
-      /** @description Requirements applied to compute acquired into this capacity (from orders or the scheduler). */
-      requirements: {
-        zones: components["schemas"]["market-api_ZoneName"][];
-        /** @enum {string} */
-        type: "zones";
-      };
-      /**
-       * @description Default node template (ID, name, or inline definition). Used when starting nodes automatically or when no template is specified during node creation.
-       *     It is the caller's responsibility to ensure the node template supports all zones listed in `requirements`.
-       */
-      node_template?: components["schemas"]["market-api_ResourceRef_NodeTemplateId"];
-      /** @description Automatically start and stop nodes when this capacity has compute available. Requires `node_template`. */
-      start_nodes_automatically: boolean;
-      /** @description Scheduler that automatically places buy and sell orders for this capacity. */
-      scheduler?: components["schemas"]["market-api_SchedulerDetails"];
-    };
     "market-api_CreateDraftInvoiceRequest": {
       /** Format: int64 */
       credit_amount_cents: number;
@@ -3153,19 +3128,6 @@ export interface components {
        */
       object: "invoice_draft";
       invoice_id: string;
-    };
-    /** @description Create a new node template defining the image and cloud-init config for nodes. */
-    "market-api_CreateNodeTemplateRequest": {
-      /** @description User-defined name for the node template. Must be unique per owner. */
-      name: components["schemas"]["market-api_Name"];
-      /** @description Image ID or name for VMs using this template. */
-      image: string;
-      /**
-       * Format: byte
-       * @description Cloud-init user data for VMs using this template.
-       *     Data should be base64 encoded.
-       */
-      cloud_init_user_data?: string;
     };
     "market-api_CreateOrderRequest": {
       /** @description Order side: "buy" or "sell" */
@@ -3242,16 +3204,6 @@ export interface components {
       /** @description Colocation strategy for the procurement */
       colocation_strategy?: components["schemas"]["market-api_ColocationStrategy"];
     };
-    /**
-     * @description Price rate in dollars per node-hour, encoded as a decimal string. Must contain a decimal point (e.g. "1.50"). Returns 6 decimal places of precision (e.g. "1.500000").
-     * @example 2.500000
-     */
-    "market-api_DollarsPerNodeHour": string;
-    "market-api_ErrorContent": {
-      type: components["schemas"]["market-api_ErrorType"];
-      message: string;
-      details?: components["schemas"]["market-api_ErrorDetail"][];
-    };
     "market-api_ErrorDetail": {
       /** @description The field that caused the error (for validation errors) */
       field?: string | null;
@@ -3259,9 +3211,6 @@ export interface components {
       code: string;
       /** @description Human-readable error message */
       message: string;
-    };
-    "market-api_ErrorObject": {
-      error: components["schemas"]["market-api_ErrorContent"];
     };
     /** @enum {string} */
     "market-api_ErrorType":
@@ -3277,7 +3226,25 @@ export interface components {
       | "upgrade_required"
       | "payment_required"
       | "service_unavailable"
-      | "unprocessable_entity";
+      | "unprocessable_entity"
+      | "gone";
+    "market-api_EventResponse": {
+      /**
+       * @example event
+       * @enum {string}
+       */
+      object: "event";
+      id: string;
+      cursor: components["schemas"]["market-api_EventsCursor"];
+      action: string;
+      /** Format: int64 */
+      occurred_at: number;
+      actor: components["schemas"]["market-api_ApiActor"];
+      targets: components["schemas"]["market-api_Target"][];
+      context: components["schemas"]["market-api_Context"];
+    };
+    /** @example evtc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "market-api_EventsCursor": string;
     /**
      * @description A schedule representing a change of a quantity over time. The schedule changes at
      *     intervals[i] to quantity[i]. Intervals are sorted from first to last change.
@@ -3302,68 +3269,55 @@ export interface components {
       payment_intent_id: string;
       client_secret: string;
       status: string;
+      /** @description Stripe-hosted payment page URL for this invoice */
+      hosted_invoice_url?: string | null;
     };
-    /**
-     * @description Response body for getting account balance from the credit ledger.
-     * @example {
-     *       "object": "balance",
-     *       "available_cents": 150000,
-     *       "current_cents": 180000,
-     *       "current_overage_cents": 0,
-     *       "current_hold_cents": 0,
-     *       "updated_at": 1640995200
-     *     }
-     */
+    "market-api_ForbiddenError": {
+      error: {
+        /** @enum {string} */
+        type: "forbidden";
+        message: string;
+      };
+    };
     "market-api_GetBalanceResponse": {
       /**
        * @example balances
        * @enum {string}
        */
       object: "balances";
-      /**
-       * Format: u-int64
-       * @description Available balance in cents: sum(credit) - sum(debit) - sum(committed holds)
-       * @example 150000
-       */
+      /** Format: u-int64 */
       available_balance_cents: number;
-      /**
-       * Format: u-int64
-       * @description Reserved balance in cents: sum(credit) - sum(debit)
-       * @example 180000
-       */
+      /** Format: u-int64 */
       current_balance_cents: number;
-      /**
-       * Format: u-int64
-       * @description Total spend that hasn't been paid for yet, in cents.
-       * @example 0
-       */
+      /** Format: u-int64 */
       current_overage_cents: number;
-      /**
-       * Format: u-int64
-       * @description The maximum amount of overages the account can incur before they are blocked from buying compute.
-       * @example 0
-       */
+      /** Format: u-int64 */
       overage_limit_cents: number;
-      /**
-       * Format: int64
-       * @description When the balance was last updated as a unix timestamp
-       * @example 1640995200
-       */
+      /** Format: int64 */
       updated_at: number;
     };
     /** @description string with format 'txc_base62_encoded_id' used for paginating a query to GET /v1/transactions */
     "market-api_GetTransactionsCursor": string;
+    "market-api_GoneError": {
+      error: {
+        /** @enum {string} */
+        type: "gone";
+        message: string;
+      };
+    };
     /**
      * Format: date-time
      * @description An ISO 8601 datetime string
      * @example 2025-07-11T20:41:37.423Z
      */
     "market-api_ISO8601DateTime": string;
-    /**
-     * @description Unique identifier with prefix 'image_'.
-     * @example image_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    "market-api_ImageId": string;
+    "market-api_InternalServerError": {
+      error: {
+        /** @enum {string} */
+        type: "api_error";
+        message: string;
+      };
+    };
     "market-api_KubernetesClusterResponse": {
       /**
        * @example kubernetes_cluster
@@ -3378,16 +3332,6 @@ export interface components {
       /** @example -----BEGIN CERTIFICATE-----... */
       kubernetes_ca_cert?: string | null;
       contract?: null | components["schemas"]["market-api_ContractResponse"];
-    };
-    "market-api_ListCapacitiesResponse": {
-      /**
-       * @example list
-       * @enum {string}
-       */
-      object: "list";
-      cursor?: null | components["schemas"]["market-api_CapacitiesCursor"];
-      has_more: boolean;
-      data: components["schemas"]["market-api_CapacityListEntry"][];
     };
     "market-api_ListClustersResponse": {
       /**
@@ -3407,15 +3351,15 @@ export interface components {
       data: components["schemas"]["market-api_ContractResponse"][];
       has_more: boolean;
     };
-    "market-api_ListNodeTemplatesResponse": {
+    "market-api_ListEventsResponse": {
       /**
        * @example list
        * @enum {string}
        */
       object: "list";
-      cursor?: null | components["schemas"]["market-api_NodeTemplatesCursor"];
+      data: components["schemas"]["market-api_EventResponse"][];
       has_more: boolean;
-      data: components["schemas"]["market-api_NodeTemplateDetails"][];
+      cursor?: null | components["schemas"]["market-api_EventsCursor"];
     };
     "market-api_ListOrdersResponse": {
       /**
@@ -3475,11 +3419,6 @@ export interface components {
     "market-api_MigrateAccountResponse":
       | "migrated"
       | "requires_manual_migration";
-    /**
-     * @description A validated resource name. Must start with alphanumeric, followed by alphanumeric, '.', '_', or '-'. Max 255 characters.
-     * @example my-resource-name
-     */
-    "market-api_Name": string;
     "market-api_NodeIdEntry": {
       current_status: string;
       product_uuid?: string | null;
@@ -3495,35 +3434,20 @@ export interface components {
     };
     /** @enum {string} */
     "market-api_NodeSource": "vm";
-    "market-api_NodeTemplateDetails": {
-      /**
-       * @example node_template
-       * @enum {string}
-       */
-      object?: "node_template";
-      id: components["schemas"]["market-api_NodeTemplateId"];
-      /** @description User-defined name for this node template. */
-      name: components["schemas"]["market-api_Name"];
-      /** @description Image ID for VMs using this template. */
-      image: components["schemas"]["market-api_ImageId"];
-      /**
-       * Format: byte
-       * @description Cloud-init user data for VMs using this template.
-       *     Data should be base64 encoded.
-       */
-      cloud_init_user_data?: string;
-      created_at: components["schemas"]["market-api_UnixEpoch"];
+    "market-api_NotFoundError": {
+      error: {
+        /** @enum {string} */
+        type: "not_found";
+        message: string;
+      };
     };
-    /**
-     * @description Unique identifier with prefix 'ntmpl_'.
-     * @example ntmpl_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
-    "market-api_NodeTemplateId": string;
-    /**
-     * @description Opaque pagination cursor for NodeTemplatesCursor. Wire format: `ntplc_{base64url}`.
-     * @example ntplc_gqXR7s0Kj5mHvE2wNpLc4Q
-     */
-    "market-api_NodeTemplatesCursor": string;
+    "market-api_NotImplementedError": {
+      error: {
+        /** @enum {string} */
+        type: "not_implemented";
+        message: string;
+      };
+    };
     /**
      * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
      * @example NOW
@@ -3551,10 +3475,7 @@ export interface components {
        */
       prorate?: boolean;
     };
-    /**
-     * @description Unique identifier with prefix 'ordr_' that references a resource.
-     * @example ordr_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
+    /** @example ordr_k3R-nX9vLm7Qp2Yw5Jd8F */
     "market-api_OrderId": string;
     "market-api_OrderResponse": {
       /**
@@ -3597,26 +3518,12 @@ export interface components {
     "market-api_OrderSide": "buy" | "sell";
     /** @enum {string} */
     "market-api_OrderStatus": "open" | "filled" | "cancelled" | "rejected";
-    /**
-     * @description Opaque pagination cursor for OrdersCursor. Wire format: `orc_{base64url}`.
-     * @example orc_gqXR7s0Kj5mHvE2wNpLc4Q
-     */
-    "market-api_OrdersCursor": string;
-    "market-api_PatchCapacityRequest": {
-      /** @description Human-readable name for the capacity. Must be unique per owner. Set to null to clear. */
-      name?: string | null;
-      /** @description Requirements applied to compute acquired into this capacity. Replaces existing requirements. */
-      requirements?: null | {
-        zones: components["schemas"]["market-api_ZoneName"][];
+    "market-api_PaymentRequiredError": {
+      error: {
         /** @enum {string} */
-        type: "zones";
+        type: "payment_required";
+        message: string;
       };
-      /** @description Default node template (ID or name). Must belong to the same owner. */
-      node_template?: string | null;
-      /** @description Automatically start and stop nodes when this capacity has compute available. Requires `node_template`. */
-      start_nodes_automatically?: boolean | null;
-      /** @description Scheduler that automatically places buy and sell orders for this capacity. Replaces the existing scheduler. Omit to leave unchanged. */
-      scheduler?: components["schemas"]["market-api_SchedulerDetails"];
     };
     /** @enum {string} */
     "market-api_ProcurementMessage": "insufficient_balance" | "running";
@@ -3716,76 +3623,19 @@ export interface components {
       /** Format: date-time */
       generated_at: string;
     };
-    "market-api_Requirements": {
-      zones: components["schemas"]["market-api_ZoneName"][];
-      /** @enum {string} */
-      type: "zones";
+    "market-api_RequestTimedOutError": {
+      error: {
+        /** @enum {string} */
+        type: "request_timed_out";
+        message: string;
+      };
     };
-    /** @description Pass an ID or name string to reference an existing resource. Pass an object to create a new resource inline. */
-    "market-api_ResourceRef_CapacityId":
-      | string
-      | {
-          name?: null | components["schemas"]["market-api_Name"];
-          /** @description Requirements applied to compute acquired into this capacity (from orders or the scheduler). */
-          requirements: {
-            zones: components["schemas"]["market-api_ZoneName"][];
-            /** @enum {string} */
-            type: "zones";
-          };
-          /**
-           * @description Default node template (ID, name, or inline definition). Used when starting nodes automatically or when no template is specified during node creation.
-           *     It is the caller's responsibility to ensure the node template supports all zones listed in `requirements`.
-           */
-          node_template?: components["schemas"]["market-api_ResourceRef_NodeTemplateId"];
-          /** @description Automatically start and stop nodes when this capacity has compute available. Requires `node_template`. */
-          start_nodes_automatically: boolean;
-          /** @description Scheduler that automatically places buy and sell orders for this capacity. */
-          scheduler?: components["schemas"]["market-api_SchedulerDetails"];
-        };
-    /** @description Pass an ID or name string to reference an existing resource. Pass an object to create a new resource inline. */
-    "market-api_ResourceRef_NodeTemplateId":
-      | string
-      | {
-          /** @description User-defined name for the node template. Must be unique per owner. */
-          name: components["schemas"]["market-api_Name"];
-          /** @description Image ID or name for VMs using this template. */
-          image: string;
-          /**
-           * Format: byte
-           * @description Cloud-init user data for VMs using this template.
-           *     Data should be base64 encoded.
-           */
-          cloud_init_user_data?: string;
-        };
-    /** @description Denotes previous and upcoming capacity availability over time. */
-    "market-api_Schedule": {
-      object: components["schemas"]["market-api_ScheduleDiscriminator"];
-      data: components["schemas"]["market-api_ScheduleEntry"][];
-    };
-    /**
-     * @example schedule
-     * @enum {string}
-     */
-    "market-api_ScheduleDiscriminator": "schedule";
-    "market-api_ScheduleEntry": {
-      timestamp: components["schemas"]["market-api_UnixEpoch"];
-      /** Format: int32 */
-      quantity: number;
-    };
-    /** @description Scheduler that automatically places buy and sell orders for this capacity. */
-    "market-api_SchedulerDetails": {
-      spot_scaler: components["schemas"]["market-api_SpotScalerConfig"];
-      /** @enum {string} */
-      type: "spot_scaler";
-    };
-    /** @description SFC standard error response */
-    "market-api_SerdeErrorProxy": {
-      /** @description The error type identifier */
-      type: components["schemas"]["market-api_ErrorType"];
-      /** @description Human-readable error message */
-      message: string;
-      /** @description Array of detailed error information when applicable */
-      details: components["schemas"]["market-api_ErrorDetail"][];
+    "market-api_ServiceUnavailableError": {
+      error: {
+        /** @enum {string} */
+        type: "service_unavailable";
+        message: string;
+      };
     };
     /** @enum {string} */
     "market-api_Side": "sell" | "buy";
@@ -3803,23 +3653,9 @@ export interface components {
      * @enum {string}
      */
     "market-api_SortDirection": "ASC" | "DESC";
-    "market-api_SpotScalerConfig": {
-      /** @description Floor price for selling compute out of this capacity (dollars/node-hour). */
-      min_sell_price_dollars_per_node_hour: components["schemas"]["market-api_DollarsPerNodeHour"];
-      /** @description Ceiling price for buying compute into this capacity (dollars/node-hour). */
-      max_buy_price_dollars_per_node_hour: components["schemas"]["market-api_DollarsPerNodeHour"];
-      /**
-       * Format: u-int64
-       * @description Target number of nodes to maintain in this capacity.
-       */
-      desired_quantity: number;
-      /**
-       * Format: u-int64
-       * @description Maximum time ahead (in minutes) the scheduler buys and sells compute for this capacity. Higher values secure compute further in advance but commit to longer windows that may need to be sold when scaling down, potentially at a loss. Lower values reduce waste but increase the risk of desired compute being unavailable. Orders are placed in 1-hour blocks within this window, so the furthest hour is secured up to `managed_window_minutes - 60` minutes before it begins. Range: 60 -- 1440.
-       */
-      managed_window_minutes: number;
-      /** @description Whether the scheduler actively places orders */
-      enabled: boolean;
+    "market-api_Target": {
+      type: string;
+      id: string;
     };
     /**
      * @example h100i
@@ -4008,12 +3844,27 @@ export interface components {
       | "refund"
       | "buy_order"
       | "sell_order";
+    "market-api_UnauthorizedError": {
+      error: {
+        /** @enum {string} */
+        type: "authentication_error";
+        message: string;
+      };
+    };
     /**
      * Format: int64
-     * @description Unix timestamp in seconds since epoch
+     * @description Unix timestamp.
      * @example 1738972800
      */
     "market-api_UnixEpoch": number;
+    "market-api_UnprocessableEntityError": {
+      error: {
+        /** @enum {string} */
+        type: "unprocessable_entity";
+        message: string;
+        details?: components["schemas"]["market-api_ErrorDetail"][];
+      };
+    };
     "market-api_UpdateProcurementRequest": {
       status?: null | components["schemas"]["market-api_ProcurementStatus"];
       instance_type?: null | components["schemas"]["market-api_Ticker"];
@@ -4044,246 +3895,569 @@ export interface components {
        */
       horizon?: number | null;
     };
-    /**
-     * @description A physically colocated datacenter.
-     * @example hayesvalley
-     */
-    "market-api_ZoneName": string;
-    "market-api_v2.CreateOrderRequest": {
-      /** @description The capacity to place the order for. Either a capacity ID or an inline capacity definition. */
-      capacity: components["schemas"]["market-api_ResourceRef_CapacityId"];
-      /** @description Order side: "buy" or "sell" */
-      side: components["schemas"]["market-api_Side"];
-      /**
-       * @description If true, allow the order to remain on the book if not immediately filled.
-       *     If false (default), the order is immediate-or-cancel.
-       */
-      allow_standing: boolean;
-      /**
-       * Format: int32
-       * @description Number of nodes to order.
-       */
-      quantity_nodes: number;
-      /**
-       * Format: int64
-       * @description Order start time as a unix timestamp (seconds).
-       *     Must be approximately now or on a future hour boundary.
-       */
-      start_at: number;
-      /**
-       * Format: int64
-       * @description Order end time as a unix timestamp (seconds). Must be on an hour boundary.
-       */
-      end_at: number;
-      /** @description Limit price in dollars per node-hour. */
-      limit_price_dollars_per_node_hour: components["schemas"]["market-api_DollarsPerNodeHour"];
+    "market-api_UpgradeRequiredError": {
+      error: {
+        /** @enum {string} */
+        type: "upgrade_required";
+        message: string;
+      };
     };
-    "market-api_v2.ListOrdersResponse": {
+    /** @example richmond */
+    "market-api_ZoneName": string;
+    /**
+     * @description A map from resource to verbs. Serializes as e.g.
+     *     `{ "node": ["read", "write"], "capacity": ["*"] }`.
+     *
+     *     Uses `BTreeMap` for deterministic key ordering.
+     */
+    "sfc-api_ActionsMap": {
+      [key: string]: components["schemas"]["sfc-api_Verb"][];
+    };
+    "sfc-api_AdminCreateInvoiceRequest": {
+      /** Format: int64 */
+      credit_amount_cents: number;
+      /** @description Required for `rail=stripe`; Mercury resolves the email from Clerk. */
+      customer_email?: string | null;
+      memo?: string | null;
+      /** Format: int32 */
+      days_until_due?: number | null;
+      /** @description Invoice rail. `stripe` (default) or `mercury`. */
+      rail?: components["schemas"]["sfc-api_InvoiceRail"];
+      /** @description Required for `rail=stripe`. Accepted values: `card`, `ach`. */
+      payment_method_type?: string | null;
+      /** @description Required for both rails. */
+      idempotency_key?: string | null;
+    };
+    "sfc-api_AdminCreateInvoiceResponse": {
+      /**
+       * @example invoice
+       * @enum {string}
+       */
+      object: "invoice";
+      rail: components["schemas"]["sfc-api_InvoiceRail"];
+      /** @description Set for `rail=stripe`. */
+      stripe_invoice_id?: string | null;
+      /** @description Set for `rail=mercury`. */
+      mercury_invoice_id?: string | null;
+      /** @description Local `invoices.id`. Set for `rail=mercury`. */
+      invoice_id?: string | null;
+      hosted_invoice_url?: string | null;
+      /** Format: int64 */
+      credit_amount_cents: number;
+      /** Format: int64 */
+      platform_fee_cents: number;
+      /** Format: int64 */
+      actual_fee_cents: number;
+      /** Format: int64 */
+      adjustment_cents: number;
+      /** Format: int64 */
+      subtotal_cents: number;
+      /** Format: int64 */
+      total_cents: number;
+      payment_method_type: string;
+    };
+    "sfc-api_AdminInstanceSku": {
+      /**
+       * @description Single discriminator for the instance-SKU object on both admin and
+       *     public endpoints. They expose different field shapes but represent
+       *     the same underlying resource (mirrors Stripe's pattern of one
+       *     `object` discriminator per resource type, regardless of view).
+       * @example instance_sku
+       * @enum {string}
+       */
+      object: "instance_sku";
+      id: components["schemas"]["sfc-api_InstanceSkuId"];
+      name?: null | components["schemas"]["sfc-api_Name"];
+      properties: components["schemas"]["sfc-api_AdminInstanceSkuProperty"][];
+      /**
+       * @description Total compute scheduled to be available for this SKU — the sum of
+       *     every live contract's shape filtered by `cluster_id`. This is the
+       *     "open interest" of the SKU's trading pool: how much capacity is in
+       *     flight at any time, regardless of which capacity, owner, or
+       *     procurement booked it. Honors `schedule_history_minutes` to include
+       *     recent past schedule.
+       */
+      total_scheduled_supply: components["schemas"]["sfc-api_Schedule"];
+    };
+    /** @description Admin view of an enumeration value. */
+    "sfc-api_AdminInstanceSkuEnumerationValue": {
+      /** @description Parent property key this value belongs to. */
+      key: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+      display_name: string;
+      description: string;
+      documentation_link?: string | null;
+      stable_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecation_info?: string | null;
+      deleted_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+      internal_note?: string | null;
+    };
+    /**
+     * @description A property set on an instance SKU, admin view. Tagged to match the
+     *     public [`InstanceSkuProperty`][crate::v2_routes::instance_skus::InstanceSkuProperty]
+     *     shape, with extra variants for keys/values that aren't fully
+     *     registered (admins see everything, customers only see fully
+     *     registered properties).
+     */
+    "sfc-api_AdminInstanceSkuProperty":
+      | {
+          key: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKey"];
+          value: components["schemas"]["sfc-api_AdminInstanceSkuEnumerationValue"];
+          /** @enum {string} */
+          type: "enumeration";
+        }
+      | {
+          key: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKey"];
+          value: components["schemas"]["sfc-api_Name"];
+          /** @enum {string} */
+          type: "unregistered_enumeration_value";
+        }
+      | {
+          key: string;
+          value: string;
+          /** @enum {string} */
+          type: "unregistered";
+        };
+    /**
+     * @description Admin view of a property key. Same shape as the public
+     *     [`InstanceSkuPropertyKey`][crate::v2_routes::instance_skus::InstanceSkuPropertyKey]
+     *     with extra fields admins need to manage the registry lifecycle.
+     */
+    "sfc-api_AdminInstanceSkuPropertyKey": {
+      name: components["schemas"]["sfc-api_Name"];
+      display_name: string;
+      description: string;
+      documentation_link?: string | null;
+      required: boolean;
+      stable_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecation_info?: string | null;
+      deleted_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+      internal_note?: string | null;
+    };
+    /**
+     * @description Property key plus a live coverage snapshot. Returned by the
+     *     `keys::*` endpoints. When a key is embedded inside an
+     *     `AdminInstanceSkuProperty` we use the bare
+     *     [`AdminInstanceSkuPropertyKey`] instead — coverage would be
+     *     expensive and irrelevant in that context.
+     */
+    "sfc-api_AdminInstanceSkuPropertyKeyDetail": {
+      key: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKey"];
+      coverage: components["schemas"]["sfc-api_PropertyKeyCoverage"];
+    };
+    /** @example aispkc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_AdminInstanceSkuPropertyKeysCursor": string;
+    /** @example aispvc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_AdminInstanceSkuPropertyValuesCursor": string;
+    /** @example aiskuc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_AdminInstanceSkusCursor": string;
+    "sfc-api_AllocationSchedule": {
+      /**
+       * @description Combined allocation schedule across all instance SKUs. Only includes
+       *     current and future schedule.
+       */
+      total: components["schemas"]["sfc-api_Schedule"];
+      /**
+       * @description Allocation schedule keyed by instance SKU. Only includes current and
+       *     future schedule.
+       */
+      by_instance_sku: {
+        [key: string]: components["schemas"]["sfc-api_Schedule"];
+      };
+    };
+    /**
+     * @description Validated API version string. Currently only `"roles/v1"` is accepted.
+     * @enum {string}
+     */
+    "sfc-api_ApiVersion": "roles/v1";
+    /** @enum {string} */
+    "sfc-api_AutomationStatus": "info" | "warning" | "error";
+    /**
+     * @description One row of `GET /v2/availability` — the SKUs that share the requested
+     *     group key, with their summed and per-SKU allocation schedules.
+     */
+    "sfc-api_AvailabilityGroup": {
+      /**
+       * @description Values of the `group_by` keys that define this group, in the same
+       *     order as the request's `group_by`. Empty when no `group_by` was
+       *     passed (single-aggregate case). Properties are projected with the
+       *     same public-key/value rules as `GET /v2/instance_skus`.
+       */
+      group: components["schemas"]["sfc-api_InstanceSkuProperty"][];
+      /**
+       * @description `total` = sum of `available_for_purchase_shape` across every SKU in
+       *     the group; `by_instance_sku` = each SKU's own shape, unsummed.
+       */
+      allocation_schedule: components["schemas"]["sfc-api_AllocationSchedule"];
+    };
+    "sfc-api_BadRequestError": {
+      error: {
+        /** @enum {string} */
+        type: "invalid_request_error";
+        message: string;
+        details?: components["schemas"]["sfc-api_ErrorDetail"][];
+      };
+    };
+    /**
+     * @description One entry in a [`BatchPatchInstancesRequest`]. The `id` selects which
+     *     instance to update; `priority` is the only mutable field supported by
+     *     the batch endpoint today — for name/tag changes use the singleton
+     *     `PATCH /v2/instances/{id}`. A future revision may grow optional fields
+     *     here (name, tags, etc.); existing entry shapes remain forward-compatible.
+     */
+    "sfc-api_BatchPatchInstanceEntry": {
+      id: components["schemas"]["sfc-api_InstanceId"];
+      /**
+       * Format: int64
+       * @description Shutdown priority. Higher numbers are kept longer.
+       */
+      priority: number;
+    };
+    /**
+     * @description Request body for `PATCH /v2/instances` (batch). Each entry in `data`
+     *     applies a partial patch to one instance; instances not mentioned are
+     *     untouched. All entries must succeed or none — a single failure rolls
+     *     back every other entry's writes (422).
+     *
+     *     Duplicate `id` entries are not deduplicated by serde; the handler runs
+     *     the patches in order, so the last write wins.
+     */
+    "sfc-api_BatchPatchInstancesRequest": {
+      data: components["schemas"]["sfc-api_BatchPatchInstanceEntry"][];
+    };
+    /**
+     * @description Response shape for `PATCH /v2/instances` (batch). Mirrors the input list
+     *     — one `InstanceResponse` per *unique* `id` in the request body, reflecting
+     *     the post-write state. Unlike the paginated list response, there's no
+     *     `cursor` or `has_more`: the response is exactly the instances the caller
+     *     mentioned, no pagination involved.
+     */
+    "sfc-api_BatchPatchInstancesResponse": {
       /**
        * @example list
        * @enum {string}
        */
       object: "list";
-      cursor?: null | components["schemas"]["market-api_OrdersCursor"];
-      has_more: boolean;
-      data: components["schemas"]["market-api_v2.OrderResponse"][];
+      data: components["schemas"]["sfc-api_InstanceResponse"][];
     };
-    "market-api_v2.OrderResponse": {
+    /** @example capc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_CapacitiesCursor": string;
+    /** @example cap_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_CapacityId": string;
+    /**
+     * @description Capacity kind determines what operations are allowed on a capacity.
+     *
+     *     - `Market`: User-created capacities.
+     *     - `Originating`: Provider capacities for selling compute. Cannot add compute
+     *       (buy orders/procurements).
+     *     - `ReadOnly`: System-managed capacities used for legacy compute, bare metal
+     *       contracts, and other. Cannot be modified through the API.
+     * @enum {string}
+     */
+    "sfc-api_CapacityKind": "market" | "originating" | "read_only";
+    "sfc-api_CapacityResponse": components["schemas"]["sfc-api_CapacityScope"] & {
       /**
-       * @example order
+       * @example capacity
        * @enum {string}
        */
-      object: "order";
-      /** @description The order ID. */
-      id: components["schemas"]["market-api_OrderId"];
-      /** @description The capacity this order is for. */
-      capacity: components["schemas"]["market-api_CapacityId"];
-      /** @description Order side: "buy" or "sell". */
-      side: components["schemas"]["market-api_Side"];
+      object: "capacity";
       /**
-       * @description If true, the order can remain on the book if not immediately filled.
-       *     If false (default), the order is immediate-or-cancel.
+       * @description Allocation schedule of this capacity. Add to the schedule by placing buy
+       *     orders into this capacity.
        */
-      allow_standing: boolean;
-      /** @description Order requirements. */
-      requirements: {
-        zones: components["schemas"]["market-api_ZoneName"][];
+      allocation_schedule: components["schemas"]["sfc-api_AllocationSchedule"];
+      /** @description Active procurements targeting this capacity. */
+      procurements?: components["schemas"]["sfc-api_ProcurementSummary"][];
+      /** @description Active deployments targeting this capacity. */
+      deployments?: components["schemas"]["sfc-api_DeploymentSummary"][];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+    };
+    "sfc-api_CapacityScope": {
+      id: components["schemas"]["sfc-api_CapacityId"];
+      resource_path: components["schemas"]["sfc-api_capacityResourcePath_CapacityId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+      kind: components["schemas"]["sfc-api_CapacityKind"];
+    };
+    "sfc-api_CapacitySummary": {
+      id: components["schemas"]["sfc-api_CapacityId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @example cxfr_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_CapacityTransferId": string;
+    /** @enum {string} */
+    "sfc-api_CapacityTransferStatus": "pending" | "executed" | "rejected";
+    /** @example ctfrc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_CapacityTransfersCursor": string;
+    "sfc-api_CheckPermissionRequest": {
+      workspace?: null | components["schemas"]["sfc-api_WorkspaceId"];
+      /**
+       * @description One or more `"resource:verb"` actions (e.g. `"node:read"`,
+       *     `"order:write"`) to evaluate. The response is a single aggregated
+       *     verdict across the whole list.
+       * @example [
+       *       "node:read",
+       *       "order:write"
+       *     ]
+       */
+      actions: string[];
+    };
+    /** @description Complete a multipart image upload. */
+    "sfc-api_CompleteUploadRequest": {
+      /** @description Not verified on upload; used during instance boot to verify integrity. */
+      sha256: string;
+    };
+    "sfc-api_ConflictError": {
+      error: {
         /** @enum {string} */
-        type: "zones";
+        type: "conflict";
+        message: string;
+        details?: components["schemas"]["sfc-api_ErrorDetail"][];
       };
+    };
+    /** @example cont_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_ContractId": string;
+    "sfc-api_CreateAdminInstanceSkuPropertyKeyRequest": {
+      name: components["schemas"]["sfc-api_Name"];
+      display_name: string;
+      description: string;
+      documentation_link?: string | null;
+      required: boolean;
+      internal_note?: string | null;
+    };
+    "sfc-api_CreateAdminInstanceSkuPropertyValueRequest": {
+      name: components["schemas"]["sfc-api_Name"];
+      display_name: string;
+      description: string;
+      documentation_link?: string | null;
+      internal_note?: string | null;
+    };
+    "sfc-api_CreateAdminInstanceSkuRequest": {
+      /**
+       * @description Provider account that owns the new instance SKU. Must already
+       *     exist — this endpoint does not bootstrap accounts, workspaces, or
+       *     originating capacities (use the v1 cluster endpoint for that path).
+       */
+      owner: components["schemas"]["sfc-api_Name"];
+      /**
+       * @description Human-readable name for this SKU. Globally unique across non-NULL
+       *     rows. Lookups are still by id; the name is purely for display.
+       */
+      name: components["schemas"]["sfc-api_Name"];
+      /**
+       * @description Initial set of properties. Validated against the registry managed
+       *     in `/v2/admin/instance_sku_properties`: every required, live key
+       *     must be present. Keys not in the registry, deprecated keys, and
+       *     enum values outside the registered set are all allowed.
+       */
+      properties: components["schemas"]["sfc-api_InstanceType"];
+    };
+    "sfc-api_CreateCapacityRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      /** @description Workspace to create this capacity in. */
+      workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+    };
+    "sfc-api_CreateDeploymentRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      capacity: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      instance_template: components["schemas"]["sfc-api_ResourcePathOrId_InstanceTemplateId"];
+      /** Format: int32 */
+      target_instance_count: number;
+      instance_name_template?: components["schemas"]["sfc-api_NameTemplate"];
+    };
+    "sfc-api_CreateFeatureFlagRequest": {
+      feature_flag: string;
+      account_regex: string;
+      enabled: boolean;
+    };
+    "sfc-api_CreateFeatureFlagResponse": {
+      /**
+       * @example feature_flag
+       * @enum {string}
+       */
+      object: "feature_flag";
+      feature_flag_id: string;
+      feature_flag: string;
+      account_regex: string;
+      enabled: boolean;
+    };
+    "sfc-api_CreateGrantRequest": components["schemas"]["sfc-api_Principal"] & {
+      workspace_id?: null | components["schemas"]["sfc-api_WorkspaceId"];
+      role_id: components["schemas"]["sfc-api_RoleId"];
+    };
+    "sfc-api_CreateInstanceRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      capacity: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      image: components["schemas"]["sfc-api_ResourcePathOrId_ImageId"];
+      /**
+       * Format: byte
+       * @description Base64-encoded [cloud-init user data](https://cloudinit.readthedocs.io/en/latest/explanation/format/index.html). Maximum 64KB.
+       * @example IyEvYmluL2Jhc2gKZWNobyBoZWxsbyB3b3JsZAo=
+       */
+      cloud_init_user_data?: string;
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+      /**
+       * Format: int64
+       * @description Shutdown priority. Higher numbers are kept longer. Defaults to 0.
+       */
+      priority?: number | null;
+      /**
+       * @description **Experimental — subject to change or removal without notice.**
+       *     Enables InfiniBand. The chosen `instance_sku` must support InfiniBand.
+       * @default false
+       * @example false
+       */
+      _preview_enable_infiniband: boolean;
+    };
+    "sfc-api_CreateInstanceTemplateRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      /** @description Workspace to create this template in. */
+      workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+      /** @description Machine image to use when starting instances with this template. Accepts name or ID. */
+      image: components["schemas"]["sfc-api_ResourcePathOrId_ImageId"];
+      /**
+       * Format: byte
+       * @description Base64-encoded [cloud-init user data](https://cloudinit.readthedocs.io/en/latest/explanation/format/index.html). Maximum 64KB.
+       * @example IyEvYmluL2Jhc2gKZWNobyBoZWxsbyB3b3JsZAo=
+       */
+      cloud_init_user_data?: string;
+    };
+    "sfc-api_CreateProcurementRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      target: components["schemas"]["sfc-api_ProcurementTarget"];
+      capacity: string;
+      /**
+       * @description Instance SKU the procurement's orders will fill on. Rejected at
+       *     submission if the SKU id is not registered.
+       */
+      instance_sku: components["schemas"]["sfc-api_InstanceSkuId"];
+      /**
+       * @description Minimum price to sell compute for ($/node-hour). Must contain decimal
+       *     point. Will be rounded to nearest multiple of $0.000060.
+       */
+      min_sell_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * @description Maximum price to buy compute ($/node-hour). Must contain decimal point.
+       *     Will be rounded to nearest multiple of $0.000060.
+       */
+      max_buy_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
       /**
        * Format: int32
-       * @description Number of nodes.
+       * @description How far ahead (in minutes) the procurement buys and sells compute. Higher
+       *     values secure compute further in advance but commit to longer windows
+       *     that may need to be sold when scaling down, potentially at a loss.
+       *     Lower values reduce waste but risk compute being unavailable. Orders
+       *     are placed in 1-hour blocks, so the furthest hour is secured up to
+       *     `managed_window_minutes - 60` minutes before it begins.
        */
-      quantity_nodes: number;
+      managed_window_minutes: number;
       /**
-       * Format: int64
-       * @description Order start time as a unix timestamp (seconds).
+       * @description Enable/disable the procurement.
+       * @default true
        */
-      start_at: number;
-      /**
-       * Format: int64
-       * @description Order end time as a unix timestamp (seconds).
-       */
-      end_at: number;
-      /** @description Limit price in dollars per node-hour. */
-      limit_price_dollars_per_node_hour: components["schemas"]["market-api_DollarsPerNodeHour"];
-      /** @description Order status. */
-      status: components["schemas"]["market-api_v2.OrderStatus"];
-      /**
-       * Format: int64
-       * @description Unix timestamp when the order was placed. Present only if not pending or rejected.
-       */
-      placed_at?: number | null;
-      /**
-       * Format: int64
-       * @description Unix timestamp when the order was filled. Present only if filled.
-       */
-      filled_at?: number | null;
-      fill_price_dollars_per_node_hour?:
-        | null
-        | components["schemas"]["market-api_DollarsPerNodeHour"];
-      /**
-       * Format: int64
-       * @description Unix timestamp when the order was cancelled. Present only if cancelled.
-       */
-      cancelled_at?: number | null;
+      enabled: boolean;
     };
-    /** @enum {string} */
-    "market-api_v2.OrderStatus":
-      | "pending"
-      | "filled"
-      | "rejected"
-      | "cancelled"
-      | "standing";
-    /**
-     * @example {
-     *       "id": "batch_bea1aa2c-fa2f-4ea5-b84f-d41320f2ec51",
-     *       "account_id": "sfcompute-com-waylon",
-     *       "object": "batch",
-     *       "endpoint": "/v1/chat/completions",
-     *       "errors": null,
-     *       "input_file_uri": "https://add-input-file-uri.com",
-     *       "completion_window": "7d",
-     *       "status": "accepted",
-     *       "output_file_uri": "https://add-output-file-uri.com",
-     *       "created_at": "2025-07-28T19:48:54.687148Z",
-     *       "in_progress_at": null,
-     *       "expires_at": null,
-     *       "finalizing_at": null,
-     *       "completed_at": null,
-     *       "failed_at": null,
-     *       "cancelling_at": null,
-     *       "expired_at": null,
-     *       "cancelled_at": null,
-     *       "request_counts": {
-     *         "total": 0,
-     *         "completed": 0,
-     *         "failed": 0
-     *       },
-     *       "metadata": {
-     *         "input_token_usage": null,
-     *         "output_token_usage": null
-     *       },
-     *       "deadline_at": "2025-07-29T19:48:54.687148Z",
-     *       "model_id": "Qwen/Qwen2.5-VL-32B-Instruct",
-     *       "retry_count": 0,
-     *       "is_retry": false
-     *     }
-     */
-    large_scale_inference_Batch: {
-      id: string;
-      account_id: string;
-      object: string;
-      endpoint: string;
-      errors?:
-        | null
-        | components["schemas"]["large_scale_inference_BatchErrors"];
-      input_file_uri: string;
-      completion_window: string;
-      status: components["schemas"]["large_scale_inference_BatchStatus"];
-      output_file_uri: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      in_progress_at?: string | null;
-      /** Format: date-time */
-      expires_at?: string | null;
-      /** Format: date-time */
-      finalizing_at?: string | null;
-      /** Format: date-time */
-      completed_at?: string | null;
-      /** Format: date-time */
-      failed_at?: string | null;
-      /** Format: date-time */
-      cancelling_at?: string | null;
-      /** Format: date-time */
-      expired_at?: string | null;
-      /** Format: date-time */
-      cancelled_at?: string | null;
-      request_counts: components["schemas"]["large_scale_inference_RequestCounts"];
-      metadata: {
-        [key: string]: string;
-      };
-      /** Format: date-time */
-      deadline_at: string;
-      model_id: string;
+    "sfc-api_CreateRoleRequest": {
+      name: components["schemas"]["sfc-api_Name"];
+      policy: components["schemas"]["sfc-api_Policy"];
+    };
+    /** @description Request body for `POST /v2/tokens`. */
+    "sfc-api_CreateTokenRequest": {
+      name: components["schemas"]["sfc-api_Name"];
+      /**
+       * Format: int64
+       * @description Optional expiry as a Unix timestamp (seconds since epoch).
+       */
+      expires_at?: number | null;
+      /** @description Optional list of role IDs. A grant is created for each role in the same transaction. */
+      role_ids?: components["schemas"]["sfc-api_RoleId"][] | null;
+    };
+    "sfc-api_CreateWorkspaceRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_DeleteFeatureFlagRequest": {
+      feature_flag_id: string;
+    };
+    "sfc-api_DeleteFeatureFlagResponse": {
+      /**
+       * @example feature_flag
+       * @enum {string}
+       */
+      object: "feature_flag";
+      feature_flag_id: string;
+    };
+    "sfc-api_DeleteImageResponse": {
+      /**
+       * @example image
+       * @enum {string}
+       */
+      object: "image";
+      deleted: boolean;
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @example depl_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_DeploymentId": string;
+    "sfc-api_DeploymentResponse": components["schemas"]["sfc-api_DeploymentScope"] & {
+      /**
+       * @example deployment
+       * @enum {string}
+       */
+      object: "deployment";
+      capacity: components["schemas"]["sfc-api_CapacitySummary"];
+      instance_template: components["schemas"]["sfc-api_InstanceTemplateSummary"];
       /** Format: int32 */
-      retry_count: number;
-      is_retry: boolean;
+      target_instance_count: number;
+      instance_name_template: components["schemas"]["sfc-api_NameTemplate"];
+      status: components["schemas"]["sfc-api_ReconciliationStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
     };
-    large_scale_inference_BatchErrorData: {
-      code: string;
-      /** Format: u-int32 */
-      line?: number | null;
-      message: string;
-      param?: string | null;
+    "sfc-api_DeploymentScope": {
+      id: components["schemas"]["sfc-api_DeploymentId"];
+      resource_path: components["schemas"]["sfc-api_deploymentResourcePath_DeploymentId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
     };
-    large_scale_inference_BatchErrors: {
-      data: components["schemas"]["large_scale_inference_BatchErrorData"][];
-      object: string;
+    "sfc-api_DeploymentSummary": {
+      id: components["schemas"]["sfc-api_DeploymentId"];
+      name: components["schemas"]["sfc-api_Name"];
     };
+    /** @example deplc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_DeploymentsCursor": string;
     /**
-     * @example {
-     *       "input_file_uri": "https://add-input-file-uri.com",
-     *       "output_file_uri": "https://add-output-file-uri.com",
-     *       "endpoint": "/v1/chat/completions",
-     *       "model_id": "Qwen/Qwen2.5-VL-32B-Instruct",
-     *       "completion_window": "7d",
-     *       "store": "s3"
-     *     }
+     * @description Price rate in dollars per node-hour.
+     * @example 2.500000
      */
-    large_scale_inference_BatchRequest: {
-      input_file_uri: string;
-      output_file_uri: string;
-      endpoint: string;
-      model_id: string;
-      store: string;
-      completion_window: string;
-      metadata?: {
-        [key: string]: string;
-      };
+    "sfc-api_DollarsPerNodeHour": string;
+    /**
+     * @description The effect of a rule on a matched action.
+     *
+     *     Effects form a hierarchy for the approval system:
+     *     - `Allow` is the union of `RequireApproval` and `ApproveApproval`: the user
+     *       can perform the action directly, request approvals, and approve others' requests.
+     *     - `RequireApproval` means the user can request approval but cannot perform
+     *       the action directly or approve others' requests.
+     *     - `ApproveApproval` means the user can approve others' approval requests
+     *       but cannot perform the action directly or create approval requests.
+     * @enum {string}
+     */
+    "sfc-api_Effect": "allow" | "require_approval" | "approve_approval";
+    "sfc-api_ErrorContent": {
+      type: components["schemas"]["sfc-api_ErrorType"];
+      message: string;
+      details?: components["schemas"]["sfc-api_ErrorDetail"][];
     };
-    large_scale_inference_BatchRequests:
-      | components["schemas"]["large_scale_inference_BatchRequest"]
-      | components["schemas"]["large_scale_inference_BatchRequest"][];
-    /** @enum {string} */
-    large_scale_inference_BatchStatus:
-      | "accepted"
-      | "compute_purchased"
-      | "not_started"
-      | "started"
-      | "validating"
-      | "failed"
-      | "in_progress"
-      | "finalizing"
-      | "completed"
-      | "expired"
-      | "cancelling"
-      | "cancelled"
-      | "waiting"
-      | "retrying";
-    large_scale_inference_ErrorDetail: {
+    "sfc-api_ErrorDetail": {
       /** @description The field that caused the error (for validation errors) */
       field?: string | null;
       /** @description Specific error code for this detail */
@@ -4292,7 +4466,7 @@ export interface components {
       message: string;
     };
     /** @enum {string} */
-    large_scale_inference_ErrorType:
+    "sfc-api_ErrorType":
       | "api_error"
       | "invalid_request_error"
       | "authentication_error"
@@ -4305,34 +4479,1643 @@ export interface components {
       | "upgrade_required"
       | "payment_required"
       | "service_unavailable"
-      | "unprocessable_entity";
-    large_scale_inference_Model: {
-      id: string;
+      | "unprocessable_entity"
+      | "gone";
+    "sfc-api_ForbiddenError": {
+      error: {
+        /** @enum {string} */
+        type: "forbidden";
+        message: string;
+      };
+    };
+    /**
+     * @example grant
+     * @enum {string}
+     */
+    "sfc-api_GrantDiscriminator": "grant";
+    /** @example grnt_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_GrantId": string;
+    "sfc-api_GrantResponse": components["schemas"]["sfc-api_Principal"] & {
+      /**
+       * @example grant
+       * @enum {string}
+       */
+      object: "grant";
+      id: components["schemas"]["sfc-api_GrantId"];
+      workspace?: null | components["schemas"]["sfc-api_WorkspaceSummary"];
+      role: components["schemas"]["sfc-api_RoleSummary"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_ImageDownloadResponse": {
+      /** @description Presigned download URL. */
+      url: string;
+      expires_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * @description For integrity verification.
+       * @example e3b0c44298fc1c149af...
+       */
+      sha256: string;
+      /**
+       * Format: u-int64
+       * @description Image size in bytes.
+       */
+      size: number;
+    };
+    /** @example image_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_ImageId": string;
+    "sfc-api_ImageListEntry": components["schemas"]["sfc-api_ImageScope"] & {
+      /**
+       * @example image
+       * @enum {string}
+       */
+      object: "image";
+      upload_status: components["schemas"]["sfc-api_ImageUploadStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      provider?: string | null;
+      sha256?: string | null;
+    };
+    "sfc-api_ImageScope": {
+      id: components["schemas"]["sfc-api_ImageId"];
+      resource_path: components["schemas"]["sfc-api_imageResourcePath_ImageId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_ImageSummary": {
+      id: components["schemas"]["sfc-api_ImageId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_ImageUploadResponse": components["schemas"]["sfc-api_ImageScope"] & {
+      /**
+       * @example image
+       * @enum {string}
+       */
+      object: "image";
+      upload_status: components["schemas"]["sfc-api_ImageUploadStatus"];
+      sha256?: string | null;
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /** @enum {string} */
+    "sfc-api_ImageUploadStatus":
+      | "started"
+      | "uploading"
+      | "completed"
+      | "failed"
+      | "revoked";
+    /** @example imagec_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_ImagesCursor": string;
+    /** @example inst_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_InstanceId": string;
+    /** @enum {string} */
+    "sfc-api_InstanceInclude": "cloud_init_user_data";
+    "sfc-api_InstanceLogChunk": {
+      /** @description Wall-clock time. Unix timestamp. */
+      timestamp_realtime: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: int64
+       * @description Monotonic clock seconds.
+       */
+      timestamp_monotonic_secs: number;
+      /**
+       * Format: u-int32
+       * @description Nanosecond component of the monotonic clock.
+       */
+      timestamp_monotonic_nanos: number;
+      /** Format: u-int64 */
+      seqnum: number;
+      /**
+       * Format: byte
+       * @description Base-64 encoded raw console output.
+       * @example SGVsbG8gV29ybGQK
+       */
+      data: string;
+    };
+    "sfc-api_InstanceLogsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_InstanceLogChunk"][];
+    };
+    "sfc-api_InstanceResponse": components["schemas"]["sfc-api_InstanceScope"] & {
+      /**
+       * @example instance
+       * @enum {string}
+       */
+      object: "instance";
+      status: components["schemas"]["sfc-api_InstanceStatus"];
+      instance_sku?: null | components["schemas"]["sfc-api_InstanceSkuSummary"];
+      /** @description Capacity this instance is utilizing. */
+      capacity: components["schemas"]["sfc-api_CapacitySummary"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Image this instance was launched from. */
+      image: components["schemas"]["sfc-api_ImageSummary"];
+      deployment?: null | components["schemas"]["sfc-api_DeploymentSummary"];
+      /** @description Whether cloud-init user data is configured for this instance. */
+      cloud_init_user_data_used: boolean;
+      /**
+       * Format: byte
+       * @description Base64-encoded [cloud-init user data](https://cloudinit.readthedocs.io/en/latest/explanation/format/index.html).
+       * @example IyEvYmluL2Jhc2gKZWNobyBoZWxsbyB3b3JsZAo=
+       */
+      cloud_init_user_data?: string;
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+      expected_shutdown_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: int64
+       * @description Shutdown priority. Higher numbers are kept longer when the capacity's
+       *     quota drops below the running-instance count. Default 0; any signed
+       *     64-bit integer is accepted.
+       */
+      priority: number;
+    };
+    "sfc-api_InstanceScope": {
+      id: components["schemas"]["sfc-api_InstanceId"];
+      resource_path: components["schemas"]["sfc-api_instanceResourcePath_InstanceId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_InstanceSku": {
+      /**
+       * @description Single discriminator for the instance-SKU object on both admin and
+       *     public endpoints. They expose different field shapes but represent
+       *     the same underlying resource (mirrors Stripe's pattern of one
+       *     `object` discriminator per resource type, regardless of view).
+       * @example instance_sku
+       * @enum {string}
+       */
+      object: "instance_sku";
+      id: components["schemas"]["sfc-api_InstanceSkuId"];
+      /**
+       * @description Human-readable name. Lookups still happen by id; the name is
+       *     purely for display. The public `GET /v2/instance_skus` and
+       *     `/v2/instance_skus/{id}` endpoints hide SKUs whose name hasn't
+       *     been set, so this field is always present here.
+       */
+      name: components["schemas"]["sfc-api_Name"];
+      properties: components["schemas"]["sfc-api_InstanceSkuProperty"][];
+    };
+    /** @description One allowed value for an enumeration-typed property key. */
+    "sfc-api_InstanceSkuEnumerationValue": {
+      name: components["schemas"]["sfc-api_Name"];
+      /** @description Human-readable display name. */
       display_name: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      retired_at?: string | null;
-      retired: boolean;
-      size: string;
+      description: string;
+      documentation_link?: string | null;
+      stable_at: components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Migration guidance shown when the value is deprecated. */
+      deprecation_info?: string | null;
     };
-    large_scale_inference_RequestCounts: {
-      /** Format: u-int32 */
+    /** @example isku_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_InstanceSkuId": string;
+    /**
+     * @description A property set on an instance SKU. Tagged by `type` so new value
+     *     kinds can be added without breaking clients.
+     */
+    "sfc-api_InstanceSkuProperty": {
+      key: components["schemas"]["sfc-api_InstanceSkuPropertyKey"];
+      value: components["schemas"]["sfc-api_InstanceSkuEnumerationValue"];
+      /** @enum {string} */
+      type: "enumeration";
+    };
+    /**
+     * @description A catalog entry describing a property key together with its allowed
+     *     enumeration values.
+     */
+    "sfc-api_InstanceSkuPropertyDefinition": {
+      key: components["schemas"]["sfc-api_InstanceSkuPropertyKey"];
+      values: components["schemas"]["sfc-api_InstanceSkuEnumerationValue"][];
+      /** @enum {string} */
+      type: "enumeration";
+    };
+    /**
+     * @description A property key describing something about an instance SKU (e.g.
+     *     `accelerator`).
+     */
+    "sfc-api_InstanceSkuPropertyKey": {
+      name: components["schemas"]["sfc-api_Name"];
+      /** @description Human-readable display name. */
+      display_name: string;
+      description: string;
+      /** @description Link to a spec sheet or further documentation. */
+      documentation_link?: string | null;
+      stable_at: components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Migration guidance shown when the key is deprecated. */
+      deprecation_info?: string | null;
+    };
+    /**
+     * @description Summary view of an instance SKU embedded on responses that reference
+     *     one (orders, procurements, instances, capacity transfers). Carries
+     *     both the id and the human-readable name. Legacy SKUs whose `name`
+     *     column hasn't been backfilled use `UNKNOWN_INSTANCE_SKU_NAME` as a
+     *     placeholder so this field is always populated on the wire.
+     */
+    "sfc-api_InstanceSkuSummary": {
+      id: components["schemas"]["sfc-api_InstanceSkuId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @enum {string} */
+    "sfc-api_InstanceSkuValueType": "enumeration";
+    /** @example iskuc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_InstanceSkusCursor": string;
+    "sfc-api_InstanceSshHostKey": {
+      /**
+       * @description Key algorithm.
+       * @example ssh-ed25519
+       * @example ssh-rsa
+       */
+      key_type: string;
+      /**
+       * Format: byte
+       * @description Base64-encoded public key.
+       * @example AAAAC3NzaC1lZDI1NTE5AAAAI...
+       */
+      key: string;
+    };
+    "sfc-api_InstanceSshInfo": {
+      /** @example 24.125.89.203 */
+      hostname: string;
+      /**
+       * Format: u-int16
+       * @example 22
+       */
+      port: number;
+      host_keys: components["schemas"]["sfc-api_InstanceSshHostKey"][];
+      last_successful_key_update_at?:
+        | null
+        | components["schemas"]["sfc-api_UnixEpoch"];
+      last_attempted_key_update_at?:
+        | null
+        | components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /**
+     * @description `awaiting_allocation` when waiting for compute allocation on its capacity,
+     *     `running` once assigned and the physical machine is running (still takes
+     *     time for the image to be downloaded and booted), `terminated` when stopped
+     *     by the user or after running out of allocation, `failed` on hardware fault.
+     * @enum {string}
+     */
+    "sfc-api_InstanceStatus":
+      | "awaiting_allocation"
+      | "running"
+      | "terminated"
+      | "failed";
+    /** @example itmpl_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_InstanceTemplateId": string;
+    /** @enum {string} */
+    "sfc-api_InstanceTemplateInclude": "cloud_init_user_data";
+    "sfc-api_InstanceTemplateResponse": components["schemas"]["sfc-api_InstanceTemplateScope"] & {
+      /**
+       * @example instance_template
+       * @enum {string}
+       */
+      object: "instance_template";
+      /** @description Machine image to use when starting instances with this template. */
+      image: components["schemas"]["sfc-api_ImageSummary"];
+      /** @description Whether cloud-init user data is configured for this template. */
+      cloud_init_user_data_used: boolean;
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: byte
+       * @description Base64-encoded [cloud-init user data](https://cloudinit.readthedocs.io/en/latest/explanation/format/index.html).
+       * @example IyEvYmluL2Jhc2gKZWNobyBoZWxsbyB3b3JsZAo=
+       */
+      cloud_init_user_data?: string;
+    };
+    "sfc-api_InstanceTemplateScope": {
+      id: components["schemas"]["sfc-api_InstanceTemplateId"];
+      resource_path: components["schemas"]["sfc-api_instance_templateResourcePath_InstanceTemplateId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_InstanceTemplateSummary": {
+      id: components["schemas"]["sfc-api_InstanceTemplateId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @example itmplc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_InstanceTemplatesCursor": string;
+    "sfc-api_InstanceType": {
+      [
+        key: string
+      ]: components["schemas"]["sfc-api_InstanceTypeCategoryVariant"];
+    };
+    "sfc-api_InstanceTypeCategoryRequirements": components["schemas"]["sfc-api_InstanceTypeCategoryVariant"][];
+    "sfc-api_InstanceTypeCategoryVariant": string;
+    "sfc-api_InstanceTypeRequirements": {
+      [
+        key: string
+      ]: components["schemas"]["sfc-api_InstanceTypeCategoryRequirements"];
+    };
+    /** @example nodec_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_InstancesCursor": string;
+    "sfc-api_InternalServerError": {
+      error: {
+        /** @enum {string} */
+        type: "api_error";
+        message: string;
+      };
+    };
+    /** @enum {string} */
+    "sfc-api_InvoiceRail": "stripe" | "mercury";
+    "sfc-api_ListAdminInstanceSkuPropertyKeysResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?:
+        | null
+        | components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeysCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeyDetail"][];
+    };
+    "sfc-api_ListAdminInstanceSkuPropertyValuesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?:
+        | null
+        | components["schemas"]["sfc-api_AdminInstanceSkuPropertyValuesCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_AdminInstanceSkuEnumerationValue"][];
+    };
+    "sfc-api_ListAdminInstanceSkusResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_AdminInstanceSkusCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_AdminInstanceSku"][];
+    };
+    "sfc-api_ListAvailabilityResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_AvailabilityGroup"][];
+    };
+    "sfc-api_ListCapacitiesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_CapacitiesCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_CapacityResponse"][];
+    };
+    "sfc-api_ListDeploymentsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_DeploymentsCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_DeploymentResponse"][];
+    };
+    "sfc-api_ListGrantsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_GrantResponse"][];
+    };
+    "sfc-api_ListImagesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_ImagesCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_ImageListEntry"][];
+    };
+    /**
+     * @description Paginated list of property-catalog entries returned by
+     *     `GET /v2/instance_sku_property_catalog`.
+     */
+    "sfc-api_ListInstanceSkuPropertyCatalogResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      /** @description Pass as `starting_after` or `ending_before` to paginate. */
+      cursor?: string | null;
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_InstanceSkuPropertyDefinition"][];
+    };
+    /** @description Paginated list of instance SKUs returned by `GET /v2/instance_skus`. */
+    "sfc-api_ListInstanceSkusResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_InstanceSkusCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_InstanceSku"][];
+    };
+    "sfc-api_ListInstanceTemplatesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_InstanceTemplatesCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_InstanceTemplateResponse"][];
+    };
+    "sfc-api_ListInstancesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_InstancesCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_InstanceResponse"][];
+    };
+    /** @description Paginated list of historical fills, newest first. */
+    "sfc-api_ListOrderbookFillsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      requirements: components["schemas"]["sfc-api_InstanceTypeRequirements"];
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Server time when the fills were sampled. */
+      requested_at: components["schemas"]["sfc-api_UnixEpoch"];
+      cursor?: null | components["schemas"]["sfc-api_OrderbookFillsCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_OrderbookFill"][];
+    };
+    /** @description Paginated list of active windows, sorted by `(start_at, end_at)` ascending. */
+    "sfc-api_ListOrderbookWindowsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      requirements: components["schemas"]["sfc-api_InstanceTypeRequirements"];
+      range_start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      range_end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      cursor?: null | components["schemas"]["sfc-api_OrderbookWindowsCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_OrderbookWindow"][];
+    };
+    "sfc-api_ListProcurementsResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_ProcurementsCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_ProcurementResponse"][];
+    };
+    "sfc-api_ListRolesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_RoleResponse"][];
+    };
+    "sfc-api_ListTokensResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      url: string;
+      data: components["schemas"]["sfc-api_TokenResponse"][];
+      has_more: boolean;
+      /** Format: int64 */
+      total_count: number;
+      cursor?: null | components["schemas"]["sfc-api_TokensCursor"];
+    };
+    "sfc-api_ListUsersResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_UserResponse"][];
+      has_more: boolean;
+      cursor?: null | components["schemas"]["sfc-api_UsersCursor"];
+    };
+    "sfc-api_ListWorkspacesResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      data: components["schemas"]["sfc-api_WorkspaceResponse"][];
+      has_more: boolean;
+    };
+    /** @example my-resource-name */
+    "sfc-api_Name": string;
+    /**
+     * @description A name template using {{variable}} syntax. Available variables: {{adjective}} (~128 random adjectives), {{noun}} (~128 random nouns), {{nanoid(N)}} (N-character alphanumeric identifier, 1 ≤ N ≤ 21). The template must produce enough unique combinations to avoid collisions — equivalent to at least the default template {{adjective}}-{{noun}}-{{nanoid(6)}} (~1 quadrillion possibilities). Must start with an alphanumeric character. Resolved names are limited to 255 characters.
+     * @example my-fleet-{{nanoid(9)}}
+     */
+    "sfc-api_NameTemplate": string;
+    /** @enum {string} */
+    "sfc-api_NodeCountTag": "node_count";
+    "sfc-api_NotFoundError": {
+      error: {
+        /** @enum {string} */
+        type: "not_found";
+        message: string;
+      };
+    };
+    "sfc-api_NotImplementedError": {
+      error: {
+        /** @enum {string} */
+        type: "not_implemented";
+        message: string;
+      };
+    };
+    /** @example ordr_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_OrderId": string;
+    /**
+     * @description The status of an order in the system.
+     *
+     *     `pending` = not resolved/processed yet.
+     *
+     *     `filled` = order executed.
+     *
+     *     `standing` = the order is waiting for a match.
+     *
+     *     `cancelled` = the order was cancelled either automatically (not a standing
+     *     order and didn't immediately fill, or current time past `end_at`) or by
+     *     explicit cancellation.
+     *
+     *     `rejected` = validation/system error occurred.
+     * @enum {string}
+     */
+    "sfc-api_OrderStatus":
+      | "pending"
+      | "filled"
+      | "rejected"
+      | "cancelled"
+      | "standing";
+    /**
+     * @description Depth of book for one delivery window. Bids descending (highest first),
+     *     asks ascending (lowest first). Either array may be empty when no orders
+     *     rest on that side.
+     */
+    "sfc-api_OrderbookDepthResponse": {
+      /** @description The hardware requirements the book was filtered by. */
+      requirements: components["schemas"]["sfc-api_InstanceTypeRequirements"];
+      /** @description Start of the delivery window the book covers. */
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description End of the delivery window the book covers. */
+      end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Server time when the book was sampled. */
+      requested_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Bids sorted descending by rate (best bid first). */
+      bids: components["schemas"]["sfc-api_PriceLevel"][];
+      /** @description Asks sorted ascending by rate (best ask first). */
+      asks: components["schemas"]["sfc-api_PriceLevel"][];
+    };
+    /** @description A single trade: execution rate, node count, and the time it was recorded. */
+    "sfc-api_OrderbookFill": {
+      /** @description Execution rate in dollars per node-hour. */
+      dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * Format: int64
+       * @description Number of nodes filled at this execution rate.
+       * @example 3
+       */
+      node_count: number;
+      /** @description When the fill was recorded. */
+      filled_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /** @example mfilc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_OrderbookFillsCursor": string;
+    /**
+     * @description Top-of-book snapshot: the highest resting buy (`best_bid`) and lowest
+     *     resting sell (`best_ask`) for the requested window. Either side may be
+     *     absent if no orders are resting on it.
+     */
+    "sfc-api_OrderbookQuoteResponse": {
+      /** @description The hardware requirements the book was filtered by. */
+      requirements: components["schemas"]["sfc-api_InstanceTypeRequirements"];
+      /** @description Start of the delivery window the book covers. */
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description End of the delivery window the book covers. */
+      end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /** @description Server time when the book was sampled. */
+      requested_at: components["schemas"]["sfc-api_UnixEpoch"];
+      best_bid?: null | components["schemas"]["sfc-api_PriceLevel"];
+      best_ask?: null | components["schemas"]["sfc-api_PriceLevel"];
+    };
+    /**
+     * @description Summary row: one delivery window with at least one resting order matching
+     *     the requested filter.
+     */
+    "sfc-api_OrderbookWindow": {
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: int64
+       * @description Duration of the window in whole hours.
+       * @example 168
+       */
+      duration_hours: number;
+      /**
+       * Format: int64
+       * @description Number of resting bid orders at this window.
+       * @example 3
+       */
+      total_bid_order_count: number;
+      /**
+       * Format: int64
+       * @description Number of resting ask orders at this window.
+       * @example 5
+       */
+      total_ask_order_count: number;
+      /**
+       * Format: int64
+       * @description Total node count across all resting bids at this window.
+       * @example 12
+       */
+      total_bid_node_count: number;
+      /**
+       * Format: int64
+       * @description Total node count across all resting asks at this window.
+       * @example 18
+       */
+      total_ask_node_count: number;
+      best_bid?: null | components["schemas"]["sfc-api_PriceLevel"];
+      best_ask?: null | components["schemas"]["sfc-api_PriceLevel"];
+    };
+    /** @example mwin_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_OrderbookWindowsCursor": string;
+    /** @example ordrc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_OrdersCursor": string;
+    "sfc-api_PatchAdminInstanceSkuPropertyKeyRequest": {
+      display_name?: string | null;
+      description?: string | null;
+      documentation_link?: string | null;
+      required?: boolean | null;
+      set_stable?: boolean;
+      set_deprecated?: boolean;
+      deprecation_info?: string | null;
+      internal_note?: string | null;
+      set_deleted?: boolean;
+    };
+    "sfc-api_PatchAdminInstanceSkuPropertyValueRequest": {
+      display_name?: string | null;
+      description?: string | null;
+      documentation_link?: string | null;
+      set_stable?: boolean;
+      set_deprecated?: boolean;
+      deprecation_info?: string | null;
+      internal_note?: string | null;
+      set_deleted?: boolean;
+    };
+    "sfc-api_PatchAdminInstanceSkuRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_PatchCapacityRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+    };
+    "sfc-api_PatchDeploymentRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      instance_template?:
+        | null
+        | components["schemas"]["sfc-api_ResourcePathOrId_InstanceTemplateId"];
+      /** Format: int32 */
+      target_instance_count?: number | null;
+      instance_name_template?:
+        | null
+        | components["schemas"]["sfc-api_NameTemplate"];
+    };
+    "sfc-api_PatchInstanceRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      tags?: null | components["schemas"]["sfc-api_Tags"];
+      /**
+       * Format: int64
+       * @description Shutdown priority. Higher numbers are kept longer. Omit to leave
+       *     unchanged.
+       */
+      priority?: number | null;
+    };
+    "sfc-api_PatchProcurementRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      instance_sku?: null | components["schemas"]["sfc-api_InstanceSkuId"];
+      min_sell_price_dollars_per_node_hour?:
+        | null
+        | components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      max_buy_price_dollars_per_node_hour?:
+        | null
+        | components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * Format: int32
+       * @description How far ahead (in minutes) the procurement buys and sells compute. Higher
+       *     values secure compute further in advance but commit to longer windows
+       *     that may need to be sold when scaling down, potentially at a loss.
+       *     Lower values reduce waste but risk compute being unavailable. Orders
+       *     are placed in 1-hour blocks, so the furthest hour is secured up to
+       *     `managed_window_minutes - 60` minutes before it begins.
+       */
+      managed_window_minutes?: number | null;
+      enabled?: boolean | null;
+    };
+    "sfc-api_PatchWorkspaceRequest": {
+      name?: string | null;
+    };
+    "sfc-api_PaymentRequiredError": {
+      error: {
+        /** @enum {string} */
+        type: "payment_required";
+        message: string;
+      };
+    };
+    "sfc-api_PermissionCheckResponse": {
+      /**
+       * @description Whether the caller can perform every action in the request directly
+       *     without approval.
+       */
+      allowed: boolean;
+    };
+    /**
+     * @description A parsed permission policy.
+     *
+     *     Policies contain a list of rules. When evaluating whether an action is
+     *     permitted, all matching rules are combined by unioning their capabilities.
+     *     If no rule matches, the action is denied by default.
+     */
+    "sfc-api_Policy": {
+      api_version: components["schemas"]["sfc-api_ApiVersion"];
+      description: string;
+      rules?: components["schemas"]["sfc-api_Rule"][];
+    };
+    /**
+     * @description One price level in the order book — orders sharing the same per-node-hour
+     *     rate are summed into a single entry.
+     */
+    "sfc-api_PriceLevel": {
+      /** @description Per-node-hour rate for orders at this level. */
+      dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * Format: int64
+       * @description Total nodes resting at this rate.
+       * @example 4
+       */
+      node_count: number;
+    };
+    /**
+     * @description Tagged sum of who a grant applies to. Wire shape is two flat fields,
+     *     `principal_type` and `principal_id`; the variant determines what
+     *     `principal_id` means:
+     *
+     *     - `User(UserId)` — `principal_id` is a `users.id` (validated as a `Name`
+     *       on deserialize). The create handler additionally verifies the row exists
+     *       in `users`.
+     *     - `Token(TokenId)` — `principal_id` is a `tokn_*` id from `api_tokens.id`.
+     *       This is what `check_permission` sees at request time (set by
+     *       `lookup_api_token` after hashing the raw bearer secret). The create
+     *       handler verifies the row exists in `api_tokens`.
+     */
+    "sfc-api_Principal":
+      | {
+          principal_id: components["schemas"]["sfc-api_UserId"];
+          /** @enum {string} */
+          principal_type: "user";
+        }
+      | {
+          principal_id: components["schemas"]["sfc-api_TokenId"];
+          /** @enum {string} */
+          principal_type: "token";
+        };
+    /**
+     * @description Postgres `principal_type` enum. Identifies what kind of principal a
+     *     `grants.principal_id` refers to.
+     *
+     *     Canonical home: `trading::grants`. `sfc_api::types::v2::grants` re-exports
+     *     for callers that already import from there.
+     * @enum {string}
+     */
+    "sfc-api_PrincipalType": "user" | "token";
+    /** @example proc_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_ProcurementId": string;
+    "sfc-api_ProcurementResponse": components["schemas"]["sfc-api_ProcurementScope"] & {
+      /**
+       * @example procurement
+       * @enum {string}
+       */
+      object: "procurement";
+      target: components["schemas"]["sfc-api_ProcurementTarget"];
+      capacity: components["schemas"]["sfc-api_CapacitySummary"];
+      instance_sku?: null | components["schemas"]["sfc-api_InstanceSkuSummary"];
+      /**
+       * @description Minimum price to sell compute for ($/node-hour). Must contain decimal
+       *     point. Will be rounded to nearest multiple of $0.000060.
+       */
+      min_sell_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * @description Maximum price to buy compute ($/node-hour). Must contain decimal point.
+       *     Will be rounded to nearest multiple of $0.000060.
+       */
+      max_buy_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * Format: int32
+       * @description How far ahead (in minutes) the procurement buys and sells compute. Higher
+       *     values secure compute further in advance but commit to longer windows
+       *     that may need to be sold when scaling down, potentially at a loss.
+       *     Lower values reduce waste but risk compute being unavailable. Orders
+       *     are placed in 1-hour blocks, so the furthest hour is secured up to
+       *     `managed_window_minutes - 60` minutes before it begins.
+       */
+      managed_window_minutes: number;
+      /** @description Enable/disable the procurement. Disabling cancels all standing orders. */
+      enabled: boolean;
+      status: components["schemas"]["sfc-api_ReconciliationStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_ProcurementScope": {
+      id: components["schemas"]["sfc-api_ProcurementId"];
+      resource_path: components["schemas"]["sfc-api_procurementResourcePath_ProcurementId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      workspace: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_ProcurementSummary": {
+      id: components["schemas"]["sfc-api_ProcurementId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_ProcurementTarget":
+      | components["schemas"]["sfc-api_NodeCountTag"]
+      | number;
+    /** @example procc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_ProcurementsCursor": string;
+    "sfc-api_PropertyEnumValue": {
+      key: components["schemas"]["sfc-api_Name"];
+      value: components["schemas"]["sfc-api_Name"];
+      customer_name: string;
+      customer_description: string;
+      customer_link?: string | null;
+      stable_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      customer_deprecated_text?: string | null;
+      internal_note?: string | null;
+      deleted_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_PropertyKey": {
+      key: components["schemas"]["sfc-api_Name"];
+      customer_name: string;
+      customer_description: string;
+      customer_link?: string | null;
+      required: boolean;
+      value_type: components["schemas"]["sfc-api_InstanceSkuValueType"];
+      stable_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      deprecated_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      customer_deprecated_text?: string | null;
+      internal_note?: string | null;
+      deleted_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /**
+     * @description How the current instance SKUs line up against this property key's
+     *     registry entry. All counts are live (computed on each read).
+     */
+    "sfc-api_PropertyKeyCoverage": {
+      /**
+       * Format: int64
+       * @description Total instance SKUs in the system.
+       */
       total: number;
-      /** Format: u-int32 */
-      completed: number;
-      /** Format: u-int32 */
-      failed: number;
+      /**
+       * Format: int64
+       * @description SKUs that set this key.
+       */
+      with_key: number;
+      /**
+       * Format: int64
+       * @description SKUs missing this key.
+       */
+      without_key: number;
+      /**
+       * Format: int64
+       * @description SKUs that set this key with a value in the registered enumeration.
+       */
+      with_registered_value: number;
+      /**
+       * Format: int64
+       * @description SKUs that set this key with a value NOT in the registered enumeration.
+       */
+      with_unregistered_value: number;
+      /** @description Up to 20 SKU IDs missing this key (stable sort by id). */
+      sample_missing: components["schemas"]["sfc-api_InstanceSkuId"][];
+      /** @description Up to 20 SKU IDs carrying an unregistered value (stable sort by id). */
+      sample_unregistered_values: components["schemas"]["sfc-api_InstanceSkuId"][];
     };
-    /** @description SFC standard error response */
-    large_scale_inference_SerdeErrorProxy: {
-      /** @description The error type identifier */
-      type: components["schemas"]["large_scale_inference_ErrorType"];
-      /** @description Human-readable error message */
+    "sfc-api_PutAdminInstanceSkuRequest": {
+      /**
+       * @description Full replacement set of properties for the instance SKU.
+       *     Validated against the registry managed in
+       *     `/v2/admin/instance_sku_properties`: every key flagged `required=true`
+       *     (and not deprecated/deleted) must be present. Keys not in the
+       *     registry, deprecated keys, and enum values outside the registered
+       *     set are all allowed.
+       */
+      properties: components["schemas"]["sfc-api_InstanceType"];
+      /**
+       * @description ⚠️ DANGER — DO NOT SET THIS UNLESS YOU MEAN IT. ⚠️
+       *
+       *     When `false` (the default), every existing `(key, value)` pair
+       *     must be present unchanged in `properties` — new keys can be
+       *     added, but no existing key may be dropped or have its value
+       *     rewritten. The trading engine treats SKU properties as the
+       *     canonical hardware/visibility identity of the SKU; flipping
+       *     `audience: public → internal`, dropping `accelerator`, or
+       *     renaming a property retroactively reshapes every order, contract,
+       *     and procurement that's already pointed at this SKU. Customers
+       *     who trusted that the SKU they bought against was H100 will
+       *     suddenly be matching against whatever you wrote.
+       *
+       *     Set this to `true` ONLY when you have audited every live
+       *     procurement, order, and contract on this SKU and know for
+       *     certain that the rewrite is intended (e.g. correcting a typo
+       *     nobody has matched against yet, or renaming a property the
+       *     trading engine doesn't key on). For everything else, create a
+       *     new SKU and migrate.
+       */
+      allow_modify?: boolean;
+    };
+    "sfc-api_ReconciliationStatus": {
+      state: components["schemas"]["sfc-api_AutomationStatus"];
       message: string;
-      /** @description Array of detailed error information when applicable */
-      details: components["schemas"]["large_scale_inference_ErrorDetail"][];
     };
+    "sfc-api_RequestTimedOutError": {
+      error: {
+        /** @enum {string} */
+        type: "request_timed_out";
+        message: string;
+      };
+    };
+    /**
+     * @description Key/value filters on instance SKU properties.
+     *
+     *     Valid keys and values are published at
+     *     `GET /v2/instance_sku_property_catalog`.
+     *
+     *     Empty map = no constraints.
+     * @example {
+     *       "accelerator": [
+     *         "H100"
+     *       ]
+     *     }
+     */
+    "sfc-api_Requirements": {
+      [key: string]: components["schemas"]["sfc-api_Name"][];
+    };
+    /**
+     * @description A resource in the permission system.
+     *
+     *     `Wildcard` matches all resources and serializes as `"*"`.
+     *
+     *     Variants must stay in sync with the `rule_resource` PostgreSQL enum
+     *     defined in migration 00110.
+     * @enum {string}
+     */
+    "sfc-api_Resource":
+      | "*"
+      | "node"
+      | "capacity"
+      | "secret"
+      | "ssh_key"
+      | "firewall"
+      | "role"
+      | "grant"
+      | "token"
+      | "billing"
+      | "order"
+      | "limits"
+      | "approval"
+      | "user";
+    /**
+     * @description A resource path like 'sfc:capacity:acme:prod:my-capacity' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example cap_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_CapacityId": string;
+    /**
+     * @description A resource path like 'sfc:image:acme:prod:my-image' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example image_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_ImageId": string;
+    /**
+     * @description A resource path like 'sfc:instance_template:acme:prod:my-instance_template' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example itmpl_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_InstanceTemplateId": string;
+    /**
+     * @description A resource path like 'sfc:procurement:acme:prod:my-procurement' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example proc_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_ProcurementId": string;
+    /**
+     * @description A resource path like 'sfc:role:acme:my-role' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example role_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_RoleId": string;
+    /**
+     * @description A resource path like 'sfc:subnet:acme:prod:my-subnet' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example snet_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_SubnetId": string;
+    /**
+     * @description A resource path like 'sfc:user:my-user' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example my-resource-name
+     */
+    "sfc-api_ResourcePathOrId_UserId": string;
+    /**
+     * @description A resource path like 'sfc:workspace:acme:my-workspace' _or_ an ID. Resource paths are human-readable but not stable - they change when resources are renamed or moved. IDs are stable and permanent.
+     * @example wksp_k3R-nX9vLm7Qp2Yw5Jd8F
+     */
+    "sfc-api_ResourcePathOrId_WorkspaceId": string;
+    /**
+     * @example role
+     * @enum {string}
+     */
+    "sfc-api_RoleDiscriminator": "role";
+    /** @example role_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_RoleId": string;
+    "sfc-api_RoleResponse": components["schemas"]["sfc-api_RoleScope"] & {
+      /**
+       * @example role
+       * @enum {string}
+       */
+      object: "role";
+      role_type: components["schemas"]["sfc-api_RoleType"];
+      policy: components["schemas"]["sfc-api_Policy"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      updated_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_RoleScope": {
+      id: components["schemas"]["sfc-api_RoleId"];
+      resource_path: components["schemas"]["sfc-api_roleResourcePath_RoleId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_RoleSummary": {
+      id: components["schemas"]["sfc-api_RoleId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @enum {string} */
+    "sfc-api_RoleType": "built_in" | "custom";
+    /** @description A single rule in a policy: an effect plus a set of actions. */
+    "sfc-api_Rule": {
+      effect: components["schemas"]["sfc-api_Effect"];
+      actions: components["schemas"]["sfc-api_ActionsMap"];
+    };
+    /**
+     * @description Node count over time, as a list of `[start_at, end_at)` time ranges.
+     *
+     *     Example: 5 nodes from t=0 to t=3600 is `[{"start_at": 0, "end_at": 3600, "node_count": 5}]`.
+     *
+     *     `start_at` and `end_at` must be 60-second aligned, `node_count` must be
+     *     non-negative. On non-final entries, `end_at` may be omitted (inferred
+     *     from the next entry's `start_at`); gaps fill with `node_count: 0`.
+     */
+    "sfc-api_Schedule": components["schemas"]["sfc-api_ScheduleEntry"][];
+    /**
+     * @description A `[start_at, end_at)` time range with a fixed `node_count`.
+     *     `end_at` is `null` only on the final entry, marking an unbounded tail.
+     */
+    "sfc-api_ScheduleEntry": {
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      end_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      /** Format: int32 */
+      node_count: number;
+    };
+    "sfc-api_ServiceUnavailableError": {
+      error: {
+        /** @enum {string} */
+        type: "service_unavailable";
+        message: string;
+      };
+    };
+    "sfc-api_SetDefaultImageResponse": components["schemas"]["sfc-api_ImageScope"] & {
+      /**
+       * @example image
+       * @enum {string}
+       */
+      object: "image";
+      upload_status: components["schemas"]["sfc-api_ImageUploadStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      provider?: string | null;
+      sha256?: string | null;
+      is_default: boolean;
+    };
+    /** @enum {string} */
+    "sfc-api_Side": "sell" | "buy";
+    /** @description Start a multipart image upload. Max image size is 128 GiB. */
+    "sfc-api_StartUploadRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      /** @description Workspace to create this image in. */
+      workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+    };
+    /** @example snet_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_SubnetId": string;
+    /**
+     * @example {
+     *       "env": "prod",
+     *       "team": "infra"
+     *     }
+     */
+    "sfc-api_Tags": {
+      [key: string]: string;
+    };
+    /** @example tokn_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_TokenId": string;
+    /** @description Token metadata response. Never includes the raw token value. */
+    "sfc-api_TokenResponse": components["schemas"]["sfc-api_TokenScope"] & {
+      /**
+       * @example api_token
+       * @enum {string}
+       */
+      object: "api_token";
+      suffix: string;
+      expires_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      last_used_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_TokenScope": {
+      id: components["schemas"]["sfc-api_TokenId"];
+      resource_path: components["schemas"]["sfc-api_tokenResourcePath_TokenId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /** @description Response returned only at creation time. Includes the one-time raw token value. */
+    "sfc-api_TokenWithValueResponse": components["schemas"]["sfc-api_TokenScope"] & {
+      /**
+       * @example api_token
+       * @enum {string}
+       */
+      object: "api_token";
+      /** @description The token value. Only shown once at creation. */
+      token: string;
+      suffix: string;
+      expires_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      last_used_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /** @example tokc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_TokensCursor": string;
+    "sfc-api_UnauthorizedError": {
+      error: {
+        /** @enum {string} */
+        type: "authentication_error";
+        message: string;
+      };
+    };
+    /**
+     * Format: int64
+     * @description Unix timestamp.
+     * @example 1738972800
+     */
+    "sfc-api_UnixEpoch": number;
+    "sfc-api_UnprocessableEntityError": {
+      error: {
+        /** @enum {string} */
+        type: "unprocessable_entity";
+        message: string;
+        details?: components["schemas"]["sfc-api_ErrorDetail"][];
+      };
+    };
+    "sfc-api_UpdateFeatureFlagRequest": {
+      feature_flag_id: string;
+      account_regex?: string | null;
+      enabled?: boolean | null;
+    };
+    "sfc-api_UpdateFeatureFlagResponse": {
+      /**
+       * @example feature_flag
+       * @enum {string}
+       */
+      object: "feature_flag";
+      feature_flag_id: string;
+    };
+    "sfc-api_UpdateRoleRequest": {
+      name?: null | components["schemas"]["sfc-api_Name"];
+      policy?: null | components["schemas"]["sfc-api_Policy"];
+    };
+    "sfc-api_UpgradeRequiredError": {
+      error: {
+        /** @enum {string} */
+        type: "upgrade_required";
+        message: string;
+      };
+    };
+    "sfc-api_UploadPartRequest": {
+      /**
+       * Format: int32
+       * @description Caller-assigned part number, starting at 1.
+       */
+      part_id: number;
+    };
+    "sfc-api_UploadPartResponse": {
+      /** @description Presigned URL to upload the part. */
+      url: string;
+      expires_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /**
+     * @example user
+     * @enum {string}
+     */
+    "sfc-api_UserDiscriminator": "user";
+    /** @example my-resource-name */
+    "sfc-api_UserId": string;
+    "sfc-api_UserResponse": {
+      /**
+       * @example user
+       * @enum {string}
+       */
+      object: "user";
+      id: components["schemas"]["sfc-api_UserId"];
+      resource_path: components["schemas"]["sfc-api_userResourcePath_UserId"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /** @example usrc_gqXR7s0Kj5mHvE2wNpLc4Q */
+    "sfc-api_UsersCursor": string;
+    /**
+     * @description The validator only rejects one thing: a instance SKU missing a
+     *     required, live (non-deprecated, non-deleted) key.
+     *
+     *     Everything else is permitted — callers are free to set keys not in the
+     *     registry, keys that are deprecated or deleted, and enum values that
+     *     aren't in the enumeration table. The registry is descriptive metadata,
+     *     not a whitelist.
+     */
+    "sfc-api_ValidationError": {
+      key: components["schemas"]["sfc-api_Name"];
+      /** @enum {string} */
+      kind: "missing_required";
+    };
+    /**
+     * @description A verb (action type) in the permission system.
+     *
+     *     `Wildcard` matches all verbs and serializes as `"*"`.
+     *
+     *     Variants must stay in sync with the `rule_verb` PostgreSQL enum
+     *     defined in migration 00110.
+     * @enum {string}
+     */
+    "sfc-api_Verb": "*" | "read" | "write" | "delete" | "list" | "create";
+    /**
+     * @example workspace
+     * @enum {string}
+     */
+    "sfc-api_WorkspaceDiscriminator": "workspace";
+    /** @example wksp_k3R-nX9vLm7Qp2Yw5Jd8F */
+    "sfc-api_WorkspaceId": string;
+    "sfc-api_WorkspaceResponse": components["schemas"]["sfc-api_WorkspaceScope"] & {
+      /**
+       * @example workspace
+       * @enum {string}
+       */
+      object: "workspace";
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    "sfc-api_WorkspaceScope": {
+      id: components["schemas"]["sfc-api_WorkspaceId"];
+      resource_path: components["schemas"]["sfc-api_workspaceResourcePath_WorkspaceId"];
+      owner: components["schemas"]["sfc-api_Name"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    "sfc-api_WorkspaceSummary": {
+      id: components["schemas"]["sfc-api_WorkspaceId"];
+      name: components["schemas"]["sfc-api_Name"];
+    };
+    /**
+     * @description A resource path for a capacity resource. Format: sfc:capacity:<account>:<workspace>:<name>.
+     * @example sfc:capacity:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_capacityResourcePath_CapacityId": string;
+    /**
+     * @description A resource path for a deployment resource. Format: sfc:deployment:<account>:<workspace>:<name>.
+     * @example sfc:deployment:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_deploymentResourcePath_DeploymentId": string;
+    /**
+     * @description A resource path for a image resource. Format: sfc:image:<account>:<workspace>:<name>.
+     * @example sfc:image:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_imageResourcePath_ImageId": string;
+    /**
+     * @description A resource path for a instance resource. Format: sfc:instance:<account>:<workspace>:<name>.
+     * @example sfc:instance:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_instanceResourcePath_InstanceId": string;
+    /**
+     * @description A resource path for a instance_template resource. Format: sfc:instance_template:<account>:<workspace>:<name>.
+     * @example sfc:instance_template:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_instance_templateResourcePath_InstanceTemplateId": string;
+    /**
+     * @description A resource path for a procurement resource. Format: sfc:procurement:<account>:<workspace>:<name>.
+     * @example sfc:procurement:<account_id>:<workspace>:<name>
+     */
+    "sfc-api_procurementResourcePath_ProcurementId": string;
+    /**
+     * @description A resource path for a role resource. Format: sfc:role:<account>:<name>.
+     * @example sfc:role:<account_id>:<name>
+     */
+    "sfc-api_roleResourcePath_RoleId": string;
+    /**
+     * @description A resource path for a token resource. Format: sfc:token:<account>:<name>.
+     * @example sfc:token:<account_id>:<name>
+     */
+    "sfc-api_tokenResourcePath_TokenId": string;
+    /**
+     * @description A resource path for a user resource. Format: sfc:user:<name>.
+     * @example sfc:user:<name>
+     */
+    "sfc-api_userResourcePath_UserId": string;
+    "sfc-api_v2.BuyOrderPreviewRequest": {
+      requirements: components["schemas"]["sfc-api_Requirements"];
+      /** @description Order start. Must align to a 60-second boundary. */
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: u-int64
+       * @description Order duration in seconds. Must be a positive multiple of 60.
+       */
+      duration_seconds: number;
+      /**
+       * Format: int32
+       * @description Number of nodes. Must be positive.
+       */
+      node_count: number;
+      capacity?:
+        | null
+        | components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+    };
+    "sfc-api_v2.CapacityTransferResponse": {
+      /**
+       * @example capacity_transfer
+       * @enum {string}
+       */
+      object: "capacity_transfer";
+      id: components["schemas"]["sfc-api_CapacityTransferId"];
+      status: components["schemas"]["sfc-api_CapacityTransferStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      from_capacity: components["schemas"]["sfc-api_CapacityId"];
+      to_capacity: components["schemas"]["sfc-api_CapacityId"];
+      /**
+       * @description Instance SKU the transfer applied to. Carries the SKU's
+       *     human-readable name when one is registered.
+       */
+      instance_sku: components["schemas"]["sfc-api_InstanceSkuSummary"];
+      /** @description Reason a capacity transfer was rejected. */
+      rejected_reason?: string | null;
+      /**
+       * @description The transfer's allocation schedule, expanded into constant-quantity
+       *     rectangles. The final rectangle has `end_at: null` (the unbounded tail);
+       *     gaps are represented as explicit zero-quantity rectangles.
+       */
+      allocation_schedule_delta: components["schemas"]["sfc-api_Schedule"];
+    };
+    "sfc-api_v2.CreateCapacityTransferRequest": {
+      /** @description Source capacity (must belong to the authenticated caller). */
+      from_capacity: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      /** @description Destination capacity (must belong to the authenticated caller). */
+      to_capacity: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      /**
+       * @description The transfer's allocation schedule as constant-quantity rectangles.
+       *     If the final entry does not have `end_at: null`, a zero-quantity
+       *     unbounded tail is appended automatically.
+       */
+      allocation_schedule_delta: components["schemas"]["sfc-api_Schedule"];
+      /** @description Instance SKU the transfer applies to. */
+      instance_sku: components["schemas"]["sfc-api_InstanceSkuId"];
+    };
+    "sfc-api_v2.CreateOrderRequest": {
+      /** @description Target capacity that receives compute when filled. */
+      capacity: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      side: components["schemas"]["sfc-api_Side"];
+      /**
+       * @description If true, the order rests on the order book until it fills, is
+       *     cancelled, or its end time passes. If false, the order is cancelled
+       *     immediately if it does not fill.
+       */
+      allow_standing?: boolean;
+      /**
+       * @description Instance SKU this order will fill on. Rejected at submission if the
+       *     SKU id is not registered.
+       */
+      instance_sku: components["schemas"]["sfc-api_InstanceSkuId"];
+      /**
+       * @description Change in capacity if the order fills (added on `buy`, subtracted
+       *     on `sell`). Must be a single time range with both `start_at` and
+       *     `end_at`.
+       */
+      allocation_schedule_delta: components["schemas"]["sfc-api_Schedule"];
+      /**
+       * @description Limit price per node-hour. Decimal string (e.g. `"1.500000"`); rounded
+       *     to per-minute precision on submission.
+       */
+      limit_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+    };
+    "sfc-api_v2.ListCapacityTransfersResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_CapacityTransfersCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_v2.CapacityTransferResponse"][];
+    };
+    "sfc-api_v2.ListOrdersResponse": {
+      /**
+       * @example list
+       * @enum {string}
+       */
+      object: "list";
+      cursor?: null | components["schemas"]["sfc-api_OrdersCursor"];
+      has_more: boolean;
+      data: components["schemas"]["sfc-api_v2.OrderResponse"][];
+    };
+    /** @enum {string} */
+    "sfc-api_v2.MaintenanceNoticeType":
+      | "info"
+      | "degraded_performance"
+      | "marketplace_unavailable";
+    /** @description A single fill event: one contract that was produced when the order matched. */
+    "sfc-api_v2.OrderFill": {
+      contract?: null | components["schemas"]["sfc-api_ContractId"];
+      filled_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * @description Capacity change this fill delivered. Quantities are always positive;
+       *     `side` on the parent order determines whether this added or removed
+       *     capacity.
+       */
+      allocation_schedule_delta: components["schemas"]["sfc-api_Schedule"];
+      price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+    };
+    /**
+     * @description Fee charged on fills for the targeted instance SKU.
+     *
+     *     Total fee = `flat_dollars_per_node_hour × node_count × duration_hours`
+     *     + `percentage_bps / 10000 × execution_total_dollars`.
+     *
+     *     Recomputed against the realized price at fill time.
+     */
+    "sfc-api_v2.OrderPreviewFee": {
+      /** @description Flat fee per node-hour. */
+      flat_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /**
+       * Format: int32
+       * @description Percentage of execution total, in basis points (10000 = 100%).
+       */
+      percentage_bps: number;
+    };
+    "sfc-api_v2.OrderPreviewNotice": {
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      maintenance_type: components["schemas"]["sfc-api_v2.MaintenanceNoticeType"];
+      title: string;
+      description: string;
+      action_message?: string | null;
+      /** @enum {string} */
+      type: "maintenance_window";
+    };
+    "sfc-api_v2.OrderPreviewRequest":
+      | (components["schemas"]["sfc-api_v2.BuyOrderPreviewRequest"] & {
+          /** @enum {string} */
+          side: "buy";
+        })
+      | (components["schemas"]["sfc-api_v2.SellOrderPreviewRequest"] & {
+          /** @enum {string} */
+          side: "sell";
+        });
+    "sfc-api_v2.OrderPreviewResponse":
+      | {
+          /**
+           * @description Ready-to-submit body for `POST /v2/orders`. Posting this body
+           *     verbatim will fill at the estimated price.
+           */
+          post_order_body: components["schemas"]["sfc-api_v2.CreateOrderRequest"];
+          /** @description Fee policy for the matched instance SKU. */
+          fee: components["schemas"]["sfc-api_v2.OrderPreviewFee"];
+          /**
+           * @description Maintenance windows for the matched instance SKU overlapping
+           *     the order's delivery window.
+           */
+          notices?: components["schemas"]["sfc-api_v2.OrderPreviewNotice"][];
+          /** @enum {string} */
+          type: "quoted";
+        }
+      | {
+          reason: components["schemas"]["sfc-api_v2.OrderPreviewUnavailableReason"];
+          fee?: null | components["schemas"]["sfc-api_v2.OrderPreviewFee"];
+          /**
+           * @description Maintenance windows for the targeted instance SKU overlapping
+           *     the requested order window.
+           */
+          notices?: components["schemas"]["sfc-api_v2.OrderPreviewNotice"][];
+          /** @enum {string} */
+          type: "unavailable";
+        };
+    /** @enum {string} */
+    "sfc-api_v2.OrderPreviewUnavailableReason":
+      | "no_matching_instance_skus"
+      | "no_availability";
+    "sfc-api_v2.OrderResponse": {
+      /**
+       * @example order
+       * @enum {string}
+       */
+      object: "order";
+      id: components["schemas"]["sfc-api_OrderId"];
+      /**
+       * @description Target capacity that receives or loses compute if this order fills
+       *     (depending on order type).
+       */
+      capacity: components["schemas"]["sfc-api_CapacitySummary"];
+      side: components["schemas"]["sfc-api_Side"];
+      /**
+       * @description If true, the order stays in the order book until either fills, is
+       *     explicitly cancelled, or the order end time is reached resulting in
+       *     automatic cancellation. If false, the order is cancelled immediately if
+       *     it doesn't fill.
+       */
+      allow_standing: boolean;
+      instance_sku?: null | components["schemas"]["sfc-api_InstanceSkuSummary"];
+      /**
+       * @description Change in capacity if the order fills. Must be a single time range
+       *     with both `start_at` and `end_at`.
+       */
+      allocation_schedule_delta: components["schemas"]["sfc-api_Schedule"];
+      limit_price_dollars_per_node_hour: components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      status: components["schemas"]["sfc-api_OrderStatus"];
+      created_at: components["schemas"]["sfc-api_UnixEpoch"];
+      filled_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: int32
+       * @description Node count that filled. Equals the order's quantity for complete fills.
+       */
+      filled_quantity?: number | null;
+      filled_average_price_dollars_per_node_hour?:
+        | null
+        | components["schemas"]["sfc-api_DollarsPerNodeHour"];
+      /** @description Each contract produced by this order. Empty for unfilled orders. */
+      fills?: components["schemas"]["sfc-api_v2.OrderFill"][];
+      cancelled_at?: null | components["schemas"]["sfc-api_UnixEpoch"];
+    };
+    /** @enum {string} */
+    "sfc-api_v2.OrderSortBy":
+      | "created_at"
+      | "-created_at"
+      | "start_at"
+      | "-start_at";
+    "sfc-api_v2.SellOrderPreviewRequest": {
+      capacity?:
+        | null
+        | components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+      /** @description Order start. Must align to a 60-second boundary. */
+      start_at: components["schemas"]["sfc-api_UnixEpoch"];
+      /**
+       * Format: u-int64
+       * @description Order duration in seconds. Must be a positive multiple of 60.
+       */
+      duration_seconds: number;
+      /**
+       * Format: int32
+       * @description Number of nodes. Must be positive.
+       */
+      node_count: number;
+      requirements: components["schemas"]["sfc-api_Requirements"];
+    };
+    /**
+     * @description A resource path for a workspace resource. Format: sfc:workspace:<account>:<name>.
+     * @example sfc:workspace:<account_id>:<name>
+     */
+    "sfc-api_workspaceResourcePath_WorkspaceId": string;
     /**
      * @description Quote details with side-specific fields
      *
@@ -4373,11 +6156,32 @@ export interface components {
       quote?: null | components["schemas"]["quoter_ApiQuoteDetails"];
       no_quote_reason?: null | components["schemas"]["quoter_NoQuoteReason"];
     };
-    /**
-     * @description Unique identifier with prefix 'cont_' that references a resource.
-     * @example cont_k3R-nX9vLm7Qp2Yw5Jd8F
-     */
+    quoter_BadRequestError: {
+      error: {
+        /** @enum {string} */
+        type: "invalid_request_error";
+        message: string;
+        details?: components["schemas"]["quoter_ErrorDetail"][];
+      };
+    };
+    quoter_ConflictError: {
+      error: {
+        /** @enum {string} */
+        type: "conflict";
+        message: string;
+        details?: components["schemas"]["quoter_ErrorDetail"][];
+      };
+    };
+    /** @example cont_k3R-nX9vLm7Qp2Yw5Jd8F */
     quoter_ContractId: string;
+    quoter_ErrorDetail: {
+      /** @description The field that caused the error (for validation errors) */
+      field?: string;
+      /** @description Specific error code for this detail */
+      code: string;
+      /** @description Human-readable error message */
+      message: string;
+    };
     /** @enum {string} */
     quoter_ErrorType:
       | "api_error"
@@ -4392,7 +6196,29 @@ export interface components {
       | "upgrade_required"
       | "payment_required"
       | "service_unavailable"
-      | "unprocessable_entity";
+      | "unprocessable_entity"
+      | "gone";
+    quoter_ForbiddenError: {
+      error: {
+        /** @enum {string} */
+        type: "forbidden";
+        message: string;
+      };
+    };
+    quoter_GoneError: {
+      error: {
+        /** @enum {string} */
+        type: "gone";
+        message: string;
+      };
+    };
+    quoter_InternalServerError: {
+      error: {
+        /** @enum {string} */
+        type: "api_error";
+        message: string;
+      };
+    };
     /**
      * @description Reason why a quote could not be provided.
      * @enum {string}
@@ -4403,12 +6229,33 @@ export interface components {
       | "bid_price_too_low"
       | "ask_price_too_high"
       | "internal_solver_error";
+    quoter_NotFoundError: {
+      error: {
+        /** @enum {string} */
+        type: "not_found";
+        message: string;
+      };
+    };
+    quoter_NotImplementedError: {
+      error: {
+        /** @enum {string} */
+        type: "not_implemented";
+        message: string;
+      };
+    };
     /**
      * @description A date/time value that can be either "NOW" or an ISO 8601 datetime string
      * @example NOW
      * @example 2025-07-11T20:41:37.423Z
      */
     quoter_NowOrISO8601DateTime: string;
+    quoter_PaymentRequiredError: {
+      error: {
+        /** @enum {string} */
+        type: "payment_required";
+        message: string;
+      };
+    };
     /**
      * @description Query parameters for GET /v0/quote
      *
@@ -4479,8 +6326,44 @@ export interface components {
        */
       max_duration?: number | null;
     };
+    quoter_RequestTimedOutError: {
+      error: {
+        /** @enum {string} */
+        type: "request_timed_out";
+        message: string;
+      };
+    };
+    quoter_ServiceUnavailableError: {
+      error: {
+        /** @enum {string} */
+        type: "service_unavailable";
+        message: string;
+      };
+    };
     /** @enum {string} */
     quoter_Side: "sell" | "buy";
+    quoter_UnauthorizedError: {
+      error: {
+        /** @enum {string} */
+        type: "authentication_error";
+        message: string;
+      };
+    };
+    quoter_UnprocessableEntityError: {
+      error: {
+        /** @enum {string} */
+        type: "unprocessable_entity";
+        message: string;
+        details?: components["schemas"]["quoter_ErrorDetail"][];
+      };
+    };
+    quoter_UpgradeRequiredError: {
+      error: {
+        /** @enum {string} */
+        type: "upgrade_required";
+        message: string;
+      };
+    };
   };
   responses: never;
   parameters: never;
@@ -4736,825 +6619,6 @@ export interface operations {
       };
     };
   };
-  list_vms_images: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of images */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ListImagesResponse"];
-        };
-      };
-      /** @description Node API features not enabled */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  start_image_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_StartMultipartUploadRequest"];
-      };
-    };
-    responses: {
-      /** @description Image upload started successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_StartMultipartUploadResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  download_image: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description VM image ID */
-        image_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ImageDownloadResponse"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  complete_image_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description VM image ID */
-        image_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_CompleteUploadRequest"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_CompleteUploadResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  create_image_upload_url: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description VM image ID */
-        image_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_ImageUploadRequest"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ImageUploadResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  list_images_v2: {
-    parameters: {
-      query?: {
-        /** @description Maximum number of results to return (1-200, default 50). */
-        limit?: number;
-        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
-        starting_after?: components["schemas"]["vmorch_ImagesCursor"];
-        /** @description Cursor for backward pagination. */
-        ending_before?: components["schemas"]["vmorch_ImagesCursor"];
-        /** @description Workspace URN (e.g. sfc:workspace:{account_id}:default). */
-        workspace?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of images */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ListImagesResponse"];
-        };
-      };
-      /** @description Features not enabled */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  start_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_StartUploadRequest"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ImageResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  get_image: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ImageResponse"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  complete_upload: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_CompleteUploadRequest"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_CompleteUploadResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  download_image_v2: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ImageDownloadResponse"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  upload_part: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_UploadPartRequest"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_UploadPartResponse"];
-        };
-      };
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  list_nodes: {
-    parameters: {
-      query?: {
-        /** @description Filter by node ID (can be repeated, e.g. `?id=<node_id_1>&id=<node_id_2>`). */
-        id?: components["schemas"]["vmorch_NodeId"][];
-        capacity?: components["schemas"]["vmorch_CapacityId"];
-        /** @description Filter by node status. When not specified, destroyed nodes are excluded. */
-        status?: components["schemas"]["vmorch_NodeStatus"][];
-        /** @description Maximum number of results to return (1–200, default 50). */
-        limit?: number;
-        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
-        starting_after?: components["schemas"]["vmorch_NodesCursor"];
-        /** @description Cursor for backward pagination. */
-        ending_before?: components["schemas"]["vmorch_NodesCursor"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of nodes */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_ListNodesResponse"];
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  get_node: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Node ID */
-        id: components["schemas"]["vmorch_NodeId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Node details */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_NodeResponse"];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Node not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  get_node_logs: {
-    parameters: {
-      query?: {
-        /** @description Return logs with seqnum <= this value. */
-        before_seqnum?: number;
-        /** @description Return logs with seqnum >= this value. */
-        since_seqnum?: number;
-        /**
-         * @description Return logs before this unix timestamp (seconds). Due to clock synchronization,
-         *     some earlier log messages may have a realtime timestamp after this value.
-         */
-        before_realtime_timestamp?: components["schemas"]["vmorch_UnixEpoch"];
-        /**
-         * @description Return logs after this unix timestamp (seconds). Due to clock synchronization,
-         *     some later log messages may have a realtime timestamp before this value.
-         */
-        since_realtime_timestamp?: components["schemas"]["vmorch_UnixEpoch"];
-        sort_by?: "seqnum" | "-seqnum";
-        limit?: number;
-      };
-      header?: never;
-      path: {
-        /** @description Node ID */
-        id: components["schemas"]["vmorch_NodeId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Log chunks */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_NodeLogsResponse"];
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Node not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  replace_node: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Node ID */
-        id: components["schemas"]["vmorch_NodeId"];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["vmorch_ReplaceNodeRequest"];
-      };
-    };
-    responses: {
-      /** @description Replacement node */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_NodeResponse"];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Feature not enabled */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description Node not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  get_node_ssh: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Node ID */
-        id: components["schemas"]["vmorch_NodeId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description SSH connection details */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_NodeSshInfo"];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-      /** @description SSH details not available */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["vmorch_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
   list_zones_handler: {
     parameters: {
       query?: never;
@@ -5579,7 +6643,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -5588,7 +6661,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5620,7 +6693,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -5629,7 +6702,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Zone not found */
@@ -5638,7 +6711,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -5647,7 +6720,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5724,7 +6797,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -5733,7 +6806,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -5742,7 +6815,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -5751,7 +6824,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5784,7 +6857,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -5793,7 +6866,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Payment Required */
@@ -5802,7 +6875,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_PaymentRequiredError"];
         };
       };
       /** @description Forbidden */
@@ -5811,7 +6884,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -5820,7 +6893,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5852,7 +6925,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -5861,7 +6934,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -5870,7 +6943,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Node not found */
@@ -5879,7 +6952,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -5888,7 +6961,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5918,7 +6991,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -5927,7 +7000,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -5936,7 +7009,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Node not found */
@@ -5945,7 +7018,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -5954,7 +7027,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -5990,7 +7063,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -5999,7 +7072,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
+        };
+      };
+      /** @description Insufficient balance */
+      402: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["node-api_PaymentRequiredError"];
         };
       };
       /** @description Forbidden */
@@ -6008,7 +7090,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Node not found */
@@ -6017,7 +7099,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
         };
       };
       /** @description Extension failed due to capacity */
@@ -6026,7 +7108,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnprocessableEntityError"];
         };
       };
       /** @description Internal server error */
@@ -6035,7 +7117,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -6071,7 +7153,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -6080,7 +7162,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -6089,7 +7171,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Node not found */
@@ -6098,7 +7180,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
         };
       };
       /** @description Redeploy failed due to invalid state */
@@ -6107,7 +7189,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnprocessableEntityError"];
         };
       };
       /** @description Internal server error */
@@ -6116,7 +7198,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -6148,7 +7230,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_BadRequestError"];
         };
       };
       /** @description Unauthorized request */
@@ -6157,7 +7239,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden */
@@ -6166,7 +7248,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_ForbiddenError"];
         };
       };
       /** @description Node not found */
@@ -6175,7 +7257,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_NotFoundError"];
+        };
+      };
+      /** @description Node already released */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["node-api_ConflictError"];
         };
       };
       /** @description Internal server error */
@@ -6184,7 +7275,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["node-api_ErrorObject"];
+          "application/json": components["schemas"]["node-api_InternalServerError"];
         };
       };
     };
@@ -6257,7 +7348,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -6274,7 +7365,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -6291,7 +7382,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -6387,7 +7478,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -6404,7 +7495,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -6421,7 +7512,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -6438,7 +7529,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -6509,7 +7600,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -6526,7 +7617,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Contract not found */
@@ -6543,7 +7634,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -6560,7 +7651,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -6681,7 +7772,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -6698,7 +7789,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -6715,7 +7806,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -6732,7 +7823,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -6783,7 +7874,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -6799,7 +7890,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen, insufficient credits, unauthorized seller, or trading halted */
@@ -6815,7 +7906,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Not found - contract or cluster not found */
@@ -6831,7 +7922,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Upgrade required - legacy account needs migration */
@@ -6847,7 +7938,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UpgradeRequiredError"];
         };
       };
       /** @description Internal server error */
@@ -6863,7 +7954,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -6928,7 +8019,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - user not authorized to view this order */
@@ -6944,7 +8035,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Order not found */
@@ -6960,7 +8051,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -6976,7 +8067,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7023,7 +8114,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Order not found */
@@ -7039,7 +8130,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7055,7 +8146,7 @@ export interface operations {
            *       "details": []
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7134,7 +8225,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -7151,7 +8242,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Order not found */
@@ -7168,7 +8259,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7185,7 +8276,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7244,7 +8335,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -7261,7 +8352,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -7278,7 +8369,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7334,7 +8425,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -7351,7 +8442,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Payment required - insufficient funds */
@@ -7368,7 +8459,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_PaymentRequiredError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -7385,7 +8476,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Not found - cluster not found */
@@ -7402,7 +8493,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7419,7 +8510,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7478,7 +8569,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -7495,7 +8586,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Procurement not found */
@@ -7512,7 +8603,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7529,7 +8620,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7591,7 +8682,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -7608,7 +8699,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Payment required - insufficient funds */
@@ -7625,7 +8716,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_PaymentRequiredError"];
         };
       };
       /** @description Forbidden - account frozen */
@@ -7642,7 +8733,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Procurement not found */
@@ -7659,7 +8750,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7676,7 +8767,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7734,7 +8825,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
     };
@@ -7769,6 +8860,13 @@ export interface operations {
       };
       /** @description Unauthorized - missing or invalid authentication token */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
         headers: {
           [name: string]: unknown;
         };
@@ -7827,7 +8925,7 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ConflictError"];
         };
       };
       /** @description Internal server error */
@@ -7846,7 +8944,83 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_events: {
+    parameters: {
+      query?: {
+        starting_after?: components["schemas"]["market-api_EventsCursor"];
+        limit?: number;
+        action?: string;
+        target?: string;
+        /** @description Filter by target type (e.g. "node", "order") */
+        target_type?: string;
+        /** @description Unix timestamp. Only return events that occurred at or after this time. */
+        since?: number;
+        /** @description Unix timestamp. Only return events that occurred at or before this time. */
+        until?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of events. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_ListEventsResponse"];
+        };
+      };
+      /** @description Validation failed. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
+        };
+      };
+      /** @description Cursor references a deleted event. */
+      410: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_GoneError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7879,7 +9053,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Forbidden */
@@ -7888,7 +9062,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Invoice not found */
@@ -7897,7 +9071,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -7906,7 +9080,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7939,7 +9113,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Forbidden */
@@ -7948,7 +9122,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -7957,7 +9131,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -7990,7 +9164,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Forbidden */
@@ -7999,7 +9173,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Invoice not found */
@@ -8008,7 +9182,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_NotFoundError"];
         };
       };
       /** @description Internal server error */
@@ -8017,7 +9191,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -8051,7 +9225,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - not a vendor */
@@ -8060,7 +9234,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -8069,7 +9243,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -8134,7 +9308,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized */
@@ -8143,7 +9317,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Forbidden - not a vendor or admin */
@@ -8152,7 +9326,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_ForbiddenError"];
         };
       };
       /** @description Internal server error */
@@ -8161,7 +9335,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
@@ -8237,7 +9411,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_BadRequestError"];
         };
       };
       /** @description Unauthorized - missing or invalid authentication token */
@@ -8246,7 +9420,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_UnauthorizedError"];
         };
       };
       /** @description Internal server error */
@@ -8255,59 +9429,12 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["market-api_InternalServerError"];
         };
       };
     };
   };
-  list_capacities_handler: {
-    parameters: {
-      query?: {
-        /** @description Maximum number of results to return (1–200, default 50). */
-        limit?: number;
-        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
-        starting_after?: components["schemas"]["market-api_CapacitiesCursor"];
-        /** @description Cursor for backward pagination. */
-        ending_before?: components["schemas"]["market-api_CapacitiesCursor"];
-        /** @description Include deleted capacities. Defaults to false. */
-        include_deleted?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated list of capacities */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ListCapacitiesResponse"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  create_capacity_handler: {
+  adminUpdateFeatureFlag: {
     parameters: {
       query?: never;
       header?: never;
@@ -8316,451 +9443,76 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["market-api_CreateCapacityRequest"];
+        "application/json": components["schemas"]["sfc-api_UpdateFeatureFlagRequest"];
       };
     };
     responses: {
-      /** @description Capacity created successfully */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_CapacityDetails"];
-        };
-      };
-      /** @description Validation failed (e.g., duplicate name or missing node template) */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  get_capacity_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Capacity details */
+      /** @description Feature flag updated */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_CapacityDetails"];
+          "application/json": components["schemas"]["sfc-api_UpdateFeatureFlagResponse"];
         };
       };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Capacity not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  delete_capacity_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Capacity deleted successfully */
-      204: {
+      /** @description No fields provided to update */
+      400: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Capacity is not empty or has an enabled scheduler */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Unauthorized request */
+      /** @description Unauthorized */
       401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Capacity not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  patch_capacity_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["market-api_PatchCapacityRequest"];
-      };
-    };
-    responses: {
-      /** @description Capacity updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_CapacityDetails"];
-        };
-      };
-      /** @description Validation failed (e.g., duplicate name or missing node template) */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Capacity or referenced node template not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  list_node_templates_handler: {
-    parameters: {
-      query?: {
-        /** @description Maximum number of results to return (1-200, default 50). */
-        limit?: number;
-        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
-        starting_after?: components["schemas"]["market-api_NodeTemplatesCursor"];
-        /** @description Cursor for backward pagination. */
-        ending_before?: components["schemas"]["market-api_NodeTemplatesCursor"];
-        /** @description Include deleted node templates. Defaults to false. */
-        include_deleted?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of node templates */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ListNodeTemplatesResponse"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  create_node_template_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["market-api_CreateNodeTemplateRequest"];
-      };
-    };
-    responses: {
-      /** @description Node template created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_NodeTemplateDetails"];
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  get_node_template_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Node template information */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_NodeTemplateDetails"];
-        };
-      };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Node template not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-    };
-  };
-  delete_node_template_handler: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Node template deleted successfully */
-      204: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Node template cannot be deleted (in use by a capacity) */
-      400: {
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
+        content?: never;
       };
-      /** @description Unauthorized request */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
-      };
-      /** @description Node template not found */
+      /** @description Feature flag not found for this id */
       404: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
+        content?: never;
       };
       /** @description Internal server error */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
+        content?: never;
       };
     };
   };
-  list_orders: {
+  adminCreateFeatureFlag: {
     parameters: {
-      query?: {
-        /** @description Filter by capacity. */
-        capacity?: components["schemas"]["market-api_CapacityId"];
-        /** @description Filter by status (can be repeated, e.g. `?status=filled&status=cancelled`). */
-        status?: components["schemas"]["market-api_v2.OrderStatus"][];
-        /** @description Only return orders placed at or after this Unix timestamp (seconds). */
-        placed_after?: number;
-        /** @description Only return orders placed at or before this Unix timestamp (seconds). */
-        placed_before?: number;
-        /** @description Sort field and direction. Prefix with `-` for descending. One of: `placed_at`, `-placed_at`, `start_time`, `-start_time`, `total_price_cents`, `-total_price_cents`. Default: `-placed_at`. */
-        sort_by?: string;
-        /** @description Maximum number of results to return (1–200, default 50). */
-        limit?: number;
-        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
-        starting_after?: components["schemas"]["market-api_OrdersCursor"];
-        /** @description Cursor for backward pagination. */
-        ending_before?: components["schemas"]["market-api_OrdersCursor"];
-      };
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateFeatureFlagRequest"];
+      };
+    };
     responses: {
-      /** @description List of orders */
-      200: {
+      /** @description Feature flag created */
+      201: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_v2.ListOrdersResponse"];
+          "application/json": components["schemas"]["sfc-api_CreateFeatureFlagResponse"];
         };
       };
       /** @description Unauthorized */
@@ -8768,22 +9520,32 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
         };
+        content?: never;
+      };
+      /** @description Feature flag already exists for this account */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Internal server error */
       500: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
-        };
+        content?: never;
       };
     };
   };
-  post_order: {
+  adminDeleteFeatureFlag: {
     parameters: {
       query?: never;
       header?: never;
@@ -8792,26 +9554,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["market-api_v2.CreateOrderRequest"];
+        "application/json": components["schemas"]["sfc-api_DeleteFeatureFlagRequest"];
       };
     };
     responses: {
-      /** @description Order created */
-      201: {
+      /** @description Feature flag deleted */
+      200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_v2.OrderResponse"];
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
+          "application/json": components["schemas"]["sfc-api_DeleteFeatureFlagResponse"];
         };
       };
       /** @description Unauthorized */
@@ -8819,17 +9572,178 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
+        content?: never;
       };
-      /** @description Insufficient balance */
-      402: {
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Feature flag not found for this id */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  publish_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID */
+        id: components["schemas"]["sfc-api_ImageId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Image published */
+      200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
+          "application/json": components["schemas"]["sfc-api_ImageListEntry"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Admin access required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Image is already published */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  set_default_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID */
+        id: components["schemas"]["sfc-api_ImageId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Default image set */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_SetDefaultImageResponse"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Admin access required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Image not found or not public */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  listInstanceSkuPropertyKeys: {
+    parameters: {
+      query?: {
+        limit?: number;
+        starting_after?: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeysCursor"];
+        ending_before?: components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeysCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of property keys */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListAdminInstanceSkuPropertyKeysResponse"];
         };
       };
       /** @description Forbidden */
@@ -8837,17 +9751,15 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
-        };
+        content?: never;
       };
-      /** @description Capacity not found */
-      404: {
+      /** @description Validation failed */
+      422: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
         };
       };
       /** @description Internal server error */
@@ -8856,12 +9768,3832 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_ErrorObject"];
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };
   };
-  get_order: {
+  createInstanceSkuPropertyKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateAdminInstanceSkuPropertyKeyRequest"];
+      };
+    };
+    responses: {
+      /** @description Property key created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeyDetail"];
+        };
+      };
+      /** @description Validation error or duplicate key */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  getInstanceSkuPropertyKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Property key, e.g. accelerator */
+        key: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Property key detail */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeyDetail"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  patchInstanceSkuPropertyKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Property key to patch */
+        key: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchAdminInstanceSkuPropertyKeyRequest"];
+      };
+    };
+    responses: {
+      /** @description Updated property key */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuPropertyKeyDetail"];
+        };
+      };
+      /** @description Invariant violation */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  listInstanceSkuPropertyValues: {
+    parameters: {
+      query?: {
+        limit?: number;
+        starting_after?: components["schemas"]["sfc-api_AdminInstanceSkuPropertyValuesCursor"];
+        ending_before?: components["schemas"]["sfc-api_AdminInstanceSkuPropertyValuesCursor"];
+      };
+      header?: never;
+      path: {
+        /** @description Property key to list values for */
+        key: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of enumeration values */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListAdminInstanceSkuPropertyValuesResponse"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  createInstanceSkuPropertyValue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Property key */
+        key: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateAdminInstanceSkuPropertyValueRequest"];
+      };
+    };
+    responses: {
+      /** @description Value created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuEnumerationValue"];
+        };
+      };
+      /** @description Validation error or duplicate value */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  getInstanceSkuPropertyValue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Property key */
+        key: components["schemas"]["sfc-api_Name"];
+        /** @description Enumeration value */
+        value: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Enumeration value */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuEnumerationValue"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key or value not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  patchInstanceSkuPropertyValue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Property key */
+        key: components["schemas"]["sfc-api_Name"];
+        /** @description Enumeration value to patch */
+        value: components["schemas"]["sfc-api_Name"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchAdminInstanceSkuPropertyValueRequest"];
+      };
+    };
+    responses: {
+      /** @description Updated value */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSkuEnumerationValue"];
+        };
+      };
+      /** @description Invariant violation */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Key or value not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  listInstanceSkus: {
+    parameters: {
+      query?: {
+        limit?: number;
+        starting_after?: components["schemas"]["sfc-api_AdminInstanceSkusCursor"];
+        ending_before?: components["schemas"]["sfc-api_AdminInstanceSkusCursor"];
+        /**
+         * @description How many minutes of past schedule to include in
+         *     `total_scheduled_supply` for each SKU.
+         */
+        schedule_history_minutes?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of instance SKUs */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListAdminInstanceSkusResponse"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  createInstanceSku: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateAdminInstanceSkuRequest"];
+      };
+    };
+    responses: {
+      /** @description Instance SKU created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSku"];
+        };
+      };
+      /** @description Validation failure */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Owner account not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  getInstanceSku: {
+    parameters: {
+      query?: {
+        /**
+         * @description How many minutes of past schedule to include in
+         *     `total_scheduled_supply`.
+         */
+        schedule_history_minutes?: number;
+      };
+      header?: never;
+      path: {
+        /** @description Instance SKU ID */
+        id: components["schemas"]["sfc-api_InstanceSkuId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance SKU with registry-enriched properties */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSku"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  putInstanceSku: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Instance SKU ID */
+        id: components["schemas"]["sfc-api_InstanceSkuId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PutAdminInstanceSkuRequest"];
+      };
+    };
+    responses: {
+      /** @description Updated instance SKU */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSku"];
+        };
+      };
+      /** @description Properties failed validation */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  deleteInstanceSku: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Instance SKU ID */
+        id: components["schemas"]["sfc-api_InstanceSkuId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance SKU destroyed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Instance SKU has active capacities and cannot be destroyed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+      /** @description Trading engine halted */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ServiceUnavailableError"];
+        };
+      };
+    };
+  };
+  patchInstanceSku: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Instance SKU ID */
+        id: components["schemas"]["sfc-api_InstanceSkuId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchAdminInstanceSkuRequest"];
+      };
+    };
+    responses: {
+      /** @description Updated instance SKU */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminInstanceSku"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Name conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  adminCreateInvoice: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description The account identifier to create an invoice for */
+        account_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_AdminCreateInvoiceRequest"];
+      };
+    };
+    responses: {
+      /** @description Invoice created and sent */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_AdminCreateInvoiceResponse"];
+        };
+      };
+      /** @description Bad request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Account not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_availability: {
+    parameters: {
+      query?: {
+        /**
+         * @description Filter SKUs before grouping. Semicolon-separated `key:value[,value...]`
+         *     pairs (e.g. `accelerator:H100`). Use keys and values from
+         *     `/v2/instance_sku_property_catalog`.
+         */
+        requirements?: string;
+        /**
+         * @description Property keys to group by. Repeatable: `?group_by=accelerator`. Each
+         *     key must be a public registry key. Empty `group_by` → a single
+         *     aggregate group.
+         */
+        group_by?: components["schemas"]["sfc-api_Name"][];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Grouped availability schedules. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListAvailabilityResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_capacities: {
+    parameters: {
+      query: {
+        /** @description Filter by workspace. */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        /** @description Filter by capacity ID, resource path, or name (repeatable). */
+        id?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"][];
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_CapacitiesCursor"];
+        /** @description Set to the response's `cursor` to fetch the previous page. */
+        ending_before?: components["schemas"]["sfc-api_CapacitiesCursor"];
+        /** @description How many minutes of past schedule to include. */
+        schedule_history_minutes?: number;
+        /**
+         * @description Filter by tag key-value pair (repeatable). Format: `key=value`
+         *     (the `=` between key and value must be percent-encoded in the URL).
+         */
+        tag?: string[];
+        /**
+         * @description Filter by tag key existence (repeatable). Returns resources that have
+         *     a tag with this key, regardless of the value.
+         */
+        tag_key?: string[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of capacities. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListCapacitiesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_capacity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateCapacityRequest"];
+      };
+    };
+    responses: {
+      /** @description Capacity created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_CapacityResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  fetch_capacity: {
+    parameters: {
+      query?: {
+        /** @description How many minutes of past schedule to include. */
+        schedule_history_minutes?: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Capacity details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_CapacityResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Capacity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_capacity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Capacity deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Capacity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Capacity has active dependencies. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  update_capacity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchCapacityRequest"];
+      };
+    };
+    responses: {
+      /** @description Capacity updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_CapacityResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Capacity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_capacity_transfers: {
+    parameters: {
+      query?: {
+        /**
+         * @description Filter by source or destination capacity (repeatable). Returns
+         *     transfers where `from_capacity_id` or `to_capacity_id` is any of the
+         *     supplied capacities.
+         */
+        capacity?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"][];
+        /** @description Filter by transfer status. */
+        status?: components["schemas"]["sfc-api_CapacityTransferStatus"];
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_CapacityTransfersCursor"];
+        /** @description Set to the response's `cursor` to fetch the previous page. */
+        ending_before?: components["schemas"]["sfc-api_CapacityTransfersCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of capacity transfers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.ListCapacityTransfersResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_capacity_transfer: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Unique key for idempotent transfer creation. */
+        "Idempotency-Key"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_v2.CreateCapacityTransferRequest"];
+      };
+    };
+    responses: {
+      /** @description Capacity transfer accepted. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.CapacityTransferResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+      /** @description Service temporarily unavailable. Try again later. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ServiceUnavailableError"];
+        };
+      };
+    };
+  };
+  fetch_capacity_transfer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Capacity transfer ID
+         * @example cxfr_abc123
+         */
+        id: components["schemas"]["sfc-api_CapacityTransferId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Capacity transfer details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.CapacityTransferResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Capacity transfer not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_deployments: {
+    parameters: {
+      query: {
+        /** @description Filter by workspace. */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        capacity?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+        limit?: number;
+        starting_after?: components["schemas"]["sfc-api_DeploymentsCursor"];
+        ending_before?: components["schemas"]["sfc-api_DeploymentsCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of deployments. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListDeploymentsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_deployment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateDeploymentRequest"];
+      };
+    };
+    responses: {
+      /** @description Deployment created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_DeploymentResponse"];
+        };
+      };
+      /** @description Deployment with this name already exists. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Capacity or node template not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_deployment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deployment details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_DeploymentResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Deployment not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_deployment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deployment deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Deployment not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  patch_deployment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchDeploymentRequest"];
+      };
+    };
+    responses: {
+      /** @description Deployment updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_DeploymentResponse"];
+        };
+      };
+      /** @description Deployment with this name already exists. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Deployment not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_grants_handler: {
+    parameters: {
+      query?: {
+        workspace_id?: components["schemas"]["sfc-api_WorkspaceId"];
+        /** @description Either a `usr_*` / legacy user id or a `tokn_*` token id. */
+        principal_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Grants listed. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListGrantsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_grant_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateGrantRequest"];
+      };
+    };
+    responses: {
+      /** @description Grant created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_GrantResponse"];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Grant already exists. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_grant_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Grant ID */
+        id: components["schemas"]["sfc-api_GrantId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Grant found. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_GrantResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Grant not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_grant_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Grant ID */
+        id: components["schemas"]["sfc-api_GrantId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Grant deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Grant not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_images: {
+    parameters: {
+      query: {
+        /**
+         * @description Filter by workspace. Pass `sfc:workspace:sfcompute:public` to list
+         *     sfc-provided public images.
+         */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        /** @description Filter by image ID (repeatable). */
+        id?: components["schemas"]["sfc-api_ImageId"][];
+        /** @description Maximum number of results to return (1-200, default 50). */
+        limit?: number;
+        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
+        starting_after?: components["schemas"]["sfc-api_ImagesCursor"];
+        /** @description Cursor for backward pagination. */
+        ending_before?: components["schemas"]["sfc-api_ImagesCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of images */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListImagesResponse"];
+        };
+      };
+      /** @description Bad request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_StartUploadRequest"];
+      };
+    };
+    responses: {
+      /** @description Image created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ImageUploadResponse"];
+        };
+      };
+      /** @description Validation failed */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  fetch_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Image details */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ImageListEntry"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Image deleted */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_DeleteImageResponse"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image cannot be deleted via this endpoint (e.g. default images) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Image is referenced by an instance template or in use by an active instance */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  complete_image_upload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CompleteUploadRequest"];
+      };
+    };
+    responses: {
+      /** @description Upload completed */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ImageUploadResponse"];
+        };
+      };
+      /** @description Validation failed */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  download_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Download URL generated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ImageDownloadResponse"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Image upload not completed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_image_upload_part_url: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_UploadPartRequest"];
+      };
+    };
+    responses: {
+      /** @description Upload URL generated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UploadPartResponse"];
+        };
+      };
+      /** @description Validation failed */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  revoke_image: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Image ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Image revoked */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ImageListEntry"];
+        };
+      };
+      /** @description Unauthorized request */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Public images can't be revoked */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Image not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Image isn't in completed status */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_instance_sku_property_catalog: {
+    parameters: {
+      query?: {
+        /** @description Maximum number of results to return (1-200, default 50). */
+        limit?: number;
+        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
+        starting_after?: string;
+        /** @description Cursor for backward pagination. */
+        ending_before?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated property catalog. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListInstanceSkuPropertyCatalogResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_instance_skus: {
+    parameters: {
+      query?: {
+        /** @description Maximum number of results to return (1-200, default 50). */
+        limit?: number;
+        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
+        starting_after?: components["schemas"]["sfc-api_InstanceSkusCursor"];
+        /** @description Cursor for backward pagination. */
+        ending_before?: components["schemas"]["sfc-api_InstanceSkusCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of instance SKUs. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListInstanceSkusResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_instance_sku: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Instance SKU ID */
+        id: components["schemas"]["sfc-api_InstanceSkuId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance SKU details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceSku"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance SKU not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_instance_templates: {
+    parameters: {
+      query: {
+        /** @description Filter by workspace. */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        /** @description Filter by instance template ID or name (repeatable). */
+        id?: components["schemas"]["sfc-api_ResourcePathOrId_InstanceTemplateId"][];
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_InstanceTemplatesCursor"];
+        /** @description Set to the response's `cursor` to fetch the previous page. */
+        ending_before?: components["schemas"]["sfc-api_InstanceTemplatesCursor"];
+        /** @description Additional fields to include in the response. */
+        include?: components["schemas"]["sfc-api_InstanceTemplateInclude"][];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of instance templates. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListInstanceTemplatesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_instance_template: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateInstanceTemplateRequest"];
+      };
+    };
+    responses: {
+      /** @description Instance template created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceTemplateResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  fetch_instance_template: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance template details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceTemplateResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance template not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_instance_template: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance template deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance template not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Instance template is in use. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_instances: {
+    parameters: {
+      query: {
+        /** @description Filter by workspace. */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        /**
+         * @description Filter by instance ID (repeatable).
+         * @example inst_k3R-nX9vLm7Qp2Yw5Jd8F
+         */
+        id?: components["schemas"]["sfc-api_InstanceId"][];
+        /** @description Filter by capacity. */
+        capacity?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+        /** @description Filter by instance status (repeatable). */
+        status?: components["schemas"]["sfc-api_InstanceStatus"][];
+        limit?: number;
+        /** @description Cursor for forward pagination (from a previous response's `cursor` field). */
+        starting_after?: components["schemas"]["sfc-api_InstancesCursor"];
+        /** @description Cursor for backward pagination. */
+        ending_before?: components["schemas"]["sfc-api_InstancesCursor"];
+        /** @description Additional fields to include in the response. */
+        include?: components["schemas"]["sfc-api_InstanceInclude"][];
+        /**
+         * @description Filter by tag key-value pair (repeatable). Format: `key=value`
+         *     (the `=` between key and value must be percent-encoded in the URL).
+         */
+        tag?: string[];
+        /**
+         * @description Filter by tag key existence (repeatable). Returns resources that have
+         *     a tag with this key, regardless of the value.
+         */
+        tag_key?: string[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of instances. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListInstancesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Capacity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_instance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateInstanceRequest"];
+      };
+    };
+    responses: {
+      /** @description Instance created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Capacity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation error (e.g. capacity limit reached). */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  batch_patch_instances: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_BatchPatchInstancesRequest"];
+      };
+    };
+    responses: {
+      /** @description Instances updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BatchPatchInstancesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Unknown instance, cross-workspace batch, or batch over the entry cap. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  fetch_instance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_instance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Instance must be terminated before deletion. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  update_instance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchInstanceRequest"];
+      };
+    };
+    responses: {
+      /** @description Instance updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceResponse"];
+        };
+      };
+      /** @description Validation error (e.g. duplicate name). */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Instance not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_instance_logs: {
+    parameters: {
+      query?: {
+        /** @description Return logs with `seqnum` less than or equal to this value. */
+        seqnum_before?: number;
+        /** @description Return logs with `seqnum` greater than or equal to this value. */
+        seqnum_after?: number;
+        /**
+         * @description Due to clock synchronization, some earlier log messages may have a
+         *     realtime timestamp after this value.
+         */
+        realtime_timestamp_before?: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description Due to clock synchronization, some later log messages may have a
+         *     realtime timestamp before this value.
+         */
+        realtime_timestamp_after?: components["schemas"]["sfc-api_UnixEpoch"];
+        sort_by?: "seqnum" | "-seqnum";
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Log chunks. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceLogsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_instance_ssh: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description SSH connection details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceSshInfo"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description SSH details not available. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  terminate_instance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Instance terminated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InstanceResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Instance not found or already terminated. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_order_preview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_v2.OrderPreviewRequest"];
+      };
+    };
+    responses: {
+      /** @description Estimate result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.OrderPreviewResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_orderbook_depth: {
+    parameters: {
+      query: {
+        /**
+         * @description URL-safe `field[:op]:value` triples joined by `;`.
+         * @example accelerator:H100
+         */
+        requirements?: string;
+        /**
+         * @description Start of the delivery window.
+         * @example 1746057600
+         */
+        start_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description End of the delivery window.
+         * @example 1746662400
+         */
+        end_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /** @description Maximum levels returned per side. Clamped to [1, 100]. Default 20. */
+        depth?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Market depth. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_OrderbookDepthResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_orderbook_fills: {
+    parameters: {
+      query: {
+        /**
+         * @description URL-safe `field[:op]:value` triples joined by `;`.
+         * @example accelerator:H100
+         */
+        requirements?: string;
+        /**
+         * @description Start of the delivery window.
+         * @example 1746057600
+         */
+        start_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description End of the delivery window.
+         * @example 1746662400
+         */
+        end_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description Lower bound on the contract's `created_at` (when the fill was
+         *     recorded). Unix epoch seconds. Defaults to `now - 7d`; clamped to at
+         *     most 90 days before `now` to bound scan cost.
+         * @example 1745452800
+         */
+        since_at?: components["schemas"]["sfc-api_UnixEpoch"];
+        /** @description Maximum results to return. Clamped to [1, 200]. Default 50. */
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next (older) page. */
+        starting_after?: components["schemas"]["sfc-api_OrderbookFillsCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of fills. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListOrderbookFillsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_orderbook_quote: {
+    parameters: {
+      query: {
+        /**
+         * @description URL-safe `field[:op]:value` triples joined by `;`.
+         * @example accelerator:H100
+         */
+        requirements?: string;
+        /**
+         * @description Start of the delivery window.
+         * @example 1746057600
+         */
+        start_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description End of the delivery window.
+         * @example 1746662400
+         */
+        end_at: components["schemas"]["sfc-api_UnixEpoch"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Market quote. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_OrderbookQuoteResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_orderbook_windows: {
+    parameters: {
+      query: {
+        /**
+         * @description URL-safe `field[:op]:value` triples joined by `;`.
+         * @example accelerator:H100
+         */
+        requirements?: string;
+        /**
+         * @description Start of the delivery-window range to browse. Unix epoch seconds,
+         *     minute-aligned.
+         * @example 1746057600
+         */
+        range_start_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description End of the delivery-window range to browse. Unix epoch seconds,
+         *     minute-aligned, must be > `range_start_at`.
+         * @example 1748649600
+         */
+        range_end_at: components["schemas"]["sfc-api_UnixEpoch"];
+        /** @description Maximum results to return. Clamped to [1, 200]. Default 50. */
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_OrderbookWindowsCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Active windows in the range. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListOrderbookWindowsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_orders: {
+    parameters: {
+      query?: {
+        /** @description Filter by order ID (repeatable). */
+        id?: components["schemas"]["sfc-api_OrderId"][];
+        /** @description Filter by capacity. */
+        capacity?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+        side?: components["schemas"]["sfc-api_Side"];
+        /** @description Filter by status (repeatable). */
+        status?: components["schemas"]["sfc-api_OrderStatus"][];
+        created_after?: components["schemas"]["sfc-api_UnixEpoch"];
+        created_before?: components["schemas"]["sfc-api_UnixEpoch"];
+        /**
+         * @description Filter to one procurement's orders (ID or resource path).
+         *     Without it, the list omits procurement orders.
+         */
+        procurement?: components["schemas"]["sfc-api_ResourcePathOrId_ProcurementId"];
+        /** @description Prefix with `-` for descending. */
+        sort_by?: components["schemas"]["sfc-api_v2.OrderSortBy"];
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_OrdersCursor"];
+        /** @description Set to the response's `cursor` to fetch the previous page. */
+        ending_before?: components["schemas"]["sfc-api_OrdersCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated list of orders. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.ListOrdersResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_order: {
+    parameters: {
+      query?: never;
+      header?: {
+        /** @description Unique key to ensure idempotent order creation. If provided, duplicate requests with the same key will not place a new order and return the original order. */
+        "Idempotency-Key"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_v2.CreateOrderRequest"];
+      };
+    };
+    responses: {
+      /** @description Order created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_v2.OrderResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Insufficient balance. */
+      402: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_PaymentRequiredError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+      /** @description Service temporarily unavailable. Try again later. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ServiceUnavailableError"];
+        };
+      };
+    };
+  };
+  fetch_order: {
     parameters: {
       query?: never;
       header?: never;
@@ -8870,67 +13602,46 @@ export interface operations {
          * @description Order ID
          * @example ordr_xyz789
          */
-        id: components["schemas"]["market-api_OrderId"];
+        id: components["schemas"]["sfc-api_OrderId"];
       };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Order details */
+      /** @description Order details. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_v2.OrderResponse"];
+          "application/json": components["schemas"]["sfc-api_v2.OrderResponse"];
         };
       };
-      /** @description Unauthorized - missing or invalid authentication token */
+      /** @description Unauthorized. */
       401: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          /**
-           * @example {
-           *       "type": "authentication_error",
-           *       "message": "missing authentication token",
-           *       "details": []
-           *     }
-           */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
         };
       };
-      /** @description Order not found */
+      /** @description Order not found. */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          /**
-           * @example {
-           *       "type": "not_found",
-           *       "message": "Order not found",
-           *       "details": []
-           *     }
-           */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
         };
       };
-      /** @description Internal server error */
+      /** @description Internal server error. */
       500: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          /**
-           * @example {
-           *       "type": "api_error",
-           *       "message": "An internal server error occurred",
-           *       "details": []
-           *     }
-           */
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };
@@ -8944,74 +13655,58 @@ export interface operations {
          * @description Order ID
          * @example ordr_xyz789
          */
-        id: components["schemas"]["market-api_OrderId"];
+        id: components["schemas"]["sfc-api_OrderId"];
       };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Order cancellation initiated */
+      /** @description Order cancellation initiated. */
       204: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Order cannot be cancelled */
-      400: {
+      /** @description Unauthorized. */
+      401: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
         };
       };
-      /** @description Order not found */
+      /** @description Order not found. */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
         };
       };
-      /** @description Internal server error */
+      /** @description Order cannot be cancelled. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
       500: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["market-api_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };
   };
-  list_batches: {
-    parameters: {
-      query: {
-        /** @description Maximum number of items to return */
-        limit: number;
-        /** @description Pagination offset */
-        after: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description List of batches */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_Batch"][];
-        };
-      };
-    };
-  };
-  create_batches: {
+  check_permission_handler: {
     parameters: {
       query?: never;
       header?: never;
@@ -9020,255 +13715,1062 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["large_scale_inference_BatchRequest"];
+        "application/json": components["schemas"]["sfc-api_CheckPermissionRequest"];
       };
     };
     responses: {
-      /** @description Batches created */
-      201: {
+      /** @description Permission evaluated. */
+      200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["large_scale_inference_Batch"][];
+          "application/json": components["schemas"]["sfc-api_PermissionCheckResponse"];
         };
       };
-      /** @description Invalid request */
+      /** @description Bad request. */
       400: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
         };
       };
-      /** @description Rate limit exceeded */
-      429: {
+      /** @description Unauthorized. */
+      401: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
         };
       };
-      /** @description Internal server error */
+      /** @description Internal server error. */
       500: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };
   };
-  get_batch: {
+  list_procurements: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description The batch identifier */
-        batch_id: string;
+      query: {
+        /** @description Filter by workspace. */
+        workspace: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"];
+        capacity?: components["schemas"]["sfc-api_ResourcePathOrId_CapacityId"];
+        limit?: number;
+        starting_after?: components["schemas"]["sfc-api_ProcurementsCursor"];
+        ending_before?: components["schemas"]["sfc-api_ProcurementsCursor"];
       };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Batch found */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_Batch"];
-        };
-      };
-      /** @description Batch not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  archive_batch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description The batch identifier */
-        batch_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Batch archived */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Batch not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  cancel_batch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Batch identifier */
-        batch_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Batch cancelled */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_Batch"];
-        };
-      };
-      /** @description Batch not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  retry_batch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description The batch identifier */
-        batch_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Batch retried */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_Batch"];
-        };
-      };
-      /** @description Batch not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-      /** @description Internal server error */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["large_scale_inference_SerdeErrorProxy"];
-        };
-      };
-    };
-  };
-  get_models: {
-    parameters: {
-      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description List available models */
+      /** @description Paginated list of procurements. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["large_scale_inference_Model"][];
+          "application/json": components["schemas"]["sfc-api_ListProcurementsResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };
   };
-  get_feature_flag: {
+  create_procurement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateProcurementRequest"];
+      };
+    };
+    responses: {
+      /** @description Procurement created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ProcurementResponse"];
+        };
+      };
+      /** @description Validation error (e.g. duplicate name). */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Capacity already has a procurement. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ConflictError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_procurement: {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        feature_flag_id: string;
+        id: string;
       };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Feature flag status */
+      /** @description Procurement details. */
       200: {
-        headers: { [name: string]: unknown };
+        headers: {
+          [name: string]: unknown;
+        };
         content: {
-          "application/json": {
-            enabled: boolean;
-          };
+          "application/json": components["schemas"]["sfc-api_ProcurementResponse"];
         };
       };
-      /** @description Feature flag not found */
-      404: {
-        headers: { [name: string]: unknown };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Procurement not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_procurement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Procurement deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Procurement not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  patch_procurement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchProcurementRequest"];
+      };
+    };
+    responses: {
+      /** @description Procurement updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ProcurementResponse"];
+        };
+      };
+      /** @description Validation error (e.g. duplicate name). */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Procurement not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Validation failed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_roles_handler: {
+    parameters: {
+      query?: {
+        /** @description Filter by role ID, resource path, or name (repeatable). */
+        id?: components["schemas"]["sfc-api_ResourcePathOrId_RoleId"][];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of roles. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListRolesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Validation error. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_role_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateRoleRequest"];
+      };
+    };
+    responses: {
+      /** @description Role created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_RoleResponse"];
+        };
+      };
+      /** @description Invalid policy. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_role_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Role ID, resource path, or name */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Role details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_RoleResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Role not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  update_role_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Role ID, resource path, or name */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_UpdateRoleRequest"];
+      };
+    };
+    responses: {
+      /** @description Role updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_RoleResponse"];
+        };
+      };
+      /** @description Invalid policy. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Role not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_role_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Role ID, name, or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Role deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Role not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_users_handler: {
+    parameters: {
+      query?: {
+        /** @description Filter by user ID or resource path (repeatable). */
+        id?: components["schemas"]["sfc-api_ResourcePathOrId_UserId"][];
+        limit?: number;
+        /** @description Set to the response's `cursor` to fetch the next page. */
+        starting_after?: components["schemas"]["sfc-api_UsersCursor"];
+        /** @description Set to the response's `cursor` to fetch the previous page. */
+        ending_before?: components["schemas"]["sfc-api_UsersCursor"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description A paginated list of users. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListUsersResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description Validation error. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_user_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description User ID or resource path */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description User details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UserResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Forbidden. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ForbiddenError"];
+        };
+      };
+      /** @description User not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  list_workspaces_handler: {
+    parameters: {
+      query?: {
+        /** @description Filter by workspace ID, resource path, or name (repeatable). */
+        id?: components["schemas"]["sfc-api_ResourcePathOrId_WorkspaceId"][];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of workspaces. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_ListWorkspacesResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Validation error. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  create_workspace_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_CreateWorkspaceRequest"];
+      };
+    };
+    responses: {
+      /** @description Workspace created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_WorkspaceResponse"];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  get_workspace_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Workspace name or ID */
+        workspace: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workspace details. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_WorkspaceResponse"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Workspace not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  delete_workspace_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Workspace name or ID */
+        workspace: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workspace deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Workspace not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Workspace is not empty. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnprocessableEntityError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
+        };
+      };
+    };
+  };
+  patch_workspace_handler: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Workspace name or ID */
+        workspace: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["sfc-api_PatchWorkspaceRequest"];
+      };
+    };
+    responses: {
+      /** @description Workspace updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_WorkspaceResponse"];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_BadRequestError"];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_UnauthorizedError"];
+        };
+      };
+      /** @description Workspace not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_NotFoundError"];
+        };
+      };
+      /** @description Internal server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["sfc-api_InternalServerError"];
         };
       };
     };

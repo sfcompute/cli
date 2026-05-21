@@ -6,7 +6,7 @@ export async function getDefaultWorkspace(): Promise<string> {
   let accountId = config.account_id;
   if (!accountId) {
     const client = await apiClient();
-    const { data } = await client.GET("/v0/me");
+    const { data } = await client.GET("/v1/account/me", {});
     if (data?.id) {
       await saveConfig({ ...config, account_id: data.id });
       accountId = data.id;

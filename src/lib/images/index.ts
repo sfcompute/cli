@@ -1,12 +1,12 @@
-import type { Command } from "@commander-js/extra-typings";
-import get from "./get.tsx";
-import list from "./list.ts";
-import upload from "./upload.ts";
+import { Command } from "@commander-js/extra-typings";
+import { createGet } from "./get.tsx";
+import { createList } from "./list.ts";
+import { createUpload } from "./upload.ts";
 
-export function registerImages(program: Command) {
-  const images = program
-    .command("images")
+export function createImagesCommand() {
+  const images = new Command("images")
     .alias("image")
+    .alias("os")
     .description("Manage images")
     .showHelpAfterError()
     .addHelpText(
@@ -23,10 +23,15 @@ Examples:\n
   $ sf images get <image-id>
 `,
     )
-    .addCommand(list)
-    .addCommand(upload)
-    .addCommand(get)
+    .addCommand(createList())
+    .addCommand(createUpload())
+    .addCommand(createGet())
     .action(() => {
       images.help();
     });
+  return images;
+}
+
+export function registerImages(program: Command) {
+  program.addCommand(createImagesCommand());
 }

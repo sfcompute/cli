@@ -65,7 +65,7 @@ export async function getProcurement({ id }: { id: string }) {
   });
 
   if (!res.response.ok) {
-    throw new Error(res.error?.message || "Failed to get procurement");
+    throw new Error(res.error?.error?.message || "Failed to get procurement");
   }
 
   return res.data ?? null;

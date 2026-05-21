@@ -10,27 +10,24 @@ import Link from "ink-link";
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import { formatDate } from "../../helpers/format-time.ts";
+import type { components } from "../../schema.ts";
 import { Row } from "../Row.tsx";
 
 dayjs.extend(utc);
 dayjs.extend(advanced);
 dayjs.extend(timezone);
 
+type Image = components["schemas"]["sfc-api_ImageListEntry"];
+type Download = components["schemas"]["sfc-api_ImageDownloadResponse"];
+
 function ImageDisplay({
   image,
   download,
 }: {
-  image: {
-    name: string;
-    id: string;
-    upload_status: string;
-    sha256_hash: string | null;
-  };
-  download: { url: string; expires_at: number } | null;
+  image: Image;
+  download: Download | null;
 }) {
-  const expiresAt = download?.expires_at
-    ? new Date(download.expires_at * 1000)
-    : null;
+  const expiresAt = download ? new Date(download.expires_at * 1000) : null;
   const isExpired = expiresAt ? expiresAt < new Date() : false;
 
   return (
@@ -43,7 +40,7 @@ function ImageDisplay({
 
       <Box paddingX={1} flexDirection="column">
         <Row head="Status: " value={formatStatusInk(image.upload_status)} />
-        {image.sha256_hash && <Row head="SHA256: " value={image.sha256_hash} />}
+        {image.sha256 && <Row head="SHA256: " value={image.sha256} />}
         {download && (
           <>
             <Row
@@ -92,50 +89,48 @@ function formatStatusInk(status: string): React.ReactElement {
       return <Text color="cyan">Completed</Text>;
     case "failed":
       return <Text color="red">Failed</Text>;
+    case "revoked":
+      return <Text color="red">Revoked</Text>;
     default:
       return <Text dimColor>Unknown</Text>;
   }
 }
 
-const get = new Command("get")
-  .description("Get image details and download URL")
-  .argument("<id>", "Image ID or name")
-  .option("--json", "Output JSON")
-  .action(async (id, opts) => {
-    const client = await apiClient();
+export function createGet() {
+  return new Command("get")
+    .alias("show")
+    .description("Get image details and download URL")
+    .argument("<id>", "Image ID or name")
+    .option("--json", "Output JSON")
+    .action(async (id, opts) => {
+      const client = await apiClient();
 
-    const { data: image, response } = await client.GET("/v2/images/{id}", {
-      params: { path: { id } },
-    });
-    if (!response.ok || !image) {
-      logAndQuit(
-        `Failed to get image: ${response.status} ${response.statusText}`,
+      const { data: image, response } = await client.GET(
+        "/preview/v2/images/{id}",
+        { params: { path: { id } } },
       );
-    }
-
-    // Fetch download URL if image is completed
-    let download = null;
-    if (image.upload_status === "completed") {
-      const { data: downloadData, response: downloadResponse } =
-        await client.GET("/v2/images/{id}/download", {
-          params: { path: { id } },
-        });
-      if (downloadResponse.ok && downloadData) {
-        download = downloadData;
+      if (!response.ok || !image) {
+        logAndQuit(
+          `Failed to get image: ${response.status} ${response.statusText}`,
+        );
       }
-    }
 
-    if (opts.json) {
-      console.log(JSON.stringify({ ...image, download }, null, 2));
-      return;
-    }
+      let download: Download | null = null;
+      if (image.upload_status === "completed") {
+        const { data: downloadData } = await client.GET(
+          "/preview/v2/images/{id}/download",
+          { params: { path: { id } } },
+        );
+        if (downloadData) {
+          download = downloadData;
+        }
+      }
 
-    render(
-      <ImageDisplay
-        image={{ ...image, sha256_hash: image.sha256_hash ?? null }}
-        download={download}
-      />,
-    );
-  });
+      if (opts.json) {
+        console.log(JSON.stringify({ ...image, download }, null, 2));
+        return;
+      }
 
-export default get;
+      render(<ImageDisplay image={image} download={download} />);
+    });
+}
