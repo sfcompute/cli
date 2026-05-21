@@ -42,6 +42,21 @@ async function main() {
     .description("The San Francisco Compute command line tool.")
     .version(pkg.version);
 
+  // Hydrate `account_id` before registering commands so feature-flag-gated
+  // surfaces (e.g. `--enable-infiniband` on `sf nodes create`) resolve
+  // correctly on the very first CLI invocation after login, rather than only
+  // appearing after the cache has been seeded by a previous run.
+  const config = await loadConfig();
+  let exchangeAccountId = config.account_id;
+  if (!exchangeAccountId) {
+    const client = await apiClient(config.auth_token);
+    const { data } = await client.GET("/v1/account/me", {});
+    if (data?.id) {
+      exchangeAccountId = data.id;
+      await saveConfig({ ...config, account_id: data.id });
+    }
+  }
+
   // commands
   registerLogin(program);
   registerContracts(program);
@@ -83,18 +98,6 @@ async function main() {
       await ensureAnalyticsShutdown();
       process.exit(0);
     });
-
-    const config = await loadConfig();
-    let exchangeAccountId = config.account_id;
-
-    if (!exchangeAccountId) {
-      const client = await apiClient(config.auth_token);
-      const { data } = await client.GET("/v1/account/me", {});
-      if (data?.id) {
-        exchangeAccountId = data.id;
-        saveConfig({ ...config, account_id: data.id });
-      }
-    }
 
     program.exitOverride((error) => {
       let isError = true;
