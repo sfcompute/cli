@@ -42,8 +42,16 @@ async function main() {
     // If the user is already on the latest version of the legacy CLI, nudge
     // them toward the new Rust CLI instead of showing nothing. We avoid
     // double-stacking with the upgrade banner since users on outdated builds
-    // need to upgrade before migrating.
-    if (!shownUpgradeBanner && !process.argv.slice(2).includes("migrate")) {
+    // need to upgrade before migrating, and skip the banner for the
+    // `upgrade` / `migrate` commands themselves (where it'd just be noise)
+    // and for users who've opted out via SF_CLI_DISABLE_MIGRATE_BANNER.
+    const subcommand = process.argv[2];
+    if (
+      !shownUpgradeBanner &&
+      subcommand !== "migrate" &&
+      subcommand !== "upgrade" &&
+      !process.env.SF_CLI_DISABLE_MIGRATE_BANNER
+    ) {
       showMigrateBanner();
     }
   }

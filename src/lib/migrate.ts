@@ -19,7 +19,8 @@ We're moving to a Rust CLI with new commands like
 Run 'sf migrate' to install it. Your current sf will
 be moved to 'sf-old' so you can keep using it.
 
-Docs: ${MIGRATION_GUIDE_URL}`;
+Docs:  ${MIGRATION_GUIDE_URL}
+Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
 
   console.log(
     boxen(chalk.cyan(message), {
@@ -54,14 +55,33 @@ async function runInstallScript(script: string): Promise<boolean> {
     env: process.env,
   });
 
-  bashProcess.stdin.write(script);
-  bashProcess.stdin.end();
-
-  const code = await new Promise<number | null>((resolve) => {
-    bashProcess.on("close", resolve);
+  // Without an error listener, spawn failures (ENOENT/EACCES on bash) emit
+  // an unhandled 'error' event and crash the CLI instead of returning false.
+  const spawnError = new Promise<Error>((resolve) => {
+    bashProcess.once("error", resolve);
   });
 
-  return code === 0;
+  try {
+    bashProcess.stdin.write(script);
+    bashProcess.stdin.end();
+  } catch {
+    // If stdin is already torn down (e.g. spawn failed synchronously), the
+    // 'error' event handler below will surface the real reason.
+  }
+
+  const result = await Promise.race([
+    new Promise<{ kind: "close"; code: number | null }>((resolve) => {
+      bashProcess.once("close", (code) => resolve({ kind: "close", code }));
+    }),
+    spawnError.then((err) => ({ kind: "error" as const, err })),
+  ]);
+
+  if (result.kind === "error") {
+    console.error(chalk.red(`Failed to run bash: ${result.err.message}`));
+    return false;
+  }
+
+  return result.code === 0;
 }
 
 export async function handleMigrate(): Promise<boolean> {
