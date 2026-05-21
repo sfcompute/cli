@@ -21,6 +21,7 @@ import {
 } from "../../helpers/units.ts";
 import { handleNodesError, nodesClient } from "../../nodesClient.ts";
 import { GPUS_PER_NODE } from "../constants.ts";
+import { isFeatureEnabled } from "../posthog.ts";
 import {
   createNodesTable,
   durationOption,
@@ -68,11 +69,9 @@ function validateCount(val: string): number {
   return parsed;
 }
 
-export function createCreateCommand({
-  enableInfiniband,
-}: {
-  enableInfiniband: boolean;
-}) {
+export async function createCreateCommand() {
+  const enableInfiniband = await isFeatureEnabled("infiniband-preview");
+
   const create = new Command("create")
     .description("Create reserved or auto reserved nodes")
     .showHelpAfterError()
