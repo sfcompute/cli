@@ -22,6 +22,7 @@ import { registerDev } from "./lib/dev.ts";
 import { registerImages } from "./lib/images/index.ts";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
+import { registerMigrate, showMigrateBanner } from "./lib/migrate.ts";
 import { registerNodes } from "./lib/nodes/index.ts";
 import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerScale } from "./lib/scale/index.tsx";
@@ -34,7 +35,17 @@ async function main() {
   const program = new Command();
 
   if (!process.argv.includes("--json")) {
-    await Promise.all([checkVersion(), getAppBanner()]);
+    const [shownUpgradeBanner] = await Promise.all([
+      checkVersion(),
+      getAppBanner(),
+    ]);
+    // If the user is already on the latest version of the legacy CLI, nudge
+    // them toward the new Rust CLI instead of showing nothing. We avoid
+    // double-stacking with the upgrade banner since users on outdated builds
+    // need to upgrade before migrating.
+    if (!shownUpgradeBanner && !process.argv.slice(2).includes("migrate")) {
+      showMigrateBanner();
+    }
   }
 
   program
@@ -63,6 +74,7 @@ async function main() {
   registerBalance(program);
   registerTokens(program);
   registerUpgrade(program);
+  registerMigrate(program);
   await registerScale(program);
   registerMe(program);
   await registerVM(program);
