@@ -15,8 +15,8 @@ export function showMigrateBanner() {
 like 'sf availability', 'sf capacities', and 'sf orders'.
 
 Migrating also opts you into our public preview, which
-lets you resell unused compute back to the market and
-earn credits.
+lets you resell unused compute back on our orderbook
+and earn credits.
 
 Run 'sf migrate' to install it. Your current sf will
 be moved to 'sf-old' so you can keep using it.
