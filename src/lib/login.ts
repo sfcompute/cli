@@ -97,9 +97,17 @@ async function getSession({ token }: { token: string }) {
       },
     });
 
-    return response.data as {
+    // The auth JWT is returned as `token` today; accept `api_token` as a
+    // fallback so the CLI is forward-compatible with a server-side rename.
+    const data = response.data as {
       validation?: string;
       token?: string;
+      api_token?: string;
+    };
+
+    return {
+      validation: data.validation,
+      token: data.token ?? data.api_token,
     };
   } catch (error) {
     console.error("Error getting session:", error);
