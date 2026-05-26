@@ -7,19 +7,16 @@ import chalk from "chalk";
 import ora from "ora";
 
 const NEW_CLI_INSTALL_URL = "https://cli.sfcompute.com";
-const MIGRATION_GUIDE_URL =
-  "https://docs.sfcompute.com/preview/guides/migrating-from-nodes";
+const MIGRATION_GUIDE_URL = "https://sfcompute.com/migrate";
 
 export function showMigrateBanner() {
-  const message = `We've rewritten sf in Rust — faster, with new commands
-like 'sf availability', 'sf capacities', and 'sf orders'.
+  const message = `We've rewritten the sf CLI in Rust.
 
-Migrating also opts you into our public preview, which
-lets you resell unused compute back on our orderbook
-and earn credits.
+List idle capacity on the orderbook to
+recoup up to 20% of your spend.
 
-Run 'sf migrate' to install it. Your current sf will
-be moved to 'sf-old' so you can keep using it.
+Run 'sf migrate' to switch. Your current
+CLI stays as 'sf-old'.
 
 Docs:  ${MIGRATION_GUIDE_URL}
 Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
@@ -33,74 +30,69 @@ Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
   );
 }
 
-async function fetchInstallScript(): Promise<string | null> {
-  const spinner = ora("Downloading install script").start();
-  try {
-    const response = await fetch(NEW_CLI_INSTALL_URL);
-    if (!response.ok) {
-      spinner.fail("Failed to download install script.");
-      return null;
-    }
-    const script = await response.text();
-    spinner.succeed();
-    return script;
-  } catch (err) {
-    spinner.fail("Failed to download install script.");
-    console.error(err);
-    return null;
-  }
-}
+export function registerMigrate(program: Command) {
+  return program
+    .command("migrate")
+    .description("Install the new Rust-based sf CLI")
+    .action(async () => {
+      const spinner = ora("Downloading install script").start();
+      let script: string;
+      try {
+        const response = await fetch(NEW_CLI_INSTALL_URL);
+        if (!response.ok) {
+          spinner.fail("Failed to download install script.");
+          process.exit(1);
+        }
+        script = await response.text();
+        spinner.succeed();
+      } catch (err) {
+        spinner.fail("Failed to download install script.");
+        console.error(err);
+        process.exit(1);
+      }
 
-async function runInstallScript(script: string): Promise<boolean> {
-  const bashProcess = spawn("bash", [], {
-    stdio: ["pipe", "inherit", "inherit"],
-    env: process.env,
-  });
+      console.log(chalk.cyan("\nInstalling the new Rust sf CLI...\n"));
 
-  // Without an error listener, spawn failures (ENOENT/EACCES on bash) emit
-  // an unhandled 'error' event and crash the CLI instead of returning false.
-  const spawnError = new Promise<Error>((resolve) => {
-    bashProcess.once("error", resolve);
-  });
+      const bashProcess = spawn("bash", [], {
+        stdio: ["pipe", "inherit", "inherit"],
+        env: process.env,
+      });
 
-  try {
-    bashProcess.stdin.write(script);
-    bashProcess.stdin.end();
-  } catch {
-    // If stdin is already torn down (e.g. spawn failed synchronously), the
-    // 'error' event handler below will surface the real reason.
-  }
+      // Without an error listener, spawn failures (ENOENT/EACCES on bash) emit
+      // an unhandled 'error' event and crash the CLI instead of exiting cleanly.
+      const spawnError = new Promise<Error>((resolve) => {
+        bashProcess.once("error", resolve);
+      });
 
-  const result = await Promise.race([
-    new Promise<{ kind: "close"; code: number | null }>((resolve) => {
-      bashProcess.once("close", (code) => resolve({ kind: "close", code }));
-    }),
-    spawnError.then((err) => ({ kind: "error" as const, err })),
-  ]);
+      try {
+        bashProcess.stdin.write(script);
+        bashProcess.stdin.end();
+      } catch {
+        // If stdin is already torn down (e.g. spawn failed synchronously), the
+        // 'error' event handler below will surface the real reason.
+      }
 
-  if (result.kind === "error") {
-    console.error(chalk.red(`Failed to run bash: ${result.err.message}`));
-    return false;
-  }
+      const result = await Promise.race([
+        new Promise<{ kind: "close"; code: number | null }>((resolve) => {
+          bashProcess.once("close", (code) => resolve({ kind: "close", code }));
+        }),
+        spawnError.then((err) => ({ kind: "error" as const, err })),
+      ]);
 
-  return result.code === 0;
-}
+      if (result.kind === "error") {
+        console.error(chalk.red(`Failed to run bash: ${result.err.message}`));
+        process.exit(1);
+      }
 
-export async function handleMigrate(): Promise<boolean> {
-  const script = await fetchInstallScript();
-  if (!script) return false;
+      if (result.code !== 0) {
+        console.error(chalk.red("\nMigration failed."));
+        process.exit(1);
+      }
 
-  console.log(chalk.cyan("\nInstalling the new Rust sf CLI...\n"));
-  const ok = await runInstallScript(script);
-  if (!ok) {
-    console.error(chalk.red("\nMigration failed."));
-    return false;
-  }
-
-  console.log(
-    boxen(
-      chalk.cyan(
-        `You're on the new sf.
+      console.log(
+        boxen(
+          chalk.cyan(
+            `You're on the new sf.
 
 Your previous CLI is still available as 'sf-old'.
 
@@ -109,23 +101,14 @@ Next steps:
   sf availability
 
 Migration guide: ${MIGRATION_GUIDE_URL}`,
-      ),
-      {
-        padding: 1,
-        borderColor: "cyan",
-        borderStyle: "round",
-      },
-    ),
-  );
-  return true;
-}
-
-export function registerMigrate(program: Command) {
-  return program
-    .command("migrate")
-    .description("Install the new Rust-based sf CLI")
-    .action(async () => {
-      const success = await handleMigrate();
-      process.exit(success ? 0 : 1);
+          ),
+          {
+            padding: 1,
+            borderColor: "cyan",
+            borderStyle: "round",
+          },
+        ),
+      );
+      process.exit(0);
     });
 }
