@@ -34,6 +34,14 @@ import { registerZones } from "./lib/zones.tsx";
 async function main() {
   const program = new Command();
 
+  // `sf migrate` replaces this binary outright, so auto-upgrading the legacy
+  // CLI first would be wasted work — and worse, the install scripts target
+  // the same `~/.local/bin/sf` path, so racing them risks clobbering the new
+  // Rust binary the user is about to install.
+  if (process.argv[2] === "migrate") {
+    process.env.SF_CLI_DISABLE_AUTO_UPGRADE = "1";
+  }
+
   if (!process.argv.includes("--json")) {
     const [shownUpgradeBanner] = await Promise.all([
       checkVersion(),
