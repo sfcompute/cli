@@ -110,7 +110,7 @@ Next steps:
   sf login
   sf availability
 
-Migration guide: ${MIGRATION_GUIDE_URL}`,
+Docs: ${MIGRATION_GUIDE_URL}`,
           ),
           {
             padding: 1,
