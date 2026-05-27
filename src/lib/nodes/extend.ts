@@ -224,14 +224,22 @@ async function extendNodeAction(
         confirmationMessage += ` for ~$${pricePerNodeHour.toFixed(2)}/node/hr`;
       } else if (filteredQuotes.length > 1) {
         const durationHours = options.duration! / 3600;
-        const totalPricePerHour = filteredQuotes.reduce((acc, quote) => {
-          if (!quote.value) return acc;
-          const pricePerGpuHour = getPricePerGpuHourFromQuote(quote.value);
+        const pricedQuotes = filteredQuotes.filter((q) => q.value);
+        const totalPricePerHour = pricedQuotes.reduce((acc, quote) => {
+          const pricePerGpuHour = getPricePerGpuHourFromQuote(quote.value!);
           const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
           return acc + pricePerNodeHour;
         }, 0);
         const totalEstimate = totalPricePerHour * durationHours;
-        confirmationMessage += ` for ~$${totalEstimate.toFixed(0)}`;
+        if (pricedQuotes.length < extendableNodes.length) {
+          // Some nodes had no liquidity quote; flag that the estimate only
+          // covers the priced subset so the user isn't surprised by a higher bill.
+          confirmationMessage += ` for ~$${totalEstimate.toFixed(2)} (estimate covers ${pricedQuotes.length} of ${extendableNodes.length} ${pluralizeNodes(
+            extendableNodes.length,
+          )}; remaining nodes will extend up to --max-price)`;
+        } else {
+          confirmationMessage += ` for ~$${totalEstimate.toFixed(2)}`;
+        }
       } else {
         confirmationMessage = chalk.red(
           "No nodes available matching your requirements. This is likely due to insufficient capacity. Attempt to extend anyway",
