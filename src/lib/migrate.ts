@@ -22,9 +22,9 @@ Docs:  ${MIGRATION_GUIDE_URL}
 Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
 
   console.log(
-    boxen(chalk.cyan(message), {
+    boxen(chalk.yellow(message), {
       padding: 1,
-      borderColor: "cyan",
+      borderColor: "yellow",
       borderStyle: "round",
     }),
   );
