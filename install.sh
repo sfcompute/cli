@@ -4,23 +4,14 @@ set -e # Exit on any error
 
 # Define the GitHub repository and the name of the binary.
 GITHUB_REPO="sfcompute/cli"
-# Allow the caller to override the binary name / install dir so an in-place
-# upgrade lands wherever the existing binary actually lives (e.g. `sf-old`,
-# or an `sf` that's not under ~/.local/bin). The TS CLI sets these from
-# process.execPath when it shells out to this script.
-BINARY_NAME="${SF_CLI_BINARY_NAME:-sf}"
+BINARY_NAME="sf"
 
 # Check the operating system
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 
-if [ -n "${SF_CLI_TARGET_DIR}" ]; then
-  TARGET_DIR="${SF_CLI_TARGET_DIR}"
-  TARGET_DIR_UNEXPANDED="${SF_CLI_TARGET_DIR}"
-else
-  TARGET_DIR_UNEXPANDED="\${HOME}/.local/bin"
-  TARGET_DIR="${HOME}/.local/bin"
-fi
+TARGET_DIR_UNEXPANDED="\${HOME}/.local/bin"
+TARGET_DIR="${HOME}/.local/bin"
 
 # Function to check if a command exists
 command_exists() {
@@ -138,13 +129,6 @@ rm -rf "${TMPDIR}" || { echo "Failed to clean up temporary directory"; exit 1; }
 if [ -f "${TARGET_FILE}" ]; then
     echo "Successfully installed '${BINARY_NAME}' CLI."
     echo "The binary is located at '${TARGET_FILE}'."
-
-    # In-place upgrades (TARGET_DIR overridden by the caller) skip the PATH
-    # onboarding nudge — the user is already running the binary, so they
-    # obviously have it on PATH.
-    if [ -n "${SF_CLI_TARGET_DIR}" ]; then
-      exit 0
-    fi
 
     # Provide instructions for adding the target directory to the PATH.
     printf "\033[0;32m\\n"
