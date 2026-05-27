@@ -5,6 +5,7 @@ import type { Command } from "@commander-js/extra-typings";
 import boxen from "boxen";
 import chalk from "chalk";
 import ora from "ora";
+import { loadConfig, saveConfig } from "../helpers/config.ts";
 
 const NEW_CLI_INSTALL_URL = "https://cli.sfcompute.com";
 const MIGRATION_GUIDE_URL = "https://sfcompute.com/migrate";
@@ -97,6 +98,15 @@ export function registerMigrate(program: Command) {
           console.error(chalk.red("\nMigration failed."));
           process.exit(1);
         }
+      }
+
+      // Persist a flag so future `sf-old` invocations don't nag the user with
+      // the migration banner.
+      try {
+        const config = await loadConfig();
+        await saveConfig({ ...config, migrated_to_rust_cli: true });
+      } catch {
+        // Best-effort: a failure here just means the banner keeps showing.
       }
 
       console.log(

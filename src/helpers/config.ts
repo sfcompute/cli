@@ -11,6 +11,7 @@ export interface Config {
   webapp_url: string;
   auth_token?: string;
   account_id?: string;
+  migrated_to_rust_cli?: boolean;
 }
 
 const ProductionConfigDefaults = {
