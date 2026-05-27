@@ -53,40 +53,50 @@ export function registerMigrate(program: Command) {
 
       console.log(chalk.cyan("\nInstalling the new Rust sf CLI...\n"));
 
-      const bashProcess = spawn("bash", [], {
-        stdio: ["pipe", "inherit", "inherit"],
-        env: process.env,
-      });
+      if (process.env.IS_DEVELOPMENT_CLI_ENV) {
+        console.log(
+          chalk.yellow(
+            "[dev] Skipping install script execution (IS_DEVELOPMENT_CLI_ENV).\n",
+          ),
+        );
+      } else {
+        const bashProcess = spawn("bash", [], {
+          stdio: ["pipe", "inherit", "inherit"],
+          env: process.env,
+        });
 
-      // Without an error listener, spawn failures (ENOENT/EACCES on bash) emit
-      // an unhandled 'error' event and crash the CLI instead of exiting cleanly.
-      const spawnError = new Promise<Error>((resolve) => {
-        bashProcess.once("error", resolve);
-      });
+        // Without an error listener, spawn failures (ENOENT/EACCES on bash) emit
+        // an unhandled 'error' event and crash the CLI instead of exiting cleanly.
+        const spawnError = new Promise<Error>((resolve) => {
+          bashProcess.once("error", resolve);
+        });
 
-      try {
-        bashProcess.stdin.write(script);
-        bashProcess.stdin.end();
-      } catch {
-        // If stdin is already torn down (e.g. spawn failed synchronously), the
-        // 'error' event handler below will surface the real reason.
-      }
+        try {
+          bashProcess.stdin.write(script);
+          bashProcess.stdin.end();
+        } catch {
+          // If stdin is already torn down (e.g. spawn failed synchronously), the
+          // 'error' event handler below will surface the real reason.
+        }
 
-      const result = await Promise.race([
-        new Promise<{ kind: "close"; code: number | null }>((resolve) => {
-          bashProcess.once("close", (code) => resolve({ kind: "close", code }));
-        }),
-        spawnError.then((err) => ({ kind: "error" as const, err })),
-      ]);
+        const result = await Promise.race([
+          new Promise<{ kind: "close"; code: number | null }>((resolve) => {
+            bashProcess.once("close", (code) =>
+              resolve({ kind: "close", code }),
+            );
+          }),
+          spawnError.then((err) => ({ kind: "error" as const, err })),
+        ]);
 
-      if (result.kind === "error") {
-        console.error(chalk.red(`Failed to run bash: ${result.err.message}`));
-        process.exit(1);
-      }
+        if (result.kind === "error") {
+          console.error(chalk.red(`Failed to run bash: ${result.err.message}`));
+          process.exit(1);
+        }
 
-      if (result.code !== 0) {
-        console.error(chalk.red("\nMigration failed."));
-        process.exit(1);
+        if (result.code !== 0) {
+          console.error(chalk.red("\nMigration failed."));
+          process.exit(1);
+        }
       }
 
       console.log(
