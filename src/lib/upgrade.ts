@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import * as console from "node:console";
-import { basename, dirname } from "node:path";
 import process from "node:process";
 import type { Command } from "@commander-js/extra-typings";
 import ora from "ora";
@@ -71,18 +70,9 @@ export async function handleUpgrade(
   // Execute the script with bash
   spinner.start("Installing upgrade");
 
-  // Tell the install script to write back to this exact binary's path. Without
-  // this, the installer hardcodes ~/.local/bin/sf — which would clobber the
-  // Rust `sf` if we're running as `sf-old`, and would silently drop a
-  // duplicate copy when `sf` is installed somewhere else (e.g. /usr/local/bin).
   const bashProcess = spawn("bash", [], {
     stdio: ["pipe", "pipe", "pipe"],
-    env: {
-      ...process.env,
-      ...(version ? { SF_CLI_VERSION: version } : {}),
-      SF_CLI_TARGET_DIR: dirname(process.execPath),
-      SF_CLI_BINARY_NAME: basename(process.execPath),
-    },
+    env: version ? { ...process.env, SF_CLI_VERSION: version } : process.env,
   });
 
   let stdout = "";
