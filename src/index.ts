@@ -22,6 +22,7 @@ import { registerDev } from "./lib/dev.ts";
 import { registerImages } from "./lib/images/index.ts";
 import { registerLogin } from "./lib/login.ts";
 import { registerMe } from "./lib/me.ts";
+import { registerMigrate, showMigrateBanner } from "./lib/migrate.ts";
 import { registerNodes } from "./lib/nodes/index.ts";
 import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerScale } from "./lib/scale/index.tsx";
@@ -33,8 +34,34 @@ import { registerZones } from "./lib/zones.tsx";
 async function main() {
   const program = new Command();
 
+  // `sf migrate` replaces this binary outright, so auto-upgrading the legacy
+  // CLI first would be wasted work — and worse, the install scripts target
+  // the same `~/.local/bin/sf` path, so racing them risks clobbering the new
+  // Rust binary the user is about to install.
+  if (process.argv[2] === "migrate") {
+    process.env.SF_CLI_DISABLE_AUTO_UPGRADE = "1";
+  }
+
   if (!process.argv.includes("--json")) {
-    await Promise.all([checkVersion(), getAppBanner()]);
+    const [shownUpgradeBanner] = await Promise.all([
+      checkVersion(),
+      getAppBanner(),
+    ]);
+    // If the user is already on the latest version of the legacy CLI, nudge
+    // them toward the new Rust CLI instead of showing nothing. We avoid
+    // double-stacking with the upgrade banner since users on outdated builds
+    // need to upgrade before migrating, and skip the banner for the
+    // `upgrade` / `migrate` commands themselves (where it'd just be noise)
+    // and for users who've opted out via SF_CLI_DISABLE_MIGRATE_BANNER.
+    const subcommand = process.argv[2];
+    if (
+      !shownUpgradeBanner &&
+      subcommand !== "migrate" &&
+      subcommand !== "upgrade" &&
+      !process.env.SF_CLI_DISABLE_MIGRATE_BANNER
+    ) {
+      showMigrateBanner();
+    }
   }
 
   program
@@ -63,6 +90,7 @@ async function main() {
   registerBalance(program);
   registerTokens(program);
   registerUpgrade(program);
+  registerMigrate(program);
   await registerScale(program);
   registerMe(program);
   await registerVM(program);

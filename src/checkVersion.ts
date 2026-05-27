@@ -93,30 +93,35 @@ async function checkProductionCLIVersion() {
   }
 }
 
-export async function checkVersion() {
+/**
+ * Returns true if an upgrade banner was shown (or an auto-upgrade was
+ * performed), false otherwise. Callers can use this to decide whether to
+ * show a different banner instead.
+ */
+export async function checkVersion(): Promise<boolean> {
   // Disable auto-upgrade if env var is set
   if (process.env.SF_CLI_DISABLE_AUTO_UPGRADE) {
-    return;
+    return false;
   }
 
   // Skip version check if running upgrade command
   const args = process.argv.slice(2);
-  if (args[0] === "upgrade") return;
+  if (args[0] === "upgrade") return false;
 
   const version = pkg.version;
   const latestVersion = await checkProductionCLIVersion();
 
-  if (!latestVersion) return;
+  if (!latestVersion) return false;
 
-  if (version === latestVersion) return;
+  if (version === latestVersion) return false;
 
   // Don't upgrade from stable to prerelease
   const currentIsStable = !semver.prerelease(version);
   const latestIsPrerelease = semver.prerelease(latestVersion);
-  if (currentIsStable && latestIsPrerelease) return;
+  if (currentIsStable && latestIsPrerelease) return false;
 
   const isOutdated = semver.lt(version, latestVersion);
-  if (!isOutdated) return;
+  if (!isOutdated) return false;
 
   // Only auto-upgrade for patch changes and when not going to a prerelease
   const isPatchUpdate = semver.diff(version, latestVersion) === "patch";
@@ -149,6 +154,7 @@ export async function checkVersion() {
     } catch {
       // Silent error, just run the command the user wanted to run
     }
+    return true;
   } else if (!latestIsPrerelease) {
     // Only show update message for non-prerelease versions
     const message = `
@@ -166,5 +172,8 @@ Run 'sf upgrade' to update to the latest version
         borderStyle: "round",
       }),
     );
+    return true;
   }
+
+  return false;
 }
