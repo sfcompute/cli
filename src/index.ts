@@ -42,6 +42,10 @@ async function main() {
     process.env.SF_CLI_DISABLE_AUTO_UPGRADE = "1";
   }
 
+  // Load config early so the migration banner can honor the persisted
+  // `migrated_to_rust_cli` flag written by a successful `sf migrate`.
+  const config = await loadConfig();
+
   if (!process.argv.includes("--json")) {
     const [shownUpgradeBanner] = await Promise.all([
       checkVersion(),
@@ -51,14 +55,16 @@ async function main() {
     // them toward the new Rust CLI instead of showing nothing. We avoid
     // double-stacking with the upgrade banner since users on outdated builds
     // need to upgrade before migrating, and skip the banner for the
-    // `upgrade` / `migrate` commands themselves (where it'd just be noise)
-    // and for users who've opted out via SF_CLI_DISABLE_MIGRATE_BANNER.
+    // `upgrade` / `migrate` commands themselves (where it'd just be noise),
+    // for users who've opted out via SF_CLI_DISABLE_MIGRATE_BANNER, and for
+    // users who've already migrated (the flag is set by `sf migrate`).
     const subcommand = process.argv[2];
     if (
       !shownUpgradeBanner &&
       subcommand !== "migrate" &&
       subcommand !== "upgrade" &&
-      !process.env.SF_CLI_DISABLE_MIGRATE_BANNER
+      !process.env.SF_CLI_DISABLE_MIGRATE_BANNER &&
+      !config.migrated_to_rust_cli
     ) {
       showMigrateBanner();
     }
@@ -73,7 +79,6 @@ async function main() {
   // surfaces (e.g. `--enable-infiniband` on `sf nodes create`) resolve
   // correctly on the very first CLI invocation after login, rather than only
   // appearing after the cache has been seeded by a previous run.
-  const config = await loadConfig();
   let exchangeAccountId = config.account_id;
   if (!exchangeAccountId) {
     const client = await apiClient(config.auth_token);
