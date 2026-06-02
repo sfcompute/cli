@@ -27,6 +27,7 @@ import { registerNodes } from "./lib/nodes/index.ts";
 import { analytics, IS_TRACKING_DISABLED } from "./lib/posthog.ts";
 import { registerScale } from "./lib/scale/index.tsx";
 import { registerTokens } from "./lib/tokens.ts";
+import { registerUninstall } from "./lib/uninstall.ts";
 import { registerUpgrade } from "./lib/upgrade.ts";
 import { registerVM } from "./lib/vm/index.ts";
 import { registerZones } from "./lib/zones.tsx";
@@ -95,6 +96,7 @@ async function main() {
   registerBalance(program);
   registerTokens(program);
   registerUpgrade(program);
+  registerUninstall(program);
   registerMigrate(program);
   await registerScale(program);
   registerMe(program);
