@@ -14,6 +14,7 @@ import {
 import { apiClient } from "../../apiClient.ts";
 import { logAndQuit } from "../../helpers/errors.ts";
 import ConfirmInput from "../ConfirmInput.tsx";
+import { GPUS_PER_NODE } from "../constants.ts";
 import ConfirmationMessage from "./ConfirmationMessage.tsx";
 import ProcurementDisplay, {
   ProcurementHeader,
@@ -150,6 +151,13 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
   const [displayedPricePerGpuHourInCents, setDisplayedPricePerGpuHourInCents] =
     useState<number>();
 
+  // `props.price` is the user-supplied limit price in cents per node-hour.
+  // The API and procurement records track cents per GPU-hour, so convert here.
+  const pricePerGpuHourInCents = useMemo(
+    () => (props.price === undefined ? undefined : props.price / GPUS_PER_NODE),
+    [props.price],
+  );
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally runs only on mount. We read props inside the effect but don't want to re-run when they change.
   useEffect(() => {
     (async function onInit() {
@@ -186,7 +194,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
         }
 
         setProcurements(settledResults);
-        setDisplayedPricePerGpuHourInCents(props.price);
+        setDisplayedPricePerGpuHourInCents(pricePerGpuHourInCents);
 
         if (props.yes) {
           await updateProcurements(
@@ -194,7 +202,7 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
             {
               horizonMinutes: props.horizon,
               nodesRequired,
-              pricePerGpuHourInCents: props.price,
+              pricePerGpuHourInCents,
             },
           );
         } else {
@@ -216,9 +224,10 @@ function UpdateProcurementCommand(props: UpdateProcurementCommandProps) {
                         props.horizon === p.horizon ? undefined : props.horizon
                       }
                       pricePerGpuHourInCents={
-                        props.price === p.buy_limit_price_per_gpu_hour
+                        pricePerGpuHourInCents ===
+                        p.buy_limit_price_per_gpu_hour
                           ? undefined
-                          : props.price
+                          : pricePerGpuHourInCents
                       }
                       accelerators={
                         props.accelerators !== undefined &&
@@ -381,8 +390,8 @@ $ sf scale update <procurement_id...> -n 16
 \x1b[2m# Disable procurements (scale to 0 GPUs)\x1b[0m
 $ sf scale update <procurement_id...> -n 0
 
-\x1b[2m# Update the limit price of procurements to $1.50/GPU/hr\x1b[0m
-$ sf scale update <procurement_id...> -p 1.50
+\x1b[2m# Update the limit price of procurements to $12.00/node/hr\x1b[0m
+$ sf scale update <procurement_id...> -p 12.00
 `,
   )
   .configureHelp({
@@ -407,7 +416,7 @@ $ sf scale update <procurement_id...> -p 1.50
   )
   .option(
     "-p, --price <price>",
-    "Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $2.65 if we can't get a price estimate.",
+    "Limit price per node per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or $21.20 if we can't get a price estimate.",
     parsePriceArg,
   )
   .option("-y, --yes", "Automatically confirm the command.")

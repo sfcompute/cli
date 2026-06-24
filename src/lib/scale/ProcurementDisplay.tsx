@@ -48,7 +48,7 @@ export default function ProcurementDisplay({
 }) {
   const horizonMinutes = horizon;
   const quantity = desired_quantity * GPUS_PER_NODE;
-  const pricePerGpuHourInCents = buy_limit_price_per_gpu_hour;
+  const pricePerNodeHourInCents = buy_limit_price_per_gpu_hour * GPUS_PER_NODE;
   const isSupportedType = instance_type in InstanceTypeMetadata;
   const typeLabel = isSupportedType
     ? InstanceTypeMetadata[instance_type].displayName
@@ -75,7 +75,7 @@ export default function ProcurementDisplay({
         <Row
           headWidth={15}
           head="Limit Price"
-          value={`$${(pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr`}
+          value={`$${(pricePerNodeHourInCents / 100).toFixed(2)}/node/hr`}
         />
         <Row
           headWidth={15}

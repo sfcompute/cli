@@ -23,6 +23,15 @@ export function getPricePerGpuHourFromQuote(
   return quote.price / GPUS_PER_NODE / quote.quantity / durationHours;
 }
 
+export function getPricePerNodeHourFromQuote(
+  quote: Pick<NonNullable<Quote>, "start_at" | "end_at" | "price" | "quantity">,
+) {
+  // A node is GPUS_PER_NODE GPUs, so the per-node-hour rate is simply the
+  // per-GPU-hour rate multiplied by GPUS_PER_NODE (equivalently: skip the
+  // division by GPUS_PER_NODE that getPricePerGpuHourFromQuote performs).
+  return getPricePerGpuHourFromQuote(quote) * GPUS_PER_NODE;
+}
+
 export async function getQuote(options: {
   instanceType?: string;
   quantity: number;

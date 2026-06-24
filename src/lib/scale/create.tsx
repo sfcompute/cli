@@ -43,8 +43,8 @@ function ScaleWarning(props: CreateProcurementCommandProps) {
     equivalentCommand += ` -z ${clusterName}`;
   }
   if (props.price) {
-    // Convert from cents per GPU/hr to dollars per node/hr
-    const pricePerNodeHour = (props.price * GPUS_PER_NODE) / 100;
+    // `props.price` is already cents per node/hr; convert to dollars per node/hr.
+    const pricePerNodeHour = props.price / 100;
     equivalentCommand += ` -p ${pricePerNodeHour.toFixed(2)}`;
   }
   if (props.yes) {
@@ -167,7 +167,10 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
   useEffect(() => {
     (async function init() {
       try {
-        let limitPricePerGpuHourInCents = props.price;
+        // `props.price` is the user-supplied limit price in cents per node-hour.
+        // The API expects cents per GPU-hour, so convert here.
+        let limitPricePerGpuHourInCents =
+          props.price === undefined ? undefined : props.price / GPUS_PER_NODE;
         // Get quote if price not specified and not skipping confirmation
         if (!props.yes && limitPricePerGpuHourInCents === undefined) {
           const quoteMinutes = Math.max(MIN_CONTRACT_MINUTES, props.horizon);
@@ -272,7 +275,7 @@ function CreateProcurementCommand(props: CreateProcurementCommandProps) {
     }
 
     if (displayedPricePerGpuHourInCents === undefined) {
-      logAndQuit("Price per GPU hour could not be determined.");
+      logAndQuit("Price per node hour could not be determined.");
     }
 
     createProcurement({
@@ -378,8 +381,8 @@ Examples:
 \x1b[2m# Create a new procurement for 8 GPUs\x1b[0m
 $ sf scale create -n 8
 
-\x1b[2m# Maintain 32 GPUs, but only while the price is <= $1.50/GPU/hr\x1b[0m
-$ sf scale create -n 32 -p 1.50
+\x1b[2m# Maintain 32 GPUs, but only while the price is <= $12.00/node/hr\x1b[0m
+$ sf scale create -n 32 -p 12.00
 
 \x1b[2m# Maintain 8 GPUs, start buying the next reservation when there's 30 minutes left\x1b[0m
 $ sf scale create -n 8 --horizon '30m'
@@ -428,8 +431,8 @@ $ sf scale create -n 8 --horizon '30m'
   )
   .option(
     "-p, --price <price>",
-    `Limit price per GPU per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${(
-      DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS / 100
+    `Limit price per node per hour, in dollars. Buy compute only if it's at most this price. Defaults to the current market price times 1.5, or ${(
+      (DEFAULT_PRICE_PER_GPU_HOUR_IN_CENTS * GPUS_PER_NODE) / 100
     ).toFixed(2)} if we can't get a price estimate.`,
     parsePriceArg,
   )

@@ -103,7 +103,7 @@ async function setNodesAction(
         console.log(
           `  • ${result.name}: Max price set to $${result.maxPrice.toFixed(
             2,
-          )}/GPU/hr`,
+          )}/node/hr`,
         );
       }
     }

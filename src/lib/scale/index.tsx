@@ -43,8 +43,8 @@ $ sf scale update <procurement-id...> -n 16
 \x1b[2m# Turn off procurements by scaling to 0\x1b[0m
 $ sf scale update <procurement-id...> -n 0
 
-\x1b[2m# Update the limit price of procurements to $1.50/GPU/hr\x1b[0m
-$ sf scale update <procurement-id...> -p 1.50
+\x1b[2m# Update the limit price of procurements to $12.00/node/hr\x1b[0m
+$ sf scale update <procurement-id...> -p 12.00
 
 \x1b[2m# Start reserving more time 30 minutes before GPUs expire\x1b[0m
 $ sf scale update <procurement-id...> --horizon '30m'

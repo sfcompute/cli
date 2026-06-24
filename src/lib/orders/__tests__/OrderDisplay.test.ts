@@ -1,5 +1,4 @@
 import { expect, test } from "vitest";
-import { GPUS_PER_NODE } from "../../constants.ts";
 import { orderDetails } from "../OrderDisplay.tsx";
 import type { HydratedOrder } from "../types.ts";
 import { OrderStatus } from "../types.ts";
@@ -25,11 +24,11 @@ const baseOrder: HydratedOrder = {
   status: OrderStatus.Open,
 };
 
-test("orderDetails - calculates price per GPU hour correctly", () => {
+test("orderDetails - calculates price per node hour correctly", () => {
   const result = orderDetails(baseOrder);
-  // $100 / (1 quantity * 1 hour * GPUS_PER_NODE)
-  const expectedPricePerGPUHour = 100 / (1 * 1 * GPUS_PER_NODE);
-  expect(result.pricePerGPUHour).toEqual(expectedPricePerGPUHour);
+  // $100 / (1 quantity * 1 hour)
+  const expectedPricePerNodeHour = 100 / (1 * 1);
+  expect(result.pricePerNodeHour).toEqual(expectedPricePerNodeHour);
 });
 
 test("orderDetails - handles zero duration by using 1 hour minimum", () => {
@@ -39,24 +38,24 @@ test("orderDetails - handles zero duration by using 1 hour minimum", () => {
     end_at: "2024-02-20T00:00:00Z",
   };
   const result = orderDetails(zeroOrder);
-  const expectedPricePerGPUHour = 100 / (1 * 1 * GPUS_PER_NODE);
-  expect(result.pricePerGPUHour).toEqual(expectedPricePerGPUHour);
+  const expectedPricePerNodeHour = 100 / (1 * 1);
+  expect(result.pricePerNodeHour).toEqual(expectedPricePerNodeHour);
 });
 
-test("orderDetails - calculates executed price per GPU hour when available", () => {
+test("orderDetails - calculates executed price per node hour when available", () => {
   const executedOrder = {
     ...baseOrder,
     executed: true,
     execution_price: 8000, // 80 USD in cents
   };
   const result = orderDetails(executedOrder);
-  const expectedExecutedPrice = 80 / (1 * 1 * GPUS_PER_NODE);
-  expect(result.executedPriceDollarsPerGPUHour).toEqual(expectedExecutedPrice);
+  const expectedExecutedPrice = 80 / (1 * 1);
+  expect(result.executedPriceDollarsPerNodeHour).toEqual(expectedExecutedPrice);
 });
 
-test("orderDetails - returns undefined for executedPriceDollarsPerGPUHour when no execution price", () => {
+test("orderDetails - returns undefined for executedPriceDollarsPerNodeHour when no execution price", () => {
   const result = orderDetails(baseOrder);
-  expect(result.executedPriceDollarsPerGPUHour).toBeUndefined();
+  expect(result.executedPriceDollarsPerNodeHour).toBeUndefined();
 });
 
 test("orderDetails - formats duration correctly", () => {
@@ -71,7 +70,7 @@ test("orderDetails - handles multiple nodes and longer duration", () => {
     end_at: "2024-02-20T03:00:00Z", // 3 hours duration
   };
   const result = orderDetails(multiNodeOrder);
-  // $100 / (2 quantity * 3 hours * GPUS_PER_NODE)
-  const expectedPricePerGPUHour = 100 / (2 * 3 * GPUS_PER_NODE);
-  expect(result.pricePerGPUHour).toEqual(expectedPricePerGPUHour);
+  // $100 / (2 quantity * 3 hours)
+  const expectedPricePerNodeHour = 100 / (2 * 3);
+  expect(result.pricePerNodeHour).toEqual(expectedPricePerNodeHour);
 });

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GPUS_PER_NODE } from "../../lib/constants.ts";
-import { getPricePerGpuHourFromQuote } from "../quote.ts";
+import { getPricePerNodeHourFromQuote } from "../quote.ts";
 
 function makeQuote(opts: {
   priceCents: number;
@@ -17,22 +16,20 @@ function makeQuote(opts: {
   };
 }
 
-function pricePerNodeHourFromQuote(
-  quote: ReturnType<typeof makeQuote>,
-): number {
-  const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-  return (pricePerGpuHour * GPUS_PER_NODE) / 100;
+function pricePerNodeHourDollars(quote: ReturnType<typeof makeQuote>): number {
+  // getPricePerNodeHourFromQuote returns cents per node-hour.
+  return getPricePerNodeHourFromQuote(quote) / 100;
 }
 
-describe("getPricePerGpuHourFromQuote", () => {
-  it("returns correct per-GPU-hour price for a single node", () => {
+describe("getPricePerNodeHourFromQuote", () => {
+  it("returns correct per-node-hour price for a single node", () => {
     // 1 node, 4 hours, $12/node/hr = $48 total = 4800 cents
     const quote = makeQuote({
       priceCents: 4800,
       quantity: 1,
       durationHours: 4,
     });
-    const pricePerNodeHour = pricePerNodeHourFromQuote(quote);
+    const pricePerNodeHour = pricePerNodeHourDollars(quote);
     expect(pricePerNodeHour).toBeCloseTo(12.0);
   });
 
@@ -43,7 +40,7 @@ describe("getPricePerGpuHourFromQuote", () => {
       quantity: 8,
       durationHours: 4,
     });
-    const pricePerNodeHour = pricePerNodeHourFromQuote(quote);
+    const pricePerNodeHour = pricePerNodeHourDollars(quote);
     expect(pricePerNodeHour).toBeCloseTo(12.0);
   });
 });
@@ -60,8 +57,7 @@ describe("multi-node total price calculation (extend confirmation)", () => {
     );
 
     const totalPricePerHour = quotes.reduce((acc, quote) => {
-      const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-      const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
+      const pricePerNodeHour = getPricePerNodeHourFromQuote(quote) / 100;
       return acc + pricePerNodeHour;
     }, 0);
     const totalEstimate = totalPricePerHour * requestedDurationHours;
@@ -81,8 +77,7 @@ describe("multi-node total price calculation (extend confirmation)", () => {
     );
 
     const totalPricePerHour = quotes.reduce((acc, quote) => {
-      const pricePerGpuHour = getPricePerGpuHourFromQuote(quote);
-      const pricePerNodeHour = (pricePerGpuHour * GPUS_PER_NODE) / 100;
+      const pricePerNodeHour = getPricePerNodeHourFromQuote(quote) / 100;
       return acc + pricePerNodeHour;
     }, 0);
     const totalEstimate = totalPricePerHour * requestedDurationHours;

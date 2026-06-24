@@ -1,6 +1,7 @@
 import { Box, Text } from "ink";
 import { formatDuration } from "../../helpers/format-time.ts";
 import { InstanceTypeMetadata } from "../../helpers/instance-types-meta.ts";
+import { GPUS_PER_NODE } from "../constants.ts";
 import { Row } from "../Row.tsx";
 
 import {
@@ -68,7 +69,11 @@ export default function ConfirmationMessage(props: {
           props.pricePerGpuHourInCents !== undefined ? (
             <Box gap={1} minWidth={30} justifyContent="space-between">
               <Text>
-                ${(props.pricePerGpuHourInCents / 100).toFixed(2)}/gpu/hr
+                $
+                {((props.pricePerGpuHourInCents * GPUS_PER_NODE) / 100).toFixed(
+                  2,
+                )}
+                /node/hr
               </Text>
               {props.quote && <Text dimColor>(1.5x market)</Text>}
             </Box>

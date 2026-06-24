@@ -10,21 +10,21 @@ import type { HydratedOrder } from "./types.ts";
 export function orderDetails(order: HydratedOrder) {
   const duration = dayjs(order.end_at).diff(order.start_at);
   const durationInHours = duration === 0 ? 1 : duration / 1000 / 60 / 60;
-  const pricePerGPUHour =
-    order.price / (order.quantity * durationInHours * GPUS_PER_NODE) / 100;
+  const pricePerNodeHour =
+    order.price / (order.quantity * durationInHours) / 100;
   const durationFormatted = formatDuration(duration);
 
-  const executedPriceDollarsPerGPUHour =
+  const executedPriceDollarsPerNodeHour =
     typeof order.execution_price === "number"
       ? order.execution_price / // cents
-        (order.quantity * GPUS_PER_NODE * durationInHours) / // cents per gpu-hour
-        100 // dollars per gpu-hour
+        (order.quantity * durationInHours) / // cents per node-hour
+        100 // dollars per node-hour
       : undefined;
 
   return {
-    pricePerGPUHour,
+    pricePerNodeHour,
     durationFormatted,
-    executedPriceDollarsPerGPUHour,
+    executedPriceDollarsPerNodeHour,
   };
 }
 
@@ -32,7 +32,7 @@ const formatDateTime = (date: string) =>
   dayjs(date).format("MMM D h:mm a").toLowerCase();
 
 function Order(props: { order: HydratedOrder }) {
-  const { pricePerGPUHour, durationFormatted } = orderDetails(props.order);
+  const { pricePerNodeHour, durationFormatted } = orderDetails(props.order);
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -55,7 +55,7 @@ function Order(props: { order: HydratedOrder }) {
       <Row
         headWidth={7}
         head="price"
-        value={`$${pricePerGPUHour.toFixed(2)}/gpu/hr`}
+        value={`$${pricePerNodeHour.toFixed(2)}/node/hr`}
       />
       <Row headWidth={7} head="time" value={durationFormatted} />
       <Row
@@ -81,8 +81,11 @@ function OrderMinimal(props: {
   order: HydratedOrder;
   activeTab: "all" | "sell" | "buy";
 }) {
-  const { pricePerGPUHour, durationFormatted, executedPriceDollarsPerGPUHour } =
-    orderDetails(props.order);
+  const {
+    pricePerNodeHour,
+    durationFormatted,
+    executedPriceDollarsPerNodeHour,
+  } = orderDetails(props.order);
 
   return (
     <Box gap={1}>
@@ -93,20 +96,20 @@ function OrderMinimal(props: {
       </Box>
 
       <Box width={18}>
-        {executedPriceDollarsPerGPUHour &&
-        executedPriceDollarsPerGPUHour.toFixed(2) !==
-          pricePerGPUHour.toFixed(2) ? (
+        {executedPriceDollarsPerNodeHour &&
+        executedPriceDollarsPerNodeHour.toFixed(2) !==
+          pricePerNodeHour.toFixed(2) ? (
           <>
             <Text strikethrough dimColor>
-              ${pricePerGPUHour.toFixed(2)}
-              <Text dimColor>/gpu/hr</Text>
+              ${pricePerNodeHour.toFixed(2)}
+              <Text dimColor>/node/hr</Text>
             </Text>
-            <Text>${executedPriceDollarsPerGPUHour.toFixed(2)}</Text>
+            <Text>${executedPriceDollarsPerNodeHour.toFixed(2)}</Text>
           </>
         ) : (
           <Text>
-            ${pricePerGPUHour.toFixed(2)}
-            <Text dimColor>/gpu/hr</Text>
+            ${pricePerNodeHour.toFixed(2)}
+            <Text dimColor>/node/hr</Text>
           </Text>
         )}
       </Box>
