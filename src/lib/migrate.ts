@@ -11,22 +11,22 @@ const NEW_CLI_INSTALL_URL = "https://cli.sfcompute.com";
 const MIGRATION_GUIDE_URL = "https://sfcompute.com/migrate";
 
 export function showMigrateBanner() {
-  const message = `We've rewritten the sf CLI in Rust.
+  const message = `This CLI is deprecated and no longer maintained.
 
-List idle capacity on the orderbook to
-recoup up to 20% of your spend.
-
-Run 'sf migrate' to switch. Your current
-CLI stays as 'sf-old'.
+The sf CLI has been rewritten in Rust. Run
+'sf migrate' to switch. Your current CLI
+stays available as 'sf-old'.
 
 Docs:  ${MIGRATION_GUIDE_URL}
 Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
 
   console.log(
-    boxen(chalk.yellow(message), {
+    boxen(chalk.red(message), {
       padding: 1,
-      borderColor: "yellow",
+      borderColor: "red",
       borderStyle: "round",
+      title: "Deprecated",
+      titleAlignment: "center",
     }),
   );
 }
