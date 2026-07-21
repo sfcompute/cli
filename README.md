@@ -4,8 +4,7 @@
 > **This repository is deprecated and no longer maintained.**
 >
 > The San Francisco Compute `sf` CLI has been rewritten in Rust. If you have
-> this legacy CLI installed, run `sf migrate` to switch — your current CLI will
-> remain available as `sf-old`.
+> this legacy CLI installed, run `sf migrate` to switch.
 >
 > - Install the current CLI: <https://cli.sfcompute.com>
 > - Migration guide: <https://sfcompute.com/migrate>
