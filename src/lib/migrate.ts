@@ -14,8 +14,7 @@ export function showMigrateBanner() {
   const message = `This CLI is deprecated and no longer maintained.
 
 The sf CLI has been rewritten in Rust. Run
-'sf migrate' to switch. Your current CLI
-stays available as 'sf-old'.
+'sf migrate' to switch.
 
 Docs:  ${MIGRATION_GUIDE_URL}
 Hide:  SF_CLI_DISABLE_MIGRATE_BANNER=1`;
